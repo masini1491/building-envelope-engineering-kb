@@ -86,7 +86,7 @@ Locking points 主要可能承擔 wind restraint 與 sash sealing / closing func
 
 `lock connection strength PASS` 仍不等於 closing / sealing function 已驗證。
 
-## Friction stay／restrictor 特定注意事項
+## 摩擦撐／限位器（Friction stay／restrictor）特定注意事項
 
 Friction stay / restrictor 除 pressure reaction 外還可能有：
 
