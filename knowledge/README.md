@@ -11,7 +11,7 @@
 - `sealants/`：structural silicone、weatherseal 與接縫設計
 - `gaskets/`：EPDM / dense / cellular / silicone gasket 等
 - `fasteners/`：螺絲、螺栓、property class、設計與耐蝕
-- `anchors/`：cast-in / post-installed anchor 與設計標準分流
+- `anchors/`：anchor standard routing、cast-in embedded plate、post-installed mechanical anchor；不同 anchor family 的 qualification / design / installation 不得混用
 - `finishes/`：烤漆、陽極處理等
 - `corrosion-protection/`：熱浸鍍鋅與其他防蝕
 - `structural-design/`：耐風、耐震、荷載生成、直料／橫料、多件擠型共同作用、continuous mullion / splice / sleeve、雙軸彎曲、glass-edge relative displacement、fastener group、screw pull-out / thread engagement、局部擠型、焊道群、anchor、design-factor / hidden-multiplier audit、structural review / failure-mode coverage，以及 `preliminary-sizing/` 前期 required section property / support / traceability 方法
@@ -49,6 +49,14 @@
 - `structural-design/connections/screw-pullout-and-thread-engagement.md`
 - `structural-design/connections/local-extrusion-failure.md`
 - `structural-design/connections/weld-group-analysis.md`
+
+### 預埋件／錨栓（Anchors）
+
+- `anchors/anchor-standards-baseline.md`：anchor family / governing-standard canonical routing
+- `anchors/cast-in-embedded-plate-design.md`：預埋鋼板、headed stud、deformed / hooked bar、plate / weld / concrete failure-mode coverage
+- `anchors/post-installed-mechanical-anchor.md`：後置式機械／膨脹錨栓 qualification、產品資料、anchor-group、concrete / steel failure、installation / software review
+
+Anchor review 應明確區分 **qualification**、**design**、**installation / inspection** 與外側 bracket / plate / weld / bolt load path。Mechanical anchor、adhesive anchor、cast-in anchor 不能只因 failure-mode 名稱相似就共用公式、factor 或 product evidence。
 
 ### 外牆耐震構件／連接／位移
 
