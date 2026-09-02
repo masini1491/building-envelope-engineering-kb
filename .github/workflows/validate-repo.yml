@@ -1,4 +1,4 @@
-name: Validate repository
+name: Repository 自動驗證
 
 on:
   push:
@@ -10,18 +10,19 @@ permissions:
 
 jobs:
   validate:
+    name: 驗證知識庫完整性
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Python
+      - name: 設定 Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
 
-      - name: Install validator dependency
+      - name: 安裝 validator dependency
         run: python -m pip install --disable-pip-version-check jsonschema
 
-      - name: Validate repository
+      - name: 執行 repository 驗證
         run: python scripts/validate_repo.py
