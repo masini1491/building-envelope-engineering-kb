@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/building-envelope-engineering-kb/material.schema.json",
+  "title": "Engineering Material",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "name", "status"],
+  "properties": {
+    "id": {"type": "string", "minLength": 1},
+    "name": {"type": "string", "minLength": 1},
+    "alloy_temper": {"type": ["string", "null"]},
+    "material_group": {"type": ["string", "null"]},
+    "E_mpa": {"type": ["number", "null"], "exclusiveMinimum": 0},
+    "Fu_mpa": {"type": ["number", "null"], "exclusiveMinimum": 0},
+    "Fy_mpa": {"type": ["number", "null"], "exclusiveMinimum": 0},
+    "allowable_bending_x_mpa": {"type": ["number", "null"], "exclusiveMinimum": 0},
+    "allowable_bending_y_mpa": {"type": ["number", "null"], "exclusiveMinimum": 0},
+    "allowable_shear_mpa": {"type": ["number", "null"], "exclusiveMinimum": 0},
+    "allowable_bearing_mpa": {"type": ["number", "null"], "exclusiveMinimum": 0},
+    "standard": {"type": ["string", "null"]},
+    "edition": {"type": ["string", "null"]},
+    "source": {"type": ["string", "null"]},
+    "notes": {"type": ["string", "null"]},
+    "status": {"enum": ["provisional", "confirmed"]}
+  }
+}
