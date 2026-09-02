@@ -14,7 +14,7 @@ canonical_key: ""
 
 ## 適用範圍（Scope）
 
-## 子目錄／Canonical pages
+## 子目錄／Canonical 頁面
 
 - `...`
 
