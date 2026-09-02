@@ -8,28 +8,30 @@ verification_status: "UNVERIFIED"
 verified_at: ""
 ---
 
-# Material / grade
+# 材料／牌號
 
-## Classification
+## 分類
 
-## Applicable standards
+## 適用標準
 
-## Typical building-envelope applications
+## 建築外殼常見用途
 
-## Mechanical / physical properties
+## 機械／物理性質
 
 僅記錄有可靠來源的數值；設計值應標示其 governing source 與適用條件。
 
-## Fabrication / formability
+## 製造／成形性
 
-## Finish / corrosion compatibility
+## 表面處理／腐蝕相容性
 
-## Related grades / substitutions
+## 相關牌號／替代
 
 不得僅因名稱、用途或名目強度相近就宣稱 equivalent。
 
-## Taiwan practice
+## 台灣工程實務
 
-## Engineering cautions
+## 工程注意事項
 
-## Sources / provenance
+## 來源／provenance
+
+> 敘述依 `LANGUAGE.md` 以繁體中文（台灣）為主；材料牌號、alloy / temper、property class 與正式標準名稱可保留原文。
