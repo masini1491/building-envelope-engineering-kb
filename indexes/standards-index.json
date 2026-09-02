@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "purpose": "Index of public standard dossiers. Edition/status ownership lives in references/standards, not in this index.",
+  "standards": [
+    {"id": "AAMA 508", "path": "references/standards/aama-508-21-pressure-equalized-rainscreen.md"},
+    {"id": "ASTM C1135", "path": "references/standards/astm-c1135.md"},
+    {"id": "ASTM C1184", "path": "references/standards/astm-c1184.md"},
+    {"id": "ASTM C1401", "path": "references/standards/astm-c1401.md"},
+    {"id": "CNS 2253", "path": "references/standards/cns-2253.md"},
+    {"id": "CNS 2257", "path": "references/standards/cns-2257.md"}
+  ]
+}
