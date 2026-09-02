@@ -10,7 +10,8 @@
 2. **技術精確性優先於硬翻譯**：英文術語若翻譯後可能改變工程語意，保留原文。
 3. **採台灣工程用語**：已有穩定台灣用語時優先採用，不使用簡體字或僅適用中國大陸語境的譯詞取代台灣既有用法。
 4. **首次出現可中英並列**：有穩定中文詞且保留英文有助檢索時，建議使用 `中文（English）`，後續可依上下文只使用中文或英文。
-5. **不為繁中化破壞資料介面**：schema key、程式識別碼、檔案路徑、公式符號、API field 等維持既有穩定名稱。
+5. **人類可讀標題採中文優先**：若標題同時包含中文與一般英文詞，原則上讓中文概念先出現，例如 `排水孔（weep）防呆`，而不是 `Weep 防呆`。正式標準編號、材料牌號、產品名稱、固定 machine-readable status 等例外可維持原始識別順序。
+6. **不為繁中化破壞資料介面**：schema key、程式識別碼、檔案路徑、公式符號、API field 等維持既有穩定名稱。
 
 ## 應以繁體中文呈現的內容
 
@@ -64,7 +65,7 @@
 
 例如 `proof load`、`bite`、`galling`、`prying`、`oil canning` 等，應依上下文決定是否中英並列，而不是創造不常用的中文名稱。
 
-## AI 回答規則
+## 人工智慧（AI）回答規則
 
 使用本 repository 的 ChatGPT、Codex 或其他 AI：
 
@@ -80,7 +81,7 @@
 - `LICENSE.md`、`LICENSE-DOCS.md`、`THIRD-PARTY-NOTICE.md` 與 `DISCLAIMER.md` 可使用繁體中文說明 repository 的授權範圍與責任邊界。
 - CC BY 4.0 的實際授權條款以 Creative Commons 官方授權頁與 legal code 為準；repository 的繁中說明不是另一份翻譯法律文本。
 
-## Schema 與程式碼
+## 資料結構（Schema）與程式碼
 
 `schemas/`、`scripts/`、`.github/` 的識別碼與機器介面以穩定性優先：
 
