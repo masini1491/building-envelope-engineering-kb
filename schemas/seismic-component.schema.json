@@ -1,0 +1,70 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/masini1491/building-envelope-engineering-kb/schemas/seismic-component.schema.json",
+  "title": "Facade Seismic Component Input",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["component_id", "category", "regulation", "status"],
+  "properties": {
+    "component_id": {"type": "string", "minLength": 1},
+    "category": {
+      "type": "string",
+      "enum": ["external_wall", "panel_connection", "connection_fixing", "other"]
+    },
+    "regulation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["title", "edition_or_revision", "source"],
+      "properties": {
+        "title": {"type": "string"},
+        "edition_or_revision": {"type": "string"},
+        "source": {"type": "string"},
+        "clause_or_table": {"type": ["string", "null"]}
+      }
+    },
+    "SDS": {"type": ["number", "null"], "minimum": 0},
+    "Ip": {"type": ["number", "null"], "exclusiveMinimum": 0},
+    "ap": {"type": ["number", "null"], "exclusiveMinimum": 0},
+    "Rp": {"type": ["number", "null"], "exclusiveMinimum": 0},
+    "Wp": {
+      "type": ["object", "null"],
+      "properties": {
+        "value": {"type": "number", "minimum": 0},
+        "unit": {"type": "string"},
+        "mass_boundary_notes": {"type": ["string", "null"]}
+      },
+      "additionalProperties": false
+    },
+    "hx": {
+      "type": ["object", "null"],
+      "properties": {
+        "value": {"type": "number", "minimum": 0},
+        "unit": {"type": "string"}
+      },
+      "additionalProperties": false
+    },
+    "hn": {
+      "type": ["object", "null"],
+      "properties": {
+        "value": {"type": "number", "exclusiveMinimum": 0},
+        "unit": {"type": "string"}
+      },
+      "additionalProperties": false
+    },
+    "force_direction": {"type": ["string", "null"]},
+    "calculated_force": {
+      "type": ["object", "null"],
+      "properties": {
+        "value": {"type": "number"},
+        "unit": {"type": "string"}
+      },
+      "additionalProperties": false
+    },
+    "minimum_maximum_treatment": {"type": ["string", "null"]},
+    "notes": {"type": ["string", "null"]},
+    "status": {
+      "type": "string",
+      "enum": ["confirmed", "provisional", "incomplete", "unknown"]
+    }
+  }
+}
