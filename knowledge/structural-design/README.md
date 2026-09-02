@@ -25,7 +25,7 @@ canonical_key: "structural-design.router"
 
 任何一層 `PASS` 都不自動代表整條 load path `PASS`。
 
-## 子目錄 routing
+## 子目錄路由（routing）
 
 - [`wind/`](wind/)：台灣帷幕牆風壓、耐風設計手冊與 design-pressure workflow。
 - [`seismic/`](seismic/)：台灣 façade component seismic force、connection load path、movement compatibility。
@@ -36,7 +36,7 @@ canonical_key: "structural-design.router"
 - [`preliminary-sizing/`](preliminary-sizing/)：required `I / S`、support/composite assumptions、design vs test pressure、traceability。
 - [`review/`](review/)：Project Design Basis、failure-mode map、coverage、hidden multiplier audit、calculation-review checklist。
 
-## 外部 subsystem routing
+## 外部子系統路由（subsystem routing）
 
 不是所有結構問題都應搬進本目錄。專屬 subsystem mechanics 保留在其 domain：
 
