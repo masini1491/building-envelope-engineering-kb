@@ -1,0 +1,108 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/masini1491/building-envelope-engineering-kb/schemas/plate-fea-model.schema.json",
+  "title": "Plate / Shell FEA Model Metadata",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["purpose", "geometry", "materials", "elements", "boundary_conditions", "loads", "interfaces", "mesh", "status"],
+  "properties": {
+    "purpose": {"type": "string", "minLength": 1},
+    "geometry": {
+      "type": "object",
+      "additionalProperties": true,
+      "description": "Generic geometry metadata only; public KB schemas do not contain project instances."
+    },
+    "materials": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "model", "source_status"],
+        "properties": {
+          "id": {"type": "string"},
+          "model": {"type": "string", "enum": ["linear_elastic", "elastic_plastic", "orthotropic", "other"]},
+          "E_MPa": {"type": ["number", "null"], "exclusiveMinimum": 0},
+          "nu": {"type": ["number", "null"], "minimum": -1, "exclusiveMaximum": 0.5},
+          "yield_strength_MPa": {"type": ["number", "null"], "exclusiveMinimum": 0},
+          "source": {"type": ["string", "null"]},
+          "source_status": {"type": "string", "enum": ["confirmed", "provisional", "unknown"]}
+        }
+      }
+    },
+    "elements": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["component", "element_family"],
+        "properties": {
+          "component": {"type": "string"},
+          "element_family": {"type": "string", "enum": ["shell", "plate", "beam", "solid", "connector", "spring", "other"]},
+          "formulation": {"type": ["string", "null"]},
+          "offset_note": {"type": ["string", "null"]}
+        }
+      }
+    },
+    "boundary_conditions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": true,
+        "required": ["id", "description"]
+      }
+    },
+    "loads": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": true,
+        "required": ["id", "type", "source_status"],
+        "properties": {
+          "id": {"type": "string"},
+          "type": {"type": "string", "enum": ["pressure", "point", "line", "gravity", "thermal", "other"]},
+          "source_status": {"type": "string", "enum": ["confirmed", "provisional", "unknown"]}
+        }
+      }
+    },
+    "interfaces": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "model", "status"],
+        "properties": {
+          "id": {"type": "string"},
+          "model": {"type": "string", "enum": ["tied", "contact", "spring", "discrete_connector", "bonded_cohesive", "slip", "unknown"]},
+          "stiffness_source": {"type": ["string", "null"]},
+          "status": {"type": "string", "enum": ["confirmed", "provisional", "unknown"]}
+        }
+      }
+    },
+    "mesh": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["baseline_size_mm", "convergence_checked"],
+      "properties": {
+        "baseline_size_mm": {"type": ["number", "null"], "exclusiveMinimum": 0},
+        "local_refinement": {"type": ["string", "null"]},
+        "convergence_checked": {"type": "boolean"},
+        "convergence_note": {"type": ["string", "null"]}
+      }
+    },
+    "analysis_type": {
+      "type": "array",
+      "items": {"type": "string", "enum": ["linear_static", "geometric_nonlinear", "material_nonlinear", "eigen_buckling", "other"]},
+      "uniqueItems": true
+    },
+    "validation": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "equilibrium_checked": {"type": "boolean"},
+        "analytical_crosscheck": {"type": "boolean"},
+        "test_crosscheck": {"type": "boolean"}
+      }
+    },
+    "status": {"type": "string", "enum": ["confirmed", "provisional", "incomplete"]}
+  }
+}
