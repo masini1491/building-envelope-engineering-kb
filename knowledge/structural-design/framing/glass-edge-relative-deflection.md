@@ -81,7 +81,7 @@ ASTM E1300-24 的玻璃 load-resistance framework 假設支承邊具有足夠剛
 
 ## Routing
 
-- [ASTM E1300 Glass Load-Resistance Routing](../../glazing/astm-e1300-glass-load-resistance-routing.md)
+- [ASTM E1300 Glass Load-Resistance Routing](../../glazing/ASTM-E1300-design-routing.md)
 - [Biaxial Bending and Resultant Deflection](biaxial-bending-and-resultant-deflection.md)
 - [Structural Glass Movement](../../structural-glass/structural-glass-movement.md)
 
