@@ -35,7 +35,7 @@ Pressure equalization 的目的，是降低 exterior rain barrier 兩側的壓�
 
 因此 outer seal 與 inner air seal 的功能不能混成同一條「越密越好」的 sealant line。
 
-## Compartmentation
+## 分艙（Compartmentation）
 
 Pressure equalization 並非只看 opening area。
 
@@ -50,7 +50,7 @@ Pressure equalization 並非只看 opening area。
 - unintended holes between compartments；
 - inner air seal continuity。
 
-## Dynamic response
+## 動態反應（Dynamic response）
 
 風壓不是恆定 scalar。
 
@@ -70,7 +70,7 @@ Pressure equalization 並非只看 opening area。
 
 如果專案的 dynamic performance 是 design requirement，應使用 project-specific analysis / test 或 applicable standard，而不是只憑幾何比例判 PASS。
 
-## Rainscreen vs Drained / Back-ventilated
+## Pressure-equalized rainscreen 與 Drained / Back-ventilated 的分界
 
 必須分辨不同 system concept：
 
