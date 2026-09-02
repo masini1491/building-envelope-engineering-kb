@@ -28,7 +28,7 @@ Knowledge pages 負責工程解讀與使用方法；若同一標準被多個 kno
 - [`standards/cns-2253.md`](standards/cns-2253.md)
 - [`standards/cns-2257.md`](standards/cns-2257.md)
 
-## Public dossier 最低欄位
+## 公開來源檔案（Public dossier）最低欄位
 
 每份 dossier 應盡量記錄：
 
@@ -44,7 +44,7 @@ Knowledge pages 負責工程解讀與使用方法；若同一標準被多個 kno
 - limitations / do-not-assume；
 - copyright / reuse restriction（若已知）。
 
-## GitHub 專案索引
+## 公開 GitHub 專案索引
 
 [`github-projects/README.md`](github-projects/README.md) 只做總 index；詳細 shortlist 依用途拆分，讓 AI progressive reading：
 
