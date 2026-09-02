@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "purpose": "Top-level knowledge domain routing. This index does not duplicate engineering content.",
+  "domains": [
+    {"id": "anchors", "path": "knowledge/anchors", "router": "knowledge/anchors/anchor-standards-baseline.md"},
+    {"id": "building-physics", "path": "knowledge/building-physics", "router": "knowledge/building-physics/thermal-and-condensation-baseline.md"},
+    {"id": "cladding", "path": "knowledge/cladding", "router": "knowledge/cladding/structural-analysis/README.md"},
+    {"id": "corrosion-protection", "path": "knowledge/corrosion-protection", "router": "knowledge/corrosion-protection/hot-dip-galvanizing-astm-family.md"},
+    {"id": "design-management", "path": "knowledge/design-management", "router": "knowledge/design-management/curtain-wall-design-workflow.md"},
+    {"id": "fasteners", "path": "knowledge/fasteners", "router": "knowledge/fasteners/stainless/iso-3506-a2-70-a2-90.md"},
+    {"id": "finishes", "path": "knowledge/finishes", "router": "knowledge/finishes/aluminum-organic-coatings-aama-2603-2604-2605.md"},
+    {"id": "fire", "path": "knowledge/fire", "router": "knowledge/fire/perimeter-fire-barrier-and-joints.md"},
+    {"id": "gaskets", "path": "knowledge/gaskets", "router": "knowledge/gaskets/elastomeric-gasket-baseline.md"},
+    {"id": "glazing", "path": "knowledge/glazing", "router": "knowledge/glazing/glass-standards-baseline.md"},
+    {"id": "materials", "path": "knowledge/materials", "router": "knowledge/materials/aluminum/common-curtain-wall-alloys.md"},
+    {"id": "operable-elements", "path": "knowledge/operable-elements", "router": "knowledge/operable-elements/README.md"},
+    {"id": "performance-testing", "path": "knowledge/performance-testing", "router": "knowledge/performance-testing/curtain-wall-performance-crosswalk.md"},
+    {"id": "sealants", "path": "knowledge/sealants", "router": "knowledge/sealants/structural-silicone-baseline.md"},
+    {"id": "skylights", "path": "knowledge/skylights", "router": "knowledge/skylights/skylight-and-sloped-glazing-baseline.md"},
+    {"id": "stone", "path": "knowledge/stone", "router": "knowledge/stone/dimension-stone-cladding-baseline.md"},
+    {"id": "structural-design", "path": "knowledge/structural-design", "router": "knowledge/structural-design/README.md"},
+    {"id": "structural-glass", "path": "knowledge/structural-glass", "router": "knowledge/structural-glass/README.md"},
+    {"id": "systems", "path": "knowledge/systems", "router": "knowledge/systems/curtain-wall-system-types.md"},
+    {"id": "water-management", "path": "knowledge/water-management", "router": "knowledge/water-management/README.md"}
+  ]
+}
