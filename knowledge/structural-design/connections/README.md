@@ -22,7 +22,7 @@ canonical_key: "structural-design.connections.router"
 
 ## 相關 specialized domain
 
-- [`../../../anchors/anchor-standards-baseline.md`](../../../anchors/anchor-standards-baseline.md)：cast-in / post-installed anchor standards 與 concrete failure routing。
+- [`../../anchors/anchor-standards-baseline.md`](../../anchors/anchor-standards-baseline.md)：cast-in / post-installed anchor standards 與 concrete failure routing。
 - [`../secondary-support/`](../secondary-support/)：back brace、reaction handoff、supporting steel local effects。
 
 > 連接元件 PASS、connected material PASS、anchor PASS 必須分開判斷；不可用單一 `connection OK` 掩蓋 failure-mode coverage。
