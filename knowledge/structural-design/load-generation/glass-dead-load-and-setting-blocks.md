@@ -35,7 +35,7 @@ canonical_owner: true
 
 任何額外 dead-load factor 都必須帶 source，不得把舊專案常數直接當 universal rule。
 
-## Setting block 位置很重要
+## 玻璃墊塊（Setting block）位置很重要
 
 即使總玻璃重量相同，setting-block 位置改變也會改變：
 
