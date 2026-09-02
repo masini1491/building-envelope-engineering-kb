@@ -9,6 +9,7 @@
 - `manufacturers/`：材料／系統製造商正式且可公開引用的技術資料
 - `research/`：公開學術與研究報告
 - `public-cases/`：只有在案例本身已由公開來源揭露且可合法引用時使用
+- [`github-projects/`](github-projects/)：與帷幕牆／建築外殼相關的公開 GitHub 工程與軟體專案參考索引；只作 **NON-NORMATIVE software / implementation reference**，不得取代 governing code、正式標準、project design basis 或專業工程判斷
 
 **不得建立 private-project dossier。** 非公開專案文件、維護者對私有施工圖的觀察、直接參與者口頭確認、內部審查紀錄或其他 private provenance 應留在 repository 外的私人工作流程。
 
@@ -26,6 +27,8 @@
 - 著作權／再利用限制（copyright / reuse restriction，若已知）
 
 同一標準的 current edition / status 宜由單一 canonical dossier 或 standard page 維護，其他 knowledge pages 只引用該 routing，避免版本 drift。
+
+GitHub 專案若宣稱實作某項 standard / code，該宣稱只代表需要進一步查證的 software claim；若要形成工程結論，仍須回到 current primary source 獨立驗證。
 
 人類可讀摘要依 [`../LANGUAGE.md`](../LANGUAGE.md) 以繁體中文（台灣）為主；來源原始標題、標準正式名稱與必要技術術語保留原文。
 
