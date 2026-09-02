@@ -15,7 +15,7 @@ verified_at: "2026-09-02"
 1. [`water-ingress-mechanisms.md`](water-ingress-mechanisms.md) — 先辨識水如何移動。
 2. [`pressure-equalization-and-rainscreen.md`](pressure-equalization-and-rainscreen.md) — 再判斷 pressure equalization / rainscreen 是否真的成立。
 3. [`drainage-and-weep-design.md`](drainage-and-weep-design.md) — 最後建立可排出的 drainage path。
-4. [`../standards/performance-testing/curtain-wall-performance-crosswalk.md`](../standards/performance-testing/curtain-wall-performance-crosswalk.md) — 用 laboratory / field test 驗證系統性能。
+4. [`../performance-testing/curtain-wall-performance-crosswalk.md`](../performance-testing/curtain-wall-performance-crosswalk.md) — 用 laboratory / field test 驗證系統性能。
 
 ## 系統思考
 
