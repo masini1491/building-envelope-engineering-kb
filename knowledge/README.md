@@ -15,6 +15,7 @@
 - `finishes/`：烤漆、陽極處理等
 - `corrosion-protection/`：熱浸鍍鋅與其他防蝕
 - `structural-design/`：耐風、耐震、荷載生成、直料／橫料、多件擠型共同作用、continuous mullion / splice / sleeve、雙軸彎曲、glass-edge relative displacement、fastener group、screw pull-out / thread engagement、局部擠型、焊道群、anchor，以及 `preliminary-sizing/` 前期 required section property / support / traceability 方法
+- `operable-elements/`：活動窗／可開啟外牆構件的 sash/frame、hinge/lock/stay、五金緊件、局部擠型與 whole-product performance / life-cycle routing
 - `engineering-notes/`：標準無法單獨回答的實務問題
 - `stone/`：天然石材外牆與繫件系統
 - `cladding/`：金屬複合板、蜂巢板及其他外牆面板系統；`structural-analysis/` 另整理 metal panel、stiffener、panel-to-stiffener connection 與 plate / shell FEA methodology
@@ -65,6 +66,14 @@
 - `cladding/structural-analysis/stiffener-analysis.md`
 - `cladding/structural-analysis/panel-to-stiffener-connection.md`
 - `cladding/structural-analysis/plate-fea-modeling.md`
+
+### Operable windows / vents
+
+- `operable-elements/README.md`
+- `operable-elements/sash-frame-analysis.md`
+- `operable-elements/hardware-load-path.md`
+- `operable-elements/hinge-lock-stay-connections.md`
+- `operable-elements/performance-and-life-cycle.md`
 
 這些頁面刻意把「需求 mechanics」和「規範 capacity」分開。若 allowable / resistance / safety treatment 沒有可驗證來源，AI 應輸出 `INCOMPLETE`，不得從既有專案計算書、舊版手冊或記憶自動補值。
 
