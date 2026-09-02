@@ -11,9 +11,9 @@
 
 ## 公開可確認範圍
 
-## Knowledge routing
+## 知識路由（Knowledge routing）
 
-## Related／commonly compared
+## 相關／常見比較（Related／commonly compared）
 
 ## 不可推論事項
 
