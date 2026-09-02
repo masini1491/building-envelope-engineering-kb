@@ -60,7 +60,7 @@ missing_inputs: []
 notes: ...
 ```
 
-## `NOT_APPLICABLE` 防呆
+## 不適用（`NOT_APPLICABLE`）防呆
 
 `NOT_APPLICABLE` 不能用來跳過不想算的項目。
 
@@ -72,7 +72,7 @@ notes: ...
 
 例如「沒有 weld」可以使 weld-group check `NOT_APPLICABLE`；但「目前沒有 weld capacity data」應是 `INCOMPLETE`，不是 N/A。
 
-## `WARNING` 防呆
+## 警告（`WARNING`）防呆
 
 適合 `WARNING` 的情形可能包括：
 
@@ -83,7 +83,7 @@ notes: ...
 
 若 uncertainty 足以改變 PASS / FAIL，應提升為 `INCOMPLETE`，不能只放 warning。
 
-## Coverage 矩陣
+## 覆蓋範圍（Coverage）矩陣
 
 系統級 review 建議至少有：
 
