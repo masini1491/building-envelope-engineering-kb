@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://example.invalid/building-envelope-engineering-kb/load-case.schema.json",
+  "$id": "https://github.com/masini1491/building-envelope-engineering-kb/schemas/load-case.schema.json",
   "title": "Structural Load Case",
   "type": "object",
   "additionalProperties": false,
@@ -8,20 +8,44 @@
   "properties": {
     "id": {"type": "string", "minLength": 1},
     "name": {"type": "string", "minLength": 1},
-    "load_type": {"enum": ["wind", "dead", "live", "seismic", "thermal", "other"]},
+    "load_type": {"enum": ["wind", "dead", "live", "seismic", "thermal", "maintenance", "operating", "other"]},
     "direction": {"enum": ["positive", "negative", "not_applicable", null]},
-    "pressure_kpa": {"type": ["number", "null"]},
     "zone": {"type": ["string", "null"]},
-    "bending_axis": {"enum": ["x", "y", "custom", null]},
+    "bending_axis": {"enum": ["x", "y", "biaxial", "custom", null]},
     "source": {"type": ["string", "null"]},
     "source_revision": {"type": ["string", "null"]},
+    "governing_standard_or_document": {"type": ["string", "null"]},
+    "applications": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/application"},
+      "description": "How the source action is applied to the structural model. Preserve pressure, line load, point load, gravity and imposed displacement as different application types."
+    },
     "notes": {"type": ["string", "null"]},
-    "status": {"enum": ["provisional", "confirmed"]}
+    "status": {"enum": ["provisional", "confirmed", "unknown", "incomplete"]}
   },
   "allOf": [
     {
-      "if": {"properties": {"load_type": {"const": "wind"}}},
+      "if": {"properties": {"load_type": {"const": "wind"}}, "required": ["load_type"]},
       "then": {"required": ["direction"]}
     }
-  ]
+  ],
+  "$defs": {
+    "application": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "status"],
+      "properties": {
+        "type": {"enum": ["pressure", "line_load", "point_load", "gravity", "imposed_displacement", "imposed_rotation", "custom"]},
+        "value": {"type": ["number", "null"]},
+        "unit": {"type": ["string", "null"]},
+        "axis_or_direction": {"type": ["string", "null"]},
+        "location_or_region": {"type": ["string", "null"]},
+        "distribution": {"enum": ["uniform", "triangular", "trapezoidal", "point", "custom", null]},
+        "tributary_geometry": {"type": ["string", "null"]},
+        "eccentricity_note": {"type": ["string", "null"]},
+        "derivation": {"type": ["string", "null"]},
+        "status": {"enum": ["provisional", "confirmed", "unknown", "incomplete"]}
+      }
+    }
+  }
 }
