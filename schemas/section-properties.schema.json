@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/building-envelope-engineering-kb/section-properties.schema.json",
+  "title": "Section Properties",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["name", "source", "status"],
+  "properties": {
+    "name": {"type": "string", "minLength": 1},
+    "axis_definition": {"type": ["string", "null"]},
+    "Ix_mm4": {"type": ["number", "null"], "minimum": 0},
+    "Iy_mm4": {"type": ["number", "null"], "minimum": 0},
+    "Sx_pos_mm3": {"type": ["number", "null"], "minimum": 0},
+    "Sx_neg_mm3": {"type": ["number", "null"], "minimum": 0},
+    "Sy_pos_mm3": {"type": ["number", "null"], "minimum": 0},
+    "Sy_neg_mm3": {"type": ["number", "null"], "minimum": 0},
+    "cx_pos_mm": {"type": ["number", "null"], "minimum": 0},
+    "cx_neg_mm": {"type": ["number", "null"], "minimum": 0},
+    "cy_pos_mm": {"type": ["number", "null"], "minimum": 0},
+    "cy_neg_mm": {"type": ["number", "null"], "minimum": 0},
+    "area_mm2": {"type": ["number", "null"], "minimum": 0},
+    "source": {"enum": ["estimated", "CAD", "supplier", "user", "calculated", "other"]},
+    "source_note": {"type": ["string", "null"]},
+    "status": {"enum": ["provisional", "confirmed"]}
+  }
+}
