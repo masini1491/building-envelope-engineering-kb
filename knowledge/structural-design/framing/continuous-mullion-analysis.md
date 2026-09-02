@@ -25,7 +25,7 @@ canonical_owner: true
 8. 再把 reactions 傳入 bracket / fastener / anchor design。
 9. 另外檢查 serviceability、glass-edge relative movement 與 splice / sleeve local failure。
 
-## Continuous beam 不等於所有樓板都 fixed
+## 連續梁（Continuous beam）不等於所有樓板都固定（fixed）
 
 多跨 mullion 可以在若干支點形成 continuous-beam behavior，但「多跨」本身不代表：
 
@@ -36,7 +36,7 @@ canonical_owner: true
 
 模型必須逐節點說明 restraint。
 
-## Support DOF 應明示
+## 支承自由度（Support DOF）應明示
 
 至少應分別記錄：
 
