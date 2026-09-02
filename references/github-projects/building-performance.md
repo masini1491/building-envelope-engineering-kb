@@ -4,7 +4,7 @@
 
 本頁聚焦 glazing thermal / optical、energy、daylight、HAM、CFD 等建築外殼性能工具。全部屬 **NON-NORMATIVE REFERENCE**。
 
-## Glazing thermal／optical
+## 玻璃熱工／光學（Glazing thermal／optical）
 
 ### `LBNL-ETA/pyWinCalc`
 
@@ -18,7 +18,7 @@ https://github.com/LBNL-ETA/Windows-CalcEngine
 
 較底層的 window / shading thermal-optical routines。可研究 core engine 與 language wrapper 分層、build/dependency discipline。
 
-## Energy／daylight
+## 能源／日照（Energy／daylight）
 
 ### `ladybug-tools/honeybee-energy`
 
@@ -32,7 +32,7 @@ https://github.com/ladybug-tools/honeybee-radiance
 
 Radiance daylight / radiation integration。適合 glazing / shading / façade geometry 的 daylight / solar analysis pipeline；不提供 structural capacity。
 
-## Hygrothermal／CFD
+## 熱濕耦合／計算流體力學（Hygrothermal／CFD）
 
 ### `srouchier/hamopy`
 
