@@ -112,7 +112,7 @@ Secondary-support design 常高度依賴：
 
 若 steel SHOP DWG 與 original structural drawing 不一致，不能只以「施工圖為準」取代 engineering re-check。
 
-## Change management
+## 變更管理（Change management）
 
 以下變更可能跨越責任介面：
 
