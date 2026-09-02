@@ -1,6 +1,6 @@
-# Knowledge
+# 技術知識（Knowledge）
 
-本目錄保存已整理、可供工程師與 AI 直接使用的技術結論。
+本目錄保存已整理、可供工程師與 AI 直接使用的技術結論。人類可讀內容依 [`../LANGUAGE.md`](../LANGUAGE.md) 以繁體中文（台灣）為主；正式標準名稱、牌號與必要英文工程術語保留原文。
 
 目前主題：
 
@@ -24,18 +24,16 @@
 - `fire/`：perimeter fire barrier、fire-resistive joint 與外牆防火 routing
 - `case-knowledge/`：只用於公開來源可追溯案例，或完全去識別且無法反推出專案身分的通用 lesson pattern
 
-## Structural calculation routing
+## 結構計算路由
 
-目前已建立的 structural methodology 主線包括：
-
-### Load generation
+### 荷載生成（Load generation）
 
 - `structural-design/load-generation/README.md`
 - `structural-design/load-generation/facade-tributary-loads.md`
 - `structural-design/load-generation/transom-wind-load-distribution.md`
 - `structural-design/load-generation/glass-dead-load-and-setting-blocks.md`
 
-### Framing
+### 框架／桿件（Framing）
 
 - `structural-design/framing/mullion-transom-design-baseline.md`
 - `structural-design/framing/continuous-mullion-analysis.md`
@@ -44,7 +42,7 @@
 - `structural-design/framing/biaxial-bending-and-resultant-deflection.md`
 - `structural-design/framing/glass-edge-relative-deflection.md`
 
-### Connections
+### 連接（Connections）
 
 - `structural-design/connections/load-path-and-anchor-reactions.md`
 - `structural-design/connections/fastener-group-analysis.md`
@@ -52,14 +50,14 @@
 - `structural-design/connections/local-extrusion-failure.md`
 - `structural-design/connections/weld-group-analysis.md`
 
-### Seismic façade components / connections / movement
+### 外牆耐震構件／連接／位移
 
 - `structural-design/seismic/README.md`
 - `structural-design/seismic/taiwan-facade-component-seismic-force.md`
 - `structural-design/seismic/seismic-connection-load-path.md`
 - `structural-design/seismic/seismic-movement-compatibility.md`
 
-### Structural review / failure-mode coverage
+### 結構審查／failure-mode coverage
 
 - `structural-design/review/README.md`
 - `structural-design/review/project-specification-extraction.md`
@@ -67,7 +65,7 @@
 - `structural-design/review/failure-mode-map.md`
 - `structural-design/review/coverage-and-completeness.md`
 
-### Preliminary sizing
+### 前期尺寸需求（Preliminary sizing）
 
 - `structural-design/preliminary-sizing/README.md`
 - `structural-design/preliminary-sizing/design-vs-test-pressure.md`
@@ -75,7 +73,7 @@
 - `structural-design/preliminary-sizing/support-and-composite-action.md`
 - `structural-design/preliminary-sizing/calculation-status-and-traceability.md`
 
-### Metal panel / stiffener / FEA
+### 金屬面板／stiffener／FEA
 
 - `cladding/structural-analysis/README.md`
 - `cladding/structural-analysis/metal-panel-analysis.md`
@@ -83,7 +81,7 @@
 - `cladding/structural-analysis/panel-to-stiffener-connection.md`
 - `cladding/structural-analysis/plate-fea-modeling.md`
 
-### Operable windows / vents
+### 活動窗／可開啟構件
 
 - `operable-elements/README.md`
 - `operable-elements/sash-frame-analysis.md`
@@ -93,7 +91,7 @@
 
 這些頁面刻意把「需求 mechanics」和「規範 capacity」分開。若 allowable / resistance / safety treatment 沒有可驗證來源，AI 應輸出 `INCOMPLETE`，不得從既有專案計算書、舊版手冊或記憶自動補值。
 
-## Machine-readable schemas
+## 機器可讀 Schemas
 
 通用 engineering data models 放在 repository 根目錄 `schemas/`。目前包括：
 
@@ -109,7 +107,7 @@
 
 Schema 不保存專案實例，只定義可供 AI / calculator / spreadsheet 共用的資料結構。正式 calculator 實作前仍應依 `AGENTS.md` 的 schema discipline 檢查 provenance、unit、scope 與 incomplete-state handling。
 
-## Evidence / public-safety rule
+## 證據／公開安全規則
 
 每個技術結論應優先連回 `references/` 中可公開追溯的 evidence；不要在多個頁面複製同一 canonical 結論或 current-edition snapshot。
 
