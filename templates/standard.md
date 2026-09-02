@@ -20,11 +20,11 @@ canonical_key: ""
 
 ## 工程使用方式
 
-## Related／cross-reference
+## 相關／交叉參照（Related／cross-reference）
 
-## Knowledge guardrails
+## 知識防呆（Knowledge guardrails）
 
-## Canonical standard dossier
+## 標準 Canonical dossier
 
 - `references/standards/...`
 
