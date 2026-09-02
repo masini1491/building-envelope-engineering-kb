@@ -25,7 +25,7 @@ canonical_owner: true
 
 `unknown` 應視為 `INCOMPLETE`，而不是由 AI 自行選一個有利假設。
 
-## Full composite 需要什麼證據
+## 完全共同作用（Full composite）需要什麼證據
 
 只有當構件間能可靠傳遞使其維持相容變形所需的 longitudinal shear / contact force 時，才可考慮 full composite。可能的證據包括：
 
