@@ -45,7 +45,7 @@ Structural silicone bite 不是固定材料常數，也不是所有案子都用�
 5. 驗證 substrate adhesion、primer requirement、compatibility。
 6. 確認 shop / field QA、cure、handling、repair / replacement procedure。
 
-## Bite 與厚度
+## 有效黏著寬度（Bite）與厚度
 
 - **bite**：沿被黏結面承擔 structural load 的有效黏著寬度。
 - **thickness**：兩 substrate 間 sealant bead 厚度／間距，與 movement capability、installation tolerance、cure 等相關。
