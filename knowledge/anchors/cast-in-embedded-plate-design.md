@@ -79,6 +79,7 @@ verified_at: "2026-09-02"
 - edge distances；
 - cracked / uncracked design basis（若 governing method 有區分）；
 - reinforcement geometry where relevant；
+- supplementary reinforcement 是否被 governing method 計入；
 - actual recess / step / edge / opening geometry that may truncate a breakout surface。
 
 缺少可能影響 governing resistance 的幾何或材料資料時，不得以「標準預埋件」補假設後直接 PASS。
@@ -95,6 +96,7 @@ verified_at: "2026-09-02"
 - concrete breakout / cone failure；
 - pullout / bearing-related failure；
 - side-face blowout；
+- concrete splitting where applicable；
 - reinforcement / development failure；
 - anchor-to-plate weld failure。
 
@@ -107,6 +109,7 @@ verified_at: "2026-09-02"
 - anchor steel shear failure；
 - concrete edge breakout；
 - pryout；
+- concrete splitting / edge interaction where applicable；
 - local bearing / plate interaction；
 - anchor-to-plate weld failure。
 
@@ -116,7 +119,7 @@ verified_at: "2026-09-02"
 
 若 governing code 對 combined tension / shear 有 interaction requirement，必須使用對應 method；interaction formula、exponent、threshold 與 factor 不得從其他 anchor system 或舊專案複製。
 
-## Anchor group 與偏心
+## Anchor group、投影面與偏心
 
 預埋件通常不是單一 anchor。
 
@@ -128,7 +131,13 @@ verified_at: "2026-09-02"
 - eccentricity；
 - anchor-group force distribution method；
 - plate rigidity / flexibility assumption；
-- governing anchor demand。
+- governing anchor demand；
+- governing method 所使用的 projected breakout area / group area；
+- edge、spacing、member thickness、opening 或相鄰 anchor 對 failure surface 的截斷／重疊影響。
+
+不得把「單根 anchor capacity × anchor 數量」當成 group capacity，除非 governing method 明確允許且 geometry 條件確實成立。
+
+若 supplementary reinforcement 被用來改變 concrete failure treatment，必須保存 reinforcement geometry、development / anchorage、適用條件與 governing source，不能只寫「有補強筋」就套較有利 factor。
 
 若 plate flexibility、bracket prying 或局部板彎曲會明顯改變 anchor force distribution，就不能只用 rigid-plate centroid model 宣告整體 PASS。
 
@@ -159,11 +168,12 @@ verified_at: "2026-09-02"
 1. anchor steel；
 2. head / pullout mechanism；
 3. concrete breakout；
-4. edge effect；
-5. shear edge breakout；
-6. pryout；
-7. stud-to-plate weld；
-8. plate bending / local deformation。
+4. edge / spacing / projected-area effect；
+5. side-face blowout / splitting where applicable；
+6. shear edge breakout；
+7. pryout；
+8. stud-to-plate weld；
+9. plate bending / local deformation。
 
 若採 proprietary headed stud / anchor system，仍須確認產品或系統適用的 qualification / design evidence；不能只用名義直徑與鋼材 `Fu` 推出整體 capacity。
 
@@ -209,6 +219,7 @@ Cast-in anchor 計算常同時出現：
 - steel resistance factors；
 - cracked-concrete modifiers；
 - edge / spacing / eccentricity factors；
+- reinforcement-related modifiers where applicable；
 - interaction exponents / thresholds。
 
 每一個 factor 都必須能回溯到 governing method、edition、clause / product evidence 與 applied quantity。
@@ -227,6 +238,7 @@ Factor audit 依 [`../structural-design/review/design-factor-and-hidden-multipli
 - anchor family 已辨識；
 - governing source 已確認；
 - applicable failure modes 已覆蓋；
+- group geometry / projected-area treatment 可重建；
 - plate / weld / anchor / concrete 均已完成相應檢核；
 - factor 與 design basis 可追溯；
 
@@ -246,7 +258,8 @@ Factor audit 依 [`../structural-design/review/design-factor-and-hidden-multipli
 
 - anchor type 不明；
 - embedment / edge / spacing 缺資料；
-- concrete geometry 無法建立；
+- concrete geometry / projected failure surface 無法建立；
+- supplementary reinforcement 被用於 resistance enhancement，但配置／development／來源不明；
 - weld detail 不明；
 - factor 或 resistance provenance 缺失；
 - 只提供最終 `O.K.` 而無法重建中間 mechanics。
