@@ -1,0 +1,129 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/masini1491/building-envelope-engineering-kb/schemas/design-factor.schema.json",
+  "title": "Structural Design Factor Audit",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "factors", "audit_status"],
+  "properties": {
+    "schema_version": {"type": "string"},
+    "calculation_scope": {"type": ["string", "null"]},
+    "original_reported_status": {"type": ["string", "null"]},
+    "recomputed_status": {
+      "type": ["string", "null"],
+      "enum": ["PASS", "WARNING", "FAIL", "INCOMPLETE", null]
+    },
+    "audit_status": {
+      "type": "string",
+      "enum": ["PASS", "WARNING", "FAIL", "INCOMPLETE"]
+    },
+    "factors": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/factor"}
+    },
+    "notes": {"type": ["string", "null"]}
+  },
+  "$defs": {
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status"],
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": ["VERIFIED", "PROJECT_SPECIFIED", "MANUFACTURER_SPECIFIED", "PENDING", "MISSING", "CONFLICTING"]
+        },
+        "organization": {"type": ["string", "null"]},
+        "document": {"type": ["string", "null"]},
+        "standard_id": {"type": ["string", "null"]},
+        "edition": {"type": ["string", "null"]},
+        "clause": {"type": ["string", "null"]},
+        "page": {"type": ["string", "integer", "null"]},
+        "notes": {"type": ["string", "null"]}
+      }
+    },
+    "factor": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "value",
+        "factor_type",
+        "applied_to",
+        "operator",
+        "source",
+        "status"
+      ],
+      "properties": {
+        "id": {"type": "string", "minLength": 1},
+        "label_as_reported": {"type": ["string", "null"]},
+        "value": {"type": "number"},
+        "factor_type": {
+          "type": "string",
+          "enum": [
+            "load_factor",
+            "demand_amplification",
+            "capacity_safety_factor",
+            "resistance_factor",
+            "allowable_conversion",
+            "material_reduction",
+            "test_or_proof_multiplier",
+            "project_specific_factor",
+            "warning_threshold",
+            "reported_ratio_definition",
+            "rounding_or_clipping_rule",
+            "other"
+          ]
+        },
+        "applied_to": {
+          "type": "string",
+          "enum": [
+            "raw_load",
+            "design_demand",
+            "combined_demand",
+            "nominal_capacity",
+            "design_capacity",
+            "allowable_value",
+            "material_property",
+            "test_demand",
+            "utilization",
+            "reported_ratio",
+            "intermediate_value",
+            "other"
+          ]
+        },
+        "operator": {
+          "type": "string",
+          "enum": ["multiply", "divide", "add", "subtract", "formula", "threshold", "ratio_definition", "other"]
+        },
+        "expression": {"type": ["string", "null"]},
+        "component_scope": {"type": ["string", "null"]},
+        "load_case": {"type": ["string", "null"]},
+        "limit_state": {
+          "type": ["string", "null"],
+          "enum": ["strength", "serviceability", "test", "proof", "durability", "movement", "other", null]
+        },
+        "calculation_location": {"type": ["string", "null"]},
+        "source": {"$ref": "#/$defs/source"},
+        "required_or_discretionary": {
+          "type": ["string", "null"],
+          "enum": ["required", "project_required", "engineering_discretion", "unknown", null]
+        },
+        "effect_on_utilization": {
+          "type": ["string", "null"],
+          "enum": ["increase", "decrease", "none", "depends", "unknown", null]
+        },
+        "possible_double_count_with": {
+          "type": "array",
+          "items": {"type": "string"}
+        },
+        "status": {
+          "type": "string",
+          "enum": ["PASS", "WARNING", "FAIL", "INCOMPLETE"]
+        },
+        "issue": {"type": ["string", "null"]},
+        "notes": {"type": ["string", "null"]}
+      }
+    }
+  }
+}
