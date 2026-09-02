@@ -1,10 +1,10 @@
-# Façade Inspection／Monitoring GitHub 專案參考
+# 帷幕檢測／監測 GitHub 專案參考（Façade Inspection／Monitoring）
 
 查證日期：2026-09-02
 
 本頁整理 façade inspection、computer vision、condition monitoring / SHM 相關公開 GitHub repository。全部屬 **NON-NORMATIVE REFERENCE**。
 
-## Condition monitoring
+## 狀態監測（Condition monitoring）
 
 ### `CurtainWallMonitoringPlatform/CurtainWallWeb-Backend`
 
@@ -18,7 +18,7 @@ https://github.com/CurtainWallMonitoringPlatform/CurtainWallWeb-Frontend
 
 可搭配 backend 觀察 monitoring UI；目前 engineering reference value 主要仍在整體 architecture，而非判定方法。
 
-## Computer vision／defect benchmark
+## 電腦視覺／缺陷基準（Computer vision／defect benchmark）
 
 ### `Whitneyyyyy/DefectBench`
 
@@ -32,9 +32,7 @@ https://github.com/ailton-santos/Deep_Facade_Inspector
 
 可研究 Drone/Image Capture → preprocessing → tiled detection → pathology classification → georeferenced report → maintenance workflow。核心 dataset / trained weights / proprietary detection algorithm 並非完整公開，因此只作 pipeline architecture reference。
 
-## 負面軟體案例
-
-### `almona02/almona-portfolio-forge` 的 ASTM E1300 compliance code
+## 負面軟體案例：`almona02/almona-portfolio-forge` 的 ASTM E1300 compliance code
 
 https://github.com/almona02/almona-portfolio-forge
 
@@ -46,7 +44,7 @@ https://github.com/almona02/almona-portfolio-forge
 
 **不得以此 implementation 作玻璃工程設計依據。**
 
-## Research gaps
+## 研究缺口（Research gaps）
 
 仍值得找但目前缺少成熟公開 implementation：
 
