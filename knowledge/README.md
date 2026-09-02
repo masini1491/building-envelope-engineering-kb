@@ -16,7 +16,7 @@
 - `design-management/`：帷幕牆 design basis、system development、跨部門 review、mock-up、material approval、shop/fabrication drawing、release / revision control 等設計作業流程
 - `finishes/`：烤漆、陽極處理等
 - `corrosion-protection/`：熱浸鍍鋅與其他防蝕
-- `structural-design/`：耐風、耐震、荷載生成、直料／橫料、多件擠型共同作用、continuous mullion / splice / sleeve、雙軸彎曲、glass-edge relative displacement、fastener group、screw pull-out / thread engagement、局部擠型、焊道群、anchor、design-factor / hidden-multiplier audit、structural review / failure-mode coverage，以及 `preliminary-sizing/` 前期 required section property / support / traceability 方法
+- `structural-design/`：耐風、耐震、荷載生成、直料／橫料、多件擠型共同作用、continuous mullion / splice / sleeve、雙軸彎曲、glass-edge relative displacement、fastener group、screw pull-out / thread engagement、局部擠型、焊道群、anchor、secondary support / back bracing / reaction handoff、design-factor / hidden-multiplier audit、structural review / failure-mode coverage，以及 `preliminary-sizing/` 前期 required section property / support / traceability 方法
 - `operable-elements/`：活動窗／可開啟外牆構件的 sash/frame、hinge/lock/stay、五金緊件、局部擠型與 whole-product performance / life-cycle routing
 - `engineering-notes/`：標準無法單獨回答的實務問題
 - `stone/`：天然石材外牆與繫件系統
@@ -66,6 +66,16 @@ Project workflow 應從 contract / specification / drawings 等輸入建立 Proj
 - `structural-design/connections/screw-pullout-and-thread-engagement.md`
 - `structural-design/connections/local-extrusion-failure.md`
 - `structural-design/connections/weld-group-analysis.md`
+
+### 次結構支撐／背撐／反力交接
+
+- `structural-design/secondary-support/README.md`：Mode A / B / C 責任模式 routing
+- `structural-design/secondary-support/curtain-wall-back-bracing.md`：帷幕廠負責 back brace / secondary support 時的完整 load-path methodology
+- `structural-design/secondary-support/reaction-handoff-to-primary-structure.md`：帷幕端只提供 reaction，由主結構技師處理 downstream structural design 的 handoff 最低要求
+- `structural-design/secondary-support/supporting-steel-local-effects.md`：beam torsion、flange / web local effects、stiffener 與 concentrated-load introduction
+- `structural-design/secondary-support/secondary-support-interface-and-responsibility.md`：責任分界、SHOP DWG 協調、revision / change management
+
+Secondary-support review 必須區分 `façade reaction generation`、`secondary-support design` 與 `primary-structure receiving-member design`。反力已算出並不代表主結構已通過；若責任切點不明，應標 `INCOMPLETE`。
 
 ### 預埋件／錨栓（Anchors）
 
