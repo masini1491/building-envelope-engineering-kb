@@ -13,7 +13,7 @@
 
 ---
 
-# 1. Bolt／Fastener Group
+# 1. 螺栓／扣件群組（Bolt／Fastener Group）
 
 ## `wcfrobert/ezbolt`
 
@@ -114,7 +114,7 @@ README 將 Connecty 定位為 structural engineering 的 weld / bolt connection 
 
 ---
 
-# 2. Aluminum Section／Local Mechanics
+# 2. 鋁截面／局部力學（Aluminum Section／Local Mechanics）
 
 ## `EdwardAstill/sectiony`
 
@@ -169,7 +169,7 @@ README 將 Sectiony 定位為 structural cross-section properties / stress analy
 
 ---
 
-# 3. Structural Glass
+# 3. 結構玻璃（Structural Glass）
 
 ## `FethersGlazingSystems/finestra`
 
@@ -213,9 +213,9 @@ README 將專案定位為「Structural analysis for glass in buildings」，目�
 
 ---
 
-# 4. 本輪明確確認仍存在的 Research Gaps
+# 4. 本輪明確確認仍存在的研究缺口（Research Gaps）
 
-## Concrete／Post-installed Anchor
+## 混凝土／後置式錨栓（Concrete／Post-installed Anchor）
 
 本輪以 repository name / code search 搜尋：
 
@@ -239,7 +239,7 @@ README 將專案定位為「Structural analysis for glass in buildings」，目�
 
 ---
 
-## Screw Pull-out／Thread Stripping in Thin Aluminum
+## 薄鋁板螺絲拔出／牙紋剝離（Screw Pull-out／Thread Stripping in Thin Aluminum）
 
 本輪搜尋 screw pullout、thread stripping、aluminum extrusion 等關鍵字，沒有找到足夠可靠且直接針對 façade thin-wall aluminum screw connection 的公開 implementation。
 
@@ -255,7 +255,7 @@ README 將專案定位為「Structural analysis for glass in buildings」，目�
 
 ---
 
-## Structural Silicone
+## 結構矽利康（Structural Silicone）
 
 本輪沒有找到足夠成熟的 open-source structural-sealant glazing calculator。
 
@@ -273,7 +273,7 @@ GitHub code search 可以找到引用 Dow manual / ASTM C24 family 的文章型 
 
 ---
 
-## Point-supported／Drilled Glass／Glass Fin
+## 點支承／鑽孔玻璃／玻璃肋（Point-supported／Drilled Glass／Glass Fin）
 
 本輪以 point-supported glass、spider glass、drilled glass、glass fin、finite element 等組合搜尋，未找到一個足以列為高品質 façade-specific implementation reference 的公開 repository。
 
