@@ -105,7 +105,7 @@ Mechanical post-installed anchor 與 adhesive anchor 不是同一 qualification 
 - seismic / sustained / other applicable load condition；
 - source / provenance of façade reaction。
 
-## Anchor group force distribution
+## 錨栓群受力分配（Anchor group force distribution）
 
 不得直接把 total reaction 除以 anchor 數量，除非已證明荷載分配確實均勻。
 
@@ -170,7 +170,7 @@ Edge distance 不只是幾何註記；它可能直接改變 concrete edge failur
 
 除非能回到本次 governing source。
 
-## Cracked／Uncracked concrete
+## 裂縫／非裂縫混凝土（Cracked／Uncracked concrete）
 
 若產品 qualification 或 design method 有 cracked / uncracked 區分，專案計算必須明確指定採用哪一個條件與理由。
 
@@ -178,7 +178,7 @@ Edge distance 不只是幾何註記；它可能直接改變 concrete edge failur
 
 如果 cracked status 無法確定，而它可能改變 resistance / qualification，至少應標 `INCOMPLETE` 或採經證明的 conservative bounding case。
 
-## Seismic qualification
+## 耐震資格（Seismic qualification）
 
 若 anchor 屬於需要承受地震 demand 的 connection，除了計算地震力外，還要確認 anchor product 本身的 seismic qualification / category / installation restrictions 是否符合 project governing requirement。
 
@@ -234,7 +234,7 @@ Manufacturer software 很適合：
 
 不得把 installation requirement 當成純施工文件而從 structural review 中刪掉，因為某些條件直接影響 qualification / resistance。
 
-## Factor audit
+## 係數稽核（Factor audit）
 
 Post-installed anchor calculation 常出現多層 factors，例如：
 
@@ -272,11 +272,11 @@ Cast-in embedded plate 方法見 [`cast-in-embedded-plate-design.md`](cast-in-em
 
 ## 審查狀態建議
 
-### `PASS`
+### 通過（`PASS`）
 
 只有在 product / qualification / geometry / substrate / loads / failure modes / factors / installation scope 都能追溯，且 connection 的外側 plate / bracket / weld / bolt checks 也已完成時，才能對明確 scope 給 PASS。
 
-### `WARNING`
+### 警告（`WARNING`）
 
 例如：
 
@@ -284,7 +284,7 @@ Cast-in embedded plate 方法見 [`cast-in-embedded-plate-design.md`](cast-in-em
 - plate-flexibility sensitivity 尚待進一步確認，但 bounding evidence 顯示不會控制；
 - product evaluation 有非 governing warning，已清楚記錄。
 
-### `INCOMPLETE`
+### 不完整（`INCOMPLETE`）
 
 例如：
 
