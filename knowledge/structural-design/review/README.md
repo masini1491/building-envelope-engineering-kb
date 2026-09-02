@@ -17,30 +17,62 @@ canonical_owner: true
 
 > 完整 load path 中，哪些 failure modes 已被檢查？哪些被排除？哪些因資料不足仍是 `INCOMPLETE`？
 
+## Recommended review sequence
+
+對 project-specific calculation review，優先流程為：
+
+`project specification / approved criteria`
+
+→ `Project Design Basis Sheet`
+
+→ `drawings / geometry / material data`
+
+→ `engineer's structural calculation`
+
+→ `KB engineering methodology / failure-mode map`
+
+→ `spec-to-calc compliance + engineering review`
+
+這可以避免只檢查公式 mechanics，卻沒有先確認該專案真正要求的 load、criterion、calculation scope 與 test acceptance。
+
 ## Review hierarchy
 
-1. **Design basis** — governing standard / edition / project criterion 是否明確。
-2. **Load sources** — wind、dead、seismic、movement、maintenance / concentrated load 等是否完整。
-3. **Load generation** — pressure / mass / imposed displacement 是否正確轉成 line / point / nodal demand。
-4. **Structural model** — span、support DOF、splice、composite action、axis、connection stiffness 是否明示。
-5. **Global member response** — framing / panel / glass / sash 的 force、stress、deflection。
-6. **Connection transfer** — fastener group、weld group、bearing、pull-out、local section、anchor。
-7. **Movement compatibility** — thermal / story drift / glass edge / stack joint / sealant / gasket。
-8. **Special subsystems** — operable elements、metal panel stiffener、structural glass、special attachments。
-9. **Performance verification** — analysis 與 mock-up / component / assembly test 的角色是否分清。
-10. **Coverage status** — `PASS / WARNING / FAIL / INCOMPLETE / NOT_APPLICABLE` 是否有 traceable basis。
+1. **Project specification extraction** — 先建立 Project Design Basis；不要直接從計算書猜 project criteria。
+2. **Design basis** — governing standard / edition / project criterion 是否明確。
+3. **Load sources** — wind、dead、seismic、movement、maintenance / concentrated load 等是否完整。
+4. **Load generation** — pressure / mass / imposed displacement 是否正確轉成 line / point / nodal demand。
+5. **Structural model** — span、support DOF、splice、composite action、axis、connection stiffness 是否明示。
+6. **Global member response** — framing / panel / glass / sash 的 force、stress、deflection。
+7. **Connection transfer** — fastener group、weld group、bearing、pull-out、local section、anchor。
+8. **Movement compatibility** — thermal / story drift / glass edge / stack joint / sealant / gasket。
+9. **Special subsystems** — operable elements、metal panel stiffener、structural glass、special attachments。
+10. **Performance verification** — analysis 與 mock-up / component / assembly test 的角色是否分清。
+11. **Coverage status** — `PASS / WARNING / FAIL / INCOMPLETE / NOT_APPLICABLE` 是否有 traceable basis。
 
 ## Routing
 
+- [Project Specification → Structural Design Basis Extraction](project-specification-extraction.md)
 - [Structural Calculation Review Checklist](structural-calculation-review-checklist.md)
 - [Façade Structural Failure-Mode Map](failure-mode-map.md)
 - [Coverage / Completeness Status](coverage-and-completeness.md)
+
+Machine-readable routing：
+
+- `/schemas/project-design-basis.schema.json`
+- `/schemas/structural-coverage.schema.json`
 
 ## 核心原則
 
 ### Calculation correctness ≠ calculation completeness
 
 一個螺栓 shear equation 算得完全正確，如果 load path 還漏掉 eccentricity、bearing、pull-out 或 local extrusion failure，整個 connection calculation 仍不完整。
+
+### Engineering PASS ≠ project-specification compliance PASS
+
+例如一個 member 的 bending mechanics 可以正確，但若使用了錯誤的 project deflection criterion，則應分開輸出：
+
+- `engineering_method: PASS`
+- `project_specification_compliance: FAIL`
 
 ### PASS is local unless scope is explicit
 
@@ -58,6 +90,8 @@ canonical_owner: true
 
 ## Public-safety rule
 
-本 review framework 可由非公開專案計算實務協助辨識常見 failure modes，但 public repository 只保存一般化分類與公開可驗證方法；不得保存專案名稱、尺寸、荷載、圖號、節點、截圖或私人 provenance。
+本 review framework 可由非公開專案規範與計算實務協助辨識常見 requirement / failure modes，但 public repository 只保存一般化 extraction / review framework 與公開可驗證方法；不得保存專案名稱、尺寸、荷載、criterion、圖號、節點、截圖或私人 provenance。
+
+Project Design Basis Sheet、spec-to-calc matrix 與 project-specific review result 均屬當次 project context，不應 commit 到 public repository。
 
 > 本頁是 structural review router，不取代 governing code、專業結構設計或 project-specific calculation。
