@@ -1,0 +1,193 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/masini1491/building-envelope-engineering-kb/schemas/project-design-basis.schema.json",
+  "title": "Façade Project Design Basis",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "document_context", "requirements"],
+  "properties": {
+    "schema_version": {
+      "type": "string"
+    },
+    "document_context": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["document_type", "source_status"],
+      "properties": {
+        "document_type": {
+          "type": "string",
+          "enum": [
+            "specification",
+            "performance_specification",
+            "addendum",
+            "approved_clarification",
+            "rfi_response",
+            "drawing",
+            "design_report",
+            "test_requirement",
+            "other"
+          ]
+        },
+        "revision": {"type": ["string", "null"]},
+        "issue_date": {"type": ["string", "null"]},
+        "governing_jurisdiction": {"type": ["string", "null"]},
+        "precedence_rule": {"type": ["string", "null"]},
+        "source_status": {
+          "type": "string",
+          "enum": ["project_input", "approved_project_source", "unverified_project_source"]
+        }
+      }
+    },
+    "requirements": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/requirement"}
+    },
+    "conflicts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["requirement_ids", "status"],
+        "properties": {
+          "requirement_ids": {
+            "type": "array",
+            "minItems": 2,
+            "items": {"type": "string"}
+          },
+          "status": {
+            "type": "string",
+            "enum": ["CONFLICTING_EVIDENCE", "RESOLVED"]
+          },
+          "resolution_basis": {"type": ["string", "null"]}
+        }
+      }
+    }
+  },
+  "$defs": {
+    "source_ref": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["document_role"],
+      "properties": {
+        "document_role": {"type": "string"},
+        "clause": {"type": ["string", "null"]},
+        "page": {"type": ["string", "integer", "null"]},
+        "revision": {"type": ["string", "null"]},
+        "quoted_text": {"type": ["string", "null"]}
+      }
+    },
+    "requirement": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "domain",
+        "requirement_type",
+        "requirement",
+        "source",
+        "extraction_status"
+      ],
+      "properties": {
+        "id": {"type": "string"},
+        "domain": {
+          "type": "string",
+          "enum": [
+            "document_control",
+            "design_responsibility",
+            "governing_reference",
+            "wind",
+            "dead_load",
+            "seismic",
+            "thermal_movement",
+            "interstory_movement",
+            "concentrated_load",
+            "maintenance_load",
+            "strength",
+            "serviceability",
+            "glass",
+            "structural_silicone",
+            "framing",
+            "connection",
+            "anchor",
+            "weld",
+            "fastener",
+            "metal_panel",
+            "operable_element",
+            "test",
+            "inspection",
+            "submittal",
+            "material",
+            "other"
+          ]
+        },
+        "requirement_type": {
+          "type": "string",
+          "enum": [
+            "load",
+            "criterion",
+            "required_analysis",
+            "required_evidence",
+            "material_requirement",
+            "test_requirement",
+            "inspection_requirement",
+            "standard_reference",
+            "responsibility",
+            "precedence",
+            "other"
+          ]
+        },
+        "requirement": {"type": "string"},
+        "scope": {"type": ["string", "null"]},
+        "component": {"type": ["string", "null"]},
+        "load_case": {"type": ["string", "null"]},
+        "direction": {"type": ["string", "null"]},
+        "limit_state": {
+          "type": ["string", "null"],
+          "enum": ["strength", "serviceability", "test", "proof", "movement", "durability", "other", null]
+        },
+        "specified_value": {
+          "type": ["number", "string", "null"]
+        },
+        "unit": {"type": ["string", "null"]},
+        "criterion_type": {
+          "type": ["string", "null"],
+          "enum": [
+            "absolute",
+            "ratio",
+            "min_ratio_absolute",
+            "ratio_plus_constant",
+            "multiplier",
+            "referenced_external",
+            "textual",
+            "other",
+            null
+          ]
+        },
+        "standard_id": {"type": ["string", "null"]},
+        "edition_as_specified": {"type": ["string", "null"]},
+        "source": {"$ref": "#/$defs/source_ref"},
+        "extraction_status": {
+          "type": "string",
+          "enum": [
+            "SPECIFIED",
+            "REFERENCED_EXTERNAL",
+            "INCOMPLETE",
+            "CONFLICTING_EVIDENCE",
+            "NOT_APPLICABLE"
+          ]
+        },
+        "verification_status": {
+          "type": ["string", "null"],
+          "enum": [
+            "PENDING",
+            "VERIFIED_CURRENT",
+            "PROJECT_APPROVED",
+            "CONFLICTING_EVIDENCE",
+            null
+          ]
+        },
+        "notes": {"type": ["string", "null"]}
+      }
+    }
+  }
+}
