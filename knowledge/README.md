@@ -14,7 +14,7 @@
 - `anchors/`：cast-in / post-installed anchor 與設計標準分流
 - `finishes/`：烤漆、陽極處理等
 - `corrosion-protection/`：熱浸鍍鋅與其他防蝕
-- `structural-design/`：耐風、耐震、荷載生成、直料／橫料、多件擠型共同作用、continuous mullion / splice / sleeve、雙軸彎曲、glass-edge relative displacement、fastener group、screw pull-out / thread engagement、局部擠型、焊道群、anchor、structural review / failure-mode coverage，以及 `preliminary-sizing/` 前期 required section property / support / traceability 方法
+- `structural-design/`：耐風、耐震、荷載生成、直料／橫料、多件擠型共同作用、continuous mullion / splice / sleeve、雙軸彎曲、glass-edge relative displacement、fastener group、screw pull-out / thread engagement、局部擠型、焊道群、anchor、design-factor / hidden-multiplier audit、structural review / failure-mode coverage，以及 `preliminary-sizing/` 前期 required section property / support / traceability 方法
 - `operable-elements/`：活動窗／可開啟外牆構件的 sash/frame、hinge/lock/stay、五金緊件、局部擠型與 whole-product performance / life-cycle routing
 - `engineering-notes/`：標準無法單獨回答的實務問題
 - `stone/`：天然石材外牆與繫件系統
@@ -61,6 +61,7 @@
 
 - `structural-design/review/README.md`
 - `structural-design/review/project-specification-extraction.md`
+- `structural-design/review/design-factor-and-hidden-multiplier-audit.md`
 - `structural-design/review/structural-calculation-review-checklist.md`
 - `structural-design/review/failure-mode-map.md`
 - `structural-design/review/coverage-and-completeness.md`
@@ -89,7 +90,7 @@
 - `operable-elements/hinge-lock-stay-connections.md`
 - `operable-elements/performance-and-life-cycle.md`
 
-這些頁面刻意把「需求 mechanics」和「規範 capacity」分開。若 allowable / resistance / safety treatment 沒有可驗證來源，AI 應輸出 `INCOMPLETE`，不得從既有專案計算書、舊版手冊或記憶自動補值。
+這些頁面刻意把「需求 mechanics」和「規範 capacity」分開。若 allowable / resistance / safety treatment / design factor 沒有可驗證來源，AI 應輸出 `INCOMPLETE`，不得從既有專案計算書、舊版手冊或記憶自動補值。
 
 ## 機器可讀 Schemas
 
@@ -104,6 +105,7 @@
 - `seismic-component.schema.json`：façade component seismic input / provenance model
 - `structural-coverage.schema.json`：failure-mode coverage / completeness model
 - `project-design-basis.schema.json`：project specification → structural design basis extraction model
+- `design-factor.schema.json`：load / safety / resistance / allowable / test multiplier 與 reported ratio 的 factor ledger / audit model
 
 Schema 不保存專案實例，只定義可供 AI / calculator / spreadsheet 共用的資料結構。正式 calculator 實作前仍應依 `AGENTS.md` 的 schema discipline 檢查 provenance、unit、scope 與 incomplete-state handling。
 
