@@ -95,7 +95,7 @@ Handoff 圖常使用 `@ spacing` 表示重複 reaction。
 
 `Rw = XX kN @ YY mm` 若沒有上述定義，不足以直接建立主結構模型。
 
-## Load case／combination
+## 荷載案例／組合（Load case／combination）
 
 每個 reaction 至少應對應到：
 
@@ -110,7 +110,7 @@ Handoff 圖常使用 `@ spacing` 表示重複 reaction。
 
 不得把不同 design level 的 reaction 混在同一張圖而沒有標示。
 
-## Reaction source reconciliation
+## 反力來源核對（Reaction source reconciliation）
 
 Handoff reaction 必須能回到 upstream calculation：
 
@@ -145,7 +145,7 @@ Handoff reaction 必須能回到 upstream calculation：
 
 依 [`../review/design-factor-and-hidden-multiplier-audit.md`](../review/design-factor-and-hidden-multiplier-audit.md) 檢查。
 
-## Responsibility handoff
+## 責任交接（Responsibility handoff）
 
 Reaction package 應明確說明至少下列責任：
 
@@ -170,7 +170,7 @@ Reaction package 應明確說明至少下列責任：
 
 實際責任仍應以 contract / design responsibility matrix / approved RFI 為準。
 
-## Revision control
+## 版次控制（Revision control）
 
 若以下任一項改變，應評估是否需要重新發 reaction package：
 
@@ -196,7 +196,7 @@ Private project package 可使用類似欄位：
 
 必要時再加 `Mx / My / Mz`、movement release、notes、governing combination 等欄位。
 
-## Review 狀態
+## 審查狀態（Review status）
 
 ### 通過（`PASS`）
 
