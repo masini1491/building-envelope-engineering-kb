@@ -12,7 +12,7 @@ verified_at: "2026-09-02"
 
 現行標準版本由 [`anchor-standards-baseline.md`](anchor-standards-baseline.md) 維護。
 
-## Qualification 與 Design 必須分開
+## 資格認證（Qualification）與設計（Design）必須分開
 
 後置式機械錨栓至少有兩個不同問題：
 
@@ -28,7 +28,7 @@ verified_at: "2026-09-02"
 
 同樣地，manufacturer software 或 ESR / ETA 中的某一 capacity 也不能脫離其適用條件直接引用。
 
-## Mechanical anchor 與 adhesive anchor 不可混用
+## 機械錨栓（Mechanical anchor）與黏著式錨栓（adhesive anchor）不可混用
 
 Mechanical post-installed anchor 與 adhesive anchor 不是同一 qualification family。
 
@@ -218,7 +218,7 @@ Review 不應只問「有沒有照說明書安裝」，還要確認：
 
 **有 seismic load calculation ≠ anchor automatically seismic-qualified。**
 
-## Manufacturer software／ESR／ETA 的定位
+## 製造商軟體（Manufacturer software）／ESR／ETA 的定位
 
 Manufacturer software 很適合：
 
