@@ -21,6 +21,18 @@ ALLOWED_VERIFICATION = {
 }
 
 MARKDOWN_LINK_RE = re.compile(r"(?<!!)\[[^\]]*\]\(([^)]+)\)")
+MARKDOWN_HEADING_RE = re.compile(r"^(#{1,6})\s+(.+?)\s*$")
+CJK_RE = re.compile(r"[\u3400-\u9fff]")
+
+# LANGUAGE.md permits standards, material designations, machine identifiers and
+# stable status/schema tokens to remain in their original form. These patterns
+# are intentionally narrow so ordinary human-facing English headings still fail.
+LANGUAGE_HEADING_ALLOWLIST = [
+    re.compile(r"^(?:ASTM|CNS|AAMA|FGIA|ISO|ACI|AISC|AWS|NAFS|FEA)(?:[ /+&.0-9A-Z_-]*)$"),
+    re.compile(r"^(?:A[24]-\d{2}|\d{4}-[HT]\d+)$"),
+    re.compile(r"^(?:PASS|WARNING|FAIL|INCOMPLETE|NOT_APPLICABLE)$"),
+    re.compile(r"^\d+\.\s+`[a-z0-9_]+`$"),
+]
 
 
 def fail(errors: list[str], message: str) -> None:
@@ -125,12 +137,73 @@ def validate_public_reference_policy(errors: list[str]) -> None:
             fail(errors, f"Private-project reference directory is not allowed: {path.relative_to(ROOT)}")
 
 
+def language_heading_allowed(heading: str) -> bool:
+    compact = re.sub(r"[*_]", "", heading).strip()
+    return any(pattern.fullmatch(compact) for pattern in LANGUAGE_HEADING_ALLOWLIST)
+
+
+def validate_language_policy(errors: list[str]) -> None:
+    """Enforce LANGUAGE.md for human-facing headings under knowledge/.
+
+    The check deliberately targets headings, where language drift is easy to
+    detect with low false-positive risk. Prose may contain technical English and
+    formal standard names, so prose remains a review concern rather than a hard
+    CI rule.
+    """
+
+    knowledge = ROOT / "knowledge"
+    if not knowledge.exists():
+        return
+
+    for path in sorted(knowledge.rglob("*.md")):
+        text = path.read_text(encoding="utf-8")
+        in_fence = False
+        in_frontmatter = text.startswith("---\n")
+        frontmatter_done = not in_frontmatter
+
+        for line_no, line in enumerate(text.splitlines(), 1):
+            if in_frontmatter and not frontmatter_done:
+                if line_no > 1 and line.strip() == "---":
+                    frontmatter_done = True
+                continue
+
+            stripped = line.lstrip()
+            if stripped.startswith(("```", "~~~")):
+                in_fence = not in_fence
+                continue
+            if in_fence:
+                continue
+
+            match = MARKDOWN_HEADING_RE.match(line)
+            if not match:
+                continue
+            heading = match.group(2).strip()
+
+            if "工程主題：" in heading:
+                fail(
+                    errors,
+                    f"Temporary language fallback heading is not allowed: "
+                    f"{path.relative_to(ROOT)}:{line_no} -> {heading}",
+                )
+                continue
+
+            if CJK_RE.search(heading) or language_heading_allowed(heading):
+                continue
+
+            fail(
+                errors,
+                f"Human-facing heading must be zh-TW-first per LANGUAGE.md: "
+                f"{path.relative_to(ROOT)}:{line_no} -> {heading}",
+            )
+
+
 def main() -> int:
     errors: list[str] = []
     validate_json(errors)
     validate_frontmatter(errors)
     validate_markdown_links(errors)
     validate_public_reference_policy(errors)
+    validate_language_policy(errors)
 
     if errors:
         print("Repository validation failed:\n")
