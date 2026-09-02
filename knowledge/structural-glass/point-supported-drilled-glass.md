@@ -34,7 +34,7 @@ ASTM E1300-24 是建築玻璃 load resistance 的重要 practice，但其 scope 
 - movement-induced contact
 - fabrication quality、tempering / heat treatment 與 edge / hole finish
 
-## Polymer sleeve／PTFE 防呆
+## 高分子套管（Polymer sleeve）／PTFE 防呆
 
 Polymer sleeve、PTFE 或其他隔離／緩衝材料可用來降低 glass-to-metal 直接接觸、改善 bearing contact 與容許施工公差，但不得因此宣稱「孔邊應力集中已被消除」。
 
