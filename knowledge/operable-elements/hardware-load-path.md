@@ -11,7 +11,7 @@ canonical_owner: true
 
 Hinge、friction stay、pivot、lock、keeper、restrictor、stopper 等 operable hardware 不是 isolated component。其 demand 來自 sash / glass / wind / operating load，並透過 fastener 與 local extrusion 回到 outer frame。
 
-## Generic load path
+## 一般荷載路徑
 
 `glass / sash load`
 

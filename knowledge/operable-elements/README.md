@@ -31,7 +31,7 @@ canonical_owner: true
 
 ## 四層 verification
 
-### 1. Sash / vent structural response
+### 1. 窗扇／vent 結構反應
 
 - frame bending / torsion
 - glass or infill support
@@ -39,7 +39,7 @@ canonical_owner: true
 - corner-joint behavior
 - local deformation near hardware
 
-### 2. Hardware demand
+### 2. 五金需求
 
 - hinge / stay reactions
 - locking-point reactions
@@ -47,7 +47,7 @@ canonical_owner: true
 - eccentricity / lever arm
 - hardware-group force distribution
 
-### 3. Fastener / local extrusion
+### 3. 緊件／鋁擠型局部行為
 
 - screw / bolt body tension / shear
 - pull-out / thread engagement
@@ -55,7 +55,7 @@ canonical_owner: true
 - local extrusion bending / tear-out / wall deformation
 - reinforcement load transfer
 
-### 4. Whole-product performance
+### 4. 整體產品性能
 
 - structural performance under pressure
 - air / water performance as applicable

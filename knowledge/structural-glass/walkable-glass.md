@@ -13,7 +13,7 @@ canonical_owner: true
 
 適用 supported laminated glass walkways、treads、landings 等可步行玻璃構件。
 
-## Design routing
+## 設計 routing
 
 至少分開確認：
 

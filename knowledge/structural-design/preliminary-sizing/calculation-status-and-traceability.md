@@ -7,7 +7,7 @@ canonical_owner: true
 
 # 計算狀態與可追溯性
 
-## Status model
+## 狀態模型
 
 建議 engineering calculation / verification 使用：
 
@@ -39,11 +39,11 @@ canonical_owner: true
 - 可關閉；
 - 與 structural capacity / allowable value 分開保存。
 
-## Calculation trace
+## 計算追溯
 
 每個結果至少應能回溯：
 
-### Inputs
+### 輸入
 
 - load case / pressure
 - tributary geometry
@@ -55,7 +55,7 @@ canonical_owner: true
 - section properties
 - axis definition
 
-### Derived values
+### 衍生值
 
 - line / point load
 - allowable deflection
@@ -64,14 +64,14 @@ canonical_owner: true
 - trial / actual deflection
 - required `I` / `S`
 
-### Method
+### 方法
 
 - analytical formula / beam solver / FEA / other
 - assumptions
 - source standard / criteria
 - edition / revision when relevant
 
-### Result
+### 結果
 
 - required value
 - actual value
@@ -81,7 +81,7 @@ canonical_owner: true
 - status
 - warnings / missing inputs
 
-## Auditability rule
+## 可稽核性規則
 
 不得只輸出 `PASS` / `FAIL` 而不保留 calculation trace。
 
@@ -96,7 +96,7 @@ canonical_owner: true
 - rounding
 - criteria / standard edition
 
-## Data integrity
+## 資料完整性
 
 任何未確認資料都應保留 provenance / status，例如：
 

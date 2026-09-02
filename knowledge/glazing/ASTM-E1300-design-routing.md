@@ -12,7 +12,7 @@ canonical_owner: true
 
 ASTM E1300-24 是建築玻璃 load resistance 的核心 practice。它用於依玻璃種類、厚度、尺寸、支承與載重條件判定玻璃抗載能力；不能由產品標準 C1036 / C1048 / C1172 直接取代。
 
-## Input checklist
+## 輸入檢核表
 
 使用 E1300 前至少確認：
 
@@ -26,14 +26,14 @@ ASTM E1300-24 是建築玻璃 load resistance 的核心 practice。它用於依�
 8. holes / notches / edge condition 是否超出標準一般假設
 9. project specification 是否要求更嚴格 criteria
 
-## Engineering guard
+## 工程防呆
 
 - 玻璃厚度不可只看公稱值而忽略標準採用的 thickness category。
 - laminated glass 不可把兩片厚度簡單相加後當 monolithic plate。
 - IGU 各 lite 的 load sharing 需依 E1300 方法處理，不能自行假設 50/50。
 - fully tempered / heat-strengthened 的 treatment effect 應依標準方法，不使用坊間固定倍率。
 
-## Serviceability / edge clearance
+## 服務性／邊緣淨空
 
 E1300 的 load resistance 判定不等於 curtain wall system 的所有 serviceability 問題均已解決。仍應檢查：
 
@@ -44,7 +44,7 @@ E1300 的 load resistance 判定不等於 curtain wall system 的所有 servicea
 - sealant joint deformation
 - thermal movement
 
-## Failure probability / project criteria
+## 破壞機率／專案判定基準
 
 正式設計時應依 E1300 與 project specification 的採用條件判斷，不得由 AI 自行設定 probability-of-breakage 或安全係數。
 

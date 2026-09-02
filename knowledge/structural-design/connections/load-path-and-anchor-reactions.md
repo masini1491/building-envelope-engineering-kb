@@ -76,7 +76,7 @@ ASTM F1554 是 anchor bolt / rod 類材料與產品規格，不能拿來當 mech
 - `anchor catalogue allowable load` 不得脫離 concrete strength、edge distance、spacing、embedment、seismic condition 與 installation condition直接套用。
 - 只要 bracket 本體夠強，不代表 connection system 已完成檢核。
 
-## Sources / routing
+## 來源／routing
 
 - 內政部建築研究所《帷幕牆系統結構耐風設計手冊》
 - ACI 318 Chapter 17

@@ -71,7 +71,7 @@ canonical_owner: true
 
 ## 必抽取的十個 domains
 
-### 1. Document control / authority
+### 工程主題：1. Document control / authority
 
 至少保存：
 
@@ -84,7 +84,7 @@ canonical_owner: true
 
 若不同文件衝突，不得自行合併；建立 `CONFLICT` item。
 
-## 2. Design responsibility / required scope
+## 工程主題：2. Design responsibility / required scope
 
 抽取：
 
@@ -96,7 +96,7 @@ canonical_owner: true
 
 Required coverage 應轉成後續 checklist targets，而不是只保留一段 prose。
 
-## 3. Governing references
+## 工程主題：3. Governing references
 
 逐項抽取：
 
@@ -115,7 +115,7 @@ Required coverage 應轉成後續 checklist targets，而不是只保留一段 p
 
 若 specification 說「latest edition」，也要原樣保存，不要在 extraction 階段自行填一個版本。
 
-## 4. Loads / actions
+## 工程主題：4. Loads / actions
 
 至少依適用性尋找：
 
@@ -142,11 +142,11 @@ Required coverage 應轉成後續 checklist targets，而不是只保留一段 p
 - load-case combination rule
 - whether it is `design`, `serviceability`, `test`, or `safety / proof` demand
 
-### Design pressure ≠ test pressure
+### 設計風壓 ≠ 試驗壓力
 
 即使數值彼此相關，也必須保存成不同 requirement objects。
 
-## 5. Strength / safety criteria
+## 工程主題：5. Strength / safety criteria
 
 抽取：
 
@@ -159,7 +159,7 @@ Required coverage 應轉成後續 checklist targets，而不是只保留一段 p
 
 不得把不同 component 的 factor 合併成一個 project-wide `safety_factor`。
 
-## 6. Serviceability / movement criteria
+## 工程主題：6. Serviceability / movement criteria
 
 按 component + direction 分開保存：
 
@@ -178,7 +178,7 @@ Required coverage 應轉成後續 checklist targets，而不是只保留一段 p
 
 例如 `L/n`、absolute limit、`min(L/n, X)`、`L/n + C` 應保留原 criterion type，不要先轉成單一數字。
 
-## 7. Required calculation coverage
+## 工程主題：7. Required calculation coverage
 
 把 specification 中的「計算書須包含」轉成 machine-reviewable checklist，例如：
 
@@ -199,7 +199,7 @@ Required coverage 應轉成後續 checklist targets，而不是只保留一段 p
 
 任何 specification 明確要求但 calculation package 找不到對應 evidence 的項目，至少應標為 `INCOMPLETE`。
 
-## 8. Required calculation trace / submittal evidence
+## 工程主題：8. Required calculation trace / submittal evidence
 
 尋找：
 
@@ -219,7 +219,7 @@ Required coverage 應轉成後續 checklist targets，而不是只保留一段 p
 
 若 specification 要求 FBD / eccentricity / reactions，而計算書只列最後 utilization，屬 specification-compliance gap。
 
-## 9. Performance test / acceptance
+## 9. 性能試驗／驗收
 
 分開抽取：
 
@@ -241,7 +241,7 @@ Required coverage 應轉成後續 checklist targets，而不是只保留一段 p
 
 `analysis result ↔ mock-up / test result correlation`
 
-## 10. Material / connection-specific requirements
+## 10. 材料／連接特定要求
 
 抽取：
 
@@ -256,7 +256,7 @@ Required coverage 應轉成後續 checklist targets，而不是只保留一段 p
 
 不要把 material requirement 與 structural capacity value 混成同一欄位。
 
-# Project Design Basis Sheet
+# 專案設計基準表（Project Design Basis Sheet）
 
 推薦至少輸出以下 table：
 
@@ -268,7 +268,7 @@ Required coverage 應轉成後續 checklist targets，而不是只保留一段 p
 
 實際 project sheet 屬 project context，不應 commit 到 public repository。
 
-## Spec → Calc Coverage Matrix
+## 規範 → 計算涵蓋矩陣
 
 取得 Design Basis Sheet 後，再建立：
 
@@ -278,13 +278,13 @@ Required coverage 應轉成後續 checklist targets，而不是只保留一段 p
 
 Status 必須區分至少兩種問題：
 
-### Engineering result
+### 工程結果
 
 例如：
 
 `member_flexure = PASS`
 
-### Specification compliance
+### 規範符合性
 
 例如：
 
@@ -292,7 +292,7 @@ Status 必須區分至少兩種問題：
 
 不能因公式 mechanics 正確，就把不符合 project criterion 的結果判為 PASS。
 
-# Conflict handling
+# 衝突處理
 
 文件彼此不一致時：
 
@@ -304,7 +304,7 @@ Status 必須區分至少兩種問題：
 
 「採較嚴格者」只有在 governing documents 明確要求且兩個 criterion 可直接比較時才能直接執行。
 
-# Recommended extraction statuses
+# 建議抽取狀態
 
 - `SPECIFIED` — 文件明確寫出。
 - `REFERENCED_EXTERNAL` — specification 指向外部報告／圖表／其他文件，尚需取得。
@@ -328,7 +328,7 @@ AI 不得：
 - 因為技師已簽證就跳過 independent completeness review。
 - 將 project-specific extraction 結果寫回 public knowledge base。
 
-# Machine-readable routing
+# 機器可讀 routing
 
 推薦搭配 repository 根目錄：
 

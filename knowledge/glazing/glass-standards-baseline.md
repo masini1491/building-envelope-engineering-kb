@@ -33,7 +33,7 @@ canonical_owner: true
   - 玻璃在建築中的 load resistance 設計方法。
   - 產品符合 C1036 / C1048 / C1172 不代表已完成 E1300 結構檢核。
 
-## Engineering routing
+## 工程 routing
 
 遇到「這片玻璃能不能承受設計風壓？」時，AI 應分開檢查：
 
@@ -46,7 +46,7 @@ canonical_owner: true
 7. project-specific allowable probability / safety requirements
 8. coating / frit / holes / notches / edge condition 等是否另有影響
 
-## Appearance / distortion guard
+## 外觀／變形防呆
 
 - 玻璃「符合產品規格」不代表建築師在任何視角下都不會看到 roller wave、anisotropy、bow / warp、coating nonuniformity 或 laminated optical effects。
 - 外觀接受標準若是專案重要要求，應在 mock-up / visual acceptance criteria 階段明確處理。

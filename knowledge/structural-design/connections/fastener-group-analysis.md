@@ -28,7 +28,7 @@ canonical_owner: true
 
 若 fastener stiffness 明顯不同、孔洞為 slot、部分孔位有 gap 或某些 fastener 不承受特定方向，不能直接使用等剛度群組模型。
 
-## 1. Fastener-group centroid
+## 工程主題：1. Fastener-group centroid
 
 若所有緊件視為等剛度，群組形心可用幾何平均：
 
@@ -38,7 +38,7 @@ canonical_owner: true
 
 若各緊件剛度不同，應依實際 stiffness weighting 建模，不應仍使用純幾何平均。
 
-## 2. Direct force
+## 工程主題：2. Direct force
 
 理想等剛度、所有緊件共同承載時：
 
@@ -54,7 +54,7 @@ canonical_owner: true
 - fastener pretension / friction 被設計成主要 load-transfer mechanism
 - connector flexibility 顯著不同
 
-## 3. In-plane eccentric shear / torsion
+## 工程主題：3. In-plane eccentric shear / torsion
 
 對位於 `(x_i, y_i)` 的 fastener，可先定義相對 group centroid 的：
 
@@ -72,7 +72,7 @@ canonical_owner: true
 
 這是 linear-elastic fastener-group model；若 connection 進入 bearing redistribution、slip、yielding 或大變形，需使用更適合的模型。
 
-## 4. Eccentric tension / overturning
+## 工程主題：4. Eccentric tension / overturning
 
 對 bolt group 承受面外拉力與 overturning moment 時，應依實際 connection mechanics 分配 tension。不得假設：
 
@@ -89,7 +89,7 @@ canonical_owner: true
 - prying
 - anchor / bolt stiffness
 
-## 5. Combined tension + shear
+## 工程主題：5. Combined tension + shear
 
 每一支 fastener 的 demand 至少應分開求得：
 
@@ -104,7 +104,7 @@ AI 不得自行把所有 fastener 都套成：
 
 因為 interaction equation、allowable / design strength basis、thread condition 與 standard family 可能不同。
 
-## 6. Connected-material checks
+## 工程主題：6. Connected-material checks
 
 fastener 本體 PASS 不代表 connection PASS。至少要依實際情況檢查：
 
@@ -117,7 +117,7 @@ fastener 本體 PASS 不代表 connection PASS。至少要依實際情況檢查�
 - plate bending / prying
 - block shear where applicable
 
-## 7. Screw-group specific guard
+## 工程主題：7. Screw-group specific guard
 
 對 curtain-wall self-tapping / machine screw connection，常見風險包括：
 
@@ -128,7 +128,7 @@ fastener 本體 PASS 不代表 connection PASS。至少要依實際情況檢查�
 
 因此 input 應保留 screw coordinates，而不是只保存 `number_of_screws`。
 
-## 8. Recommended calculation output
+## 工程主題：8. Recommended calculation output
 
 至少輸出：
 

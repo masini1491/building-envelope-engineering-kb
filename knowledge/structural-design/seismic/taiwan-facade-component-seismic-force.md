@@ -7,11 +7,11 @@ canonical_owner: true
 
 # 台灣建築外殼構件地震力
 
-## Purpose
+## 目的
 
 本頁整理台灣《建築物耐震設計規範及解說》第四章對外牆／帷幕非結構構材地震力的工程 routing。公開 KB 只保存公式角色、輸入欄位與 guardrail；不保存任何專案的實際 `SDS / Ip / ap / Rp / Wp / hx / hn`。
 
-## Component-force structure
+## 構件地震力架構
 
 現行第四章使用的基本概念可整理為：
 
@@ -31,13 +31,13 @@ AI / calculator 必須把以下欄位分開保存：
 - component category / table row
 - regulation edition / source clause
 
-## Height amplification matters
+## 高度放大效應很重要
 
 第四章公式包含 `hx/hn`，因此 component seismic force 可能隨安裝高度改變。
 
 不得把某一樓層算出的 component force 無條件套到全棟，也不得只記「本案 seismic coefficient = X」而遺失其高度來源。
 
-## Component category selection
+## 構件分類選擇
 
 外牆帷幕相關部件至少可能落在不同類別：
 
@@ -58,7 +58,7 @@ seismic_component:
   source_clause: ...
 ```
 
-## Weight definition guard
+## 重量定義防呆
 
 `Wp` 必須依 current regulation 對該構件的定義建立，不應任意：
 
@@ -68,19 +68,19 @@ seismic_component:
 
 若 effective component mass / weight boundary 不明，結果應標記 `INCOMPLETE`。
 
-## Force direction
+## 作用力方向
 
 應依 governing regulation 與 component geometry 分別處理所需方向；不要因 façade 主要受風方向是 façade-normal，就假設 seismic 只需同方向。
 
 對轉角、突出物、懸吊構件、設備附件或具有多軸 load path 的 façade subsystem，可能需要多方向／組合檢核。
 
-## Load combinations
+## 荷載組合
 
 本頁不硬編碼任何 load combination。地震 component force 與 dead / wind / other action 的組合應回到 current Taiwan structural design basis / project specification。
 
 AI 不得從舊 project calculation 自行重建 load combination rules。
 
-## Output requirements
+## 輸出要求
 
 至少輸出：
 

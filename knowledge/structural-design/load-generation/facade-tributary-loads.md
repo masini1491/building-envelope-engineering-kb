@@ -17,7 +17,7 @@ canonical_owner: true
 
 但 tributary geometry 由實際 support boundary 決定，不能預設為固定半跨或固定一半面板。
 
-## Mullion
+## 直料（Mullion）
 
 對由左右面板將風壓傳給中間 mullion 的常見情況，線荷載可表示為：
 
@@ -27,7 +27,7 @@ canonical_owner: true
 
 對不對稱左右 panel width、edge mullion、corner mullion、opening-adjacent mullion 等，`b_t` 必須由實際幾何建立。
 
-## Transom
+## 橫料（Transom）
 
 Transom 的面材 tributary load 常不是單一 uniform line load。若 panel 四邊支承，面壓向 transom 的分配可能隨位置形成 triangular / trapezoidal line load；應依實際 panel aspect ratio、support assumption 與採用方法建立。
 

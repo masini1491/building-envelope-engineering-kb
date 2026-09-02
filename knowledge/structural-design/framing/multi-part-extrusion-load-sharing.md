@@ -123,7 +123,7 @@ AI 不得：
 
 `composite_action = unknown → structural result incomplete`
 
-## Public sources / routing
+## 公開來源／routing
 
 - The Aluminum Association, **Aluminum Design Manual 2020**：鋁結構 strength / member design 的現行公開出版資訊可由 Aluminum Association Standards / Bookstore 查證。
 - 內政部建築研究所《帷幕牆系統結構耐風設計手冊》：作為台灣帷幕 framing / load-path 的總體 routing。

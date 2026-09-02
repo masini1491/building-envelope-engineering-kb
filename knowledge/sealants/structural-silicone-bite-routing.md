@@ -42,7 +42,7 @@ Structural silicone bite 不是固定材料常數，也不是「所有案子都�
 5. 驗證 substrate adhesion、primer requirement、compatibility。
 6. 確認 shop / field QA、cure、handling、deglazing / repair procedure。
 
-## Thickness and movement
+## 厚度與位移
 
 Structural bite 與 sealant thickness 是不同幾何參數：
 
@@ -64,7 +64,7 @@ Structural bite 與 sealant thickness 是不同幾何參數：
 
 為準。
 
-## Dead load
+## 自重
 
 是否允許 structural silicone 承擔玻璃永久自重，不可由一般 SSG 概念自行推定。應依系統設計、setting block / dead-load support arrangement、產品與 manufacturer approval 判斷。
 

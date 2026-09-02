@@ -20,7 +20,7 @@ canonical_owner: true
 
 各類產品的面材、芯材、黏著方式、邊部封裝、局部補強、耐火與耐候性能可能完全不同。
 
-## Sandwich-panel mechanical test family
+## 夾芯板機械性能試驗族群
 
 蜂巢／sandwich panel 常見材料或構造試驗包括：
 
@@ -32,7 +32,7 @@ canonical_owner: true
 
 這些試驗可提供 core shear、facesheet、flatwise compression 或 peel 等材料／bond performance evidence；**單一 coupon test 不能取代完成 panel 與 attachment system 的結構驗證。**
 
-## Panel-level structural verification
+## 面板層級結構驗證
 
 實際外牆 panel design 至少要確認：
 
@@ -48,7 +48,7 @@ canonical_owner: true
 10. corner / edge / opening local effects
 11. full-size structural test（若專案要求或分析模型不足）
 
-## Fire-test applicability guard
+## 防火試驗適用性防呆
 
 ### ASTM E84
 
@@ -63,13 +63,13 @@ ASTM 自身明確說明 E84：
 
 > `ASTM E84 PASS` 不等於 exterior wall assembly 已通過 full-scale / assembly fire requirement。
 
-### Exterior-wall assembly fire testing
+### 外牆組件防火試驗
 
 若專案法規或規範要求 NFPA 285 或其他 exterior-wall assembly fire test，判定對象通常是**具體 assembly**：面板、芯材、保溫、防水層、air gap、subframe、fire blocking、開口細節等共同組成。
 
 不得只因同品牌／同芯材的另一個 wall build-up 有測試報告，就自動宣稱本案 configuration 被涵蓋。
 
-## Substitution review
+## 替代審查
 
 複合板或蜂巢板替代時，至少比對：
 

@@ -24,7 +24,7 @@ Panel-to-stiffener connection 是 panel skin 與 stiffener 之間真正傳遞 sh
 
 不同類型應分別處理，不能只用一個通用「connector capacity」。
 
-## Load transfer
+## 荷載傳遞
 
 至少要回答：
 
@@ -35,7 +35,7 @@ Panel-to-stiffener connection 是 panel skin 與 stiffener 之間真正傳遞 sh
 5. 是否有 thermal differential movement？
 6. stiffener end force 如何進入 perimeter support？
 
-## Discrete fasteners
+## 離散緊件
 
 使用 stud / screw / rivet 時，至少檢查：
 
@@ -50,7 +50,7 @@ Panel-to-stiffener connection 是 panel skin 與 stiffener 之間真正傳遞 sh
 
 相關方法可路由至 `structural-design/connections/`。
 
-## Adhesive / bonded interface
+## 黏著／膠合介面
 
 黏著連接至少需要：
 
@@ -65,7 +65,7 @@ Panel-to-stiffener connection 是 panel skin 與 stiffener 之間真正傳遞 sh
 
 AI 不得自行把 adhesive interface 定義成 rigid tie，也不得只靠短期 coupon strength 宣稱 façade panel connection 已完成驗證。
 
-## Welded connection
+## 焊接連接
 
 若 stiffener 以 weld 與 panel / return 連接，需另外考慮：
 
@@ -77,7 +77,7 @@ AI 不得自行把 adhesive interface 定義成 rigid tie，也不得只靠短�
 
 鋁材焊接不可直接套用 steel weld strength equation。
 
-## Connector spacing
+## 連接件間距
 
 Spacing 同時影響：
 
@@ -89,7 +89,7 @@ Spacing 同時影響：
 
 所以 connector spacing 不只是 strength 問題，也可能控制完成面品質。
 
-## FEA representation
+## FEA 表示方式
 
 在 panel FEA 中，interface 可依 evidence 採：
 

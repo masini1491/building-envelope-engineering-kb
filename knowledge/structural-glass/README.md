@@ -67,7 +67,7 @@ canonical_owner: true
 
 本目錄只保存可泛化方法與公開來源。非公開專案文件若曾用於維護者理解問題，不得在此留下專案名稱、尺寸、荷載、圖號、節點、截圖或其他可識別資訊。
 
-## Related pages
+## 相關頁面
 
 - `laminated-glass-effective-thickness.md`
 - `glass-fin-design.md`

@@ -21,7 +21,7 @@ Building-envelope thermal performance 不能只看單一材料的 conductivity�
 
 專案若採 NFRC、ISO、CNS 或其他 energy-code 方法，仍應依指定體系處理；本頁不宣告不同體系完全等價。
 
-## Curtain wall / glazed wall thermal path
+## 帷幕牆／玻璃外牆熱傳路徑
 
 至少拆成：
 
@@ -35,7 +35,7 @@ Building-envelope thermal performance 不能只看單一材料的 conductivity�
 8. slab edge / anchor / steel bracket thermal bridge
 9. perimeter seal and adjacent wall interface
 
-## Condensation logic
+## 結露判斷邏輯
 
 結露不是只由「室內外溫差」單一因素決定。至少與：
 
@@ -58,7 +58,7 @@ Building-envelope thermal performance 不能只看單一材料的 conductivity�
 - concealed condensation inside spandrel / cavity
 - air-leakage-driven condensation
 
-## Thermal bridge guard
+## 熱橋防呆
 
 即使 main mullion 有 thermal break，以下位置仍可能形成局部熱橋：
 
@@ -71,7 +71,7 @@ Building-envelope thermal performance 不能只看單一材料的 conductivity�
 
 因此「型錄 frame U-value」不能直接代表整棟 facade 的 assembly performance。
 
-## Test vs calculation
+## 試驗與計算的區分
 
 Hot-box test、AAMA 1503 test、2D/3D thermal simulation、material conductivity data 各自只證明其實際 scope。
 

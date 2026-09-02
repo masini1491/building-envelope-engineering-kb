@@ -31,7 +31,7 @@ canonical_owner: true
 
 並非每一節點都需要全部檢查；應依 load path 決定 applicable modes。
 
-## Local-section model
+## 局部截面模型
 
 常見簡化方法是把受力區域抽象成一段局部板件，建立：
 
@@ -59,7 +59,7 @@ canonical_owner: true
 
 不能由 AI 為了讓 ratio 通過而調整 effective width。
 
-## Bearing
+## 承壓（Bearing）
 
 理想化平均 bearing stress 常可寫成：
 
@@ -69,7 +69,7 @@ canonical_owner: true
 
 這只是 demand expression；allowable / design bearing strength、edge-distance reduction、hole type、load direction、temper / heat-affected condition 等仍須依適用規範。
 
-## Local wall bending
+## 局部壁板彎曲
 
 當 bolt / screw force 的作用線與局部板件 critical section 有 eccentricity，需考慮：
 
@@ -89,7 +89,7 @@ canonical_owner: true
 - cleat support wall
 - extrusion web adjacent to bracket
 
-## Screw pull-out / thread stripping
+## 螺絲抗拔／螺紋剝離
 
 對直接鎖入鋁擠型的 screw，至少要區分：
 
@@ -111,7 +111,7 @@ canonical_owner: true
 
 不得因 screw 本體 A2-70 或其他 property class 很高，就推論 thread engagement 也有相同等級的 capacity。
 
-## Thread engagement
+## 螺紋咬合（Thread engagement）
 
 若 design method 用 minimum engaged thickness 來確保 screw / bolt tensile capacity可被充分發揮，必須保存：
 
@@ -124,7 +124,7 @@ canonical_owner: true
 
 不能只留下「至少 X mm」而失去來源與適用條件。
 
-## Thin-wall and geometry guard
+## 薄壁／幾何防呆
 
 鋁擠型截面常具有：
 
@@ -140,7 +140,7 @@ canonical_owner: true
 
 如果 local geometry 對結果高度敏感，應使用 verified CAD geometry、局部 shell / solid FEA 或經驗證的 test data。
 
-## HAZ / welding guard
+## 熱影響區（HAZ）／焊接防呆
 
 鋁擠型若在 critical region 附近焊接，焊接熱影響可能改變局部材料強度。此時不能仍無條件採用未焊母材的 alloy / temper allowable。
 

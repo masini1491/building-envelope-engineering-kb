@@ -7,7 +7,7 @@ canonical_owner: true
 
 # 鋁材有機塗裝 AAMA 2603／2604／2605 基線
 
-## Current editions（2026-09-02）
+## 現行版本（2026-09-02）
 
 FGIA 已於 2026 年更新建築鋁材有機塗裝三件套：
 

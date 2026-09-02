@@ -137,7 +137,7 @@ Primary building structure
 
 ## 連鎖失效概念
 
-Façade failure modes often cascade rather than occur independently.
+建築外殼的破壞模式常呈連鎖發展，而不是彼此完全獨立。
 
 Example generic chain:
 

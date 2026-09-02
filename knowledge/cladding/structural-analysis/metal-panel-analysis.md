@@ -11,7 +11,7 @@ canonical_owner: true
 
 本頁處理 solid metal sheet / plate、折盒板與具周邊折邊之 façade panel 的結構分析。複合板、蜂巢板另需依其 sandwich construction 與產品資料處理。
 
-## Load path first
+## 荷載路徑優先
 
 分析前先明確定義：
 
@@ -19,7 +19,7 @@ canonical_owner: true
 
 如果其中任一介面不清楚，不能只靠 panel skin FEA 宣稱整體系統 PASS。
 
-## Geometry model
+## 幾何模型
 
 至少保存：
 
@@ -34,7 +34,7 @@ canonical_owner: true
 
 折邊若對剛度有貢獻，不應只建平板；反之若實際接頭允許相對滑移，也不能把所有折邊與補強視為完全剛接。
 
-## Material model
+## 材料模型
 
 至少保存：
 
@@ -46,7 +46,7 @@ canonical_owner: true
 
 若資料不足，只可完成 elastic-response analysis，不得自動宣告 strength PASS。
 
-## Analysis outputs
+## 分析輸出
 
 至少分開檢視：
 
@@ -57,7 +57,7 @@ canonical_owner: true
 - stiffener demand
 - folded-return demand
 
-## Serviceability vs strength
+## 服務性與強度
 
 面板最大位移可能控制視覺或接縫相容性；局部應力則可能控制材料強度。兩者的 acceptance criterion 來源可不同。
 
@@ -71,7 +71,7 @@ canonical_owner: true
 
 也不要把 panel stress PASS 等同於 connector / stiffener / support PASS。
 
-## Local peaks
+## 局部峰值
 
 FEA 在以下位置常出現局部 peak：
 
@@ -84,7 +84,7 @@ FEA 在以下位置常出現局部 peak：
 
 若 peak 隨 mesh refinement 持續增大，應先判斷 singularity / modeling artifact，再依適用 design method選擇合理的 stress extraction / averaging / local submodel；不得直接拿單一最高 node value 做結論。
 
-## Buckling / geometric nonlinearity
+## 挫屈／幾何非線性
 
 薄金屬板可能受 local buckling、large deflection 與 membrane action 影響。若線性小變形 plate analysis 已接近幾何非線性範圍，應評估是否需要：
 
@@ -96,7 +96,7 @@ FEA 在以下位置常出現局部 peak：
 
 不能把線性 FEA 的低應力結果當成已排除 buckling。
 
-## Flatness / oil canning guard
+## 平整度／oil canning 防呆
 
 結構分析中的 elastic deflection 不等於完成面 oil canning prediction。完成面視覺仍受 residual stress、leveling、fabrication、thermal cycle、installation restraint 等影響。
 

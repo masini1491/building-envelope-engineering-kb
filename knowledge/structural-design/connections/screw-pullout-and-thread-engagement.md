@@ -19,7 +19,7 @@ canonical_owner: true
 
 因此「螺絲本體強度 PASS」不代表 connection 已完成。
 
-## Pull-out variables
+## 抗拔影響變數
 
 Screw pull-out / thread stripping 通常受到下列因素影響：
 
@@ -34,7 +34,7 @@ Screw pull-out / thread stripping 通常受到下列因素影響：
 
 不能只用 screw property class 判斷 pull-out capacity。
 
-## Thread engagement
+## 螺紋咬合（Thread engagement）
 
 對 machine screw / bolt into tapped extrusion，至少保存：
 
@@ -47,7 +47,7 @@ Screw pull-out / thread stripping 通常受到下列因素影響：
 
 若某 design method 以「達到 fastener tensile capacity 所需最小 engagement」表示，這只是其中一種 design check；實際 equation / coefficient 必須回到 current standard / validated engineering method。
 
-## Screw pull-out workflow
+## 螺絲抗拔流程
 
 1. 求每支 screw 的 tensile demand。
 2. 確認 actual thread / screw geometry。
@@ -58,7 +58,7 @@ Screw pull-out / thread stripping 通常受到下列因素影響：
 7. 與 demand 比較。
 8. 另外檢查 bearing、edge distance、local wall bending與 screw-body capacity。
 
-## Eccentric group interaction
+## 偏心群組交互作用
 
 若 screw 位於偏心 fastener group，pull-out demand 不得直接取 `total tension / number of screws`；應先依 [Fastener Group Analysis](fastener-group-analysis.md) 求每一支 screw 的 actual tension / shear demand，再進入 pull-out check。
 

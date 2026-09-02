@@ -15,7 +15,7 @@ canonical_owner: true
 
 至少保存：
 
-### Geometry
+### 幾何
 
 - panel dimensions
 - thickness
@@ -24,21 +24,21 @@ canonical_owner: true
 - offsets / eccentricities
 - connector locations
 
-### Elements
+### 元素類型
 
 - shell / plate / beam / solid element type
 - element formulation when material to interpretation
 - nominal element size / mesh strategy
 - local refinement region
 
-### Material
+### 材料
 
 - `E`
 - `ν`
 - yield / design strength if strength check is performed
 - material provenance
 
-### Boundary conditions
+### 邊界條件
 
 - restrained translations
 - restrained rotations
@@ -55,14 +55,14 @@ canonical_owner: true
 - gravity / dead load if included
 - load combinations or factors, with source
 
-### Interface assumptions
+### 介面假設
 
 - panel-to-stiffener tie / slip / connector / spring
 - stiffener end condition
 - perimeter-frame interaction
 - fastener stiffness if modeled
 
-## Mesh convergence
+## 網格收斂
 
 至少對 governing result 做 mesh-sensitivity check。推薦記錄：
 
@@ -74,7 +74,7 @@ canonical_owner: true
 
 若 mesh refinement 造成 peak stress 持續增加但 global response 收斂，應判斷是否為 idealized singularity，而不是用無限增大的 peak node stress直接做 acceptance。
 
-## Stress result selection
+## 應力結果選取
 
 應明確說明讀的是：
 
@@ -90,17 +90,17 @@ canonical_owner: true
 
 對 ductile metal yielding check 常可能關注 equivalent stress，但 local buckling、fatigue、weld、thin-sheet connection 或 code-specific checks 可能要求不同 response quantity。
 
-## Linear vs nonlinear
+## 線性與非線性
 
-### Linear static
+### 線性靜力
 
 適合 elastic small-deflection response 的第一層分析與 sanity check。
 
-### Geometric nonlinear
+### 幾何非線性
 
 當 out-of-plane deflection 與 thickness / geometry 相比已不可忽略，membrane action 或 large displacement 可能影響 response 時，應評估 geometric nonlinearity。
 
-### Buckling
+### 挫屈
 
 Eigenvalue buckling 可用於識別 mode / sensitivity，但不能單獨視為 actual nonlinear ultimate capacity。
 
@@ -111,11 +111,11 @@ Eigenvalue buckling 可用於識別 mode / sensitivity，但不能單獨視為 a
 - material nonlinear analysis
 - validated test / design method
 
-## Connection modeling
+## 連接建模
 
 將 connector 建成 rigid tie 會提高 composite action 與 stiffness。若實際 fastener / adhesive 會 slip 或 deform，應以 discrete connector / spring / contact 等更適當模型處理，或進行 bounding analysis。
 
-## Reactions
+## 反力
 
 FEA 不只應讀 panel stress；還應輸出：
 
@@ -125,7 +125,7 @@ FEA 不只應讀 panel stress；還應輸出：
 
 這些反力應接續進 fastener / bracket / framing load path。
 
-## Sanity checks
+## 合理性檢查（Sanity checks）
 
 正式使用結果前至少做：
 
@@ -138,7 +138,7 @@ FEA 不只應讀 panel stress；還應輸出：
 
 若 FEA 與簡化模型差異很大，不應先假設 FEA 一定正確；先查 boundary、units、offsets、connectivity、mesh、load application 與 result interpretation。
 
-## Reporting minimum
+## 報告最低要求
 
 一份可稽核 FEA 摘要至少包含：
 

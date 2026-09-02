@@ -15,7 +15,7 @@ canonical_owner: true
 
 各層 failure mode 可能不同。
 
-## Connection demand
+## 連接需求
 
 由 façade component seismic force 取得的 action 應依實際幾何、支點數、偏心與固定方式轉成：
 
@@ -43,7 +43,7 @@ canonical_owner: true
 
 因此 connection group 要考慮 direct force + eccentric moment。
 
-## Different component categories
+## 不同構件分類
 
 台灣耐震規範第四章對 external wall body、panel connection 與 fixing / anchorage 可能指定不同 `ap / Rp`。因此：
 
@@ -74,7 +74,7 @@ Routing：
 - `../connections/weld-group-analysis.md`
 - `../connections/load-path-and-anchor-reactions.md`
 
-## Movement must remain compatible
+## 位移必須保持相容
 
 耐震連接不只需要「夠強」，也可能需要允許指定方向的層間相對位移。
 
@@ -82,7 +82,7 @@ Routing：
 
 例如增加 bolt clamp 或把 slot 全鎖死可能提高某些短期 strength，但同時破壞原本 movement accommodation；這必須作 system-level 判斷。
 
-## Output requirements
+## 輸出要求
 
 至少保存：
 
@@ -105,7 +105,7 @@ Routing：
 - anchor catalogue value can be used without concrete / edge / spacing / seismic condition
 - connection PASS means inter-story drift compatibility PASS
 
-## Primary-source routing
+## 一手來源 routing
 
 - 內政部國土管理署《建築物耐震設計規範及解說》第四章
 - applicable anchor design standard / evaluation report

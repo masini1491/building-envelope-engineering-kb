@@ -86,7 +86,7 @@ AI 不得自行宣稱所有 curtain wall mullion 都固定採同一個 `L/x` 或
 - local extrusion wall deformation
 - anchor reaction overload
 
-## Primary sources / routing
+## 主要來源／routing
 
 - 內政部建築研究所《帷幕牆系統結構耐風設計手冊》
 - governing aluminum material standard（如 CNS 2257 / ASTM B221 family）

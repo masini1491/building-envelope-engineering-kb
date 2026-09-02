@@ -24,7 +24,7 @@ canonical_owner: true
 
 因此不可把所有後置式 expansion anchor 都寫成 `ASTM F1554`。
 
-## Post-installed anchors
+## 後置式錨栓（Post-installed anchors）
 
 後置式錨栓的設計與資格評估通常要進入：
 
@@ -34,7 +34,7 @@ canonical_owner: true
 
 實際產品亦可能透過 ICC-ES evaluation / ESR 等系統提供適用混凝土強度、裂縫／非裂縫、邊距、間距、安裝條件與 design data。
 
-## Curtain-wall design routing
+## 帷幕牆設計 routing
 
 幕牆 anchor / bracket 設計至少分開檢查：
 

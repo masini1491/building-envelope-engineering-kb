@@ -31,7 +31,7 @@ canonical_owner: true
 - [Metal Composite and Honeycomb Panels](../metal-composite-and-honeycomb-panels.md)
 - [Aluminum Panel Flatness and Oil Canning](../../engineering-notes/aluminum-panel-flatness-and-oil-canning.md)
 
-## Test vs analysis
+## 工程主題：Test vs analysis
 
 ASTM E330/E330M-14(2021) 目前仍列為 Active，提供 exterior windows / curtain walls / doors 在 uniform static air pressure 下的 structural performance test method。它可用來驗證特定 specimen / assembly，但不等於一套 metal-panel FEA design equation。
 

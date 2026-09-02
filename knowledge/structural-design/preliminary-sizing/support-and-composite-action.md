@@ -22,7 +22,7 @@ canonical_owner: true
 
 若 support condition 不明，結果應標記 `INCOMPLETE` 或 `PROVISIONAL`，而不是由 AI 自行猜測。
 
-## Male / Female mullion composite action
+## 公／母直料複合作用（Composite action）
 
 unitized / interlocking framing 常有 male / female profiles 或多件式組合截面。
 
@@ -53,7 +53,7 @@ unitized / interlocking framing 常有 male / female profiles 或多件式組合
 
 影響，因此 full composite、partial composite、independent action 可能得到不同結果。
 
-## Axis definition
+## 座標軸定義
 
 Section property 必須配合截面 local axes 與實際 load direction。
 
@@ -65,7 +65,7 @@ Section property 必須配合截面 local axes 與實際 load direction。
 
 應保存 CAD / calculation axis definition，並明確指定每個 load case 的 bending axis。
 
-## Status recommendation
+## 狀態建議
 
 對 support / composite assumption 可使用：
 

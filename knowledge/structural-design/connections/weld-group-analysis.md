@@ -15,11 +15,11 @@ canonical_owner: true
 
 ## 先區分兩個層次
 
-### 1. Weld-group mechanics
+### 1. 焊道群力學
 
 回答「這一組焊道在目前幾何與外力下，各位置 demand 多大」。
 
-### 2. Weld / base-metal strength
+### 2. 焊道／母材強度
 
 回答「這個 demand 是否小於適用規範允許的 weld metal / base metal / HAZ / connected-part capacity」。
 
@@ -142,7 +142,7 @@ Weld metal PASS 仍不足以完成 connection design。還要依實際節點檢�
 1. weld segment geometry
 2. effective throat / effective length basis
 3. weld-group centroid
-4. `A_w / I_x / I_y / I_xy / J` as applicable
+4. 依適用性列出 `A_w / I_x / I_y / I_xy / J`
 5. applied `Fx / Fy / Fz / Mx / My / Mz`
 6. direct components
 7. moment-induced components

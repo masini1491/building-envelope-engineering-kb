@@ -40,7 +40,7 @@ SF = 1.5
 
 必須知道它**作用在哪一個量、用乘還是除、來源在哪裡，以及最後讓 utilization 增加還是減少**。
 
-## Factor ledger
+## 係數台帳（Factor ledger）
 
 審查一份計算書時，建議先建立完整 factor ledger：
 
@@ -131,7 +131,7 @@ safety ratio = capacity / demand
 
 ## 必做 reconciliation
 
-### A. Demand reconciliation
+### A. 需求對帳
 
 應能重建：
 
@@ -147,7 +147,7 @@ safety ratio = capacity / demand
 
 任何不明倍率都要列出。
 
-### B. Capacity reconciliation
+### B. 承載力對帳
 
 應能重建：
 
@@ -163,7 +163,7 @@ safety ratio = capacity / demand
 
 不得只接受計算書最後一格 `Allowable = X`。
 
-### C. Result reconciliation
+### C. 結果對帳
 
 應能重建 final check 的實際定義，例如：
 
@@ -183,13 +183,13 @@ PASS if reported_safety_ratio >= required_ratio
 
 ## 常見異常模式
 
-### 1. Unexplained multiplier
+### 1. 無法解釋的倍率
 
 公式中突然出現 `×k` 或 `÷k`，但沒有 standard / project / manufacturer source。
 
 若 factor 影響 governing result：`INCOMPLETE`。
 
-### 2. Double counting
+### 2. 重複計入（Double counting）
 
 同一安全處理被套用兩次，例如：
 
@@ -199,47 +199,47 @@ PASS if reported_safety_ratio >= required_ratio
 
 Double counting 可能變得過度保守，也可能因 ratio 定義錯誤反而讓報表看似更安全；都必須釐清。
 
-### 3. Omitted required factor
+### 3. 漏掉必要係數
 
 project specification / governing method 要求 factor，但計算書沒有套用。
 
 這通常是 compliance gap；若會改變結果，應重新計算後判定。
 
-### 4. Wrong-side application
+### 4. 係數套用側錯誤
 
 factor 的值本身正確，但乘／除在錯的 quantity，例如應放大 demand 卻被用來放大 capacity。
 
 這是高風險錯誤。
 
-### 5. Ratio inversion
+### 5. 比值顛倒
 
 把 `capacity / demand` 與 `demand / capacity` 混用，或 label 寫 Safety Factor、實際公式卻是 utilization。
 
 不得用名稱猜公式，必須從算式重建。
 
-### 6. Design / test factor contamination
+### 6. 設計／試驗係數混用
 
 將 structural test / proof multiplier 當成 normal design factor，或反過來用 design utilization 直接推論 test acceptance。
 
 Design 與 test 必須分開。
 
-### 7. Mixed design philosophies
+### 7. 混用設計哲學
 
 把不同 design basis 的 factor 混用，例如 allowable-based procedure、resistance-based procedure、manufacturer allowable 與 project-specific factor 交錯，但沒有 reconciliation。
 
 若無法證明相容性：`INCOMPLETE`。
 
-### 8. Hidden factor inside spreadsheet / software
+### 8. 試算表／軟體內隱藏係數
 
 GUI、spreadsheet hidden cell、named range、template constant、macro、post-processing expression 或 solver setting 可能含 factor。
 
 審查時應要求 final result 可由 visible trace 重建；不能只因軟體顯示 PASS 就接受。
 
-### 9. Convenient rounding / clipping
+### 9. 有利的四捨五入／截斷
 
 若 intermediate value 被非一般 rounding、clamping、minimum / maximum rule 改變，該操作本身也視為 transformation，必須有依據。
 
-### 10. Factor changed between similar checks
+### 10. 相似檢核間係數不一致
 
 相同 design basis、相同 component family 或相同 limit state 的 factor 若在不同頁／不同構件無理由改變，應列 `WARNING` 並要求 reconciliation。
 
@@ -297,7 +297,7 @@ factor_audit:
 
 不得因原計算書印有技師簽章或 `PASS / OK` 就跳過 factor audit。
 
-## Machine-readable routing
+## 機器可讀 routing
 
 搭配：
 

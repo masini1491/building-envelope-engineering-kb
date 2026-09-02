@@ -9,7 +9,7 @@ canonical_owner: true
 
 建築外殼常用 gasket 可能以 EPDM、silicone rubber 或其他 elastomer 製作。AI 不應把「EPDM」材料名稱直接等同於某一個 ASTM gasket 標準；應依 gasket 結構、密度與用途判斷。
 
-## Core ASTM standards
+## 核心 ASTM 標準
 
 - **ASTM C864-05(2026)** — Standard Specification for Dense Elastomeric Compression Seal Gaskets, Setting Blocks, and Spacers
   - 適用 dense elastomeric compression seal gaskets、setting blocks、spacers。
@@ -23,7 +23,7 @@ canonical_owner: true
   - silicone rubber dense gasket / accessories 的標準。
   - 不應把所有 silicone gasket 自動視為 EPDM 或 C864 產品。
 
-## Engineering routing
+## 工程 routing
 
 選 gasket 時至少應確認：
 

@@ -13,7 +13,7 @@ canonical_owner: true
 
 此方法適合 preliminary sizing，不等於正式 project-specific structural calculation。
 
-## Deflection → Required I
+## 撓度 → 所需 I
 
 線彈性、小變形且 member stiffness 可按比例縮放時，撓度與 `1/(EI)` 成正比。
 
@@ -31,7 +31,7 @@ canonical_owner: true
 
 對 simple-span uniform load，可用 closed-form solution 作 sanity check；複雜 multi-span / semi-rigid / eccentric system 不應因有此比例式就忽略正確結構模型。
 
-## Bending strength → Required S
+## 彎曲強度 → 所需 S
 
 若採 ASD 型式且已有 project-approved allowable bending stress：
 
@@ -55,7 +55,7 @@ canonical_owner: true
 
 不得只存單一 `Sx` / `Sy` 而忽略方向差異。
 
-## Actual verification
+## 實際截面驗證
 
 取得實際 section property 後，可做：
 
@@ -64,7 +64,7 @@ canonical_owner: true
 
 但正式判斷仍應同步重新計算 actual deflection / actual stress，而不是只比較 ratio。
 
-## Governing envelope
+## 控制包絡
 
 一個構件可能有多個：
 

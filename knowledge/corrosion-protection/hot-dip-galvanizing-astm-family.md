@@ -9,7 +9,7 @@ canonical_owner: true
 
 建築外殼鐵件若只寫「ASTM A123 熱浸鍍鋅」通常不足以涵蓋設計、製造、五金、變形控制與現場修補。建議把下列標準視為一個互補 family。
 
-## Current editions（2026-09-02）
+## 現行版本（2026-09-02）
 
 - ASTM A123/A123M-24 — Zinc (Hot-Dip Galvanized) Coatings on Iron and Steel Products
 - ASTM A153/A153M-23 — Zinc Coating (Hot-Dip) on Iron and Steel Hardware
@@ -56,7 +56,7 @@ canonical_owner: true
 - 薄板焊接盒件或長型材鍍鋅前應特別評估 A384 的變形風險。
 - 本頁不抄錄 minimum coating thickness tables；正式送審與驗收應依產品類型、材料厚度與當版標準表格判定。
 
-## Taiwan cross-reference
+## 台灣交叉對照
 
 台灣常見相關 CNS 包括：
 - CNS 10007：鋼鐵之熱浸鍍鋅

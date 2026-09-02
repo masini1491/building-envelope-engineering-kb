@@ -50,7 +50,7 @@ canonical_owner: true
 3. 若耐風設計規範日後修訂，手冊中的公式、係數、案例與引用版本都需要重新核對。
 4. 不應將手冊內個別案例尺寸或設計值直接套用到其他專案。
 
-## Repository usage
+## Repository 使用方式
 
 本手冊應作為 `knowledge/structural-design/wind/` 的主要台灣政府 reference。後續宜依主題拆成：
 

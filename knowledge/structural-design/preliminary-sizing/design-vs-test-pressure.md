@@ -11,7 +11,7 @@ canonical_owner: true
 
 `Design Pressure` 與 `Test Pressure` 是不同 engineering objects，必須分開保存、分開顯示、分開追溯來源。
 
-### Design Pressure
+### 設計風壓（Design Pressure）
 
 用於 structural sizing / verification 的設計荷載來源可能包括：
 
@@ -22,7 +22,7 @@ canonical_owner: true
 
 Positive pressure 與 Negative pressure 應保留為獨立 load cases，不應只保留一個 absolute value。
 
-### Test Pressure
+### 試驗壓力（Test Pressure）
 
 ASTM E330 / E330M 等試驗方法所使用的 pressure 是 performance-test input，通常來自 project test specification、mock-up protocol 或其他測試要求。
 

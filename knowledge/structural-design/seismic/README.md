@@ -25,7 +25,7 @@ canonical_owner: true
 
 ## Façade seismic design 要拆成兩條主線
 
-### 1. Force path
+### 1. 受力路徑
 
 `façade / panel / framing mass → seismic component force → connection / anchor → primary structure`
 
@@ -36,7 +36,7 @@ canonical_owner: true
 - anchorage / fastener / bracket capacity
 - load transfer to primary structure
 
-### 2. Movement path
+### 2. 位移路徑
 
 `building story deformation → support / anchor relative movement → mullion / panel / glass / joint compatibility`
 

@@ -27,7 +27,7 @@ Glass fin / glass mullion 是以玻璃本身作為主要受彎或受軸構材的
 10. inter-story / thermal imposed movement
 11. post-breakage / redundancy
 
-## Global model guard
+## 全域模型防呆
 
 以 beam / frame / shell / solid model模擬 glass fin 時，必須先定義模型代表的是：
 
@@ -38,7 +38,7 @@ Glass fin / glass mullion 是以玻璃本身作為主要受彎或受軸構材的
 
 不同模型層級不能混用 section property 或 response interpretation。
 
-## Effective section properties
+## 等效截面性質
 
 若使用 effective thickness：
 
@@ -48,11 +48,11 @@ Glass fin / glass mullion 是以玻璃本身作為主要受彎或受軸構材的
 
 參見 `laminated-glass-effective-thickness.md`。
 
-## Buckling / stability
+## 挫屈／穩定性
 
 細長 glass fin 除強度與撓度外，還要確認是否存在 lateral / flexural / torsional stability 問題。若模型或適用標準沒有涵蓋 relevant instability mode，不得只因線性彈性應力低於某值就宣稱整體安全。
 
-## Connection interaction
+## 連接交互作用
 
 Glass fin 的 global PASS 不代表 connection PASS。必須將支承反力傳入：
 

@@ -31,7 +31,7 @@ canonical_owner: true
 - [Mullion / Transom Design Baseline](../framing/mullion-transom-design-baseline.md)
 - [Taiwan Design Wind Pressure Workflow](../wind/taiwan-design-wind-pressure-workflow.md)
 
-## Data schemas
+## 資料 schema
 
 機器可讀資料模型位於 repository `/schemas/`：
 

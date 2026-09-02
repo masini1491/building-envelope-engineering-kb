@@ -16,7 +16,7 @@ canonical_owner: true
 
 兩者不是同一件事：perimeter fire barrier 與一般 fire-resistive joint 的 geometry、movement、supporting construction 與 fire exposure 可能不同。
 
-## Assembly-specific principle
+## 組件特定原則
 
 E2307 與 E1966 都是**系統／assembly test**邏輯。
 
@@ -38,7 +38,7 @@ E2307 與 E1966 都是**系統／assembly test**邏輯。
 
 > 某個 firestop product 本身有測試報告，不代表任意樓板邊緣／帷幕組合都 automatically covered。
 
-## Movement / construction tolerance
+## 位移／施工公差
 
 防火接縫同時可能需要容許：
 
@@ -50,7 +50,7 @@ E2307 與 E1966 都是**系統／assembly test**邏輯。
 
 若 tested system 的 joint width、compression、cycling 或 supporting construction 與本案不同，應確認 listing / engineering judgment / project approval 是否允許。
 
-## Curtain-wall coordination
+## 帷幕牆整合協調
 
 樓板邊緣防火封堵通常需要跨專業協調：
 
@@ -66,7 +66,7 @@ E2307 與 E1966 都是**系統／assembly test**邏輯。
 
 不能只在最後施工階段「塞滿防火棉」就視為完成設計。
 
-## Exterior-wall fire testing distinction
+## 外牆防火試驗區分
 
 Perimeter fire barrier testing（例如 ASTM E2307）與 combustible exterior-wall assembly fire testing（例如法規可能引用 NFPA 285）目的不同。
 

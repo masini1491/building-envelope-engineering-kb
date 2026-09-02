@@ -23,7 +23,7 @@ Stiffener 的功能是將 panel skin 的面外荷載轉成較有效率的 beam /
 
 因此「加了補強料」不等於結構自動改善。
 
-## Modeling choices
+## 建模選擇
 
 常見簡化包括：
 
@@ -39,7 +39,7 @@ Stiffener 的功能是將 panel skin 的面外荷載轉成較有效率的 beam /
 - end releases / support
 - material
 
-## Composite-action guard
+## 複合作用（Composite action）防呆
 
 Panel skin 與 stiffener 可透過 adhesive、stud、rivet、screw、weld 或其他方式連接。不同連接會有不同 slip / peel / shear-transfer behavior。
 
@@ -49,7 +49,7 @@ Panel skin 與 stiffener 可透過 adhesive、stud、rivet、screw、weld 或其
 
 或把 panel + stiffener 建成完全 tied 的 composite section。
 
-## Stiffener demand
+## 補強材需求
 
 至少檢查：
 
@@ -63,7 +63,7 @@ Panel skin 與 stiffener 可透過 adhesive、stud、rivet、screw、weld 或其
 
 若補強料是 open thin-walled extrusion / channel，torsion 與 local deformation 可能不可忽略。
 
-## End condition
+## 端部條件
 
 Stiffener 的 end condition 對效果很敏感：
 
@@ -75,7 +75,7 @@ Stiffener 的 end condition 對效果很敏感：
 
 不能用「stiffener length = panel height」就推定兩端 fixed。
 
-## Spacing / load-sharing
+## 間距／荷載分配
 
 多支相同 stiffener 不代表每支平均承受 `total load / n`。Panel plate action、edge support、stiffener spacing、relative stiffness 與 connection stiffness 都會改變 load distribution。
 
