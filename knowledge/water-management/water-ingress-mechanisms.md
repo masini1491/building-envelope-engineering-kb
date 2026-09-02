@@ -112,7 +112,7 @@ verified_at: "2026-09-02"
 - field diagnostic water check 可協助定位局部 path；
 - test method 不同，不能把 PASS 結果互相視為等價。
 
-相關標準 routing：[`../standards/performance-testing/curtain-wall-performance-crosswalk.md`](../standards/performance-testing/curtain-wall-performance-crosswalk.md)。
+相關標準 routing：[`../performance-testing/curtain-wall-performance-crosswalk.md`](../performance-testing/curtain-wall-performance-crosswalk.md)。
 
 ## 公開來源
 
