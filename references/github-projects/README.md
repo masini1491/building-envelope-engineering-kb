@@ -42,7 +42,7 @@
 9. archived / early-stage repo 可以保留 architecture value，但要明示限制；
 10. 若要依賴 output，需重新確認 repository version、assumptions 與 validation status。
 
-## 目前共通 Research gaps
+## 目前共通研究缺口（Research gaps）
 
 高價值但仍缺乏成熟公開 implementation 的領域包括：
 
