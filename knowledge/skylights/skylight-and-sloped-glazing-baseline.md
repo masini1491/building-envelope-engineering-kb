@@ -61,7 +61,7 @@ canonical_owner: true
 7. sealant joint geometry
 8. field access for repair
 
-## Mock-up／現場試驗注意事項
+## 實體樣品（Mock-up）／現場試驗注意事項
 
 斜面玻璃的 corner、ridge、valley、gutter、splice 與 wall-to-skylight transition 往往是高風險位置。大型或非典型系統宜將這些 junction 納入 mock-up / field water verification，而不是只測標準直線區段。
 
