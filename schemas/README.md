@@ -1,4 +1,4 @@
-# Machine-readable Engineering Schemas
+# 機器可讀工程資料結構（Machine-readable Engineering Schemas）
 
 `schemas/` 定義 AI、calculator、spreadsheet 或其他工具可共用的**通用 engineering interchange contract**。Schema 不保存 project instance，也不代表某一專案或某一標準已核准特定設計值。
 
@@ -19,7 +19,7 @@
 - `seismic-component.schema.json`：façade component seismic input / classification / provenance。
 - `deflection-criterion.schema.json`：serviceability criterion、方向、scope、source。
 
-### Review／coverage
+### 審查／覆蓋範圍（Review／coverage）
 
 - `structural-coverage.schema.json`：failure-mode coverage、scope 與 `PASS / WARNING / FAIL / INCOMPLETE / NOT_APPLICABLE`。
 
@@ -33,7 +33,7 @@
 - Schema 必須能表示 provisional / unknown / incomplete；不要逼迫使用者填入猜測值。
 - Schema path 與 `$id` 若已被 calculator / external tool 使用，避免只為目錄美觀而搬動。
 
-## 與 Knowledge 的關係
+## 與知識（Knowledge）的關係
 
 `knowledge/` 定義工程方法與 guardrails；`schemas/` 定義資料交換格式。
 
