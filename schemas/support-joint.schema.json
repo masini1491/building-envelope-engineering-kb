@@ -1,0 +1,95 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/masini1491/building-envelope-engineering-kb/schemas/support-joint.schema.json",
+  "title": "Support / Joint Boundary Condition",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "location", "translation", "rotation", "status"],
+  "properties": {
+    "id": {"type": "string", "minLength": 1},
+    "location": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "x_mm": {"type": "number"},
+        "y_mm": {"type": "number"},
+        "z_mm": {"type": "number"}
+      }
+    },
+    "translation": {
+      "$ref": "#/$defs/threeDofTranslation"
+    },
+    "rotation": {
+      "$ref": "#/$defs/threeDofRotation"
+    },
+    "joint_type": {
+      "type": "string",
+      "enum": ["support", "splice", "sleeve", "stack_joint", "connector", "other"]
+    },
+    "force_transfer": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "axial": {"type": ["boolean", "null"]},
+        "shear_x": {"type": ["boolean", "null"]},
+        "shear_y": {"type": ["boolean", "null"]},
+        "moment_x": {"type": ["boolean", "null"]},
+        "moment_y": {"type": ["boolean", "null"]},
+        "torsion_z": {"type": ["boolean", "null"]}
+      }
+    },
+    "stiffness_source": {"type": ["string", "null"]},
+    "notes": {"type": ["string", "null"]},
+    "status": {
+      "type": "string",
+      "enum": ["confirmed", "provisional", "unknown"]
+    }
+  },
+  "$defs": {
+    "translationalState": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["state"],
+      "properties": {
+        "state": {
+          "type": "string",
+          "enum": ["restrained", "released", "spring", "gap_contact", "unknown"]
+        },
+        "stiffness_N_per_mm": {"type": ["number", "null"], "exclusiveMinimum": 0},
+        "gap_mm": {"type": ["number", "null"], "minimum": 0}
+      }
+    },
+    "rotationalState": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["state"],
+      "properties": {
+        "state": {
+          "type": "string",
+          "enum": ["restrained", "released", "spring", "unknown"]
+        },
+        "stiffness_Nmm_per_rad": {"type": ["number", "null"], "exclusiveMinimum": 0}
+      }
+    },
+    "threeDofTranslation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["x", "y", "z"],
+      "properties": {
+        "x": {"$ref": "#/$defs/translationalState"},
+        "y": {"$ref": "#/$defs/translationalState"},
+        "z": {"$ref": "#/$defs/translationalState"}
+      }
+    },
+    "threeDofRotation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["x", "y", "z"],
+      "properties": {
+        "x": {"$ref": "#/$defs/rotationalState"},
+        "y": {"$ref": "#/$defs/rotationalState"},
+        "z": {"$ref": "#/$defs/rotationalState"}
+      }
+    }
+  }
+}
