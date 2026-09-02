@@ -9,11 +9,11 @@
 - 查證日期：2026-09-02
 - authority type：industry standard / test method
 
-## Scope routing
+## 適用範圍路由（Scope routing）
 
 本標準為 structural sealant tensile adhesion properties 的試驗方法。它不能單獨取代 project-specific substrate approval、compatibility、joint design 或 manufacturer engineering review。
 
-## Knowledge routing
+## 知識路由（Knowledge routing）
 
 - [`../../knowledge/sealants/structural-silicone-baseline.md`](../../knowledge/sealants/structural-silicone-baseline.md)
 - [`../../knowledge/structural-glass/glass-to-glass-structural-silicone.md`](../../knowledge/structural-glass/glass-to-glass-structural-silicone.md)
