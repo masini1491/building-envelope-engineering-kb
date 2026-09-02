@@ -1,0 +1,44 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/building-envelope-engineering-kb/deflection-criterion.schema.json",
+  "title": "Deflection Criterion",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["type", "label", "source", "confirmed"],
+  "properties": {
+    "type": {
+      "enum": ["ratio", "absolute_mm", "min_ratio_and_absolute", "ratio_plus_constant", "custom_manual"]
+    },
+    "n": {"type": ["number", "null"], "exclusiveMinimum": 0},
+    "absolute_mm": {"type": ["number", "null"], "minimum": 0},
+    "constant_mm": {"type": ["number", "null"]},
+    "manual_allowable_mm": {"type": ["number", "null"], "minimum": 0},
+    "label": {"type": "string", "minLength": 1},
+    "source": {"type": "string", "minLength": 1},
+    "source_revision": {"type": ["string", "null"]},
+    "confirmed": {"type": "boolean"},
+    "notes": {"type": ["string", "null"]}
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"type": {"const": "ratio"}}},
+      "then": {"required": ["n"]}
+    },
+    {
+      "if": {"properties": {"type": {"const": "absolute_mm"}}},
+      "then": {"required": ["absolute_mm"]}
+    },
+    {
+      "if": {"properties": {"type": {"const": "min_ratio_and_absolute"}}},
+      "then": {"required": ["n", "absolute_mm"]}
+    },
+    {
+      "if": {"properties": {"type": {"const": "ratio_plus_constant"}}},
+      "then": {"required": ["n", "constant_mm"]}
+    },
+    {
+      "if": {"properties": {"type": {"const": "custom_manual"}}},
+      "then": {"required": ["manual_allowable_mm"]}
+    }
+  ]
+}
