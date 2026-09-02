@@ -1,52 +1,52 @@
-# Engineering Disclaimer
+# 工程免責與責任邊界
 
-This repository is an engineering knowledge base and review-methodology resource. It is intended to support research, preliminary analysis, technical discussion, quality review, and AI-assisted engineering workflows.
+本 repository 是工程知識庫與審查方法資源，用於支援研究、初步分析、技術討論、品質審查與 AI-assisted engineering workflows。
 
-It is **not** a substitute for project-specific professional engineering services, licensed-engineer judgment, statutory review, certification, approval, inspection, or construction acceptance.
+它**不取代**特定專案的專業工程服務、技師／專業工程師判斷、法定審查、簽證、核可、檢查或施工驗收。
 
-## No project-specific certification
+## 不構成特定專案認證
 
-Content in this repository does not, by itself, establish that any particular façade, curtain wall, glazing system, connection, anchor, panel, window, sealant joint, or other building-envelope system complies with applicable law, contract documents, standards, or project requirements.
+本 repository 的內容本身不能證明任何特定 façade、curtain wall、glazing system、connection、anchor、panel、window、sealant joint 或其他 building-envelope system 符合適用法律、契約文件、標準或 project requirements。
 
-Project-specific conclusions require the actual governing information, which may include:
+特定專案的結論仍需要實際 governing information，可能包括：
 
-- current laws and regulations
+- 現行法律與法規
 - governing standards and editions
-- approved project specifications
-- design criteria and load reports
-- drawings and geometry
-- material certificates and product data
+- 核定／approved project specifications
+- design criteria 與 load reports
+- drawings 與 geometry
+- material certificates 與 product data
 - section properties
-- connection and anchor details
+- connection 與 anchor details
 - manufacturer technical review
-- laboratory or field test evidence
-- construction tolerances and as-built conditions
-- judgment by the responsible professional engineer
+- laboratory / field test evidence
+- construction tolerances 與 as-built conditions
+- 負責專業工程師的判斷
 
-## AI and automated review
+## AI 與自動化審查
 
-AI-generated or automated outputs based on this repository are aids to review, not professional certification.
+依本 repository 產生的 AI 或 automated outputs 是審查輔助工具，不是專業工程認證。
 
-A result such as `PASS`, `WARNING`, `FAIL`, `INCOMPLETE`, or `NOT_APPLICABLE` has only the scope explicitly defined by the analysis. In particular:
+`PASS`、`WARNING`、`FAIL`、`INCOMPLETE`、`NOT_APPLICABLE` 等結果，只對分析中明確定義的 scope 有效。尤其：
 
-> An automated `PASS` does not constitute engineering approval, legal compliance, professional certification, or authorization for construction.
+> 自動化輸出的 `PASS` 不構成工程核可、法規符合證明、專業簽證或施工授權。
 
-Missing, uncertain, conflicting, or unverifiable inputs should be treated according to the repository governance, including use of `INCOMPLETE` where a reliable conclusion cannot be reached.
+缺漏、不確定、互相衝突或無法驗證的輸入，應依 repository governance 處理；無法形成可靠結論時應使用 `INCOMPLETE`。
 
-## No warranty
+## 不提供保證
 
-To the maximum extent permitted by applicable law, the repository content is provided without warranty as to completeness, accuracy, currentness, fitness for a particular purpose, or suitability for any specific project.
+在適用法律允許的最大範圍內，本 repository 不保證內容的完整性、正確性、時效性、特定用途適用性或對任何特定專案的適用性。
 
-Standards, regulations, products, interpretations, and accepted engineering practices may change. Users are responsible for verifying current governing sources before relying on any result.
+標準、法規、產品、工程解釋與 accepted engineering practices 都可能更新。使用者在依賴任何結果前，仍有責任重新確認 current governing sources。
 
-## Responsibility for use
+## 使用者責任
 
-Users remain responsible for:
+使用者仍應自行負責：
 
-- determining whether information is applicable to their project
-- validating calculations and assumptions
-- obtaining required professional review and approvals
-- complying with contracts, laws, codes, standards, licenses, and third-party rights
-- protecting confidential or project-sensitive information
+- 判斷資訊是否適用於實際專案
+- 驗證計算與假設
+- 取得所需的專業審查、簽證與核可
+- 遵守契約、法律、法規、標準、授權與第三方權利
+- 保護 confidential 或 project-sensitive information
 
-The repository's public-knowledge and licensing model does not authorize disclosure of confidential project information.
+本 repository 的公開知識與授權模型，不構成揭露任何機密專案資訊的授權。
