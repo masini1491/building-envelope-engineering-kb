@@ -62,9 +62,18 @@
 ### Structural review / failure-mode coverage
 
 - `structural-design/review/README.md`
+- `structural-design/review/project-specification-extraction.md`
 - `structural-design/review/structural-calculation-review-checklist.md`
 - `structural-design/review/failure-mode-map.md`
 - `structural-design/review/coverage-and-completeness.md`
+
+### Preliminary sizing
+
+- `structural-design/preliminary-sizing/README.md`
+- `structural-design/preliminary-sizing/design-vs-test-pressure.md`
+- `structural-design/preliminary-sizing/required-section-properties.md`
+- `structural-design/preliminary-sizing/support-and-composite-action.md`
+- `structural-design/preliminary-sizing/calculation-status-and-traceability.md`
 
 ### Metal panel / stiffener / FEA
 
@@ -84,8 +93,24 @@
 
 這些頁面刻意把「需求 mechanics」和「規範 capacity」分開。若 allowable / resistance / safety treatment 沒有可驗證來源，AI 應輸出 `INCOMPLETE`，不得從既有專案計算書、舊版手冊或記憶自動補值。
 
-機器可讀的通用 engineering data models 放在 repository 根目錄 `schemas/`，目前包含 material、load case、section properties、deflection criterion、`support-joint.schema.json` 的逐自由度 boundary-condition model、`plate-fea-model.schema.json` 的 solver-independent FEA metadata、`seismic-component.schema.json` 的 façade component seismic input / provenance model，以及 `structural-coverage.schema.json` 的 failure-mode coverage / completeness model。Schema 不保存專案實例，只定義可供 AI / calculator / spreadsheet 共用的資料結構。
+## Machine-readable schemas
 
-每個技術結論應連回 `references/` 中可追溯的公開 evidence；不要在多個頁面複製同一 canonical 結論。
+通用 engineering data models 放在 repository 根目錄 `schemas/`。目前包括：
+
+- `material.schema.json`
+- `load-case.schema.json`
+- `section-properties.schema.json`
+- `deflection-criterion.schema.json`
+- `support-joint.schema.json`：逐自由度 boundary-condition model
+- `plate-fea-model.schema.json`：solver-independent FEA metadata
+- `seismic-component.schema.json`：façade component seismic input / provenance model
+- `structural-coverage.schema.json`：failure-mode coverage / completeness model
+- `project-design-basis.schema.json`：project specification → structural design basis extraction model
+
+Schema 不保存專案實例，只定義可供 AI / calculator / spreadsheet 共用的資料結構。正式 calculator 實作前仍應依 `AGENTS.md` 的 schema discipline 檢查 provenance、unit、scope 與 incomplete-state handling。
+
+## Evidence / public-safety rule
+
+每個技術結論應優先連回 `references/` 中可公開追溯的 evidence；不要在多個頁面複製同一 canonical 結論或 current-edition snapshot。
 
 若知識最初來自非公開專案文件，public repository 只保留重新泛化、去識別且可由公開技術來源支持的方法論；不得留下專案名稱、尺寸、荷載、圖號、節點、截圖或私人 provenance。
