@@ -96,7 +96,7 @@ verified_at: "2026-09-02"
 
 因此「補矽利康後不漏」只能證明當下某一條 path 被阻斷，不能自動證明 root cause 已被正確理解。
 
-## Failure diagnosis 建議流程
+## 失效診斷（Failure diagnosis）建議流程
 
 1. 標示觀察到的水源與漏水位置。
 2. 追蹤可能的連續 path，而不是只看表面裂縫。
