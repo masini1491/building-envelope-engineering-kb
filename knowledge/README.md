@@ -14,7 +14,7 @@
 - `anchors/`：cast-in / post-installed anchor 與設計標準分流
 - `finishes/`：烤漆、陽極處理等
 - `corrosion-protection/`：熱浸鍍鋅與其他防蝕
-- `structural-design/`：耐風、荷載生成、直料／橫料、多件擠型共同作用、continuous mullion / splice / sleeve、雙軸彎曲、glass-edge relative displacement、fastener group、screw pull-out / thread engagement、局部擠型、焊道群、anchor，以及 `preliminary-sizing/` 前期 required section property / support / traceability 方法
+- `structural-design/`：耐風、耐震、荷載生成、直料／橫料、多件擠型共同作用、continuous mullion / splice / sleeve、雙軸彎曲、glass-edge relative displacement、fastener group、screw pull-out / thread engagement、局部擠型、焊道群、anchor，以及 `preliminary-sizing/` 前期 required section property / support / traceability 方法
 - `engineering-notes/`：標準無法單獨回答的實務問題
 - `stone/`：天然石材外牆與繫件系統
 - `cladding/`：金屬複合板、蜂巢板及其他外牆面板系統；`structural-analysis/` 另整理 metal panel、stiffener、panel-to-stiffener connection 與 plate / shell FEA methodology
@@ -51,6 +51,13 @@
 - `structural-design/connections/local-extrusion-failure.md`
 - `structural-design/connections/weld-group-analysis.md`
 
+### Seismic façade components / connections / movement
+
+- `structural-design/seismic/README.md`
+- `structural-design/seismic/taiwan-facade-component-seismic-force.md`
+- `structural-design/seismic/seismic-connection-load-path.md`
+- `structural-design/seismic/seismic-movement-compatibility.md`
+
 ### Metal panel / stiffener / FEA
 
 - `cladding/structural-analysis/README.md`
@@ -61,7 +68,7 @@
 
 這些頁面刻意把「需求 mechanics」和「規範 capacity」分開。若 allowable / resistance / safety treatment 沒有可驗證來源，AI 應輸出 `INCOMPLETE`，不得從既有專案計算書、舊版手冊或記憶自動補值。
 
-機器可讀的通用 engineering data models 放在 repository 根目錄 `schemas/`，目前包含 material、load case、section properties、deflection criterion、`support-joint.schema.json` 的逐自由度 boundary-condition model，以及 `plate-fea-model.schema.json` 的 solver-independent FEA metadata。Schema 不保存專案實例，只定義可供 AI / calculator / spreadsheet 共用的資料結構。
+機器可讀的通用 engineering data models 放在 repository 根目錄 `schemas/`，目前包含 material、load case、section properties、deflection criterion、`support-joint.schema.json` 的逐自由度 boundary-condition model、`plate-fea-model.schema.json` 的 solver-independent FEA metadata，以及 `seismic-component.schema.json` 的 façade component seismic input / provenance model。Schema 不保存專案實例，只定義可供 AI / calculator / spreadsheet 共用的資料結構。
 
 每個技術結論應連回 `references/` 中可追溯的公開 evidence；不要在多個頁面複製同一 canonical 結論。
 
