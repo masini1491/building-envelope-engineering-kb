@@ -23,7 +23,7 @@
 - construction tolerances 與 as-built conditions
 - 負責專業工程師的判斷
 
-## AI 與自動化審查
+## 人工智慧（AI）與自動化審查
 
 依本 repository 產生的 AI 或 automated outputs 是審查輔助工具，不是專業工程認證。
 
