@@ -1,151 +1,69 @@
 # 技術知識（Knowledge）
 
-本目錄保存已整理、可供工程師與 AI 直接使用的技術結論。人類可讀內容依 [`../LANGUAGE.md`](../LANGUAGE.md) 以繁體中文（台灣）為主；正式標準名稱、牌號與必要英文工程術語保留原文。
+本目錄保存已整理、可供工程師與 AI 直接使用的 canonical engineering knowledge。人類可讀內容依 [`../LANGUAGE.md`](../LANGUAGE.md) 以繁體中文（台灣）為主；標準正式名稱、材料牌號、schema key、公式符號與必要英文工程術語保留原文。
 
-目前主題：
+使用原則：**先選 domain，再讀該 domain router；不要從本頁直接掃所有 leaf pages。**
 
-- `standards/`：規範的工程摘要與 cross-reference
-- `materials/`：鋁、鋼、不鏽鋼等材料
-- `glazing/`：建築玻璃產品與一般玻璃結構設計標準 routing
-- `structural-glass/`：glass fin、laminated effective thickness、point-supported glass、glass-to-glass structural silicone、movement、FEA、walkable glass、post-breakage / redundancy
-- `sealants/`：structural silicone、weatherseal 與接縫設計
-- `gaskets/`：EPDM / dense / cellular / silicone gasket 等
-- `fasteners/`：螺絲、螺栓、property class、設計與耐蝕
-- `anchors/`：anchor standard routing、cast-in embedded plate、post-installed mechanical anchor；不同 anchor family 的 qualification / design / installation 不得混用
-- `water-management/`：雨水侵入機制、pressure equalization / rainscreen、drainage / weep design；水密設計採 mechanism + path + drainage 的 system approach
-- `design-management/`：帷幕牆 design basis、system development、跨部門 review、mock-up、material approval、shop/fabrication drawing、release / revision control 等設計作業流程
-- `finishes/`：烤漆、陽極處理等
-- `corrosion-protection/`：熱浸鍍鋅與其他防蝕
-- `structural-design/`：耐風、耐震、荷載生成、直料／橫料、多件擠型共同作用、continuous mullion / splice / sleeve、雙軸彎曲、glass-edge relative displacement、fastener group、screw pull-out / thread engagement、局部擠型、焊道群、anchor、secondary support / back bracing / reaction handoff、design-factor / hidden-multiplier audit、structural review / failure-mode coverage，以及 `preliminary-sizing/` 前期 required section property / support / traceability 方法
-- `operable-elements/`：活動窗／可開啟外牆構件的 sash/frame、hinge/lock/stay、五金緊件、局部擠型與 whole-product performance / life-cycle routing
-- `engineering-notes/`：標準無法單獨回答的實務問題
-- `stone/`：天然石材外牆與繫件系統
-- `cladding/`：金屬複合板、蜂巢板及其他外牆面板系統；`structural-analysis/` 另整理 metal panel、stiffener、panel-to-stiffener connection 與 plate / shell FEA methodology
-- `skylights/`：採光罩與斜面玻璃
-- `building-physics/`：thermal、thermal bridge、condensation
-- `fire/`：perimeter fire barrier、fire-resistive joint 與外牆防火 routing
-- `case-knowledge/`：只用於公開來源可追溯案例，或完全去識別且無法反推出專案身分的通用 lesson pattern
+## Domain routing
 
-## 水管理 routing
+- [`systems/`](systems/)：帷幕牆系統型式與 system-level 分類。
+- [`design-management/`](design-management/)：Project Design Basis、system development、跨部門 review、mock-up、材料／圖面 release 與 revision control。
+- [`materials/`](materials/)：鋁、鋼、不鏽鋼等材料與材料替代／選用方法。
+- [`fasteners/`](fasteners/)：螺絲、螺栓、property class 與扣件 engineering guardrails。
+- [`anchors/`](anchors/)：cast-in embedded plate、post-installed mechanical anchor、qualification / design / installation routing。
+- [`finishes/`](finishes/)：鋁表面處理與塗裝。
+- [`corrosion-protection/`](corrosion-protection/)：鍍鋅、防蝕與材料相容性。
+- [`glazing/`](glazing/)：一般建築玻璃產品與 glass design-standard routing。
+- [`structural-glass/`](structural-glass/)：glass fin、laminated effective thickness、point-supported / drilled glass、FEA、movement、walkable glass、post-breakage / redundancy。
+- [`sealants/`](sealants/)：structural silicone、weatherseal 與 joint design。
+- [`gaskets/`](gaskets/)：EPDM / silicone 等 gasket engineering baseline。
+- [`cladding/`](cladding/)：金屬面板、複合板／蜂巢板、完成面與 panel-specific structural analysis。
+- [`stone/`](stone/)：天然石材外牆與 fixing system。
+- [`skylights/`](skylights/)：採光罩與斜面玻璃。
+- [`operable-elements/`](operable-elements/)：活動窗／可開啟構件的 sash、hardware、connection、whole-product performance / life cycle。
+- [`water-management/`](water-management/)：雨水侵入機制、pressure equalization / rainscreen、drainage / weep。
+- [`building-physics/`](building-physics/)：thermal、thermal bridge、condensation。
+- [`fire/`](fire/)：perimeter fire barrier、fire-resistive joint 與外牆防火 routing。
+- [`performance-testing/`](performance-testing/)：氣密／水密／結構／層間位移等 performance-test crosswalk 與後續試驗方法論。
+- [`structural-design/`](structural-design/)：耐風、耐震、荷載生成、frame mechanics、connections、secondary support、preliminary sizing 與 calculation review。
 
-- `water-management/README.md`
-- `water-management/water-ingress-mechanisms.md`
-- `water-management/pressure-equalization-and-rainscreen.md`
-- `water-management/drainage-and-weep-design.md`
+## 結構工程入口
 
-Water-management review 不把「有 sealant／有排水孔／有 cavity」直接視為 PASS；應先辨識 water source、path、driving force、air / pressure boundary、collection cavity 與完整 drainage path。
+結構問題優先從 [`structural-design/README.md`](structural-design/README.md) 開始，再依問題進入：
 
-## 設計作業流程 routing
+- wind / seismic
+- load generation
+- framing
+- connections
+- secondary support / reaction handoff
+- preliminary sizing
+- review / coverage / hidden multiplier audit
 
-- `design-management/curtain-wall-design-workflow.md`
+Component-specific mechanics 仍留在其 domain，例如 structural glass、metal panel、operable elements、anchors；不因「需要結構計算」就全部搬入 `structural-design/`。
 
-Project workflow 應從 contract / specification / drawings 等輸入建立 Project Design Basis，再經 system design、跨部門 review、structural / performance verification、mock-up、material approval、shop / fabrication drawing、final verification 與 controlled release。既有成功 detail 只能作 reference，不自動成為新案 design authority。
+## 標準與來源 ownership
 
-## 結構計算路由
+- 工程解讀放 `knowledge/`。
+- 標準 current edition / status、官方 URL、查證日期與 provenance 優先由 [`../references/standards/`](../references/standards/) 單一維護。
+- 政府技術資料由 [`../references/government/`](../references/government/) 保存 public dossier。
+- 公開 GitHub 軟體／工程專案只放 [`../references/github-projects/`](../references/github-projects/)，一律視為 NON-NORMATIVE implementation reference。
 
-### 荷載生成（Load generation）
+Knowledge page 不應為方便而在多處獨立維護同一標準的 current-edition snapshot。
 
-- `structural-design/load-generation/README.md`
-- `structural-design/load-generation/facade-tributary-loads.md`
-- `structural-design/load-generation/transom-wind-load-distribution.md`
-- `structural-design/load-generation/glass-dead-load-and-setting-blocks.md`
+## 機器可讀資料
 
-### 框架／桿件（Framing）
+通用 engineering data models 位於 [`../schemas/`](../schemas/)；它們是 interchange contract，不保存 project instance，也不取代 governing engineering method。
 
-- `structural-design/framing/mullion-transom-design-baseline.md`
-- `structural-design/framing/continuous-mullion-analysis.md`
-- `structural-design/framing/splice-and-sleeve-modeling.md`
-- `structural-design/framing/multi-part-extrusion-load-sharing.md`
-- `structural-design/framing/biaxial-bending-and-resultant-deflection.md`
-- `structural-design/framing/glass-edge-relative-deflection.md`
+Machine-readable routing / lookup 放 `../indexes/`；index 不複製 knowledge 內容，只提供 path、domain、document type、canonical key 等檢索資訊。
 
-### 連接（Connections）
+## 公開安全
 
-- `structural-design/connections/load-path-and-anchor-reactions.md`
-- `structural-design/connections/fastener-group-analysis.md`
-- `structural-design/connections/screw-pullout-and-thread-engagement.md`
-- `structural-design/connections/local-extrusion-failure.md`
-- `structural-design/connections/weld-group-analysis.md`
+若知識最初來自私人計算書、施工圖、專案規範或教育訓練資料，public repository 只保留：
 
-### 次結構支撐／背撐／反力交接
+- 去識別後的 engineering principle；
+- 可由 public source 支持的方法論；
+- generic failure mode / review guardrail。
 
-- `structural-design/secondary-support/README.md`：Mode A / B / C 責任模式 routing
-- `structural-design/secondary-support/curtain-wall-back-bracing.md`：帷幕廠負責 back brace / secondary support 時的完整 load-path methodology
-- `structural-design/secondary-support/reaction-handoff-to-primary-structure.md`：帷幕端只提供 reaction，由主結構技師處理 downstream structural design 的 handoff 最低要求
-- `structural-design/secondary-support/supporting-steel-local-effects.md`：beam torsion、flange / web local effects、stiffener 與 concentrated-load introduction
-- `structural-design/secondary-support/secondary-support-interface-and-responsibility.md`：責任分界、SHOP DWG 協調、revision / change management
+不得留下 project name、樓層、尺寸、荷載、圖號、節點、截圖、私人檔名或 private provenance。
 
-Secondary-support review 必須區分 `façade reaction generation`、`secondary-support design` 與 `primary-structure receiving-member design`。反力已算出並不代表主結構已通過；若責任切點不明，應標 `INCOMPLETE`。
-
-### 預埋件／錨栓（Anchors）
-
-- `anchors/anchor-standards-baseline.md`：anchor family / governing-standard canonical routing
-- `anchors/cast-in-embedded-plate-design.md`：預埋鋼板、headed stud、deformed / hooked bar、plate / weld / concrete failure-mode coverage
-- `anchors/post-installed-mechanical-anchor.md`：後置式機械／膨脹錨栓 qualification、產品資料、anchor-group、concrete / steel failure、installation / software review
-
-Anchor review 應明確區分 **qualification**、**design**、**installation / inspection** 與外側 bracket / plate / weld / bolt load path。Mechanical anchor、adhesive anchor、cast-in anchor 不能只因 failure-mode 名稱相似就共用公式、factor 或 product evidence。
-
-### 外牆耐震構件／連接／位移
-
-- `structural-design/seismic/README.md`
-- `structural-design/seismic/taiwan-facade-component-seismic-force.md`
-- `structural-design/seismic/seismic-connection-load-path.md`
-- `structural-design/seismic/seismic-movement-compatibility.md`
-
-### 結構審查／failure-mode coverage
-
-- `structural-design/review/README.md`
-- `structural-design/review/project-specification-extraction.md`
-- `structural-design/review/design-factor-and-hidden-multiplier-audit.md`
-- `structural-design/review/structural-calculation-review-checklist.md`
-- `structural-design/review/failure-mode-map.md`
-- `structural-design/review/coverage-and-completeness.md`
-
-### 前期尺寸需求（Preliminary sizing）
-
-- `structural-design/preliminary-sizing/README.md`
-- `structural-design/preliminary-sizing/design-vs-test-pressure.md`
-- `structural-design/preliminary-sizing/required-section-properties.md`
-- `structural-design/preliminary-sizing/support-and-composite-action.md`
-- `structural-design/preliminary-sizing/calculation-status-and-traceability.md`
-
-### 金屬面板／stiffener／FEA
-
-- `cladding/structural-analysis/README.md`
-- `cladding/structural-analysis/metal-panel-analysis.md`
-- `cladding/structural-analysis/stiffener-analysis.md`
-- `cladding/structural-analysis/panel-to-stiffener-connection.md`
-- `cladding/structural-analysis/plate-fea-modeling.md`
-
-### 活動窗／可開啟構件
-
-- `operable-elements/README.md`
-- `operable-elements/sash-frame-analysis.md`
-- `operable-elements/hardware-load-path.md`
-- `operable-elements/hinge-lock-stay-connections.md`
-- `operable-elements/performance-and-life-cycle.md`
-
-這些頁面刻意把「需求 mechanics」和「規範 capacity」分開。若 allowable / resistance / safety treatment / design factor 沒有可驗證來源，AI 應輸出 `INCOMPLETE`，不得從既有專案計算書、舊版手冊或記憶自動補值。
-
-## 機器可讀 Schemas
-
-通用 engineering data models 放在 repository 根目錄 `schemas/`。目前包括：
-
-- `material.schema.json`
-- `load-case.schema.json`
-- `section-properties.schema.json`
-- `deflection-criterion.schema.json`
-- `support-joint.schema.json`：逐自由度 boundary-condition model
-- `plate-fea-model.schema.json`：solver-independent FEA metadata
-- `seismic-component.schema.json`：façade component seismic input / provenance model
-- `structural-coverage.schema.json`：failure-mode coverage / completeness model
-- `project-design-basis.schema.json`：project specification → structural design basis extraction model
-- `design-factor.schema.json`：load / safety / resistance / allowable / test multiplier 與 reported ratio 的 factor ledger / audit model
-
-Schema 不保存專案實例，只定義可供 AI / calculator / spreadsheet 共用的資料結構。正式 calculator 實作前仍應依 `AGENTS.md` 的 schema discipline 檢查 provenance、unit、scope 與 incomplete-state handling。
-
-## 證據／公開安全規則
-
-每個技術結論應優先連回 `references/` 中可公開追溯的 evidence；不要在多個頁面複製同一 canonical 結論或 current-edition snapshot。
-
-若知識最初來自非公開專案文件或私人教育訓練資料，public repository 只保留重新泛化、去識別且可由公開技術來源支持的方法論；不得留下專案名稱、尺寸、荷載、圖號、節點、截圖、私人檔名或私人 provenance。
+> `knowledge/` 是工程結論層，不是來源文件倉庫，也不是不知道該放哪裡時使用的 `engineering-notes` catch-all。
