@@ -40,7 +40,7 @@ canonical_owner: true
 
 Mechanical anchor 與 adhesive anchor 不得互相代用 qualification rules。
 
-### Post-installed reinforcing bar systems
+### 後置植筋系統（Post-installed reinforcing bar systems）
 
 若系統是 post-installed reinforcing bar，而不是一般 mechanical / adhesive anchor，必須辨識其專屬 qualification / design routing；不可只因施工方式使用黏著劑就自動視為一般 adhesive anchor。
 
@@ -50,7 +50,7 @@ Mechanical anchor 與 adhesive anchor 不得互相代用 qualification rules。
 
 但 ASTM F1554 的 scope 明確排除 mechanical expansion anchors，因此不可把所有後置式 expansion anchor 都寫成 `ASTM F1554`。
 
-## Cast-in embedded plate routing
+## 預埋鋼板（Cast-in embedded plate）routing
 
 若為預埋鋼板系統，不能只寫「anchor PASS」。至少要辨識：
 
@@ -81,7 +81,7 @@ Mechanical post-installed anchor 應把以下項目一起納入 review：
 
 Canonical methodology：[`post-installed-mechanical-anchor.md`](post-installed-mechanical-anchor.md)。
 
-## Adhesive anchor routing
+## 黏著錨栓（Adhesive anchor）routing
 
 Adhesive anchor 至少還要額外確認：
 
@@ -94,7 +94,7 @@ Adhesive anchor 至少還要額外確認：
 
 目前本 KB 尚未建立完整 adhesive-anchor canonical design page；遇到正式專案應回 governing code + ACI CODE-355.4-24 + exact product evaluation evidence，不得用 mechanical-anchor page 代替。
 
-## Manufacturer software／ESR／ETA
+## 製造商軟體／ESR／ETA
 
 Manufacturer software、ICC-ES ESR、ETA / EAD 等可以是重要 product evidence，但必須保存：
 
