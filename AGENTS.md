@@ -80,9 +80,13 @@ AI 不應預設完整掃描 repository。
 
 1. 讀 `README.md`。
 2. 讀 `CHAT_INIT.md`。
-3. 依題目只搜尋最低必要的 `knowledge/` 主題。
-4. 若答案需要查來源、版本或 evidence，再讀對應 `references/`。
-5. 若 repository 內 evidence 不足或 freshness 不明，再外部查證。
+3. 讀 `AGENTS.md`。
+4. 讀 [`AI_RESPONSE_CONTRACT.md`](AI_RESPONSE_CONTRACT.md)，啟用本 repository 的工程回覆呈現規則。
+5. 依題目只搜尋最低必要的 `knowledge/` 主題。
+6. 若答案需要查來源、版本或 evidence，再讀對應 `references/`。
+7. 若 repository 內 evidence 不足或 freshness 不明，再外部查證。
+
+`AI_RESPONSE_CONTRACT.md` 只負責回答如何呈現：結論優先、回答深度、已確認／推論／缺口分離、scope-qualified status、精簡與引用方式。它不得覆蓋本檔的 authority、工程數值、公開安全或 canonical ownership 規則。
 
 ## 工程數值防呆
 
@@ -160,7 +164,7 @@ ASTM、CNS、JIS、EN、ISO、AAMA-FGIA 等不同體系不得只因名稱或用�
 - 已由公開來源完整揭露且可合法引用的 public case study；或
 - 完全去識別、且不再依賴專案身分才能成立的通用 failure / lesson pattern。
 
-若知識來自非公開專案，優先整理進一般主題頁（例如 `structural-glass/`、`connections/`、`engineering-notes/`），而不是建立匿名但仍可被反推的 project case page。
+若知識來自非公開專案，優先整理進一般主題頁（例如 `structural-glass/`、`connections/`、`cladding/`），而不是建立匿名但仍可被反推的 project case page。
 
 ### 私人專案 provenance
 
