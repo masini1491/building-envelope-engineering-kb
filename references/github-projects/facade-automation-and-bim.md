@@ -1,4 +1,4 @@
-# Façade Automation／BIM GitHub 專案參考
+# 帷幕自動化／BIM GitHub 專案參考（Façade Automation）
 
 查證日期：2026-09-02
 
@@ -30,7 +30,7 @@ https://github.com/1006867586/curtainwall-tool
 
 套裁、鋼材快查、五金提料等 browser utility。適合參考 façade engineer 日常 UX、cutting optimisation、hardware quantity aggregation；數據與公式需另行驗證。
 
-## Revit／Rhino／AEC integration
+## AEC 整合：Revit／Rhino
 
 ### `mcneel/rhino.inside-revit`
 
