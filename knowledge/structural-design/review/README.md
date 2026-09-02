@@ -31,11 +31,13 @@ canonical_owner: true
 
 → `design-factor / hidden-multiplier audit`
 
+→ `secondary-support / reaction-handoff responsibility check`（若適用）
+
 → `KB engineering methodology / failure-mode map`
 
 → `spec-to-calc compliance + engineering review`
 
-這可以避免只檢查公式 mechanics，卻沒有先確認該專案真正要求的 load、criterion、factor、calculation scope 與 test acceptance。
+這可以避免只檢查公式 mechanics，卻沒有先確認該專案真正要求的 load、criterion、factor、calculation scope、次結構責任界面與 test acceptance。
 
 ## 審查層級
 
@@ -47,10 +49,11 @@ canonical_owner: true
 6. **Structural model** — span、support DOF、splice、composite action、axis、connection stiffness 是否明示。
 7. **Global member response** — framing / panel / glass / sash 的 force、stress、deflection。
 8. **Connection transfer** — fastener group、weld group、bearing、pull-out、local section、anchor。
-9. **Movement compatibility** — thermal / story drift / glass edge / stack joint / sealant / gasket。
-10. **Special subsystems** — operable elements、metal panel stiffener、structural glass、special attachments。
-11. **Performance verification** — analysis 與 mock-up / component / assembly test 的角色是否分清。
-12. **Coverage status** — `PASS / WARNING / FAIL / INCOMPLETE / NOT_APPLICABLE` 是否有 traceable basis。
+9. **Secondary support / reaction handoff** — 若 façade fixing reaction 需透過背撐、次結構或交由主結構技師處理，必須確認 Mode A / B / C、reaction completeness、responsibility boundary、receiving-member local effects 與 revision ownership。
+10. **Movement compatibility** — thermal / story drift / glass edge / stack joint / sealant / gasket。
+11. **Special subsystems** — operable elements、metal panel stiffener、structural glass、special attachments。
+12. **Performance verification** — analysis 與 mock-up / component / assembly test 的角色是否分清。
+13. **Coverage status** — `PASS / WARNING / FAIL / INCOMPLETE / NOT_APPLICABLE` 是否有 traceable basis。
 
 ## 相關頁面與 routing
 
@@ -59,6 +62,7 @@ canonical_owner: true
 - [Structural Calculation Review Checklist](structural-calculation-review-checklist.md)
 - [Façade Structural Failure-Mode Map](failure-mode-map.md)
 - [Coverage / Completeness Status](coverage-and-completeness.md)
+- [Secondary Support / Reaction Handoff](../secondary-support/README.md)
 
 Machine-readable routing：
 
@@ -71,6 +75,8 @@ Machine-readable routing：
 ### 計算正確 ≠ 計算完整
 
 一個螺栓 shear equation 算得完全正確，如果 load path 還漏掉 eccentricity、bearing、pull-out 或 local extrusion failure，整個 connection calculation 仍不完整。
+
+同樣地，一個 façade support reaction 算得正確，如果後續 secondary support / primary structure responsibility 沒有人明確承接，整體 load path 仍是不完整。
 
 ### 數值 PASS ≠ 可追溯 PASS
 
@@ -93,17 +99,19 @@ Machine-readable routing：
 - `fastener_body_shear: PASS`
 - `weld_group_demand: PASS`
 - `factor_audit: PASS`
+- `reaction_handoff_completeness: PASS`
+- `primary_structure_local_effect: INCOMPLETE`
 
 不能只寫一個沒有範圍的 `STRUCTURE: PASS`。
 
 ### 缺少證據不等於可採有利假設
 
-若 criterion、allowable、factor source、support、composite action、connection geometry 或 load source 缺失，狀態應是 `INCOMPLETE`，而不是自行補入最方便的值。
+若 criterion、allowable、factor source、support、composite action、connection geometry、load source 或 responsibility boundary 缺失，狀態應是 `INCOMPLETE`，而不是自行補入最方便的值。
 
 ## 公開安全規則
 
-本 review framework 可由非公開專案規範與計算實務協助辨識常見 requirement / failure modes，但 public repository 只保存一般化 extraction / review framework 與公開可驗證方法；不得保存專案名稱、尺寸、荷載、criterion、factor、圖號、節點、截圖或私人 provenance。
+本 review framework 可由非公開專案規範與計算實務協助辨識常見 requirement / failure modes，但 public repository 只保存一般化 extraction / review framework 與公開可驗證方法；不得保存專案名稱、尺寸、荷載、criterion、factor、圖號、節點、反力表、截圖或私人 provenance。
 
-Project Design Basis Sheet、factor ledger、spec-to-calc matrix 與 project-specific review result 均屬當次 project context，不應 commit 到 public repository。
+Project Design Basis Sheet、factor ledger、reaction handoff table、spec-to-calc matrix 與 project-specific review result 均屬當次 project context，不應 commit 到 public repository。
 
 > 本頁是 structural review router，不取代 governing code、專業結構設計或 project-specific calculation。
