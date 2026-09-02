@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/masini1491/building-envelope-engineering-kb/schemas/structural-coverage.schema.json",
+  "title": "Structural Calculation Coverage",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["system_id", "items", "overall_status"],
+  "properties": {
+    "system_id": {"type": "string", "minLength": 1},
+    "system_type": {"type": ["string", "null"]},
+    "design_basis": {"type": ["string", "null"]},
+    "items": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/coverageItem"}
+    },
+    "overall_status": {
+      "type": "string",
+      "enum": ["PASS", "WARNING", "FAIL", "INCOMPLETE"]
+    },
+    "package_status": {
+      "type": "string",
+      "enum": ["COMPLETE", "INCOMPLETE"]
+    },
+    "notes": {"type": ["string", "null"]}
+  },
+  "$defs": {
+    "coverageItem": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["domain", "failure_mode", "applicable", "status"],
+      "properties": {
+        "domain": {"type": "string", "minLength": 1},
+        "failure_mode": {"type": "string", "minLength": 1},
+        "applicable": {"type": "boolean"},
+        "status": {
+          "type": "string",
+          "enum": ["PASS", "WARNING", "FAIL", "INCOMPLETE", "NOT_APPLICABLE"]
+        },
+        "load_case": {"type": ["string", "null"]},
+        "result": {"type": ["number", "string", "null"]},
+        "criterion": {"type": ["number", "string", "null"]},
+        "criterion_source": {"type": ["string", "null"]},
+        "method": {"type": ["string", "null"]},
+        "assumptions": {
+          "type": "array",
+          "items": {"type": "string"}
+        },
+        "missing_inputs": {
+          "type": "array",
+          "items": {"type": "string"}
+        },
+        "not_applicable_reason": {"type": ["string", "null"]},
+        "notes": {"type": ["string", "null"]}
+      }
+    }
+  }
+}
