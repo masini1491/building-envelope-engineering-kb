@@ -33,9 +33,9 @@ canonical_owner: true
 
 → `spec-to-calc compliance + engineering review`
 
-## Extraction 與 Verification 必須分開
+## 抽取（Extraction）與驗證（Verification）必須分開
 
-### Phase A — 原文抽取
+### 階段 A（Phase A）— 原文抽取
 
 先忠實保存文件實際要求：
 
@@ -49,7 +49,7 @@ canonical_owner: true
 
 這一步**不得因 AI 認為規範過時、數值奇怪或另有更常見做法而自行修改**。
 
-### Phase B — 權威性／現行性驗證
+### 階段 B（Phase B）— 權威性／現行性驗證
 
 再另外判斷：
 
