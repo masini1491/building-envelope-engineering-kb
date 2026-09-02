@@ -16,15 +16,15 @@ canonical_key: ""
 
 ## 必要輸入
 
-## 方法／Load path
+## 方法／荷載路徑（Load path）
 
-## Failure modes／Review checks
+## 破壞模式／審查項目（Failure modes／Review checks）
 
-## `INCOMPLETE` 條件
+## 不完整（`INCOMPLETE`）條件
 
-## 相關 routing
+## 相關路由（Routing）
 
-## 來源／provenance
+## 來源／可追溯性（Provenance）
 
 ## 不可推論事項
 
