@@ -7,7 +7,7 @@ canonical_owner: true
 
 # 支承條件與複合作用（Composite Action）
 
-## Support model 必須 explicit
+## 支承模型（Support model）必須明確
 
 帷幕 framing 的 preliminary sizing 不得把所有構件預設成 simply supported 或 fixed-fixed。
 
