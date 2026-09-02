@@ -43,6 +43,10 @@ GitHub 專案最適合拿來參考：
 - **C — 支援工具**：不是帷幕專用，但對截面、FEA、BIM／IFC、CAD、工程報告與資料交換等工作有高度參考價值。
 - **D — 觀察／教育用途**：概念值得看，但目前成熟度、工程適用性或 provenance 不足，不宜當 production reference。
 
+## 專題深度索引
+
+- [`structural-connections-and-glass.md`](structural-connections-and-glass.md)：bolt／fastener group、鋁擠型 section/local mechanics、structural glass，以及 concrete anchor、screw pull-out、structural silicone、point-supported/drilled glass 等目前仍存在的公開實作 research gaps。
+
 ## 目前優先研究鏈
 
 若目的是建立帷幕牆工程 calculator / review / automation 生態，建議優先把這些 repository 視為不同層的參考，而不是尋找單一「帷幕牆萬用程式」：
@@ -215,9 +219,7 @@ Repository：https://github.com/Payette/SkinDesigner
 
 **定位：直接相關／Grasshopper façade panelization。**
 
-README 將 SkinDesigner 定義為：
-
-> a facade panelization tool for Grasshopper
+README 將 SkinDesigner 定義為 façade panelization tool for Grasshopper。
 
 ### 值得借鏡
 
@@ -835,17 +837,13 @@ GitHub code search 可找到 `src/compliance/ASTME1300.ts`，但目前實作包�
 
 # 目前仍缺少高品質公開 shortlist 的主題
 
-本輪已補上 façade panelization、Grasshopper→FEA、Revit automation、AEC data exchange、DXF ingestion、CFD workflow、traceable calculation rendering 與 façade computer vision；下列主題仍值得持續搜尋：
+本輪已補上 façade panelization、Grasshopper→FEA、Revit automation、AEC data exchange、DXF ingestion、CFD workflow、traceable calculation rendering 與 façade computer vision；連接／結構玻璃的深度搜尋與 research gaps 詳見 [`structural-connections-and-glass.md`](structural-connections-and-glass.md)。
+
+仍值得持續搜尋：
 
 - AAMA / ASTM façade performance-test data acquisition；
 - curtain-wall air / water chamber test automation；
-- structural silicone joint engineering calculator；
-- façade-specific anchor / fastener-group analysis；
-- screw pull-out / thread stripping for thin aluminum extrusion；
-- aluminum extrusion local failure / concentrated-load solver；
 - Taiwan façade-specific wind-pressure calculation implementation；
-- glass-fin / point-supported / drilled-glass FEA；
-- structural-glass post-breakage / redundancy numerical model；
 - curtain-wall shop-drawing semantic QA；
 - fabrication tolerance / stack-joint / installation survey automation；
 - sensor-based curtain-wall SHM with documented sensor calibration and damage validation；
@@ -862,7 +860,7 @@ GitHub code search 可找到 `src/compliance/ASTME1300.ts`，但目前實作包�
 3. 沒有只因 repository 名稱相似就收錄；
 4. 明確區分工程 authority 與 software reference value；
 5. 若要複製／衍生 code，另查 license；
-6. 若 repo 宣稱實作標準，必須另回 current official standard 驗證；
+6. 若 repo 宣稱實作某項 standard / code，必須另回 current official standard 驗證；
 7. 若發現 hard-coded unknown factor / placeholder / default PASS，降低分級並記錄風險；
 8. 不把第三方 repo 的 copyrighted tables / standard text 複製進本 KB；
 9. archived / abandoned / early-stage repo 仍可保留作 historical / architecture reference，但必須明示狀態；
