@@ -54,6 +54,6 @@ Test pressure 則應使用獨立 object / namespace，避免與 structural desig
 ## 相關頁面
 
 - [Taiwan Design Wind Pressure Workflow](../wind/taiwan-design-wind-pressure-workflow.md)
-- [Curtain Wall Performance Test Crosswalk](../../standards/performance-testing/curtain-wall-performance-crosswalk.md)
+- [Curtain Wall Performance Test Crosswalk](../../performance-testing/curtain-wall-performance-crosswalk.md)
 
 > 本頁定義資料與工程責任邊界，不自行規定任何 project-specific pressure multiplier。
