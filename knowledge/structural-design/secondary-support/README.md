@@ -94,7 +94,7 @@ canonical_owner: true
 
 這些項目見 [`supporting-steel-local-effects.md`](supporting-steel-local-effects.md)。
 
-## Review 狀態規則
+## 審查狀態規則（Review status）
 
 ### 通過（`PASS`）
 
@@ -126,7 +126,7 @@ canonical_owner: true
 - [`../connections/load-path-and-anchor-reactions.md`](../connections/load-path-and-anchor-reactions.md)
 - [`../connections/fastener-group-analysis.md`](../connections/fastener-group-analysis.md)
 - [`../connections/weld-group-analysis.md`](../connections/weld-group-analysis.md)
-- [`../../anchors/README.md`](../../anchors/README.md)
+- [`../../anchors/anchor-standards-baseline.md`](../../anchors/anchor-standards-baseline.md)
 - [`../seismic/seismic-movement-compatibility.md`](../seismic/seismic-movement-compatibility.md)
 - [`../review/design-factor-and-hidden-multiplier-audit.md`](../review/design-factor-and-hidden-multiplier-audit.md)
 
