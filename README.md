@@ -19,51 +19,49 @@
 - `CHAT_INIT.md`：新聊天室最小啟動流程。
 - `knowledge/`：整理後、可供工程師與 AI 直接使用的技術結論。
 - `references/`：來源、provenance、版本、適用範圍、限制與 evidence dossier。
-- `indexes/`：規範、材料與 cross-reference 的機器可讀索引。
+- `indexes/`：規範、材料與 cross-reference 的機器可讀索引（待建立）。
 - `templates/`：新增標準、材料、工程筆記與專案知識時的固定格式。
 
-## 預定知識範圍
+## 已建立的第一批 baseline
 
 ### Standards / performance testing
 
-- CNS 13971 / 13972 / 13973 / 13974 / 14280 / 14281
-- ASTM E283 / E330 / E331 / E1105 / E1233 等
-- AAMA / FGIA 501 系列、503 等
-
-### Materials
-
-- 鋁板：3003-H14、3004-H12 等
-- 鋁擠型：6063-T5、6005-T5、6105-T5 等
-- 結構鋼：ASTM A36 等
-- 不鏽鋼與其他建築外殼常用材料
-
-### Finishes / corrosion protection
-
-- AAMA 2603 / 2604 / 2605
-- AAMA 611
-- ASTM A123 / A153 / A780 / A384 / A385
-- CNS 熱浸鍍鋅相關規範
-
-### Fasteners
-
-- ISO 3506 系列
-- A2-70 / A2-80 與專案特殊高強度扣件
-- ISO 898-1、ASTM fastener standards
-- tension / shear / bearing / thread engagement / galling / galvanic corrosion
+- [`knowledge/standards/performance-testing/curtain-wall-performance-crosswalk.md`](knowledge/standards/performance-testing/curtain-wall-performance-crosswalk.md)  
+  CNS 13971 / 13972 / 13973 / 13974 / 14281 與 ASTM E283 / E330 / E331、AAMA 501.1 / 501.4 等帷幕性能試驗 crosswalk；另收 AAMA 501.2、501.6、501.7、503、ASTM E1105 / E1233。
 
 ### Structural design / manuals
 
-- 《帷幕牆系統結構耐風設計手冊》
-- 設計風壓、有效受風面積、直料、橫料、繫件、螺栓、玻璃、結構矽膠等
+- [`knowledge/structural-design/wind/taiwan-curtain-wall-wind-design-manual.md`](knowledge/structural-design/wind/taiwan-curtain-wall-wind-design-manual.md)  
+  內政部建築研究所《帷幕牆系統結構耐風設計手冊》與前身研究之 routing / 工程摘要。
 
-### Engineering notes / case knowledge
+### Materials
 
-保存標準沒有直接回答、但工程實務反覆遇到的問題，例如：
+- [`knowledge/materials/aluminum/common-curtain-wall-alloys.md`](knowledge/materials/aluminum/common-curtain-wall-alloys.md)  
+  3003-H14、3004-H12、6063-T5、6005-T5、6105-T5 的 product-form 與 governing-standard baseline；3003-H14 → 3004-H12 的台灣實務趨勢目前保守標為 field observation，待補公開一手證據。
+- [`knowledge/materials/steel/astm-a36.md`](knowledge/materials/steel/astm-a36.md)  
+  ASTM A36/A36M 結構鋼 baseline，並提醒不得直接視為 CNS 2473 SS400 完全等價。
 
-- 3003-H14 與 3004-H12 的選用差異
-- 鋁板平整度與 oil canning
-- 材料替代時應驗證的項目
-- 重大專案的特殊規格，但只保存可公開的抽象化工程知識，不上傳機密原始文件
+### Finishes / corrosion protection
+
+- [`knowledge/finishes/aluminum-organic-coatings-aama-2603-2604-2605.md`](knowledge/finishes/aluminum-organic-coatings-aama-2603-2604-2605.md)  
+  AAMA 2603-26 / 2604-26 / 2605-26 的性能層級與「性能規範 ≠ 固定塗料 chemistry」原則，另路由 AAMA 611-26。
+- [`knowledge/corrosion-protection/hot-dip-galvanizing-astm-family.md`](knowledge/corrosion-protection/hot-dip-galvanizing-astm-family.md)  
+  ASTM A123 / A153 / A384 / A385 / A780 熱浸鍍鋅 family 的分工與建築外殼工程使用注意事項。
+
+### Fasteners / project knowledge
+
+- [`knowledge/fasteners/stainless/iso-3506-a2-70-a2-90.md`](knowledge/fasteners/stainless/iso-3506-a2-70-a2-90.md)  
+  ISO 3506-1:2020、A2-70 與非標準 property class A2-90；包含台北 101 帷幕 A2-90 的 `VERIFIED_PROJECT` / `HIGH_CONFIDENCE` 抽象化工程知識，不公開原施工圖。
+
+## 下一批預定範圍
+
+- 個別 CNS / ASTM / AAMA-FGIA 標準專頁與 machine-readable index
+- 3003-H14、3004-H12、6063-T5、6005-T5、6105-T5 個別材料頁
+- `3003-H14-vs-3004-H12` 與 aluminum panel flatness / oil canning 工程筆記
+- AAMA 611 陽極處理
+- CNS 10007 / CNS 1247 熱浸鍍鋅
+- 玻璃、structural silicone、gasket、stone、skylight 等 building-envelope 領域
+- fastener tension / shear / bearing / thread engagement / galling / galvanic corrosion
 
 ## Copyright / licensing boundary
 
@@ -80,4 +78,4 @@ ASTM、AAMA-FGIA、ISO、CNS 與其他第三方標準可能受著作權或授權
 
 ## Status
 
-目前為初始化階段。第一優先是建立 standards / materials / finishes / fasteners / structural-design 的可信 baseline，再逐步擴張至其他 building-envelope 領域。
+第一批可信 baseline 已建立。後續維護以「先補 primary evidence → 再擴充 canonical knowledge → 最後建立 machine-readable index」為原則。
