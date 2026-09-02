@@ -34,7 +34,7 @@ canonical_key: "structural-glass.glass-to-glass-structural-silicone"
 
 不得因 structural silicone 可傳遞風壓，就自動認定它也是主要 dead-load support。若永久自重由 setting block、shoe、bearing member、glass fin 或其他 mechanical support 承擔，analysis model 與 detail 必須反映該 load path。
 
-## Bite／厚度設計 routing
+## 結構矽利康 Bite／厚度設計路由（routing）
 
 Structural bite 與 sealant thickness 是不同設計參數。
 
