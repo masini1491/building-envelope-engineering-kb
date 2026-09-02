@@ -26,6 +26,7 @@ REPLACEMENTS = {
     "## 工程主題：7. Required calculation coverage": "## 7. 必要計算涵蓋範圍",
     "## 工程主題：8. Required calculation trace / submittal evidence": "## 8. 必要計算追溯／送審證據",
     "## 工程主題：Bite／thickness routing": "## Bite／厚度（thickness）設計 routing",
+    "## 工程主題：Stack joint／splice": "## Stack joint／splice 位移與接頭行為",
 }
 
 
