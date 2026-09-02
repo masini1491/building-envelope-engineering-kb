@@ -12,6 +12,8 @@
 - `gaskets/`：EPDM / dense / cellular / silicone gasket 等
 - `fasteners/`：螺絲、螺栓、property class、設計與耐蝕
 - `anchors/`：anchor standard routing、cast-in embedded plate、post-installed mechanical anchor；不同 anchor family 的 qualification / design / installation 不得混用
+- `water-management/`：雨水侵入機制、pressure equalization / rainscreen、drainage / weep design；水密設計採 mechanism + path + drainage 的 system approach
+- `design-management/`：帷幕牆 design basis、system development、跨部門 review、mock-up、material approval、shop/fabrication drawing、release / revision control 等設計作業流程
 - `finishes/`：烤漆、陽極處理等
 - `corrosion-protection/`：熱浸鍍鋅與其他防蝕
 - `structural-design/`：耐風、耐震、荷載生成、直料／橫料、多件擠型共同作用、continuous mullion / splice / sleeve、雙軸彎曲、glass-edge relative displacement、fastener group、screw pull-out / thread engagement、局部擠型、焊道群、anchor、design-factor / hidden-multiplier audit、structural review / failure-mode coverage，以及 `preliminary-sizing/` 前期 required section property / support / traceability 方法
@@ -23,6 +25,21 @@
 - `building-physics/`：thermal、thermal bridge、condensation
 - `fire/`：perimeter fire barrier、fire-resistive joint 與外牆防火 routing
 - `case-knowledge/`：只用於公開來源可追溯案例，或完全去識別且無法反推出專案身分的通用 lesson pattern
+
+## 水管理 routing
+
+- `water-management/README.md`
+- `water-management/water-ingress-mechanisms.md`
+- `water-management/pressure-equalization-and-rainscreen.md`
+- `water-management/drainage-and-weep-design.md`
+
+Water-management review 不把「有 sealant／有排水孔／有 cavity」直接視為 PASS；應先辨識 water source、path、driving force、air / pressure boundary、collection cavity 與完整 drainage path。
+
+## 設計作業流程 routing
+
+- `design-management/curtain-wall-design-workflow.md`
+
+Project workflow 應從 contract / specification / drawings 等輸入建立 Project Design Basis，再經 system design、跨部門 review、structural / performance verification、mock-up、material approval、shop / fabrication drawing、final verification 與 controlled release。既有成功 detail 只能作 reference，不自動成為新案 design authority。
 
 ## 結構計算路由
 
@@ -121,4 +138,4 @@ Schema 不保存專案實例，只定義可供 AI / calculator / spreadsheet 共
 
 每個技術結論應優先連回 `references/` 中可公開追溯的 evidence；不要在多個頁面複製同一 canonical 結論或 current-edition snapshot。
 
-若知識最初來自非公開專案文件，public repository 只保留重新泛化、去識別且可由公開技術來源支持的方法論；不得留下專案名稱、尺寸、荷載、圖號、節點、截圖或私人 provenance。
+若知識最初來自非公開專案文件或私人教育訓練資料，public repository 只保留重新泛化、去識別且可由公開技術來源支持的方法論；不得留下專案名稱、尺寸、荷載、圖號、節點、截圖、私人檔名或私人 provenance。
