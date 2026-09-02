@@ -30,7 +30,7 @@
   },
   "$defs": {
     "sourceRef": {
-      "type": ["object", "null"],
+      "type": "object",
       "additionalProperties": false,
       "properties": {
         "organization": {"type": ["string", "null"]},
