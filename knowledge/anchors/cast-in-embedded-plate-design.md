@@ -84,7 +84,7 @@ verified_at: "2026-09-02"
 
 缺少可能影響 governing resistance 的幾何或材料資料時，不得以「標準預埋件」補假設後直接 PASS。
 
-## Anchor-to-concrete 檢核
+## 錨栓對混凝土（Anchor-to-concrete）檢核
 
 依 anchor type、load direction 與 governing code，至少考慮適用的 failure modes。
 
@@ -119,7 +119,7 @@ verified_at: "2026-09-02"
 
 若 governing code 對 combined tension / shear 有 interaction requirement，必須使用對應 method；interaction formula、exponent、threshold 與 factor 不得從其他 anchor system 或舊專案複製。
 
-## Anchor group、投影面與偏心
+## 錨栓群組（Anchor group）、投影面與偏心
 
 預埋件通常不是單一 anchor。
 
@@ -161,7 +161,7 @@ verified_at: "2026-09-02"
 
 同樣地，也不得只因鋼筋拉力容量足夠，就忽略 development 或其與 plate 的連接。
 
-## Headed stud 型預埋件
+## 頭栓（Headed stud）型預埋件
 
 若使用 headed stud / headed anchor，至少分開看：
 
