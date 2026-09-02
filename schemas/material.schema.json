@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://example.invalid/building-envelope-engineering-kb/material.schema.json",
+  "$id": "https://github.com/masini1491/building-envelope-engineering-kb/schemas/material.schema.json",
   "title": "Engineering Material",
   "type": "object",
   "additionalProperties": false,
@@ -10,17 +10,56 @@
     "name": {"type": "string", "minLength": 1},
     "alloy_temper": {"type": ["string", "null"]},
     "material_group": {"type": ["string", "null"]},
-    "E_mpa": {"type": ["number", "null"], "exclusiveMinimum": 0},
-    "Fu_mpa": {"type": ["number", "null"], "exclusiveMinimum": 0},
-    "Fy_mpa": {"type": ["number", "null"], "exclusiveMinimum": 0},
-    "allowable_bending_x_mpa": {"type": ["number", "null"], "exclusiveMinimum": 0},
-    "allowable_bending_y_mpa": {"type": ["number", "null"], "exclusiveMinimum": 0},
-    "allowable_shear_mpa": {"type": ["number", "null"], "exclusiveMinimum": 0},
-    "allowable_bearing_mpa": {"type": ["number", "null"], "exclusiveMinimum": 0},
+    "product_form": {"type": ["string", "null"]},
+    "condition": {"type": ["string", "null"], "description": "Examples: unwelded, welded/HAZ, heat-treated, product-specific condition."},
+    "thickness_or_size_range": {"type": ["string", "null"]},
+    "E_MPa": {"type": ["number", "null"], "exclusiveMinimum": 0},
+    "Fu_MPa": {"type": ["number", "null"], "exclusiveMinimum": 0},
+    "Fy_MPa": {"type": ["number", "null"], "exclusiveMinimum": 0},
+    "mechanical_property_source": {"$ref": "#/$defs/sourceRef"},
+    "design_properties": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/designProperty"},
+      "description": "Allowable/resistance values must carry their own design-basis context; do not treat them as timeless material constants."
+    },
     "standard": {"type": ["string", "null"]},
     "edition": {"type": ["string", "null"]},
     "source": {"type": ["string", "null"]},
     "notes": {"type": ["string", "null"]},
-    "status": {"enum": ["provisional", "confirmed"]}
+    "status": {"enum": ["provisional", "confirmed", "unknown"]}
+  },
+  "$defs": {
+    "sourceRef": {
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "properties": {
+        "organization": {"type": ["string", "null"]},
+        "document": {"type": ["string", "null"]},
+        "standard": {"type": ["string", "null"]},
+        "edition": {"type": ["string", "null"]},
+        "clause_or_table": {"type": ["string", "null"]},
+        "url": {"type": ["string", "null"]},
+        "status": {"enum": ["confirmed", "provisional", "unknown", null]}
+      }
+    },
+    "designProperty": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["property", "value_MPa", "design_basis", "status"],
+      "properties": {
+        "property": {
+          "enum": ["allowable_bending_x", "allowable_bending_y", "allowable_shear", "allowable_bearing", "design_strength", "other"]
+        },
+        "value_MPa": {"type": "number", "exclusiveMinimum": 0},
+        "axis_or_direction": {"type": ["string", "null"]},
+        "limit_state": {"type": ["string", "null"]},
+        "product_form": {"type": ["string", "null"]},
+        "condition": {"type": ["string", "null"]},
+        "thickness_or_size_range": {"type": ["string", "null"]},
+        "design_basis": {"$ref": "#/$defs/sourceRef"},
+        "notes": {"type": ["string", "null"]},
+        "status": {"enum": ["confirmed", "provisional", "unknown"]}
+      }
+    }
   }
 }
