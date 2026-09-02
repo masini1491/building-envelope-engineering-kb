@@ -19,7 +19,7 @@ canonical_key: "cladding.aluminum-panel-flatness-and-oil-canning"
 
 兩者相關，但不能互相取代。
 
-## Oil canning 是什麼
+## 板面波浪（Oil canning）是什麼
 
 Metal Construction Association (MCA) 將 oil canning 說明為金屬屋面／牆面板平坦區域可見的波浪狀變形，技術上常稱 elastic buckling / stress wrinkling。鋼、鋁、鋅、銅等金屬板都可能發生。
 
@@ -42,7 +42,7 @@ MCA 同時指出，oil canning 受多種生產、材料選擇、panel design 與
 - 運輸、堆放與吊裝方式
 - finish 反射性、顏色、觀察距離、視角與日照角度
 
-## Temper 不等於完成面平整度
+## 調質狀態（Temper）不等於完成面平整度
 
 H12 與 H14 是不同加工硬化狀態；但不能從「H12 的加工硬化程度較低」直接推出「H12 成品一定較不平」。
 
