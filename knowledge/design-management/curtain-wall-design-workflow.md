@@ -132,7 +132,7 @@ Calculation review routing：[`../structural-design/review/README.md`](../struct
 
 水管理 routing：[`../water-management/README.md`](../water-management/README.md)。
 
-## Phase 5 — Mock-up／Prototype Planning
+## Phase 5 — Mock-up／Prototype 規劃
 
 若專案要求 laboratory mock-up / performance test，應盡早選定代表性 specimen，而不是設計全部完成後才臨時拼試體。
 
@@ -168,7 +168,7 @@ Performance-test routing：[`../standards/performance-testing/curtain-wall-perfo
 
 「等級相近」或「廠商說可以」不等於 approved substitution。
 
-## Phase 7 — Shop／Fabrication Drawing
+## Phase 7 — Shop／Fabrication Drawing 製作
 
 Fabrication drawing 是 design intent 轉成工廠可製造資料的工程介面。
 
@@ -186,7 +186,7 @@ Fabrication drawing 是 design intent 轉成工廠可製造資料的工程介面
 
 Shop / fabrication drawing 應能回到 approved design drawing、design basis 與 revision source。
 
-## Phase 8 — Final Design Verification
+## Phase 8 — 最終設計確認（Final Design Verification）
 
 Release 前不應只做 drawing drafting check；至少再確認：
 
@@ -222,7 +222,7 @@ Release 前不應只做 drawing drafting check；至少再確認：
 - `mock-up PASS = production workmanship automatically identical`：錯誤。
 - `材料已採購 = 可以略過 substitution review`：錯誤。
 
-## Public-source routing
+## 公開來源 routing
 
 - [`../../references/government/abri-metal-curtain-wall-design-manual-2003.md`](../../references/government/abri-metal-curtain-wall-design-manual-2003.md) — 台灣帷幕牆 coverage / performance / mock-up / fixed-attachment historical public technical source。
 - 本頁另外整合一般 façade engineering process practice；因此 verification status 為 `HIGH_CONFIDENCE`，不宣稱為法規程序。
