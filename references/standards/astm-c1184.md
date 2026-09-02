@@ -9,11 +9,11 @@
 - 查證日期：2026-09-02
 - authority type：industry standard / material specification
 
-## Scope routing
+## 適用範圍路由（Scope routing）
 
 本標準為 structural silicone sealant 的產品／材料規格之一。它不直接等於特定專案 structural bite、sealant thickness、allowable design stress 或 completed SSG system approval。
 
-## Knowledge routing
+## 知識路由（Knowledge routing）
 
 - [`../../knowledge/sealants/structural-silicone-baseline.md`](../../knowledge/sealants/structural-silicone-baseline.md)
 - [`../../knowledge/sealants/structural-silicone-bite-routing.md`](../../knowledge/sealants/structural-silicone-bite-routing.md)
