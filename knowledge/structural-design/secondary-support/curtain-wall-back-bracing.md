@@ -55,7 +55,7 @@ verified_at: "2026-09-02"
 
 不得使用固定角鋼尺寸表取代 actual length / force / support model。
 
-## Brace angle 與力放大
+## 背撐角度與力放大（Brace angle）
 
 斜撐角度會改變 brace axial force 與端部 reaction。
 
@@ -80,9 +80,9 @@ Routing：
 
 - [`../connections/fastener-group-analysis.md`](../connections/fastener-group-analysis.md)
 - [`../connections/weld-group-analysis.md`](../connections/weld-group-analysis.md)
-- [`../../anchors/README.md`](../../anchors/README.md)
+- [`../../anchors/anchor-standards-baseline.md`](../../anchors/anchor-standards-baseline.md)
 
-## Supporting member local effects
+## 支承構件局部效應（Supporting member local effects）
 
 Back brace 把 concentrated / eccentric load 導入 receiving steel 時，除了 primary member global strength，還可能需要檢查：
 
@@ -111,7 +111,7 @@ Back brace 把 concentrated / eccentric load 導入 receiving steel 時，除了
 
 `strength PASS ≠ movement / constructability PASS`。
 
-## Responsibility boundary
+## 責任分界（Responsibility boundary）
 
 若帷幕廠負責 back brace，但 primary beam reinforcement 由主結構技師負責，必須明確切出 interface。
 
