@@ -38,7 +38,7 @@ Review 至少包括：
 - joint overlap；
 - water path at corner / splice / stack joint。
 
-## Weep / outlet 防呆
+## 排水孔／出口（Weep / outlet）防呆
 
 Weep 可能因：
 
@@ -127,7 +127,7 @@ Weep 可能因：
 
 這和 glazed curtain-wall glazing pocket 的 drainage mechanics 不一定相同。
 
-## Mock-up／現場審查
+## 試體／Mock-up／現場審查
 
 水管理 detail 很適合在封板前檢查：
 
