@@ -72,7 +72,7 @@ canonical_owner: true
 - point load 是否保持 concentrated load，而非無依據平均化？
 - load combination / envelope 是否有 governing basis？
 
-## 6. Framing 模型
+## 6. 構架（Framing）模型
 
 - single-span / multi-span / continuous beam 是否與實際相符？
 - support DOF 是否明示？
