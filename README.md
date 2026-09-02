@@ -2,169 +2,108 @@
 
 以台灣建築外殼工程實務為核心的公開技術知識庫，供工程師與 AI（例如 ChatGPT / Codex）查詢、交叉驗證、計算審查與持續維護。
 
-範圍包含但不限於：帷幕牆、玻璃、結構玻璃、鋁板與金屬外牆、石材、採光罩、材料與扣件、表面處理、防蝕、結構耐風／耐震、氣密／水密／層間變位試驗、**雨水侵入／等壓／排水、帷幕設計作業流程**、活動窗、建築物理（building physics）、防火（fire），以及相關 CNS / ASTM / AAMA-FGIA / ISO 標準與台灣工程實務。
+範圍包含帷幕牆、玻璃與結構玻璃、鋁板／金屬外牆、石材、採光罩、材料與扣件、表面處理、防蝕、結構耐風／耐震、錨栓、背撐／次結構、性能試驗、水管理、活動窗、建築物理、防火，以及相關 CNS / ASTM / AAMA-FGIA / ISO 與台灣工程實務。
 
 ## 核心原則
 
 1. **證據優先（Evidence first）**：先有來源，再下工程結論。
-2. **辨識來源權威（Authority aware）**：區分法規、正式標準、政府手冊、專案文件、製造商資料、工程經驗與未驗證資訊。
-3. **現行資訊優先（Current before cached）**：涉及現行規範、版本或產品資料時，優先確認 freshness；舊聊天與 AI memory 不作正式技術來源。
-4. **單一來源、不重複（Reference, don't repeat）**：同一規則、標準版本或技術結論只保留一個 canonical owner，其他頁面以連結／routing 為主。
-5. **漸進式讀取（Progressive reading）**：AI 先從本 README 與 `CHAT_INIT.md` 進入，再依題目讀最低必要內容。
-6. **`INCOMPLETE` 是有效結果**：必要 input、criterion、capacity source、support model 或 provenance 不足時，應回傳 `INCOMPLETE`，不得補猜為 PASS。
-7. **公開安全（Public-safe）**：不公開未授權施工圖、專案名稱／可辨識 geometry、客戶／公司機密、私人 provenance、受版權保護標準全文或其他不可再散布內容。
+2. **辨識來源權威（Authority aware）**：法規、正式標準、政府資料、專案文件、製造商資料與工程觀察不可混為同一層級。
+3. **現行資訊優先（Current before cached）**：標準版本、法規與產品資料可能更新時，重新查證 freshness。
+4. **單一 canonical owner**：同一規則、標準版本或工程結論只維護一個 owner，其他頁面用 routing / link。
+5. **漸進式讀取（Progressive reading）**：AI 不預設掃完整個 Repo，只讀回答問題所需的最低充分內容。
+6. **`INCOMPLETE` 是有效結果**：必要 input、criterion、capacity source、support model 或 provenance 不足時，不得補猜為 PASS。
+7. **公開安全（Public-safe）**：不公開未授權施工圖、計算書、可辨識專案條件、私人 provenance 或受版權限制全文。
 
-## Repository 路由
+完整治理規則見 [`AGENTS.md`](AGENTS.md)。語言規則見 [`LANGUAGE.md`](LANGUAGE.md)。
 
-- `AGENTS.md`：AI / maintainer 的治理、來源權威、schema 與公開安全規則。
-- `CHAT_INIT.md`：新聊天室最小啟動流程。
-- `LANGUAGE.md`：繁體中文與技術術語使用規則。
-- `knowledge/`：整理後、可供工程師與 AI 直接使用的 canonical technical knowledge。
-- `references/`：**只保存可公開散布**的來源、版本、適用範圍、限制與 evidence dossier。
-- `schemas/`：AI / calculator / spreadsheet 共用的 machine-readable engineering data models。
-- `indexes/`：未來需要 standards / materials / cross-reference lookup 時才建立的 machine-readable index；不與 `schemas/` 混用。
-- `templates/`：新增標準、材料與工程知識時的固定格式。
+## 快速開始
 
-## 語言
+### 給工程師／一般使用者
 
-本 repository 是**繁體中文（台灣）優先**的工程知識庫，不追求「零英文」。
-
-- 主要敘述、章節標題、表格欄名與 AI 預設回答使用繁體中文。
-- 標準正式名稱、標準編號、材料牌號、產品名稱與必要英文工程術語可保留原文。
-- schema key、enum、程式識別碼、檔案路徑、公式與單位不因繁中化而改名。
-- 完整規則見 [`LANGUAGE.md`](LANGUAGE.md)。
-
-## 設計作業與水管理入口
-
-- [`knowledge/design-management/curtain-wall-design-workflow.md`](knowledge/design-management/curtain-wall-design-workflow.md) — project inputs → design basis → system design → 跨部門 review → calculation / mock-up → material approval → shop/fabrication drawing → release / revision control
-- [`knowledge/water-management/README.md`](knowledge/water-management/README.md) — 雨水侵入、pressure equalization / rainscreen、drainage / weep 的 system-level router
-- [`knowledge/water-management/water-ingress-mechanisms.md`](knowledge/water-management/water-ingress-mechanisms.md) — 水源／路徑／驅動力；重力、表面張力、毛細、雨滴動能、壓差
-- [`knowledge/water-management/pressure-equalization-and-rainscreen.md`](knowledge/water-management/pressure-equalization-and-rainscreen.md) — chamber、vent、air seal、compartmentation 與 dynamic response
-- [`knowledge/water-management/drainage-and-weep-design.md`](knowledge/water-management/drainage-and-weep-design.md) — collection cavity、slope、end dam、weep / outlet、vertical drainage 與現場堵塞防呆
-
-這些頁面不把歷史教材的固定比例、壓力、孔洞面積或水頭高度直接當 universal rule；任何 project-specific numerical criterion 仍須可追溯至 current source / project design basis。
-
-## 結構設計方法基線
-
-目前已建立的主要 structural chain：
-
-```text
-專案規範／design basis
-        ↓
-荷載定義／load generation
-        ↓
-框架／面板／玻璃／窗扇結構反應
-        ↓
-splice／composite action／movement
-        ↓
-fastener／local extrusion／weld／anchor
-        ↓
-主體結構介面
-        ↓
-性能試驗／validation
-        ↓
-failure-mode coverage／完整性審查
-```
+先進入 [`knowledge/README.md`](knowledge/README.md)，依主題選擇 domain。
 
 主要入口：
 
-- [`knowledge/structural-design/review/README.md`](knowledge/structural-design/review/README.md) — 結構計算審查／coverage router
-- [`knowledge/structural-design/review/project-specification-extraction.md`](knowledge/structural-design/review/project-specification-extraction.md) — project specification → Project Design Basis
-- [`knowledge/structural-design/load-generation/README.md`](knowledge/structural-design/load-generation/README.md) — pressure / mass / point load → component demand
-- [`knowledge/structural-design/framing/mullion-transom-design-baseline.md`](knowledge/structural-design/framing/mullion-transom-design-baseline.md) — mullion / transom 基線
-- [`knowledge/structural-design/framing/continuous-mullion-analysis.md`](knowledge/structural-design/framing/continuous-mullion-analysis.md) — multi-span / support DOF
-- [`knowledge/structural-design/framing/multi-part-extrusion-load-sharing.md`](knowledge/structural-design/framing/multi-part-extrusion-load-sharing.md) — composite-action guardrails
-- [`knowledge/structural-design/connections/load-path-and-anchor-reactions.md`](knowledge/structural-design/connections/load-path-and-anchor-reactions.md) — connection / anchor load path
-- [`knowledge/structural-design/seismic/README.md`](knowledge/structural-design/seismic/README.md) — 台灣 façade seismic force + movement routing
-- [`knowledge/cladding/structural-analysis/README.md`](knowledge/cladding/structural-analysis/README.md) — metal panel / stiffener / plate-shell FEA
-- [`knowledge/operable-elements/README.md`](knowledge/operable-elements/README.md) — 活動窗 sash / hardware / life-cycle routing
-- [`knowledge/structural-glass/README.md`](knowledge/structural-glass/README.md) — structural glass / laminated effective thickness / point supports / movement / redundancy
+- [`knowledge/structural-design/README.md`](knowledge/structural-design/README.md) — 結構設計／計算審查總 router
+- [`knowledge/structural-glass/README.md`](knowledge/structural-glass/README.md) — 結構玻璃
+- [`knowledge/water-management/README.md`](knowledge/water-management/README.md) — 雨水侵入、等壓、排水
+- [`knowledge/operable-elements/README.md`](knowledge/operable-elements/README.md) — 活動窗／可開啟構件
+- [`knowledge/design-management/curtain-wall-design-workflow.md`](knowledge/design-management/curtain-wall-design-workflow.md) — 帷幕設計作業流程
+- [`knowledge/performance-testing/curtain-wall-performance-crosswalk.md`](knowledge/performance-testing/curtain-wall-performance-crosswalk.md) — CNS / ASTM / AAMA-FGIA 性能試驗 crosswalk
 
-## 標準／性能試驗基線
+### 給 ChatGPT / Codex
 
-- [`knowledge/standards/performance-testing/curtain-wall-performance-crosswalk.md`](knowledge/standards/performance-testing/curtain-wall-performance-crosswalk.md) — CNS / ASTM / AAMA-FGIA performance-test crosswalk
-- [`knowledge/structural-design/wind/taiwan-curtain-wall-wind-design-manual.md`](knowledge/structural-design/wind/taiwan-curtain-wall-wind-design-manual.md) — 內政部建研所帷幕耐風手冊 routing
-- [`knowledge/structural-design/wind/taiwan-design-wind-pressure-workflow.md`](knowledge/structural-design/wind/taiwan-design-wind-pressure-workflow.md) — 台灣現行風壓設計 workflow
+新 session 依序：
 
-Cross-reference 只表示用途相關，不代表不同標準體系全文等價。
+1. 讀本 README。
+2. 讀 [`CHAT_INIT.md`](CHAT_INIT.md)。
+3. 讀 [`AGENTS.md`](AGENTS.md)。
+4. 依問題只讀最低必要的 `knowledge/` router / canonical pages。
+5. 需要版本、來源或 provenance 時再讀 `references/`。
+6. Repository evidence 不足或 freshness 不明時，再查 current primary source。
 
-## 材料／表面處理／耐久性基線
+## Repository 結構
 
-- [`knowledge/materials/aluminum/common-curtain-wall-alloys.md`](knowledge/materials/aluminum/common-curtain-wall-alloys.md)
-- [`knowledge/materials/steel/astm-a36.md`](knowledge/materials/steel/astm-a36.md)
-- [`knowledge/materials/stainless-steel/stainless-steel-baseline.md`](knowledge/materials/stainless-steel/stainless-steel-baseline.md)
-- [`knowledge/fasteners/stainless/iso-3506-a2-70-a2-90.md`](knowledge/fasteners/stainless/iso-3506-a2-70-a2-90.md) — A2-70 與非標準 A2-90 designation guardrail；不保存 private-project provenance
-- [`knowledge/finishes/aluminum-organic-coatings-aama-2603-2604-2605.md`](knowledge/finishes/aluminum-organic-coatings-aama-2603-2604-2605.md)
-- [`knowledge/corrosion-protection/hot-dip-galvanizing-astm-family.md`](knowledge/corrosion-protection/hot-dip-galvanizing-astm-family.md)
-- [`knowledge/engineering-notes/aluminum-panel-flatness-and-oil-canning.md`](knowledge/engineering-notes/aluminum-panel-flatness-and-oil-canning.md)
+- [`knowledge/`](knowledge/)：整理後、供工程師與 AI 直接使用的 canonical engineering knowledge。
+- [`references/`](references/)：**只保存可公開散布**的 public evidence dossier、版本、scope、限制與 provenance。
+  - `references/standards/` 是標準 current-edition / status 的優先 owner。
+  - [`references/github-projects/`](references/github-projects/) 是 NON-NORMATIVE 軟體／實作參考。
+- [`schemas/`](schemas/)：AI / calculator / spreadsheet 共用的 machine-readable engineering data models。
+- `indexes/`：machine-readable routing / lookup index；只保存索引，不複製 knowledge 本體。
+- [`templates/`](templates/)：新增 knowledge / reference 時的格式骨架。
+- [`scripts/`](scripts/) 與 `.github/`：repository validation / maintenance tooling。
 
-## 玻璃／填縫材／外牆系統
+## 關鍵工程防呆
 
-- [`knowledge/glazing/glass-standards-baseline.md`](knowledge/glazing/glass-standards-baseline.md)
-- [`knowledge/glazing/ASTM-E1300-design-routing.md`](knowledge/glazing/ASTM-E1300-design-routing.md)
-- [`knowledge/sealants/structural-silicone-baseline.md`](knowledge/sealants/structural-silicone-baseline.md)
-- [`knowledge/sealants/structural-silicone-bite-routing.md`](knowledge/sealants/structural-silicone-bite-routing.md)
-- [`knowledge/sealants/weatherseal-joint-design.md`](knowledge/sealants/weatherseal-joint-design.md)
-- [`knowledge/gaskets/elastomeric-gasket-baseline.md`](knowledge/gaskets/elastomeric-gasket-baseline.md)
-- [`knowledge/stone/dimension-stone-cladding-baseline.md`](knowledge/stone/dimension-stone-cladding-baseline.md)
-- [`knowledge/skylights/skylight-and-sloped-glazing-baseline.md`](knowledge/skylights/skylight-and-sloped-glazing-baseline.md)
-- [`knowledge/building-physics/thermal-and-condensation-baseline.md`](knowledge/building-physics/thermal-and-condensation-baseline.md)
-- [`knowledge/fire/perimeter-fire-barrier-and-joints.md`](knowledge/fire/perimeter-fire-barrier-and-joints.md)
+本 Repo 不自行捏造或從不相干資料推算：
 
-## 機器可讀 Schemas
+- 材料強度／allowable / resistance
+- safety factor / hidden multiplier
+- test pressure / duration
+- bolt proof / torque
+- glass capacity / interlayer shear modulus
+- structural silicone allowable design stress
+- 標準等價關係
 
-`schemas/` 已包含 material、load case、section properties、deflection criterion、support/joint DOF、plate/shell FEA metadata、seismic component、structural coverage 與 project design basis models。
+Cross-reference 只代表用途相關，不代表 CNS / ASTM / AAMA-FGIA / ISO 等不同體系全文等價。
 
-Schema 是 engineering interchange contract，不是 project instance。正式 calculator 實作前必須確認 unit、provenance、standard/edition、scope、boundary condition 與 incomplete-state handling。
+結構審查特別區分：
+
+`Project Design Basis`
+→ `load generation`
+→ `member / panel / glass response`
+→ `connection / anchor`
+→ `secondary support / primary-structure interface`
+→ `movement / performance validation`
+→ `failure-mode coverage`
+
+任一局部 `PASS` 不自動代表整體系統 `PASS`。
 
 ## 自動驗證
 
-`.github/workflows/validate-repo.yml` 會在 push / pull request 執行 `scripts/validate_repo.py`，目前檢查：
+`.github/workflows/validate-repo.yml` 執行 `scripts/validate_repo.py`。目前 baseline 包含：
 
-- JSON parse
-- JSON Schema Draft 2020-12 meta-validation
-- schema `$id` 不得使用 `example.invalid`
+- JSON / JSON Schema validation
 - Markdown relative-link existence
-- knowledge frontmatter `verification_status`
-- `references/` 不得建立 private-project dossier 目錄
-- `knowledge/` 人類可讀 heading 依 `LANGUAGE.md` 維持繁中優先
+- knowledge verification status
+- public-reference privacy rule
+- `LANGUAGE.md` 繁中 heading lint
 
-這是 baseline guard；後續可再擴充 duplicate canonical-owner、standard-version ownership 與更多 privacy lint。
+Repository 進入 consolidation / hardening 階段後，會再擴充 canonical ownership、orphan page、standard-version ownership 與 index consistency 等檢查。
 
-## 目前 hardening 優先事項
+## 授權與責任
 
-目前內容已由「建立 baseline」進入「consolidation / hardening」階段。後續優先：
+本 repository 採雙授權模型，且只授權 maintainer 有權授權的原創內容：
 
-1. 持續建立 `references/standards/`、`references/government/` 等 public evidence dossiers，集中 current-edition ownership。
-2. 持續強化 JSON schemas 與 source/provenance model。
-3. 擴充 automated validation：duplicate canonical-owner、standard-version ownership、privacy lint。
-4. 依 coverage audit 補隔音、排煙／外牆開口介面、摩擦音／異音、mock-up planning / failure-feedback 等 knowledge gaps。
-5. 補 AAMA 611、CNS 10007 / 1247 等尚未建立的 standards pages。
-6. 視實際需求再建立 `indexes/`，不要為了目錄完整而預先複製資料。
-
-## 授權
-
-本 repository 採雙授權模型，且只授權 repository maintainer 有權授權的原創內容：
-
-- **工程知識／文件：CC BY 4.0** — 一般適用於 `README.md`、`AGENTS.md`、`CHAT_INIT.md`、`LANGUAGE.md`、`knowledge/`、repository-authored `references/` metadata/commentary、`templates/` 等文件內容。
-- **schemas／scripts／code：MIT License** — 一般適用於 `schemas/`、`scripts/`、`.github/` 與其他明確屬於 software/tooling 的內容。
+- 工程知識／文件：CC BY 4.0
+- schemas／scripts／code：MIT License
 
 詳見：
 
-- [`LICENSE.md`](LICENSE.md) — 授權範圍與雙授權總則
-- [`LICENSE-DOCS.md`](LICENSE-DOCS.md) — CC BY 4.0 文件授權說明
-- [`LICENSE-CODE`](LICENSE-CODE) — MIT License 官方英文文字
-- [`THIRD-PARTY-NOTICE.md`](THIRD-PARTY-NOTICE.md) — 第三方標準、出版物、商標與技術資料不因出現在本 Repo 而被重新授權
-- [`DISCLAIMER.md`](DISCLAIMER.md) — 工程／AI review 免責與責任邊界
+- [`LICENSE.md`](LICENSE.md)
+- [`LICENSE-DOCS.md`](LICENSE-DOCS.md)
+- [`LICENSE-CODE`](LICENSE-CODE)
+- [`THIRD-PARTY-NOTICE.md`](THIRD-PARTY-NOTICE.md)
+- [`DISCLAIMER.md`](DISCLAIMER.md)
 
-## 著作權／第三方權利邊界
-
-ASTM、AAMA-FGIA、ISO、CNS、Aluminum Association、AWS、AISC、製造商資料與其他第三方作品可能受各自著作權、商標或授權條款限制。
-
-本 repository 的 CC BY 4.0 / MIT 授權**不會重新授權這些第三方原始作品**。Repo 原則上只保存標準編號、版本資訊、適用範圍、合法可引用的最低充分內容、自行整理的工程摘要／routing 與官方或合法來源連結；不把付費／受限制標準全文或未授權 PDF 直接 commit 到公開 repository。
-
-## 工程責任邊界
-
-本 repository 可支援工程研究、初步分析、計算審查與 AI-assisted review，但不取代 project-specific professional engineering judgment、技師簽證、主管機關審查、正式試驗、施工核可或 project approval。
-
-**任何 AI / automated review 輸出的 `PASS` 都不構成專業工程認證、法規核准或施工授權。** 詳見 [`DISCLAIMER.md`](DISCLAIMER.md)。
+> 本知識庫是工程研究、查核與 AI 輔助工具，不取代專案契約、正式標準原文、製造商 project review 或依法應由合格專業人員承擔的設計責任。
