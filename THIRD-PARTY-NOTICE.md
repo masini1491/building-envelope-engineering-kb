@@ -1,41 +1,37 @@
-# Third-Party Rights Notice
+# 第三方權利聲明
 
-This repository references standards, publications, manufacturers, organizations, government documents, and other external sources for engineering research and traceability.
+本 repository 為工程研究與可追溯性目的，會引用標準、出版物、製造商、組織、政府文件與其他外部來源。
 
-## No relicensing of third-party works
+## 不重新授權第三方作品
 
-The repository licenses (`CC BY 4.0` for original documentation/knowledge and `MIT` for original schemas/scripts/code) apply only to material for which the repository maintainer has the right to grant those licenses.
+本 repository 的授權（原創文件／知識採 `CC BY 4.0`；原創 schemas／scripts／code 採 `MIT`）只適用於 repository maintainer 有權授權的內容。
 
-They do **not** grant permission to reproduce, redistribute, adapt, sell, or otherwise exploit third-party works beyond rights already available under applicable law or the third party's own license/terms.
+這些授權**不會額外授予**重製、再散布、改作、販售或以其他方式利用第三方作品的權利；第三方作品仍依適用法律及原權利人的授權／使用條款處理。
 
-Third-party material may include, without limitation:
+第三方內容可能包括但不限於：
 
 - ASTM standards and publications
-- CNS standards
+- CNS 標準
 - ISO standards
 - AAMA / FGIA standards and publications
 - Aluminum Association publications
 - AWS / AISC publications
-- manufacturer technical literature, evaluation reports, test reports, product data, trademarks, and logos
-- government publications subject to their own reuse terms
-- research papers, figures, tables, photographs, diagrams, or quotations owned by others
+- 製造商 technical literature、evaluation reports、test reports、product data、trademarks 與 logos
+- 受自身再利用條款規範的政府出版物
+- 他人擁有的研究論文、圖、表、照片、diagram 或 quotation
 
-## Repository summaries and metadata
+## Repository 自行撰寫的摘要與 metadata
 
-Repository-authored summaries, classifications, routing notes, engineering commentary, and metadata may be licensed under this repository's documentation license, but that does not transfer rights in the underlying third-party source.
+本 repository 自行撰寫的摘要、分類、routing notes、工程評論與 metadata，可依 repository 的文件授權使用；但這不會移轉或重新授權底層第三方來源的權利。
 
-For example, a repository-authored statement such as:
+例如 repository 自行整理「ASTM E330 可作為 uniform static air pressure 結構性能試驗的 routing reference」這類工程說明，可屬於 repository 的原創 commentary；但 ASTM 標準原文仍是第三方作品。
 
-> ASTM E330 is used as a routing reference for structural performance testing by uniform static air pressure.
+## 商標
 
-may be part of this repository's original commentary, while the ASTM standard itself remains a third-party copyrighted work.
+ASTM、ISO、CNS、AAMA、FGIA 及製造商名稱等名稱與標誌，只用於識別與引用。除非相關權利人明確表示，否則不代表 sponsorship、endorsement、affiliation 或 ownership。
 
-## Trademarks
+## 取得來源
 
-Names and marks such as ASTM, ISO, CNS, AAMA, FGIA, and manufacturer names are used for identification and reference. No sponsorship, endorsement, affiliation, or ownership is implied unless explicitly stated by the relevant rights holder.
+使用者應從適用的 publisher、主管機關、manufacturer 或合法授權來源取得標準及 proprietary technical documents，並遵守其使用條款。
 
-## Source access
-
-Users should obtain standards and proprietary technical documents from the applicable publisher, authority, manufacturer, or licensed source and comply with their terms of use.
-
-If third-party material is discovered in this repository that should not be present or is attributed incorrectly, please open an issue so it can be reviewed.
+若發現本 repository 出現不應公開的第三方內容或 attribution 錯誤，請提出 issue 供維護者檢查。
