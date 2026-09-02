@@ -61,7 +61,8 @@ Mechanical post-installed anchor 與 adhesive anchor 不是同一 qualification 
 - cracked / uncracked approval；
 - seismic qualification if required；
 - permitted embedment variants；
-- permitted installation conditions。
+- permitted installation conditions；
+- installation-sensitivity / anchor category treatment where governing evidence uses it。
 
 ### 混凝土／基材
 
@@ -70,7 +71,7 @@ Mechanical post-installed anchor 與 adhesive anchor 不是同一 qualification 
 - concrete member thickness；
 - edge distances；
 - anchor spacing；
-- reinforcement condition where governing method uses it；
+- reinforcement / supplementary reinforcement condition where governing method uses it；
 - opening / recess / step / edge geometry；
 - lightweight / normal-weight status if relevant to governing method。
 
@@ -123,6 +124,23 @@ Mechanical post-installed anchor 與 adhesive anchor 不是同一 qualification 
 
 若 manufacturer software 假設 rigid anchor plate，而實際 bracket / plate 明顯柔弱，應另外檢查此 model assumption 對 anchor force distribution 是否仍合理。
 
+## 群組破壞面／幾何效應
+
+Concrete breakout / edge failure 等 group checks 不能只用「單根 resistance × anchor 數量」。
+
+若 governing method 使用 projected failure area / group area，至少保存：
+
+- single-anchor reference area；
+- actual group projected area；
+- anchor spacing；
+- edge-distance truncation；
+- concrete member thickness / opening / recess 對 failure surface 的影響；
+- eccentricity modifier；
+- cracked-concrete treatment；
+- supplementary reinforcement 是否被計入，以及其配置與來源。
+
+若這些 geometry 無法重建，就不能只接受 manufacturer report 的最終 utilization。
+
 ## 拉力 failure modes
 
 依 governing code 與產品 evaluation，至少考慮適用的：
@@ -131,6 +149,7 @@ Mechanical post-installed anchor 與 adhesive anchor 不是同一 qualification 
 - concrete breakout / cone failure；
 - pullout；
 - side-face blowout；
+- concrete splitting where applicable；
 - 其他產品 qualification 明確要求的 tension failure mode。
 
 對每一 failure mode，都要保存：
@@ -152,6 +171,7 @@ Mechanical post-installed anchor 與 adhesive anchor 不是同一 qualification 
 - anchor steel shear failure；
 - concrete edge breakout；
 - pryout；
+- concrete splitting / edge interaction where applicable；
 - shear direction / edge orientation effect；
 - plate / bracket bearing and local deformation。
 
@@ -177,6 +197,20 @@ Edge distance 不只是幾何註記；它可能直接改變 concrete edge failur
 不得因 uncracked resistance 較高，就在沒有 structural basis 的情況下自行選 uncracked concrete。
 
 如果 cracked status 無法確定，而它可能改變 resistance / qualification，至少應標 `INCOMPLETE` 或採經證明的 conservative bounding case。
+
+## 安裝敏感性與 qualification
+
+後置式 anchor 的 resistance 可能對 installation process 敏感。
+
+Review 不應只問「有沒有照說明書安裝」，還要確認：
+
+- qualification 是否涵蓋實際 drilling / setting method；
+- required torque / embedment / hole tolerance；
+- installer-sensitive steps；
+- 現場是否有 inspection / proof-test requirement；
+- calculation 中是否使用與 product qualification 對應的 resistance / factor treatment。
+
+不得把歷史教材中的 anchor category 或舊版 installation factor 直接帶入 current design；如 governing method 有 category / sensitivity concept，應以本次 exact product evaluation 與 current method 為準。
 
 ## 耐震資格（Seismic qualification）
 
@@ -209,7 +243,8 @@ Manufacturer software 很適合：
 7. plate-rigidity assumption；
 8. load input 是否與 façade calculation 對得上；
 9. warnings / exclusions；
-10. output 是否涵蓋所有 required failure modes。
+10. output 是否涵蓋所有 required failure modes；
+11. group projected-area / edge / spacing treatment 是否可追溯。
 
 **Manufacturer software PASS ≠ façade connection PASS。**
 
@@ -244,6 +279,7 @@ Post-installed anchor calculation 常出現多層 factors，例如：
 - installation / anchor-category factor；
 - cracked-concrete treatment；
 - edge / spacing / eccentricity modifiers；
+- reinforcement-related modifiers where applicable；
 - seismic modifiers；
 - combined-load exponent / threshold。
 
@@ -274,7 +310,7 @@ Cast-in embedded plate 方法見 [`cast-in-embedded-plate-design.md`](cast-in-em
 
 ### 通過（`PASS`）
 
-只有在 product / qualification / geometry / substrate / loads / failure modes / factors / installation scope 都能追溯，且 connection 的外側 plate / bracket / weld / bolt checks 也已完成時，才能對明確 scope 給 PASS。
+只有在 product / qualification / geometry / substrate / loads / failure modes / factors / installation scope 都能追溯，group projected-area treatment 可重建，且 connection 的外側 plate / bracket / weld / bolt checks 也已完成時，才能對明確 scope 給 PASS。
 
 ### 警告（`WARNING`）
 
@@ -292,6 +328,8 @@ Cast-in embedded plate 方法見 [`cast-in-embedded-plate-design.md`](cast-in-em
 - evaluation report / design method 不明；
 - cracked status 不明；
 - edge / spacing / embedment / concrete thickness 缺失；
+- group projected failure area 無法重建；
+- supplementary reinforcement 被用於 resistance enhancement，但配置／來源不明；
 - installation condition 缺失；
 - manufacturer report 的 load 無法與 façade reaction 對上；
 - factor provenance 不明；
