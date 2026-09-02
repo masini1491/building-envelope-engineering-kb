@@ -28,7 +28,7 @@ verified_at: "2026-09-02"
 
 任何重要變更都應能回到 design basis 重新檢查，而不是只修改圖面。
 
-## Phase 0 — 收集專案輸入
+## 階段 0（Phase 0）— 收集專案輸入
 
 正式開始設計前，至少確認可取得的：
 
@@ -47,7 +47,7 @@ verified_at: "2026-09-02"
 
 缺少會影響系統或責任界面的文件時，應先記錄 `INCOMPLETE / RFI required`，不要默默沿用前案。
 
-## Phase 1 — 建立 Project Design Basis
+## 階段 1（Phase 1）— 建立專案設計依據（Project Design Basis）
 
 應把 specification 與 governing references 轉成可檢核的 project-specific basis：
 
@@ -64,7 +64,7 @@ verified_at: "2026-09-02"
 
 Routing：[`../structural-design/review/project-specification-extraction.md`](../structural-design/review/project-specification-extraction.md)。
 
-## Phase 2 — 系統／標準部設計
+## 階段 2（Phase 2）— 系統／標準部設計
 
 先建立代表性 typical / system details，再大量展開施工圖。
 
@@ -83,7 +83,7 @@ Routing：[`../structural-design/review/project-specification-extraction.md`](..
 
 System detail 尚未穩定前，過早大量展開 shop drawing 會提高後續 revision cost。
 
-## Phase 3 — 跨部門設計審查
+## 階段 3（Phase 3）— 跨部門設計審查
 
 System design 應至少接受下列視角的 review：
 
@@ -111,7 +111,7 @@ System design 應至少接受下列視角的 review：
 - excessive part count / field work；
 - project scope gap。
 
-## Phase 4 — 結構與性能驗證
+## 階段 4（Phase 4）— 結構與性能驗證
 
 結構 calculation 應與 drawing geometry 同步，而不是獨立存在。
 
@@ -132,7 +132,7 @@ Calculation review routing：[`../structural-design/review/README.md`](../struct
 
 水管理 routing：[`../water-management/README.md`](../water-management/README.md)。
 
-## Phase 5 — Mock-up／Prototype 規劃
+## 階段 5（Phase 5）— 實體樣品／原型（Mock-up／Prototype）規劃
 
 若專案要求 laboratory mock-up / performance test，應盡早選定代表性 specimen，而不是設計全部完成後才臨時拼試體。
 
@@ -151,7 +151,7 @@ Mock-up 的價值不只在「取得 PASS」；失敗與拆解 observation 應回
 
 Performance-test routing：[`../performance-testing/curtain-wall-performance-crosswalk.md`](../performance-testing/curtain-wall-performance-crosswalk.md)。
 
-## Phase 6 — 材料／樣品／五金核准
+## 階段 6（Phase 6）— 材料／樣品／五金核准
 
 在大量採購或加工前，至少追蹤：
 
@@ -168,7 +168,7 @@ Performance-test routing：[`../performance-testing/curtain-wall-performance-cro
 
 「等級相近」或「廠商說可以」不等於 approved substitution。
 
-## Phase 7 — Shop／Fabrication Drawing 製作
+## 階段 7（Phase 7）— 施工圖／加工圖（Shop／Fabrication Drawing）製作
 
 Fabrication drawing 是 design intent 轉成工廠可製造資料的工程介面。
 
@@ -186,7 +186,7 @@ Fabrication drawing 是 design intent 轉成工廠可製造資料的工程介面
 
 Shop / fabrication drawing 應能回到 approved design drawing、design basis 與 revision source。
 
-## Phase 8 — 最終設計確認（Final Design Verification）
+## 階段 8（Phase 8）— 最終設計確認（Final Design Verification）
 
 Release 前不應只做 drawing drafting check；至少再確認：
 
@@ -199,7 +199,7 @@ Release 前不應只做 drawing drafting check；至少再確認：
 - machining / assembly 是否符合 system intent；
 - unresolved RFI / NCR / comment 是否已關閉。
 
-## Phase 9 — Release 與 Revision Control
+## 階段 9（Phase 9）— 發行與版本控制（Release／Revision Control）
 
 發行後應保存：
 
