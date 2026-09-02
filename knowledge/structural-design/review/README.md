@@ -1,11 +1,11 @@
 ---
-title: "帷幕牆結構計算審查與 Failure-Mode Routing"
+title: "帷幕牆結構計算審查與破壞模式路由（Failure-Mode Routing）"
 verification_status: "HIGH_CONFIDENCE"
 verified_at: "2026-09-02"
 canonical_owner: true
 ---
 
-# 帷幕牆結構計算審查與 Failure-Mode Routing
+# 帷幕牆結構計算審查與破壞模式路由（Failure-Mode Routing）
 
 本目錄不是另一套計算公式，而是把 repository 既有 structural knowledge 串成一個**coverage / completeness review layer**。
 
@@ -55,7 +55,7 @@ canonical_owner: true
 12. **Performance verification** — analysis 與 mock-up / component / assembly test 的角色是否分清。
 13. **Coverage status** — `PASS / WARNING / FAIL / INCOMPLETE / NOT_APPLICABLE` 是否有 traceable basis。
 
-## 相關頁面與 routing
+## 相關頁面與路由（routing）
 
 - [Project Specification → Structural Design Basis Extraction](project-specification-extraction.md)
 - [Design Factor／Safety Factor／隱藏倍率稽核](design-factor-and-hidden-multiplier-audit.md)
