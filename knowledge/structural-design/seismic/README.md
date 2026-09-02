@@ -23,7 +23,7 @@ canonical_owner: true
 
 正式設計前應重新確認 current master page 與對應章節，不應只看舊計算書封面年份判斷規範版本。
 
-## Façade seismic design 要拆成兩條主線
+## 外牆耐震設計（Façade seismic design）要拆成兩條主線
 
 ### 1. 受力路徑
 
