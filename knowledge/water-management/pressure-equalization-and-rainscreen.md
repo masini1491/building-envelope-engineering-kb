@@ -70,7 +70,7 @@ Pressure equalization 並非只看 opening area。
 
 如果專案的 dynamic performance 是 design requirement，應使用 project-specific analysis / test 或 applicable standard，而不是只憑幾何比例判 PASS。
 
-## Pressure-equalized rainscreen 與 Drained / Back-ventilated 的分界
+## 等壓雨幕（Pressure-equalized rainscreen）與排水／背通風雨幕（Drained / Back-ventilated）的分界
 
 必須分辨不同 system concept：
 
@@ -84,7 +84,7 @@ FGIA 目前分別有：
 
 不能只因都有 cavity / open joint 就把兩者等同。
 
-## Curtain wall 系統中的應用
+## 帷幕牆（Curtain wall）系統中的應用
 
 在 stick / unitized curtain wall 中，pressure moderation 可能發生於：
 
