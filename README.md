@@ -2,7 +2,7 @@
 
 以台灣建築外殼工程實務為核心的公開技術知識庫，供工程師與 AI（例如 ChatGPT / Codex）查詢、交叉驗證、計算審查與持續維護。
 
-範圍包含但不限於：帷幕牆、玻璃、結構玻璃、鋁板與金屬外牆、石材、採光罩、材料與扣件、表面處理、防蝕、結構耐風／耐震、氣密／水密／層間變位試驗、活動窗、建築物理（building physics）、防火（fire），以及相關 CNS / ASTM / AAMA-FGIA / ISO 標準與台灣工程實務。
+範圍包含但不限於：帷幕牆、玻璃、結構玻璃、鋁板與金屬外牆、石材、採光罩、材料與扣件、表面處理、防蝕、結構耐風／耐震、氣密／水密／層間變位試驗、**雨水侵入／等壓／排水、帷幕設計作業流程**、活動窗、建築物理（building physics）、防火（fire），以及相關 CNS / ASTM / AAMA-FGIA / ISO 標準與台灣工程實務。
 
 ## 核心原則
 
@@ -33,6 +33,16 @@
 - 標準正式名稱、標準編號、材料牌號、產品名稱與必要英文工程術語可保留原文。
 - schema key、enum、程式識別碼、檔案路徑、公式與單位不因繁中化而改名。
 - 完整規則見 [`LANGUAGE.md`](LANGUAGE.md)。
+
+## 設計作業與水管理入口
+
+- [`knowledge/design-management/curtain-wall-design-workflow.md`](knowledge/design-management/curtain-wall-design-workflow.md) — project inputs → design basis → system design → 跨部門 review → calculation / mock-up → material approval → shop/fabrication drawing → release / revision control
+- [`knowledge/water-management/README.md`](knowledge/water-management/README.md) — 雨水侵入、pressure equalization / rainscreen、drainage / weep 的 system-level router
+- [`knowledge/water-management/water-ingress-mechanisms.md`](knowledge/water-management/water-ingress-mechanisms.md) — 水源／路徑／驅動力；重力、表面張力、毛細、雨滴動能、壓差
+- [`knowledge/water-management/pressure-equalization-and-rainscreen.md`](knowledge/water-management/pressure-equalization-and-rainscreen.md) — chamber、vent、air seal、compartmentation 與 dynamic response
+- [`knowledge/water-management/drainage-and-weep-design.md`](knowledge/water-management/drainage-and-weep-design.md) — collection cavity、slope、end dam、weep / outlet、vertical drainage 與現場堵塞防呆
+
+這些頁面不把歷史教材的固定比例、壓力、孔洞面積或水頭高度直接當 universal rule；任何 project-specific numerical criterion 仍須可追溯至 current source / project design basis。
 
 ## 結構設計方法基線
 
@@ -117,6 +127,7 @@ Schema 是 engineering interchange contract，不是 project instance。正式 c
 - Markdown relative-link existence
 - knowledge frontmatter `verification_status`
 - `references/` 不得建立 private-project dossier 目錄
+- `knowledge/` 人類可讀 heading 依 `LANGUAGE.md` 維持繁中優先
 
 這是 baseline guard；後續可再擴充 duplicate canonical-owner、standard-version ownership 與更多 privacy lint。
 
@@ -124,11 +135,12 @@ Schema 是 engineering interchange contract，不是 project instance。正式 c
 
 目前內容已由「建立 baseline」進入「consolidation / hardening」階段。後續優先：
 
-1. 建立 `references/standards/`、`references/government/` 等 public evidence dossiers，集中 current-edition ownership。
+1. 持續建立 `references/standards/`、`references/government/` 等 public evidence dossiers，集中 current-edition ownership。
 2. 持續強化 JSON schemas 與 source/provenance model。
 3. 擴充 automated validation：duplicate canonical-owner、standard-version ownership、privacy lint。
-4. 補 AAMA 611、CNS 10007 / 1247 等尚未建立的 standards pages。
-5. 視實際需求再建立 `indexes/`，不要為了目錄完整而預先複製資料。
+4. 依 coverage audit 補隔音、排煙／外牆開口介面、摩擦音／異音、mock-up planning / failure-feedback 等 knowledge gaps。
+5. 補 AAMA 611、CNS 10007 / 1247 等尚未建立的 standards pages。
+6. 視實際需求再建立 `indexes/`，不要為了目錄完整而預先複製資料。
 
 ## 授權
 
