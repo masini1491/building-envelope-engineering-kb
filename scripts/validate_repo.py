@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Lightweight repository integrity checks for the public engineering KB."""
+"""Repository integrity and information-architecture checks for the public engineering KB."""
 
 from __future__ import annotations
 
@@ -24,9 +24,6 @@ MARKDOWN_LINK_RE = re.compile(r"(?<!!)\[[^\]]*\]\(([^)]+)\)")
 MARKDOWN_HEADING_RE = re.compile(r"^(#{1,6})\s+(.+?)\s*$")
 CJK_RE = re.compile(r"[\u3400-\u9fff]")
 
-# LANGUAGE.md permits standards, material designations, machine identifiers and
-# stable status/schema tokens to remain in their original form. These patterns
-# are intentionally narrow so ordinary human-facing English headings still fail.
 LANGUAGE_HEADING_ALLOWLIST = [
     re.compile(r"^(?:ASTM|CNS|AAMA|FGIA|ISO|ACI|AISC|AWS|NAFS|FEA)(?:[ /+&.0-9A-Z_-]*)$"),
     re.compile(r"^(?:A[24]-\d{2}|\d{4}-[HT]\d+)$"),
@@ -34,20 +31,40 @@ LANGUAGE_HEADING_ALLOWLIST = [
     re.compile(r"^\d+\.\s+`[a-z0-9_]+`$"),
 ]
 
+FORBIDDEN_KNOWLEDGE_DIRS = {
+    "knowledge/standards",
+    "knowledge/engineering-notes",
+}
+
+FORBIDDEN_ONE_TIME_SCRIPTS = {
+    "scripts/finish_language_fallbacks.py",
+    "scripts/localize_remaining_headings.py",
+    "scripts/normalize_markdown_language.py",
+}
+
 
 def fail(errors: list[str], message: str) -> None:
     errors.append(message)
 
 
+def load_json(path: Path, errors: list[str]) -> object | None:
+    try:
+        return json.loads(path.read_text(encoding="utf-8"))
+    except Exception as exc:  # noqa: BLE001
+        fail(errors, f"JSON parse failed: {path.relative_to(ROOT)}: {exc}")
+        return None
+
+
 def validate_json(errors: list[str]) -> None:
     for path in sorted(ROOT.rglob("*.json")):
-        try:
-            data = json.loads(path.read_text(encoding="utf-8"))
-        except Exception as exc:  # noqa: BLE001
-            fail(errors, f"JSON parse failed: {path.relative_to(ROOT)}: {exc}")
+        data = load_json(path, errors)
+        if data is None:
             continue
 
         if path.parent.name == "schemas" and path.name.endswith(".schema.json"):
+            if not isinstance(data, dict):
+                fail(errors, f"Schema root must be object: {path.relative_to(ROOT)}")
+                continue
             schema_id = data.get("$id", "")
             if "example.invalid" in schema_id:
                 fail(errors, f"Invalid placeholder $id: {path.relative_to(ROOT)} -> {schema_id}")
@@ -84,17 +101,30 @@ def validate_frontmatter(errors: list[str]) -> None:
     if not knowledge.exists():
         return
 
+    canonical_owners: dict[str, Path] = {}
+
     for path in sorted(knowledge.rglob("*.md")):
         text = path.read_text(encoding="utf-8")
         fm = parse_frontmatter(text)
         if not fm:
             continue
+
         status = fm.get("verification_status")
         if status and status not in ALLOWED_VERIFICATION:
-            fail(
-                errors,
-                f"Unknown verification_status: {path.relative_to(ROOT)} -> {status}",
-            )
+            fail(errors, f"Unknown verification_status: {path.relative_to(ROOT)} -> {status}")
+
+        canonical_key = fm.get("canonical_key", "").strip()
+        is_owner = fm.get("canonical_owner", "").lower() == "true"
+        if canonical_key and is_owner:
+            if canonical_key in canonical_owners:
+                other = canonical_owners[canonical_key]
+                fail(
+                    errors,
+                    "Duplicate canonical owner: "
+                    f"{canonical_key} -> {other.relative_to(ROOT)} and {path.relative_to(ROOT)}",
+                )
+            else:
+                canonical_owners[canonical_key] = path
 
 
 def normalize_link_target(raw: str) -> str:
@@ -102,7 +132,6 @@ def normalize_link_target(raw: str) -> str:
     if raw.startswith("<") and raw.endswith(">"):
         raw = raw[1:-1]
     if " " in raw and not raw.startswith(("http://", "https://")):
-        # Markdown optional title: path "title"
         raw = raw.split(" ", 1)[0]
     return unquote(raw.split("#", 1)[0])
 
@@ -137,20 +166,107 @@ def validate_public_reference_policy(errors: list[str]) -> None:
             fail(errors, f"Private-project reference directory is not allowed: {path.relative_to(ROOT)}")
 
 
+def validate_architecture(errors: list[str]) -> None:
+    for rel in sorted(FORBIDDEN_KNOWLEDGE_DIRS):
+        if (ROOT / rel).exists():
+            fail(errors, f"Retired catch-all/standards knowledge directory must not return: {rel}")
+
+    for rel in sorted(FORBIDDEN_ONE_TIME_SCRIPTS):
+        if (ROOT / rel).exists():
+            fail(errors, f"One-time migration script must not return to main: {rel}")
+
+
+def validate_indexes(errors: list[str]) -> None:
+    knowledge_index = ROOT / "indexes" / "knowledge-index.json"
+    standards_index = ROOT / "indexes" / "standards-index.json"
+
+    if not knowledge_index.exists():
+        fail(errors, "Missing indexes/knowledge-index.json")
+    else:
+        data = load_json(knowledge_index, errors)
+        if isinstance(data, dict):
+            domains = data.get("domains", [])
+            if not isinstance(domains, list):
+                fail(errors, "knowledge-index.json: domains must be an array")
+            else:
+                ids: set[str] = set()
+                indexed_dirs: set[str] = set()
+                for item in domains:
+                    if not isinstance(item, dict):
+                        fail(errors, "knowledge-index.json: each domain must be an object")
+                        continue
+                    domain_id = str(item.get("id", "")).strip()
+                    path_text = str(item.get("path", "")).strip()
+                    router_text = str(item.get("router", "")).strip()
+                    if not domain_id or domain_id in ids:
+                        fail(errors, f"knowledge-index.json: missing/duplicate domain id -> {domain_id!r}")
+                    ids.add(domain_id)
+                    if path_text:
+                        indexed_dirs.add(path_text)
+                        if not (ROOT / path_text).is_dir():
+                            fail(errors, f"knowledge-index.json: missing domain path -> {path_text}")
+                    if router_text and not (ROOT / router_text).is_file():
+                        fail(errors, f"knowledge-index.json: missing router -> {router_text}")
+
+                knowledge_root = ROOT / "knowledge"
+                actual_dirs = {
+                    str(path.relative_to(ROOT))
+                    for path in knowledge_root.iterdir()
+                    if path.is_dir()
+                }
+                if indexed_dirs != actual_dirs:
+                    missing = sorted(actual_dirs - indexed_dirs)
+                    stale = sorted(indexed_dirs - actual_dirs)
+                    if missing:
+                        fail(errors, f"knowledge-index.json: unindexed top-level domains -> {missing}")
+                    if stale:
+                        fail(errors, f"knowledge-index.json: stale domain paths -> {stale}")
+
+    if not standards_index.exists():
+        fail(errors, "Missing indexes/standards-index.json")
+    else:
+        data = load_json(standards_index, errors)
+        if isinstance(data, dict):
+            standards = data.get("standards", [])
+            if not isinstance(standards, list):
+                fail(errors, "standards-index.json: standards must be an array")
+            else:
+                ids: set[str] = set()
+                indexed_files: set[str] = set()
+                for item in standards:
+                    if not isinstance(item, dict):
+                        fail(errors, "standards-index.json: each standard must be an object")
+                        continue
+                    standard_id = str(item.get("id", "")).strip()
+                    path_text = str(item.get("path", "")).strip()
+                    if not standard_id or standard_id in ids:
+                        fail(errors, f"standards-index.json: missing/duplicate standard id -> {standard_id!r}")
+                    ids.add(standard_id)
+                    if not path_text or not (ROOT / path_text).is_file():
+                        fail(errors, f"standards-index.json: missing dossier -> {path_text}")
+                    else:
+                        indexed_files.add(path_text)
+
+                standards_root = ROOT / "references" / "standards"
+                actual_files = {
+                    str(path.relative_to(ROOT))
+                    for path in standards_root.glob("*.md")
+                }
+                if indexed_files != actual_files:
+                    missing = sorted(actual_files - indexed_files)
+                    stale = sorted(indexed_files - actual_files)
+                    if missing:
+                        fail(errors, f"standards-index.json: unindexed dossiers -> {missing}")
+                    if stale:
+                        fail(errors, f"standards-index.json: stale dossier paths -> {stale}")
+
+
 def language_heading_allowed(heading: str) -> bool:
     compact = re.sub(r"[*_]", "", heading).strip()
     return any(pattern.fullmatch(compact) for pattern in LANGUAGE_HEADING_ALLOWLIST)
 
 
 def validate_language_policy(errors: list[str]) -> None:
-    """Enforce LANGUAGE.md for human-facing headings under knowledge/.
-
-    The check deliberately targets headings, where language drift is easy to
-    detect with low false-positive risk. Prose may contain technical English and
-    formal standard names, so prose remains a review concern rather than a hard
-    CI rule.
-    """
-
     knowledge = ROOT / "knowledge"
     if not knowledge.exists():
         return
@@ -182,7 +298,7 @@ def validate_language_policy(errors: list[str]) -> None:
             if "工程主題：" in heading:
                 fail(
                     errors,
-                    f"Temporary language fallback heading is not allowed: "
+                    "Temporary language fallback heading is not allowed: "
                     f"{path.relative_to(ROOT)}:{line_no} -> {heading}",
                 )
                 continue
@@ -192,7 +308,7 @@ def validate_language_policy(errors: list[str]) -> None:
 
             fail(
                 errors,
-                f"Human-facing heading must be zh-TW-first per LANGUAGE.md: "
+                "Human-facing heading must be zh-TW-first per LANGUAGE.md: "
                 f"{path.relative_to(ROOT)}:{line_no} -> {heading}",
             )
 
@@ -203,6 +319,8 @@ def main() -> int:
     validate_frontmatter(errors)
     validate_markdown_links(errors)
     validate_public_reference_policy(errors)
+    validate_architecture(errors)
+    validate_indexes(errors)
     validate_language_policy(errors)
 
     if errors:
