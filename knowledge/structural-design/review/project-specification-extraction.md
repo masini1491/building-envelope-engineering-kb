@@ -71,7 +71,7 @@ canonical_owner: true
 
 ## 必抽取的十個 domains
 
-### 工程主題：1. Document control / authority
+### 1. 文件控制／權威性
 
 至少保存：
 
@@ -84,7 +84,7 @@ canonical_owner: true
 
 若不同文件衝突，不得自行合併；建立 `CONFLICT` item。
 
-## 工程主題：2. Design responsibility / required scope
+## 2. 設計責任／必要範圍
 
 抽取：
 
@@ -96,7 +96,7 @@ canonical_owner: true
 
 Required coverage 應轉成後續 checklist targets，而不是只保留一段 prose。
 
-## 工程主題：3. Governing references
+## 3. 適用參考依據
 
 逐項抽取：
 
@@ -115,7 +115,7 @@ Required coverage 應轉成後續 checklist targets，而不是只保留一段 p
 
 若 specification 說「latest edition」，也要原樣保存，不要在 extraction 階段自行填一個版本。
 
-## 工程主題：4. Loads / actions
+## 4. 荷載／作用
 
 至少依適用性尋找：
 
@@ -146,7 +146,7 @@ Required coverage 應轉成後續 checklist targets，而不是只保留一段 p
 
 即使數值彼此相關，也必須保存成不同 requirement objects。
 
-## 工程主題：5. Strength / safety criteria
+## 5. 強度／安全判定基準
 
 抽取：
 
@@ -159,7 +159,7 @@ Required coverage 應轉成後續 checklist targets，而不是只保留一段 p
 
 不得把不同 component 的 factor 合併成一個 project-wide `safety_factor`。
 
-## 工程主題：6. Serviceability / movement criteria
+## 6. 服務性／位移判定基準
 
 按 component + direction 分開保存：
 
@@ -178,7 +178,7 @@ Required coverage 應轉成後續 checklist targets，而不是只保留一段 p
 
 例如 `L/n`、absolute limit、`min(L/n, X)`、`L/n + C` 應保留原 criterion type，不要先轉成單一數字。
 
-## 工程主題：7. Required calculation coverage
+## 7. 必要計算涵蓋範圍
 
 把 specification 中的「計算書須包含」轉成 machine-reviewable checklist，例如：
 
@@ -199,7 +199,7 @@ Required coverage 應轉成後續 checklist targets，而不是只保留一段 p
 
 任何 specification 明確要求但 calculation package 找不到對應 evidence 的項目，至少應標為 `INCOMPLETE`。
 
-## 工程主題：8. Required calculation trace / submittal evidence
+## 8. 必要計算追溯／送審證據
 
 尋找：
 

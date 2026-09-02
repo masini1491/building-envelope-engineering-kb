@@ -54,7 +54,7 @@ Building drift 與 wind-induced member deflection 是不同 action source，但�
 
 不得自行把兩者直接代數相加或取 envelope；應依 governing design basis 處理。
 
-## 工程主題：Stack joint／splice
+## Stack joint／splice 位移與接頭行為
 
 Unitized / stick system 在 splice / stack joint 可能需要：
 

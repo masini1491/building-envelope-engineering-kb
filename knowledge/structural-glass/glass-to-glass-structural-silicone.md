@@ -28,7 +28,7 @@ canonical_owner: true
 
 不得因 structural silicone 可傳遞風壓，就自動認定它也是主要 dead-load support。若永久自重要由 setting block、shoe、bearing member、glass fin 或其他 mechanical support 承擔，模型與細部必須反映該 load path。
 
-## 工程主題：Bite／thickness routing
+## Bite／厚度（thickness）設計 routing
 
 Structural bite 與 sealant thickness 是不同設計參數。
 
