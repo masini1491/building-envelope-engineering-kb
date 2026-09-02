@@ -30,7 +30,7 @@
 
 繁中說明見 [`LICENSE-DOCS.md`](LICENSE-DOCS.md)。本頁與 `LICENSE-DOCS.md` 為 repository 的授權範圍說明；實際 CC BY 4.0 法律條款以 Creative Commons 官方頁面與 legal code 為準。
 
-## 2. Schemas、scripts 與程式碼 — MIT License
+## 2. 資料結構（Schemas）、scripts 與程式碼 — MIT License
 
 除個別檔案另有說明外，本 repository 原創、偏 software/tooling 性質的內容採 **MIT License**。
 
