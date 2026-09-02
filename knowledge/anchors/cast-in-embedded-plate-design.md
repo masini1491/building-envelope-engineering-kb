@@ -200,7 +200,7 @@ Anchor-to-concrete PASS 之後，embedded plate 本身仍需獨立檢查。
 
 焊道 methodology 另見 [`../structural-design/connections/weld-group-analysis.md`](../structural-design/connections/weld-group-analysis.md)。
 
-## Factor audit
+## 係數稽核（Factor audit）
 
 Cast-in anchor 計算常同時出現：
 
@@ -219,7 +219,7 @@ Factor audit 依 [`../structural-design/review/design-factor-and-hidden-multipli
 
 ## 審查狀態建議
 
-### `PASS`
+### 通過（`PASS`）
 
 只有在：
 
@@ -232,7 +232,7 @@ Factor audit 依 [`../structural-design/review/design-factor-and-hidden-multipli
 
 才可對明確 scope 給出 `PASS`。
 
-### `WARNING`
+### 警告（`WARNING`）
 
 例如：
 
@@ -240,7 +240,7 @@ Factor audit 依 [`../structural-design/review/design-factor-and-hidden-multipli
 - inspection / fabrication evidence 尚待補件；
 - 使用 bounding assumption 且已明確證明保守性。
 
-### `INCOMPLETE`
+### 不完整（`INCOMPLETE`）
 
 例如：
 
