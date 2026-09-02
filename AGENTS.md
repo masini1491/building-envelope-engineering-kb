@@ -36,7 +36,7 @@
 知識頁面或 reference 可使用以下狀態：
 
 - `VERIFIED_PRIMARY`：由正式法規、標準、政府或其他一手權威來源確認
-- `VERIFIED_PROJECT`：由專案正式文件確認；此狀態主要供私人／內部工作流程使用，公開頁面不得因此揭露非公開專案 provenance
+- `VERIFIED_PROJECT`：由專案正式文件確認；此狀態只適合私人／內部工作流程，public repository 不得保存可識別的 project provenance
 - `HIGH_CONFIDENCE`：有多個可靠來源或一手／準一手證據支持，但不是公開正式標準
 - `FIELD_OBSERVATION`：工程實務觀察，尚未提升到正式可普遍化結論
 - `UNVERIFIED`：尚缺可靠證據
@@ -62,10 +62,15 @@
 `README.md` 只做 overview + router。
 
 - 整理後的工程結論放在 `knowledge/`。
-- 來源與 provenance 放在 `references/`。
-- 機器可讀索引放在 `indexes/`。
+- **只有可公開散布的來源與 provenance** 放在 `references/`。
+- 通用 machine-readable engineering data models 放在 `schemas/`。
+- `indexes/` 僅在需要建立 standards / materials / cross-reference lookup index 時新增；不得和 `schemas/` 混為同一責任。
 - 同一標準／材料／工程結論只指定一個 canonical owner。
 - 其他頁面只摘要必要差異並連結 canonical owner，避免全文重複造成 drift。
+
+### Standard-version ownership
+
+同一標準若被多個 knowledge pages 使用，current edition / status 應由一個 canonical standard page 或 public reference dossier 優先維護；其他頁面只引用 canonical routing。不得在多頁獨立維護互相衝突的 current-edition snapshot。
 
 ## AI reading discipline
 
@@ -126,6 +131,7 @@ ASTM、CNS、JIS、EN、ISO、AAMA-FGIA 等不同體系不得只因名稱或用�
 - 非公開審查意見、答覆文字或會議紀錄
 - proprietary drawing / calculation / submittal 的 screenshot、crop、摘錄或下載連結
 - 私人／非公開來源的檔名、metadata 或 provenance
+- 非公開專案名稱搭配維護者觀察、口頭確認、施工圖來源等 evidence trail
 
 ### Generalization rule
 
@@ -156,11 +162,28 @@ ASTM、CNS、JIS、EN、ISO、AAMA-FGIA 等不同體系不得只因名稱或用�
 
 若知識來自非公開專案，優先整理進一般主題頁（例如 `structural-glass/`、`connections/`、`engineering-notes/`），而不是建立匿名但仍可被反推的 project case page。
 
+### Private project provenance
+
+非公開 project provenance、直接參與者確認、私有文件 observation 應留在 public repository 之外的私人工作流程。**不得在 `references/` 建立 private-project dossier。**
+
+## Schema discipline
+
+`schemas/` 定義可由 AI、calculator、spreadsheet 或其他工具交換的通用 engineering data model，不保存任何 project instance。
+
+Schema 維護原則：
+
+- 使用 JSON Schema Draft 2020-12。
+- `$id` 使用本 repository 的穩定 namespace，不使用 `example.invalid`。
+- property 名稱應包含必要 unit 或以結構化 unit field 表達。
+- material allowable / resistance 不得脫離 standard、edition、product form、condition、limit state 與 provenance 而成為無上下文常數。
+- load source、load application、test pressure、design pressure、imposed displacement 等不同 engineering objects 不得為方便而混成單一 scalar。
+- 缺必要資料時，資料模型應能表示 provisional / unknown / incomplete，而不是逼迫使用者填入猜測值。
+
 ## Copyright / provenance
 
 研究不等於 copy permission。
 
-Reference dossier 應盡量記錄：
+Public reference dossier 應盡量記錄：
 
 - source / organization
 - title / standard number
