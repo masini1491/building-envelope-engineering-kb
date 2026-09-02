@@ -4,7 +4,7 @@
 
 本頁收錄對帷幕牆 section mechanics、frame / FEA、structural glass、traceable calculation presentation 有參考價值的公開 repository。全部屬 **NON-NORMATIVE REFERENCE**。
 
-## Section mechanics
+## 截面力學（Section mechanics）
 
 ### `robbievanleeuwen/section-properties`
 
@@ -18,7 +18,7 @@ https://github.com/EdwardAstill/sectiony
 
 另一套 cross-section mechanics reference，含 `Ixy`、principal axes、shear center、`J / Cw`、stress distribution 與 serialization。可作獨立 architecture / regression 參考。
 
-## Frame／FEA
+## 桿件／有限元素分析（Frame／FEA）
 
 ### `JWock82/Pynite`
 
@@ -52,7 +52,7 @@ https://github.com/Mahdi-Soheyli/ML-Facade-Project
 
 E1300-style deterministic oracle + dataset / KNN ML + FastAPI + dashboard / Grasshopper integration。值得研究「engineering oracle 與 ML prediction 分離」；其 code/table 不作 authoritative E1300 implementation。
 
-## Connection mechanics
+## 連接力學（Connection mechanics）
 
 ### `wcfrobert/ezbolt`
 
@@ -68,7 +68,7 @@ Experimental weld / bolt connection architecture，含 6-component loads、eccen
 
 更深入的限制與 research gaps 見 [`structural-connections-and-glass.md`](structural-connections-and-glass.md)。
 
-## Calculation traceability／engineering library
+## 計算可追溯性／工程函式庫（Calculation traceability／engineering library）
 
 ### `connorferster/handcalcs`
 
