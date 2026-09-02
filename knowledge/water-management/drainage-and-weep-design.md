@@ -145,6 +145,6 @@ Weep 可能因：
 
 - [`water-ingress-mechanisms.md`](water-ingress-mechanisms.md)
 - [`pressure-equalization-and-rainscreen.md`](pressure-equalization-and-rainscreen.md)
-- [`../standards/performance-testing/curtain-wall-performance-crosswalk.md`](../standards/performance-testing/curtain-wall-performance-crosswalk.md)
+- [`../performance-testing/curtain-wall-performance-crosswalk.md`](../performance-testing/curtain-wall-performance-crosswalk.md)
 
 > Drainage design 的核心是可追溯的 continuous path。未知 outlet geometry、未知 cavity connection 或未知 pressure basis 時，不應只靠「一般做法」判 PASS。
