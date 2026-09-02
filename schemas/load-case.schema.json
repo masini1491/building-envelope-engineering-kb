@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/building-envelope-engineering-kb/load-case.schema.json",
+  "title": "Structural Load Case",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "name", "load_type", "status"],
+  "properties": {
+    "id": {"type": "string", "minLength": 1},
+    "name": {"type": "string", "minLength": 1},
+    "load_type": {"enum": ["wind", "dead", "live", "seismic", "thermal", "other"]},
+    "direction": {"enum": ["positive", "negative", "not_applicable", null]},
+    "pressure_kpa": {"type": ["number", "null"]},
+    "zone": {"type": ["string", "null"]},
+    "bending_axis": {"enum": ["x", "y", "custom", null]},
+    "source": {"type": ["string", "null"]},
+    "source_revision": {"type": ["string", "null"]},
+    "notes": {"type": ["string", "null"]},
+    "status": {"enum": ["provisional", "confirmed"]}
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"load_type": {"const": "wind"}}},
+      "then": {"required": ["direction"]}
+    }
+  ]
+}
