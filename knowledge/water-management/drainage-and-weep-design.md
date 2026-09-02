@@ -61,7 +61,7 @@ Weep 可能因：
 - outlet 被堵後的 secondary path；
 - field-cleaning / maintenance access（若適用）。
 
-## Vertical drainage 與 compartment
+## 垂直排水與分艙（Vertical drainage / compartment）
 
 水可以沿 mullion / cavity 向下，但不能不加控制地跨越所有樓層與 pressure compartments。
 
@@ -73,7 +73,7 @@ Weep 可能因：
 - transom / sill 是否具有 end dam；
 - curtain-wall-to-adjacent-construction interface 如何收水。
 
-## Water head
+## 水頭（Water head）
 
 任何需要以 water head / hydrostatic pressure 判斷 outlet elevation 或 dam height 的設計，都必須以本次 project pressure、geometry 與 governing method建立。
 
@@ -88,7 +88,7 @@ Weep 可能因：
 - safety / freeboard treatment（若使用）；
 - source / provenance。
 
-## Stick curtain wall
+## 框架式帷幕牆（Stick curtain wall）
 
 常見 review point：
 
@@ -101,7 +101,7 @@ Weep 可能因：
 - field splice；
 - perimeter seal interface。
 
-## Unitized curtain wall
+## 單元式帷幕牆（Unitized curtain wall）
 
 常見 review point：
 
@@ -114,7 +114,7 @@ Weep 可能因：
 - floor-to-floor compartment behaviour；
 - sill / head transition。
 
-## Metal panel / rainscreen
+## 金屬面板／雨幕（Metal panel / rainscreen）
 
 若為 open-joint metal cladding，還須區分：
 
@@ -127,7 +127,7 @@ Weep 可能因：
 
 這和 glazed curtain-wall glazing pocket 的 drainage mechanics 不一定相同。
 
-## Mock-up / field review
+## Mock-up／現場審查
 
 水管理 detail 很適合在封板前檢查：
 
