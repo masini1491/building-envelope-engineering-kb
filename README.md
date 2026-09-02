@@ -97,13 +97,26 @@ Cross-reference 只表示用途相關，不代表不同標準體系全文等價�
 
 Schema 是 engineering interchange contract，不是 project instance。正式 calculator 實作前必須確認 unit、provenance、standard/edition、scope、boundary condition 與 incomplete-state handling。
 
+## Automated validation
+
+`.github/workflows/validate-repo.yml` 會在 push / pull request 執行 `scripts/validate_repo.py`，目前檢查：
+
+- JSON parse
+- JSON Schema Draft 2020-12 meta-validation
+- schema `$id` 不得使用 `example.invalid`
+- Markdown relative-link existence
+- knowledge frontmatter `verification_status`
+- `references/` 不得建立 private-project dossier 目錄
+
+這是 baseline guard；後續可再擴充 duplicate canonical-owner、standard-version ownership 與更多 privacy lint。
+
 ## Current hardening priorities
 
 目前內容已由「建立 baseline」進入「consolidation / hardening」階段。後續優先：
 
 1. 建立 `references/standards/`、`references/government/` 等 public evidence dossiers，集中 current-edition ownership。
 2. 持續強化 JSON schemas 與 source/provenance model。
-3. 建立 automated validation：JSON / JSON Schema、Markdown internal links、frontmatter/status、duplicate canonical-owner warning。
+3. 擴充 automated validation：duplicate canonical-owner、standard-version ownership、privacy lint。
 4. 補 AAMA 611、CNS 10007 / 1247 等尚未建立的 standards pages。
 5. 視實際需求再建立 `indexes/`，不要為了目錄完整而預先複製資料。
 
