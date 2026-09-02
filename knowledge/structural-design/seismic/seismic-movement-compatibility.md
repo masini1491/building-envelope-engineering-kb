@@ -79,7 +79,7 @@ Unitized / stick system 在 splice / stack joint 可能需要：
 
 - `../framing/glass-edge-relative-deflection.md`
 - `../../structural-glass/structural-glass-movement.md`
-- `../../sealants/structural-silicone-curtain-wall-baseline.md`
+- `../../sealants/structural-silicone-baseline.md`
 
 ## Test routing
 
