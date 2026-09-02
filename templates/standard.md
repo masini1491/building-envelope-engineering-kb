@@ -1,31 +1,33 @@
 ---
 title: ""
-standard: ""
-organization: ""
-edition: ""
-status: ""
 verification_status: "UNVERIFIED"
 verified_at: ""
 canonical_owner: true
+document_type: "standard-routing"
+domain: ""
+canonical_key: ""
 ---
 
-# 標準名稱
+# 標準相關工程主題
 
-## 用途與適用範圍
+本模板用於 `knowledge/` 中的**工程解讀／routing page**，不是 current-edition metadata owner。
+
+標準的 edition / status / official URL / verified_at 應優先放在 `references/standards/` 的 canonical dossier，並由本頁連結。
+
+## 適用範圍
 
 ## 與建築外殼工程的關係
 
-## 主要工程要求摘要
+## 工程使用方式
 
-## 相關標準／cross-reference
+## Related／cross-reference
 
-## 工程備註
+## Knowledge guardrails
+
+## Canonical standard dossier
+
+- `references/standards/...`
 
 ## 不可推論事項
 
-## 來源
-
-- 官方／primary source：
-- Reference dossier：
-
-> 注意：本頁為工程摘要，不取代正式標準原文或專案規範。正式標準名稱可保留原文；敘述依 `LANGUAGE.md` 以繁體中文（台灣）為主。
+> 本頁不取代正式標準原文；不要在多個 knowledge pages 獨立維護同一標準的 current edition。
