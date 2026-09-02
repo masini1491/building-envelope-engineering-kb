@@ -62,7 +62,7 @@ canonical_owner: true
 
 若答案未知，應標 `INCOMPLETE`。
 
-## Sleeve 作為補強
+## 套筒（Sleeve）作為補強
 
 Sleeve 可能只負責 alignment，也可能在有限長度內提高局部 stiffness 或傳遞 interface force。
 
