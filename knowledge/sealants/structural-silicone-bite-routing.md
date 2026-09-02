@@ -9,9 +9,13 @@ canonical_owner: true
 
 ## Core standards
 
-- ASTM C1184-25：structural silicone sealant material specification
-- ASTM C1401-24：structural sealant glazing design / installation guide
-- ASTM C1135-15(2020)：tensile adhesion test method
+本頁的標準版本以 `structural-silicone-baseline.md` 為 canonical routing；截至 2026-09-02：
+
+- ASTM C1184-23：structural silicone sealant material specification
+- ASTM C1401-23：structural sealant glazing design / installation guide
+- ASTM C1135-19(2024)：tensile adhesion test method
+
+若版本資訊更新，應優先更新 canonical baseline，再同步檢查本頁，不在不同頁面各自維護互相衝突的 current-edition snapshot。
 
 ## 核心概念
 
@@ -73,8 +77,9 @@ Structural bite 與 sealant thickness 是不同幾何參數：
 
 ## Primary sources
 
-- ASTM C1184-25: https://store.astm.org/c1184-25.html
-- ASTM C1401-24: https://store.astm.org/c1401-24.html
-- ASTM C1135-15(2020): https://store.astm.org/c1135-15r20.html
+- Canonical repo routing：`knowledge/sealants/structural-silicone-baseline.md`
+- ASTM C1184-23: https://store.astm.org/c1184-23.html
+- ASTM C1401-23: https://store.astm.org/c1401-23.html
+- ASTM C1135-19(2024): https://store.astm.org/c1135-19r24.html
 
 > 正式 structural silicone sizing 應由採用產品之 manufacturer technical review 與專案計算確認。
