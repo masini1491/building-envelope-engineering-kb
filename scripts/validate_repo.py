@@ -34,9 +34,15 @@ LANGUAGE_HEADING_ALLOWLIST = [
     re.compile(r"^CC BY 4\.0$"),
 ]
 
+# These prefixes are stable identifiers / abbreviations explicitly allowed by LANGUAGE.md.
+# They may remain before the Chinese explanation without being treated as an English-first prose heading.
 LANGUAGE_PREFIX_ALLOWLIST = [
     re.compile(r"^(?:ASTM|CNS|AAMA|FGIA|ISO|ACI|AISC|AWS|NAFS|FEA)\b"),
     re.compile(r"^(?:A[24]-\d{2}|\d{4}-[HT]\d+)\b"),
+    re.compile(r"^(?:PASS|WARNING|FAIL|INCOMPLETE|NOT_APPLICABLE)\b"),
+    re.compile(r"^(?:AI)\b"),
+    re.compile(r"^(?:A2|C\d{3,4})\b"),
+    re.compile(r"^(?:I\s+與\s+S)\b"),
 ]
 
 FORBIDDEN_KNOWLEDGE_DIRS = {
