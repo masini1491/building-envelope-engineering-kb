@@ -43,7 +43,7 @@ Mode C：
 
 只要 interface 沒畫清楚，就容易形成 scope gap。
 
-## Responsibility matrix 最低欄位
+## 責任矩陣（Responsibility matrix）最低欄位
 
 至少釐清：
 
@@ -89,7 +89,7 @@ Mode C：
 
 結果：製造可行，但 engineering model 已改變。
 
-## SHOP DWG／現場協調
+## 施工圖（SHOP DWG）／現場協調
 
 Secondary-support design 常高度依賴：
 
