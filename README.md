@@ -22,7 +22,7 @@
 - `indexes/`：規範、材料與 cross-reference 的機器可讀索引（待建立）。
 - `templates/`：新增標準、材料、工程筆記與專案知識時的固定格式。
 
-## 已建立的第一批 baseline
+## 已建立的 baseline
 
 ### Standards / performance testing
 
@@ -33,6 +33,18 @@
 
 - [`knowledge/structural-design/wind/taiwan-curtain-wall-wind-design-manual.md`](knowledge/structural-design/wind/taiwan-curtain-wall-wind-design-manual.md)  
   內政部建築研究所《帷幕牆系統結構耐風設計手冊》與前身研究之 routing / 工程摘要。
+- [`knowledge/structural-design/framing/mullion-transom-design-baseline.md`](knowledge/structural-design/framing/mullion-transom-design-baseline.md)  
+  直料／橫料的 load path、section property、strength、deflection 與 connection 基線。
+- [`knowledge/structural-design/framing/multi-part-extrusion-load-sharing.md`](knowledge/structural-design/framing/multi-part-extrusion-load-sharing.md)  
+  male / female / reinforcement 等多件鋁擠型的共同作用、stiffness sharing 與 `composite_action = unknown → INCOMPLETE` guardrail。
+- [`knowledge/structural-design/connections/load-path-and-anchor-reactions.md`](knowledge/structural-design/connections/load-path-and-anchor-reactions.md)  
+  帷幕 connection load path、bracket / anchor reaction 與 eccentricity routing。
+- [`knowledge/structural-design/connections/fastener-group-analysis.md`](knowledge/structural-design/connections/fastener-group-analysis.md)  
+  偏心 bolt / screw group 的 centroid、direct load、moment-induced load、resultant demand 與 connected-material checks。
+- [`knowledge/structural-design/connections/local-extrusion-failure.md`](knowledge/structural-design/connections/local-extrusion-failure.md)  
+  bolt channel、screw race、hook、sleeve 等局部鋁擠型的 bearing、local bending、pull-out / thread engagement failure-mode framework。
+- [`knowledge/structural-design/connections/weld-group-analysis.md`](knowledge/structural-design/connections/weld-group-analysis.md)  
+  arbitrary weld-group geometry、effective throat、centroid、`Aw / Ix / Iy / J`、偏心荷載與 critical-point demand 的通用分析框架。
 
 ### Materials
 
@@ -51,17 +63,22 @@
 ### Fasteners / project knowledge
 
 - [`knowledge/fasteners/stainless/iso-3506-a2-70-a2-90.md`](knowledge/fasteners/stainless/iso-3506-a2-70-a2-90.md)  
-  ISO 3506-1:2020、A2-70 與非標準 property class A2-90；包含台北 101 帷幕 A2-90 的 `VERIFIED_PROJECT` / `HIGH_CONFIDENCE` 抽象化工程知識，不公開原施工圖。
+  ISO 3506-1:2020、A2-70 與非標準 property class A2-90；包含已去識別化的 `VERIFIED_PROJECT` / `HIGH_CONFIDENCE` 特殊工程知識，不公開原施工圖或可辨識專案資訊。
 
 ## 下一批預定範圍
 
+- structural load generation：tributary load、transom wind-load distribution、glass dead load / setting blocks、concentrated attachment loads
+- framing：continuous mullion、biaxial bending、resultant / glass-edge relative deflection
+- connection：tension-shear interaction、screw pull-out、thread engagement、bracket local bending 的 primary-source 深化
+- seismic façade component / connection force 與 inter-story-drift routing
+- metal panel / stiffener / plate-FEA modeling methodology
+- operable window / sash / hardware structural load path
 - 個別 CNS / ASTM / AAMA-FGIA 標準專頁與 machine-readable index
 - 3003-H14、3004-H12、6063-T5、6005-T5、6105-T5 個別材料頁
 - `3003-H14-vs-3004-H12` 與 aluminum panel flatness / oil canning 工程筆記
 - AAMA 611 陽極處理
 - CNS 10007 / CNS 1247 熱浸鍍鋅
 - 玻璃、structural silicone、gasket、stone、skylight 等 building-envelope 領域
-- fastener tension / shear / bearing / thread engagement / galling / galvanic corrosion
 
 ## Copyright / licensing boundary
 
@@ -78,4 +95,4 @@ ASTM、AAMA-FGIA、ISO、CNS 與其他第三方標準可能受著作權或授權
 
 ## Status
 
-第一批可信 baseline 已建立。後續維護以「先補 primary evidence → 再擴充 canonical knowledge → 最後建立 machine-readable index」為原則。
+可信 baseline 與第一批 structural-calculation methodology 已建立。後續維護以「先補 primary evidence → 再擴充 canonical knowledge → 最後建立 machine-readable index」為原則。
