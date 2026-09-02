@@ -1,4 +1,4 @@
-# NIST 建築外殼雨水侵入／Pressure Equalization 來源 dossier
+# 美國國家標準與技術研究院（NIST）建築外殼雨水侵入／等壓（Pressure Equalization）來源 dossier
 
 - 驗證狀態：`VERIFIED_PRIMARY`
 - 來源組織：National Institute of Standards and Technology（NIST）
