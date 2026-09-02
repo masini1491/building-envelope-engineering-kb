@@ -54,13 +54,23 @@ canonical_owner: true
 
 ## Relative-stiffness load sharing
 
-在**已經證明構件具有 compatible curvature** 的前提下，彎矩可依 flexural stiffness 分配：
+在**已經證明構件具有 compatible curvature** 的前提下，才可討論依 flexural-stiffness contribution 分配彎矩。
 
-`M_i = M_total × (E_i I_i) / Σ(E_j I_j)`
+對真正的 full-composite built-up section，每一構件的 stiffness contribution 必須建立在**共同 reference / neutral axis** 上，而不是直接拿各 profile 對自身 centroid 的 `I_i,c` 做比例分配。概念上可寫成：
 
-若所有構件材料 `E` 相同，才可簡化為依 `I_i / ΣI` 分配。
+`(EI)_i,contribution = E_i × (I_i,c + A_i d_i²)`
 
-這個公式只是「已建立共同作用之後」的 stiffness distribution；**它本身不能證明 composite action 存在**。
+再以：
+
+`M_i = M_total × (EI)_i,contribution / Σ(EI)_j,contribution`
+
+理解各 constituent 對共同曲率下彎曲剛度的貢獻。
+
+若材料 `E` 相同，仍必須使用對共同 axis 的 section-property contribution；**不能簡化成各 profile 自身 centroidal `I` 的比例，除非幾何上它們恰好共用同一 centroid / reference axis。**
+
+若分析對象不是 full-composite built-up section，而是多個獨立 member 因 connector / frame constraint 形成相容變形，則應另依該 structural model 的 member stiffness 與 connector mechanics 求 load sharing，不應把本段 built-up-section 關係直接套用。
+
+這些公式只是在**共同作用已經由 load-transfer evidence 建立之後**描述 stiffness distribution；它們本身不能證明 composite action 存在。
 
 ## Male / female curtain-wall extrusion guard
 
@@ -105,6 +115,7 @@ AI 不得：
 
 - 看到 male + female profile 就自動 `I_total = I_male + I_female`
 - 以幾何接觸直接宣稱 full composite
+- 用各 profile 自身 centroidal `I` 比例冒充 full-composite stiffness contribution
 - 用某一份既有計算書的 stiffness-sharing 方法當作所有 curtain wall system 的 universal rule
 - 在缺少 interface force-transfer evidence 時輸出 final PASS
 
