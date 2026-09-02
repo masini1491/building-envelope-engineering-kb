@@ -20,7 +20,7 @@
 - 受自身再利用條款規範的政府出版物
 - 他人擁有的研究論文、圖、表、照片、diagram 或 quotation
 
-## Repository 自行撰寫的摘要與 metadata
+## 儲存庫（Repository）自行撰寫的摘要與 metadata
 
 本 repository 自行撰寫的摘要、分類、routing notes、工程評論與 metadata，可依 repository 的文件授權使用；但這不會移轉或重新授權底層第三方來源的權利。
 
