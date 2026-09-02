@@ -9,11 +9,11 @@
 - 查證日期：2026-09-02
 - authority type：industry standard / guide
 
-## Scope routing
+## 適用範圍路由（Scope routing）
 
 本標準為 structural sealant glazing system 的設計、施工與品質管理 guide。正式專案仍需與 design pressure、substrate、joint geometry、manufacturer project review、adhesion / compatibility 與 QA requirements 一起使用。
 
-## Knowledge routing
+## 知識路由（Knowledge routing）
 
 - [`../../knowledge/sealants/structural-silicone-baseline.md`](../../knowledge/sealants/structural-silicone-baseline.md)
 - [`../../knowledge/sealants/structural-silicone-bite-routing.md`](../../knowledge/sealants/structural-silicone-bite-routing.md)
