@@ -149,7 +149,7 @@ Calculation review routing：[`../structural-design/review/README.md`](../struct
 
 Mock-up 的價值不只在「取得 PASS」；失敗與拆解 observation 應回饋到 production design。
 
-Performance-test routing：[`../standards/performance-testing/curtain-wall-performance-crosswalk.md`](../standards/performance-testing/curtain-wall-performance-crosswalk.md)。
+Performance-test routing：[`../performance-testing/curtain-wall-performance-crosswalk.md`](../performance-testing/curtain-wall-performance-crosswalk.md)。
 
 ## Phase 6 — 材料／樣品／五金核准
 
