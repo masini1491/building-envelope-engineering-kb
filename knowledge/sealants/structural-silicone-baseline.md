@@ -11,15 +11,15 @@ canonical_owner: true
 
 ## Core standards
 
-- **ASTM C1184-25** — Standard Specification for Structural Silicone Sealants
+- **ASTM C1184-23** — Standard Specification for Structural Silicone Sealants
   - 結構用矽利康 sealant 的材料規格。
   - 屬產品性能標準，不直接等於特定接縫尺寸／bite / thickness 的設計結果。
 
-- **ASTM C1401-24** — Standard Guide for Structural Sealant Glazing
+- **ASTM C1401-23** — Standard Guide for Structural Sealant Glazing
   - Structural Sealant Glazing 系統設計、施工與品質管理 guide。
   - 應與專案設計風壓、玻璃尺寸、支承條件、silicone manufacturer design review 等一起使用。
 
-- **ASTM C1135-15(2020)** — Standard Test Method for Determining Tensile Adhesion Properties of Structural Sealants
+- **ASTM C1135-19(2024)** — Standard Test Method for Determining Tensile Adhesion Properties of Structural Sealants
   - Structural sealant tensile adhesion 性能試驗方法。
   - 試驗結果不能單獨取代 project-specific adhesion / compatibility verification。
 
@@ -50,8 +50,8 @@ SSG 專案至少應區分：
 
 ## Primary sources
 
-- ASTM C1184-25: https://store.astm.org/c1184-25.html
-- ASTM C1401-24: https://store.astm.org/c1401-24.html
-- ASTM C1135-15(2020): https://store.astm.org/c1135-15r20.html
+- ASTM C1184-23: https://store.astm.org/c1184-23.html
+- ASTM C1401-23: https://store.astm.org/c1401-23.html
+- ASTM C1135-19(2024): https://store.astm.org/c1135-19r24.html
 
 > 本頁為標準 routing 與工程防呆，不取代 silicone manufacturer 的 project-specific structural calculation、adhesion/compatibility report 或 warranty requirements。
