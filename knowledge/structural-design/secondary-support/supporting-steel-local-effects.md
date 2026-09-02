@@ -47,7 +47,7 @@ Reaction 若作用點不在 beam shear center / web plane，應至少辨識：
 
 不能只把反力投影成 vertical / horizontal shear 後忽略扭矩。
 
-## Flange／Web 局部行為
+## 翼板／腹板（Flange／Web）局部行為
 
 若 connection 作用在 beam flange / web 局部區域，應確認：
 
@@ -62,7 +62,7 @@ Reaction 若作用點不在 beam shear center / web plane，應至少辨識：
 
 是否需要 stiffener 應由 governing structural method 與 actual demand 判斷，不能用固定 façade wind-pressure threshold 直接決定。
 
-## Stiffener 的角色
+## 加勁板（Stiffener）的角色
 
 Stiffener 可能用來：
 
