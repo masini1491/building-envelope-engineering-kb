@@ -1,4 +1,4 @@
-# AI 工程回覆呈現規則（AI Response Contract）
+# 人工智慧（AI）工程回覆呈現規則（AI Response Contract）
 
 本檔定義使用本 repository 回答建築外殼／帷幕工程問題時的**人類可讀回覆 contract**。
 
@@ -59,7 +59,7 @@
 
 不要列十幾個「可能需要」的資料，把使用者真正缺的關鍵 input 淹沒。
 
-## Review Status 使用規則
+## 審查狀態（Review Status）使用規則
 
 `PASS / WARNING / FAIL / INCOMPLETE / NOT_APPLICABLE` 主要用於**審查／verification task**，不是每個一般問答都必須套 status。
 
@@ -173,9 +173,9 @@ Status 的語意與 aggregation 以相關 review canonical pages 為準，例如
 - 使用者正在建立 workflow / KB / calculator，需要 continuity；
 - 使用者明確要求建議下一步。
 
-## Evidence 與引用呈現
+## 證據（Evidence）與引用呈現
 
-### Repository 內已足夠
+### 儲存庫（Repository）內已足夠
 
 若答案可由 canonical KB 支持：
 
