@@ -1,11 +1,11 @@
 ---
-title: "EPDM / Elastomeric Gasket 標準基線"
+title: "彈性體墊條基線"
 verification_status: "VERIFIED_PRIMARY"
 verified_at: "2026-09-02"
 canonical_owner: true
 ---
 
-# EPDM / Elastomeric Gasket 標準基線
+# 彈性體墊條基線
 
 建築外殼常用 gasket 可能以 EPDM、silicone rubber 或其他 elastomer 製作。AI 不應把「EPDM」材料名稱直接等同於某一個 ASTM gasket 標準；應依 gasket 結構、密度與用途判斷。
 
@@ -38,14 +38,14 @@ canonical_owner: true
 9. setting block / spacer 是否具有不同功能與材料要求
 10. system pressure-equalization / drainage design 是否依賴 gasket contact pressure
 
-## Do not assume
+## 不可推論事項
 
 - `EPDM = ASTM C864` 不一定成立；需確認產品是否符合該標準 scope。
 - dense gasket 與 cellular gasket 不得因外觀相似就互換。
 - hardness 相同不代表 compression set、weatherability、compatibility 相同。
 - gasket 本身符合材料標準，不代表整體 curtain wall 的 air / water performance 已經合格。
 
-## Sources
+## 來源
 
 - ASTM C864-05(2026): https://store.astm.org/c0864-05r26.html
 - ASTM C509 listing/search: https://store.astm.org/

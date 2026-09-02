@@ -37,7 +37,7 @@ canonical_owner: true
 
 這可以避免只檢查公式 mechanics，卻沒有先確認該專案真正要求的 load、criterion、factor、calculation scope 與 test acceptance。
 
-## Review hierarchy
+## 審查層級
 
 1. **Project specification extraction** — 先建立 Project Design Basis；不要直接從計算書猜 project criteria。
 2. **Design basis** — governing standard / edition / project criterion 是否明確。
@@ -52,7 +52,7 @@ canonical_owner: true
 11. **Performance verification** — analysis 與 mock-up / component / assembly test 的角色是否分清。
 12. **Coverage status** — `PASS / WARNING / FAIL / INCOMPLETE / NOT_APPLICABLE` 是否有 traceable basis。
 
-## Routing
+## 相關頁面與 routing
 
 - [Project Specification → Structural Design Basis Extraction](project-specification-extraction.md)
 - [Design Factor／Safety Factor／隱藏倍率稽核](design-factor-and-hidden-multiplier-audit.md)
@@ -68,24 +68,24 @@ Machine-readable routing：
 
 ## 核心原則
 
-### Calculation correctness ≠ calculation completeness
+### 計算正確 ≠ 計算完整
 
 一個螺栓 shear equation 算得完全正確，如果 load path 還漏掉 eccentricity、bearing、pull-out 或 local extrusion failure，整個 connection calculation 仍不完整。
 
-### A numerical PASS ≠ a traceable PASS
+### 數值 PASS ≠ 可追溯 PASS
 
 若最後 utilization / safety ratio 看似合格，但中間的 factor、allowable transformation、capacity reduction 或 ratio definition 無法追溯，該 PASS 不可靠。
 
 尤其不得只因某 factor 看起來「比較保守」就略過審查；conservative-looking treatment 仍可能 double count、混用 design philosophy、污染 test / design routing，或遮蔽另一個 non-conservative assumption。
 
-### Engineering PASS ≠ project-specification compliance PASS
+### 工程 PASS ≠ 專案規範符合性 PASS
 
 例如一個 member 的 bending mechanics 可以正確，但若使用了錯誤的 project deflection criterion，則應分開輸出：
 
 - `engineering_method: PASS`
 - `project_specification_compliance: FAIL`
 
-### PASS is local unless scope is explicit
+### 未明確範圍時，PASS 只代表局部
 
 任何 `PASS` 必須附帶 scope，例如：
 
@@ -96,11 +96,11 @@ Machine-readable routing：
 
 不能只寫一個沒有範圍的 `STRUCTURE: PASS`。
 
-### Missing evidence is not a favorable assumption
+### 缺少證據不等於可採有利假設
 
 若 criterion、allowable、factor source、support、composite action、connection geometry 或 load source 缺失，狀態應是 `INCOMPLETE`，而不是自行補入最方便的值。
 
-## Public-safety rule
+## 公開安全規則
 
 本 review framework 可由非公開專案規範與計算實務協助辨識常見 requirement / failure modes，但 public repository 只保存一般化 extraction / review framework 與公開可驗證方法；不得保存專案名稱、尺寸、荷載、criterion、factor、圖號、節點、截圖或私人 provenance。
 

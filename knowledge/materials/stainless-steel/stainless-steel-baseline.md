@@ -9,7 +9,7 @@ canonical_owner: true
 
 不鏽鋼在建築外殼工程可能用於螺栓、螺帽、華司、連接件、板件、角鐵、裝飾板與其他配件。材料規範需依 product form 分開，不應只寫「SUS304」或「A2」就結束。
 
-## Product-form routing
+## 產品形式 routing
 
 - **ASTM A240/A240M** — Chromium and Chromium-Nickel Stainless Steel Plate, Sheet, and Strip for Pressure Vessels and General Applications
   - 適合 routing plate / sheet / strip 類產品。
@@ -31,7 +31,7 @@ canonical_owner: true
 
 `A2` / `A4` 是 ISO 3506 fastener steel grade groups；`304` / `316` 是不鏽鋼 grade designation family。實際 fastener 可使用符合該 group composition / processing requirement 的不同鋼種。
 
-## Corrosion routing
+## 耐蝕性 routing
 
 選不鏽鋼不應只看 nominal grade，還應確認：
 
@@ -44,14 +44,14 @@ canonical_owner: true
 7. welding heat tint / post-weld treatment
 8. fastener galling risk
 
-## Do not assume
+## 不可推論事項
 
 - `SUS304 = A2` 不應寫成完全等價。
 - `SUS316 = A4` 同理。
 - 304 一定足夠所有外牆環境不成立；應依 exposure 與專案耐蝕要求判斷。
 - stainless steel 與 aluminum 接觸不代表一定失效，但需要評估 galvanic couple、water retention 與 isolation details。
 
-## Primary sources
+## 主要來源
 
 - ASTM A240/A240M standard page: https://store.astm.org/
 - ASTM A276/A276M standard page: https://store.astm.org/

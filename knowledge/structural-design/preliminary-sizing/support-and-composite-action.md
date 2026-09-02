@@ -1,11 +1,11 @@
 ---
-title: "Support Model 與 Composite Action Guardrails"
+title: "支承條件與複合作用（Composite Action）"
 verification_status: "HIGH_CONFIDENCE"
 verified_at: "2026-09-02"
 canonical_owner: true
 ---
 
-# Support Model 與 Composite Action Guardrails
+# 支承條件與複合作用（Composite Action）
 
 ## Support model 必須 explicit
 
@@ -75,7 +75,7 @@ Section property 必須配合截面 local axes 與實際 load direction。
 
 `unknown` 不得產生無條件 PASS。
 
-## Related
+## 相關頁面
 
 - [Mullion / Transom Design Baseline](../framing/mullion-transom-design-baseline.md)
 - [Required Section Properties](required-section-properties.md)

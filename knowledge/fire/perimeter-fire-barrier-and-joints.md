@@ -1,11 +1,11 @@
 ---
-title: "樓板邊緣防火封堵與防火接縫基線"
+title: "帷幕外牆周邊防火阻隔與接縫"
 verification_status: "VERIFIED_PRIMARY"
 verified_at: "2026-09-02"
 canonical_owner: true
 ---
 
-# 樓板邊緣防火封堵與防火接縫基線
+# 帷幕外牆周邊防火阻隔與接縫
 
 ## 核心標準
 
@@ -75,14 +75,14 @@ Perimeter fire barrier testing（例如 ASTM E2307）與 combustible exterior-wa
 
 不得互相替代。
 
-## Do not assume
+## 不可推論事項
 
 - `mineral wool = firestop` 不成立；完整 listed / tested system 才是判斷單位。
 - 相同 firestop 品牌不代表不同 wall build-up 自動 covered。
 - E1966 PASS 不代表 E2307 perimeter condition PASS。
 - insulation、backpan、anchor geometry 改變後，不能假設原 listing 仍完全適用。
 
-## Primary sources
+## 主要來源
 
 - ASTM E2307-25b: https://store.astm.org/standards/e2307
 - ASTM E1966-24: https://store.astm.org/standards/e1966

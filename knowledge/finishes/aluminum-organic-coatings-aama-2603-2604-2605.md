@@ -1,11 +1,11 @@
 ---
-title: "AAMA 2603 / 2604 / 2605 建築鋁材有機塗裝性能等級"
+title: "鋁材有機塗裝 AAMA 2603／2604／2605 基線"
 verification_status: "VERIFIED_PRIMARY"
 verified_at: "2026-09-02"
 canonical_owner: true
 ---
 
-# AAMA 2603 / 2604 / 2605 建築鋁材有機塗裝性能等級
+# 鋁材有機塗裝 AAMA 2603／2604／2605 基線
 
 ## Current editions（2026-09-02）
 
@@ -48,18 +48,18 @@ FGIA 將 2603 / 2604 / 2605 視為由低到高的「good / better / best」性�
 - warranty 與 exposure 條件
 - 是否另有專案加嚴測試或限制
 
-## Do not assume
+## 不可推論事項
 
 - 符合某塗料化學名稱不等於自動符合 AAMA 2604 或 2605。
 - AAMA 2605 不表示所有顏色、光澤、金屬色或特殊效果具有相同性能或保固。
 - 本頁不保存 film thickness、weathering duration、color-retention limit 等受正式標準控制的細部數值；正式採購／驗收應查閱當版標準與產品認證資料。
 
-## Related
+## 相關頁面
 
 - AAMA 611-26：建築用鋁陽極氧化處理（architectural quality aluminum oxide coatings）。
 - 材料牌號如 3003-H14、3004-H12、6063-T5 與表面處理性能應分開建檔，不應混成單一材料名稱。
 
-## Primary sources
+## 主要來源
 
 - FGIA｜AAMA 2604-26: https://store.fgiaonline.org/aama-2604-26
 - FGIA｜AAMA 2605-26: https://store.fgiaonline.org/aama-2605-26

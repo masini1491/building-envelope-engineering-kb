@@ -19,7 +19,7 @@ canonical_owner: true
 - **ASTM C1201** — Structural Performance of Exterior Dimension Stone Cladding Systems by Uniform Static Air Pressure Difference
   - 用於 assembled stone cladding system 的整體結構性能試驗；使用時重新確認 current edition。
 
-## Stone type specifications
+## 石材類型規範
 
 C1242 的 stone specification family 會依石種分流，例如：
 
@@ -48,7 +48,7 @@ C1242 的 stone specification family 會依石種分流，例如：
 10. water management、joint、sealant 與背後 drainage
 11. fabrication / installation inspection
 
-## Sampling / variability guard
+## 取樣／變異性防呆
 
 天然石材不是均質工業材料。不同 quarry、vein、orientation、含水狀態、缺陷與批次可能影響性能。
 
@@ -57,14 +57,14 @@ C1242 的 stone specification family 會依石種分流，例如：
 - 若專案要求石材試驗，specimen orientation、conditioning、sampling lot 與 acceptance basis 必須一致。
 - anchor test 應反映實際石材、厚度、孔／槽、anchor geometry 與施工方式。
 
-## Do not assume
+## 不可推論事項
 
 - `C880 PASS = stone anchorage PASS` 不成立。
 - `C1354 anchor strength = entire cladding system capacity` 不成立。
 - 不同石種或不同 quarry 的數據不得無條件互用。
 - ASTM C1242 是 engineering guide，不代表所有專案 acceptance criteria 都被它單獨定義。
 
-## Primary sources
+## 主要來源
 
 - ASTM C1242-26: https://store.astm.org/standards/c1242
 - ASTM dimension-stone test index: https://store.astm.org/products-services/standards-and-publications/standards/geotechnical-engineering-standards.html

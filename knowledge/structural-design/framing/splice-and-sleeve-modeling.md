@@ -1,11 +1,11 @@
 ---
-title: "Mullion Splice／Sleeve 接頭建模方法"
+title: "直料接頭／套筒（Splice／Sleeve）建模方法"
 verification_status: "HIGH_CONFIDENCE"
 verified_at: "2026-09-02"
 canonical_owner: true
 ---
 
-# Mullion Splice／Sleeve 接頭建模方法
+# 直料接頭／套筒（Splice／Sleeve）建模方法
 
 ## 角色
 
@@ -47,7 +47,7 @@ canonical_owner: true
 
 因此工程資料應以 DOF / force component 表示，而不是只存 `hinge=true`。
 
-## Force-transfer questions
+## 傳力問題
 
 每個 splice 至少回答：
 
@@ -62,7 +62,7 @@ canonical_owner: true
 
 若答案未知，應標 `INCOMPLETE`。
 
-## Sleeve as reinforcement
+## Sleeve 作為補強
 
 Sleeve 可能只負責 alignment，也可能在有限長度內提高局部 stiffness 或傳遞 interface force。
 
@@ -78,7 +78,7 @@ Sleeve 可能只負責 alignment，也可能在有限長度內提高局部 stiff
 
 不能因 sleeve 幾何上插入 mullion cavity 就自動把 sleeve `I` 加到整支 mullion。
 
-## Local connection demand
+## 局部連接需求
 
 splice / sleeve 附近可能出現：
 
@@ -92,7 +92,7 @@ splice / sleeve 附近可能出現：
 
 因此 global beam model 若只用 ideal hinge / spring，仍需把該 joint force 回傳到 connection-level checks。
 
-## Semi-rigid model
+## 半剛性模型
 
 若接頭有可驗證 rotational stiffness `kθ`，可使用 rotational spring 等方式建立 semi-rigid model。
 
@@ -108,7 +108,7 @@ splice / sleeve 附近可能出現：
 
 不得由 AI 任意猜一個 stiffness 以讓模型收斂。
 
-## Movement compatibility
+## 位移相容性
 
 若 splice 同時作為 movement joint，需另確認：
 
@@ -122,7 +122,7 @@ splice / sleeve 附近可能出現：
 
 「結構上可滑」與「實際 detail 有足夠 movement capacity」是兩個不同檢核。
 
-## Bounding cases
+## 界限案例
 
 當接頭 stiffness 不確定，可比較：
 
@@ -140,7 +140,7 @@ splice / sleeve 附近可能出現：
 
 不能只挑其中一個總體上較保守或較容易 PASS 的模型。
 
-## Recommended output
+## 建議輸出
 
 每個 splice record 至少輸出：
 
@@ -161,7 +161,7 @@ splice:
   verification_status: confirmed | provisional | unknown
 ```
 
-## AI guard
+## AI 防呆
 
 不得：
 
@@ -172,7 +172,7 @@ splice:
 - 忽略 splice 附近 local fastener / extrusion failure
 - 在 splice behavior 未定時輸出 final structural PASS
 
-## Related
+## 相關頁面
 
 - [Continuous Mullion Analysis](continuous-mullion-analysis.md)
 - [Multi-Part Extrusion Load Sharing](multi-part-extrusion-load-sharing.md)
@@ -180,7 +180,7 @@ splice:
 - [Fastener Group Analysis](../connections/fastener-group-analysis.md)
 - [Local Extrusion Failure](../connections/local-extrusion-failure.md)
 
-## Public-source routing
+## 公開來源 routing
 
 - FGIA **AAMA CWM-19 Curtain Wall Manual**：curtain-wall movement、anchorage、splice 等一般設計原則 routing。
 - The Aluminum Association **Aluminum Design Manual 2020**：aluminum member / connection design routing。

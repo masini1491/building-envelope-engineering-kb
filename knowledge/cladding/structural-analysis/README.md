@@ -1,11 +1,11 @@
 ---
-title: "金屬外牆面板結構分析方法"
+title: "金屬板／補強材結構分析"
 verification_status: "HIGH_CONFIDENCE"
 verified_at: "2026-09-02"
 canonical_owner: true
 ---
 
-# 金屬外牆面板結構分析方法
+# 金屬板／補強材結構分析
 
 本目錄處理 solid aluminum panel、folded tray panel、stiffened metal panel 與其他需要以 plate / shell / beam 模型評估的外牆面板。
 
@@ -22,7 +22,7 @@ canonical_owner: true
 5. Wind-load analysis 與 visual flatness / oil canning 是相關但不同問題。
 6. 所有 allowable / resistance / deflection criterion 仍需 public standard、manufacturer data 或 project-approved source。
 
-## Routing
+## 相關頁面與 routing
 
 - [Metal Panel Analysis](metal-panel-analysis.md)
 - [Stiffener Analysis](stiffener-analysis.md)
@@ -45,7 +45,7 @@ ASTM E330/E330M-14(2021) 目前仍列為 Active，提供 exterior windows / curt
 
 應分別保存，必要時互相校核，但不能互相冒充。
 
-## Public-source routing
+## 公開來源 routing
 
 - ASTM E330/E330M-14(2021) — uniform static air-pressure structural performance test。
 - The Aluminum Association, Aluminum Design Manual 2020 — aluminum structural member / plate design routing。

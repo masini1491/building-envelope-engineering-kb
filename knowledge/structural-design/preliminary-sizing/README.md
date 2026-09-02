@@ -22,7 +22,7 @@ canonical_owner: true
 7. Missing data 應回傳 `INCOMPLETE`，不得默認 `PASS`。
 8. 所有結果應保留 inputs、derived values、method、assumptions 與 governing case。
 
-## Routing
+## 相關頁面與 routing
 
 - [Design Pressure vs Test Pressure](design-vs-test-pressure.md)
 - [Required Section Properties](required-section-properties.md)

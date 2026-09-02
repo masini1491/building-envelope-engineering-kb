@@ -1,11 +1,11 @@
 ---
-title: "Project Specification → Structural Design Basis Extraction"
+title: "專案規範 → 結構設計基準抽取"
 verification_status: "HIGH_CONFIDENCE"
 verified_at: "2026-09-02"
 canonical_owner: true
 ---
 
-# Project Specification → Structural Design Basis Extraction
+# 專案規範 → 結構設計基準抽取
 
 ## 目的
 
@@ -35,7 +35,7 @@ canonical_owner: true
 
 ## Extraction 與 Verification 必須分開
 
-### Phase A — Literal extraction
+### Phase A — 原文抽取
 
 先忠實保存文件實際要求：
 
@@ -49,7 +49,7 @@ canonical_owner: true
 
 這一步**不得因 AI 認為規範過時、數值奇怪或另有更常見做法而自行修改**。
 
-### Phase B — Authority / currentness verification
+### Phase B — 權威性／現行性驗證
 
 再另外判斷：
 
@@ -314,7 +314,7 @@ Status 必須區分至少兩種問題：
 - `CONFLICTING_EVIDENCE` — 不同 project sources 尚未解決。
 - `NOT_APPLICABLE` — 有明確理由判定不適用。
 
-# AI guard
+# AI 防呆
 
 AI 不得：
 

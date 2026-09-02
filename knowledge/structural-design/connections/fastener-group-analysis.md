@@ -143,7 +143,7 @@ fastener 本體 PASS 不代表 connection PASS。至少要依實際情況檢查�
 9. connected-material failure modes
 10. assumptions / excluded nonlinear behavior
 
-## AI guard
+## AI 防呆
 
 不得：
 
@@ -157,7 +157,7 @@ fastener 本體 PASS 不代表 connection PASS。至少要依實際情況檢查�
 
 `fastener_group_geometry incomplete`、`capacity source pending verification` 或 `connected-material check incomplete`。
 
-## Routing
+## 相關頁面與 routing
 
 - 緊件 material / property class：`knowledge/fasteners/`
 - 整體 load path / anchor reaction：`load-path-and-anchor-reactions.md`

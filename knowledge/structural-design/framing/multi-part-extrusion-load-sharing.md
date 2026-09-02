@@ -36,7 +36,7 @@ canonical_owner: true
 
 單純「兩支鋁料互相卡在一起」、「施工後不易分開」或「CAD 看起來接觸」都不足以證明 full composite action。
 
-## Section-property mechanics
+## 截面性質力學
 
 若確定為 full composite，必須先建立共同 reference axis / neutral axis；不能只把每一支 profile 對自己 centroid 的 `I` 無條件相加。
 
@@ -52,7 +52,7 @@ canonical_owner: true
 
 若材料彈性模數不同，應改以 `EA / EI` 或 transformed-section / stiffness 方法處理，不能只比較幾何 `I`。
 
-## Relative-stiffness load sharing
+## 相對剛度荷載分配
 
 在**已經證明構件具有 compatible curvature** 的前提下，才可討論依 flexural-stiffness contribution 分配彎矩。
 
@@ -72,7 +72,7 @@ canonical_owner: true
 
 這些公式只是在**共同作用已經由 load-transfer evidence 建立之後**描述 stiffness distribution；它們本身不能證明 composite action 存在。
 
-## Male / female curtain-wall extrusion guard
+## 公／母帷幕鋁擠型防呆
 
 對 male / female mullion 或類似 interlocking extrusion，至少要另外確認：
 
@@ -85,7 +85,7 @@ canonical_owner: true
 
 因此「某一跨距可視為 composite」不代表整支 mullion 每個位置都可使用同一組 effective section properties。
 
-## Independent / partial behavior
+## 獨立／部分共同作用
 
 若介面不能可靠傳遞共同作用所需的 shear，應：
 
@@ -96,7 +96,7 @@ canonical_owner: true
 
 不得用「取兩種結果中較安全的一個」取代對 load path 的判斷，因為強度、撓度與 connection reaction 的 governing case 可能不同。
 
-## Stress / deflection checks
+## 應力／撓度檢核
 
 多件 extrusion 分析至少應檢查：
 
@@ -109,7 +109,7 @@ canonical_owner: true
 - discontinuity near anchor / transom connection
 - glass edge relative displacement / serviceability compatibility
 
-## AI guard
+## AI 防呆
 
 AI 不得：
 

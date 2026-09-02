@@ -1,11 +1,11 @@
 ---
-title: "帷幕牆系統型式：Stick / Unitized / Semi-Unitized"
+title: "帷幕牆系統型式：直橫料式（Stick）／單元式（Unitized）／半單元式（Semi-Unitized）"
 verification_status: "HIGH_CONFIDENCE"
 verified_at: "2026-09-02"
 canonical_owner: true
 ---
 
-# 帷幕牆系統型式：Stick / Unitized / Semi-Unitized
+# 帷幕牆系統型式：直橫料式（Stick）／單元式（Unitized）／半單元式（Semi-Unitized）
 
 ## Stick system
 
@@ -70,7 +70,7 @@ Unitized 系統的 stack joint / interlocking chamber 常利用 pressure equaliz
 
 試驗 specimen 必須反映實際系統接縫、anchor、splice、corner、typical / critical condition。
 
-## Primary / supporting source
+## 主要／輔助來源
 
 - 內政部建築研究所《帷幕牆系統結構耐風設計手冊》及前期研究報告
 - FGIA curtain wall testing standards family

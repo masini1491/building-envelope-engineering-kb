@@ -26,7 +26,7 @@ canonical_owner: true
 9. thermal movement / inter-story movement compatibility
 10. anchor reactions and load path continuity
 
-## Simplified mechanics are not final design
+## 簡化力學不等於正式設計
 
 對簡單單跨直料可用基本梁理論做初步理解，例如 uniformly distributed load 下的 bending / deflection；但實際 curtain wall framing 可能包含：
 
@@ -41,7 +41,7 @@ canonical_owner: true
 
 因此示意梁公式只能作初步 sanity check，不能取代 project-specific structural model。
 
-## Deflection guard
+## 撓度防呆
 
 Deflection criterion 可能來自：
 
@@ -53,7 +53,7 @@ Deflection criterion 可能來自：
 
 AI 不得自行宣稱所有 curtain wall mullion 都固定採同一個 `L/x` 或固定 mm 限值。
 
-## Section-property guard
+## 截面性質防呆
 
 複雜鋁擠型截面不可只用外包矩形估算 section properties。應使用：
 
@@ -63,7 +63,7 @@ AI 不得自行宣稱所有 curtain wall mullion 都固定採同一個 `L/x` 或
 
 若截面有 thermal break、screw race、snap cap、male/female interlock、非對稱 cavity 或組合件，需依實際 load transfer 判斷 effective section。
 
-## Transom-specific notes
+## 橫料特定注意事項
 
 橫料除風壓外還可能承受：
 
@@ -74,7 +74,7 @@ AI 不得自行宣稱所有 curtain wall mullion 都固定採同一個 `L/x` 或
 
 不能只用「橫料與直料同一套風壓彎矩公式」處理所有 case。
 
-## Failure-mode checklist
+## 破壞模式檢核表
 
 - flexural stress
 - shear

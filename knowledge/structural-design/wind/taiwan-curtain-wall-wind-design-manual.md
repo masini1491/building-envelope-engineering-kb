@@ -65,7 +65,7 @@ canonical_owner: true
 
 拆頁時應以本頁為 source routing，不重複大段手冊內容。
 
-## Primary sources
+## 主要來源
 
 - 內政部建築研究所出版品《帷幕牆系統結構耐風設計手冊》： https://www.abri.gov.tw/PeriodicalDetail.aspx?isShowAll=false&key=91&n=861&s=2428
 - 內政部建築研究所《帷幕牆系統結構耐風設計手冊研擬》研究成果 PDF： https://ws.moi.gov.tw/Download.ashx?n=5bi35bmV54mG6KiI55Wr5oiQ5p6c5aCx5ZGKMTA3LjAxLjA1LnBkZg%3D%3D&u=LzAwMS9VcGxvYWQvT2xkRmlsZV9BYnJpX0dvdi9yZXNlYXJjaC8yNzYwLzE1MjE1MTY5Njh4ZDE5MzMucGRm

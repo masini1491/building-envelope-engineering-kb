@@ -1,11 +1,11 @@
 ---
-title: "Calculation Status 與 Traceability"
+title: "計算狀態與可追溯性"
 verification_status: "HIGH_CONFIDENCE"
 verified_at: "2026-09-02"
 canonical_owner: true
 ---
 
-# Calculation Status 與 Traceability
+# 計算狀態與可追溯性
 
 ## Status model
 

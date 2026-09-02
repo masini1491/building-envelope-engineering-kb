@@ -1,14 +1,14 @@
 ---
-title: "ASTM E1300 玻璃耐載設計 Routing"
+title: "ASTM E1300 建築玻璃耐荷重設計 routing"
 standard: "ASTM E1300-24"
 verification_status: "VERIFIED_PRIMARY"
 verified_at: "2026-09-02"
 canonical_owner: true
 ---
 
-# ASTM E1300 玻璃耐載設計 Routing
+# ASTM E1300 建築玻璃耐荷重設計 routing
 
-## Scope
+## 適用範圍
 
 ASTM E1300-24 是建築玻璃 load resistance 的核心 practice。它用於依玻璃種類、厚度、尺寸、支承與載重條件判定玻璃抗載能力；不能由產品標準 C1036 / C1048 / C1172 直接取代。
 
@@ -48,14 +48,14 @@ E1300 的 load resistance 判定不等於 curtain wall system 的所有 servicea
 
 正式設計時應依 E1300 與 project specification 的採用條件判斷，不得由 AI 自行設定 probability-of-breakage 或安全係數。
 
-## Do not assume
+## 不可推論事項
 
 - `tempered = 4× strength` 不是可直接代替 E1300 的設計規則。
 - `laminated 6+6 = monolithic 12 mm` 不成立。
 - `IGU = each lite carries half pressure` 不成立。
 - `E1300 PASS = framing / sealant / gasket system PASS` 不成立。
 
-## Primary source
+## 主要來源
 
 - ASTM E1300-24, Standard Practice for Determining Load Resistance of Glass in Buildings: https://store.astm.org/e1300-24.html
 

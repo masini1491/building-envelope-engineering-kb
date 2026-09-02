@@ -64,7 +64,7 @@ canonical_owner: true
 
 **Local connection PASS 不等於 whole-window performance PASS。**
 
-## Current public standard routing
+## 現行公開標準 routing
 
 截至 2026-09-02，FGIA Store 將下列文件列為 Active：
 
@@ -75,7 +75,7 @@ ASTM **E330/E330M-14(2021)** 仍為 exterior windows / doors / skylights / curta
 
 這些標準是 performance / test routing；它們不直接取代 sash / hinge / screw / local extrusion 的 engineering calculation。
 
-## Routing
+## 相關頁面與 routing
 
 - [Sash / Frame Structural Analysis](sash-frame-analysis.md)
 - [Operable Hardware Load Path](hardware-load-path.md)
@@ -85,7 +85,7 @@ ASTM **E330/E330M-14(2021)** 仍為 exterior windows / doors / skylights / curta
 - [Screw Pull-out / Thread Engagement](../structural-design/connections/screw-pullout-and-thread-engagement.md)
 - [Local Extrusion Failure](../structural-design/connections/local-extrusion-failure.md)
 
-## Do not assume
+## 不可推論事項
 
 - `sash frame PASS = hardware PASS` 不成立。
 - `hardware catalogue load = installed connection capacity` 不成立。
@@ -94,7 +94,7 @@ ASTM **E330/E330M-14(2021)** 仍為 exterior windows / doors / skylights / curta
 - `E330 test PASS` 不代表 operating-cycle durability 已完成。
 - 五金位置／數量若改變，load path 需要重新確認。
 
-## Public sources
+## 公開來源
 
 - FGIA Store, AAMA/WDMA/CSA 101/I.S.2/A440-26
 - FGIA Store, AAMA 910-24

@@ -23,7 +23,7 @@ canonical_owner: true
 6. Setting block、point attachment、maintenance attachment 等 concentrated load 不得偷偷平均成 UDL。
 7. 任何 reduction factor、load factor、impact factor、seismic coefficient 或 safety factor 都必須附 source；不得從舊計算書直接泛化。
 
-## Routing
+## 相關頁面與 routing
 
 - [Facade Tributary Loads](facade-tributary-loads.md)
 - [Transom Wind-Load Distribution](transom-wind-load-distribution.md)
@@ -32,7 +32,7 @@ canonical_owner: true
 - [Mullion / Transom Design Baseline](../framing/mullion-transom-design-baseline.md)
 - [Load Path / Anchor Reactions](../connections/load-path-and-anchor-reactions.md)
 
-## Data-model recommendation
+## 資料模型建議
 
 Future calculators should preserve at least:
 
@@ -50,9 +50,9 @@ load_transfer:
   assumptions: ...
 ```
 
-Do not reduce the entire chain to one scalar `w` without provenance.
+不要在失去來源追溯的情況下，把整條鏈縮成單一純量 `w`。
 
-## Public-source routing
+## 公開來源 routing
 
 - 內政部建築研究所《帷幕牆系統結構耐風設計手冊》與相關研究：要求依面材、直料、橫料的位置、有效受風面積與風壓傳導機制分別建立設計風壓與構件需求。
 - ASTM E1300-24：玻璃 load resistance routing；玻璃受力模型不能直接替代 framing load-generation model。

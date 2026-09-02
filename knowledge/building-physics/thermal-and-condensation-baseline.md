@@ -1,11 +1,11 @@
 ---
-title: "熱工與結露工程基線"
+title: "建築外殼熱傳與結露基線"
 verification_status: "VERIFIED_PRIMARY"
 verified_at: "2026-09-02"
 canonical_owner: true
 ---
 
-# 熱工與結露工程基線
+# 建築外殼熱傳與結露基線
 
 ## 核心觀念
 
@@ -79,14 +79,14 @@ Hot-box test、AAMA 1503 test、2D/3D thermal simulation、material conductivity
 - simulation 結果依賴 geometry、boundary conditions、material properties
 - material R-value 不可直接當整體 wall R-value
 
-## Do not assume
+## 不可推論事項
 
 - `有 thermal break = 不會結露` 不成立。
 - `Low-E glass = frame condensation solved` 不成立。
 - `insulation thickness 相同 = thermal performance 相同` 不成立。
 - 單一 component U-factor 不等於 whole-envelope U-factor。
 
-## Primary sources
+## 主要來源
 
 - ASTM C1363-24: https://store.astm.org/standards/c1363
 - FGIA AAMA 1503-09: https://store.fgiaonline.org/AAMA-1503-09/

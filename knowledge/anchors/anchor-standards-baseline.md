@@ -1,11 +1,11 @@
 ---
-title: "錨栓／Anchor 標準基線"
+title: "帷幕牆錨栓標準基線"
 verification_status: "VERIFIED_PRIMARY"
 verified_at: "2026-09-02"
 canonical_owner: true
 ---
 
-# 錨栓／Anchor 標準基線
+# 帷幕牆錨栓標準基線
 
 建築外殼工程中的 anchor 不應被視為單一材料類別。最少要先區分：
 
@@ -49,14 +49,14 @@ canonical_owner: true
 9. base plate / bracket bearing and bending
 10. weld / bolt / anchor channel 等完整 load path
 
-## Do not assume
+## 不可推論事項
 
 - `F1554 anchor bolt = expansion anchor` 錯誤。
 - 只看螺桿鋼材強度不能代表整個 anchor capacity。
 - 廠商型錄最大拉力不能直接當設計值；需確認對應 substrate、embedment、edge distance、safety/design method。
 - adhesive anchor 不應用 mechanical anchor 的 qualification 規則代替。
 
-## Primary sources
+## 主要來源
 
 - ASTM F1554/F1554M standard page: https://store.astm.org/
 - ACI 318 Building Code Requirements for Structural Concrete: https://www.concrete.org/

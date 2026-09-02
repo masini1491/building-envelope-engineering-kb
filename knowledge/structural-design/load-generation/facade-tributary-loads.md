@@ -33,7 +33,7 @@ Transom 的面材 tributary load 常不是單一 uniform line load。若 panel �
 
 詳見 [Transom Wind-Load Distribution](transom-wind-load-distribution.md)。
 
-## Point loads
+## 集中荷載
 
 以下作用通常不應直接平均成 façade UDL：
 
@@ -46,7 +46,7 @@ Transom 的面材 tributary load 常不是單一 uniform line load。若 panel �
 
 它們應保留 point-load location 與 eccentricity。
 
-## Positive / negative cases
+## 正／負壓案例
 
 即使後續構件強度只取 absolute envelope，也建議資料層保留：
 
@@ -57,14 +57,14 @@ Transom 的面材 tributary load 常不是單一 uniform line load。若 panel �
 
 因為 connection contact、interlock、sealant、glass support 與 local bearing 在正／負方向可能不是完全對稱。
 
-## Do not assume
+## 不可推論事項
 
 - 不得把 whole-panel area 當成單一 mullion 的 tributary area。
 - 不得因左右 panel 看起來相近就預設各半。
 - 不得把 point load 平均成 UDL 來掩蓋 local connection demand。
 - 不得把 wind-load tributary geometry 直接套到 glass dead load。
 
-## Public-source routing
+## 公開來源 routing
 
 - 內政部建築研究所《帷幕牆系統結構耐風設計手冊》：component / cladding、直料、橫料與繫件應依其實際受風面與 load path 分別設計。
 - 基本 tributary-area / statics 原理。

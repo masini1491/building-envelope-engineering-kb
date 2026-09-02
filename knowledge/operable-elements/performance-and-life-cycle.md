@@ -1,11 +1,11 @@
 ---
-title: "活動窗整窗性能與 Life-cycle Routing"
+title: "活動窗整窗性能與生命週期 routing"
 verification_status: "VERIFIED_PRIMARY"
 verified_at: "2026-09-02"
 canonical_owner: true
 ---
 
-# 活動窗整窗性能與 Life-cycle Routing
+# 活動窗整窗性能與生命週期 routing
 
 ## 角色
 
@@ -28,7 +28,7 @@ Performance test 則可觀察：
 
 兩者不能互相取代。
 
-## NAFS routing
+## NAFS 標準 routing
 
 截至 2026-09-02，FGIA Store 將 **AAMA/WDMA/CSA 101/I.S.2/A440-26 (NAFS)** 列為 Active。
 
@@ -43,7 +43,7 @@ NAFS 適用於 windows、doors、skylights 的產品性能分類／規範 routin
 - 不同 anchorage
 - 不同 mullion / curtain-wall integration condition
 
-## AAMA 910 routing
+## AAMA 910 標準 routing
 
 截至 2026-09-02，FGIA Store 將 **AAMA 910-24 — Life Cycle Specifications and Test Methods for AW Class Windows and Doors** 列為 Active。
 
@@ -59,7 +59,7 @@ NAFS 適用於 windows、doors、skylights 的產品性能分類／規範 routin
 
 也不代表長期 operating force / locking / sealing performance 已驗證。
 
-## ASTM E330 routing
+## ASTM E330 標準 routing
 
 ASTM **E330/E330M-14(2021)** 目前為 Active，適用於 exterior windows、doors、skylights、curtain walls 的 uniform static air pressure structural performance test。
 
@@ -70,7 +70,7 @@ ASTM **E330/E330M-14(2021)** 目前為 Active，適用於 exterior windows、doo
 - frame member design specification
 - operating-cycle test
 
-## Pre-test / post-test function
+## 試驗前／後功能
 
 若 project specification 要求 operability before / after pressure loading，應明確保存：
 
@@ -84,7 +84,7 @@ ASTM **E330/E330M-14(2021)** 目前為 Active，適用於 exterior windows、doo
 
 AI 不得自行把「未破壞」等同「可正常操作」。
 
-## Modification / substitution review
+## 修改／替代審查
 
 活動窗替代／改版至少應重新比對：
 
@@ -101,7 +101,7 @@ AI 不得自行把「未破壞」等同「可正常操作」。
 
 若改動超出 test / certification coverage，應標示 `verification required`。
 
-## Calculation + test traceability
+## 計算＋試驗可追溯性
 
 推薦輸出：
 
@@ -127,7 +127,7 @@ Final status
 
 而不是單一 `PASS`。
 
-## AI guard
+## AI 防呆
 
 不得：
 
@@ -137,7 +137,7 @@ Final status
 - 假設任何尺寸／五金改動仍在原 test coverage
 - 把無破壞等同 operability 合格
 
-## Public sources
+## 公開來源
 
 - FGIA Store — AAMA/WDMA/CSA 101/I.S.2/A440-26
 - FGIA Store — AAMA 910-24

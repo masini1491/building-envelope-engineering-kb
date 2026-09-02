@@ -1,11 +1,11 @@
 ---
-title: "台灣外牆非結構構材地震力方法"
+title: "台灣建築外殼構件地震力"
 verification_status: "VERIFIED_PRIMARY"
 verified_at: "2026-09-02"
 canonical_owner: true
 ---
 
-# 台灣外牆非結構構材地震力方法
+# 台灣建築外殼構件地震力
 
 ## Purpose
 
@@ -94,7 +94,7 @@ AI 不得從舊 project calculation 自行重建 load combination rules。
 8. downstream load path target
 9. assumptions / missing data
 
-## Do not assume
+## 不可推論事項
 
 - `ap / Rp` 是所有 façade component 共用常數
 - `Ip = 1.0` 可永遠預設
@@ -102,7 +102,7 @@ AI 不得從舊 project calculation 自行重建 load combination rules。
 - 同一建築所有樓層 seismic component force 相同
 - 舊案使用過的係數可直接視為 current code
 
-## Primary source
+## 主要來源
 
 - 內政部國土管理署《建築物耐震設計規範及解說》總頁：https://www.nlma.gov.tw/ch/legislation/regsearch/175
 - 官方第四章 PDF：https://www.nlma.gov.tw/filesys/file/chinese/publication/law/law2/111061504.pdf

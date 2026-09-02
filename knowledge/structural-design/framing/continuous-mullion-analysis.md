@@ -1,11 +1,11 @@
 ---
-title: "Continuous Mullion 多跨直料結構分析方法"
+title: "多跨直料（Continuous Mullion）結構分析方法"
 verification_status: "HIGH_CONFIDENCE"
 verified_at: "2026-09-02"
 canonical_owner: true
 ---
 
-# Continuous Mullion 多跨直料結構分析方法
+# 多跨直料（Continuous Mullion）結構分析方法
 
 ## 角色
 
@@ -58,7 +58,7 @@ canonical_owner: true
 
 這和 ideal `fixed support` 不同。
 
-## Joint labels are not mechanics
+## 接頭標籤不等於力學行為
 
 分析軟體中的 `free joint`、`release`、`hinge`、`slider` 等名稱只是 solver implementation。工程文件必須能回答：
 
@@ -66,7 +66,7 @@ canonical_owner: true
 
 不得只保存軟體畫面上的 label，卻無法重建 structural boundary condition。
 
-## Member stiffness
+## 構件剛度
 
 線彈性 beam analysis 的主要 flexural stiffness 為：
 
@@ -76,7 +76,7 @@ canonical_owner: true
 
 若某一段因 reinforcement、sleeve、splice、截面變化或 multi-part composite action 而 stiffness 改變，應分段建模；不能用整支 mullion 單一平均 `I` 掩蓋局部剛度變化。
 
-## Loads
+## 荷載
 
 應由 [load-generation](../load-generation/README.md) 路由進入，保留：
 
@@ -88,7 +88,7 @@ canonical_owner: true
 
 不要把所有 action 先合併成單一 UDL，除非能證明這種 envelope simplification 對所檢查 response 保守且適用。
 
-## Reactions are outputs, not assumptions
+## 反力是輸出，不是預設
 
 對多跨 mullion，樓板 reaction 受到：
 
@@ -107,7 +107,7 @@ canonical_owner: true
 
 取代 continuous-beam analysis。
 
-## Strength checks
+## 強度檢核
 
 取得 internal force 後，至少依實際 member / section model檢查：
 
@@ -121,7 +121,7 @@ canonical_owner: true
 
 若 mullion 是多件 extrusion，另依 [multi-part extrusion load sharing](multi-part-extrusion-load-sharing.md) 確認 composite-action assumption。
 
-## Deflection checks
+## 撓度檢核
 
 除了 global maximum deflection，還可能需要：
 
@@ -133,7 +133,7 @@ canonical_owner: true
 
 對玻璃邊緣相容性應路由至 [glass-edge-relative-deflection](glass-edge-relative-deflection.md)，不要只用整支 mullion 最大位移做判斷。
 
-## Sensitivity / bounding analysis
+## 敏感度／界限分析
 
 當 splice stiffness 或 rotational restraint 不確定時，推薦使用 engineering bounding cases：
 
@@ -151,7 +151,7 @@ canonical_owner: true
 
 因為不同 failure mode 的 governing boundary condition 可能不同。
 
-## AI guard
+## AI 防呆
 
 AI 不得：
 
@@ -167,7 +167,7 @@ AI 不得：
 
 `structural_model_status = INCOMPLETE`
 
-## Public-source routing
+## 公開來源 routing
 
 - 內政部建築研究所《帷幕牆系統結構耐風設計手冊》及其前身研究：要求先界定帷幕系統構件、風壓傳導機制，再分別分析直料、橫料與繫件。
 - FGIA **AAMA CWM-19 Curtain Wall Manual**：現行 curtain-wall manual，用於一般 curtain-wall design principles / movement / anchorage / splice routing；不在本 repository 重製受版權保護內容。

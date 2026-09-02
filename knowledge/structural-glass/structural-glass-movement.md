@@ -7,11 +7,11 @@ canonical_owner: true
 
 # 結構玻璃位移相容性
 
-## Scope
+## 適用範圍
 
 結構玻璃系統除風壓強度外，還必須處理樓層側移、垂直層間位移、thermal movement、support rotation 與 construction tolerance。
 
-## Recommended workflow
+## 建議流程
 
 1. 定義 imposed movement：horizontal drift / vertical differential movement / thermal movement。
 2. 建立支承自由度：fixed、sliding、rotational、bearing、slotted connection 等。
@@ -20,7 +20,7 @@ canonical_owner: true
 5. 必要時另外做 local hole / bearing / sealant deformation check。
 6. 極限或 seismic condition 下再確認 glass fallout、contact、support disengagement 與 residual stability。
 
-## Clearance vs stress
+## 淨空與應力
 
 只做「joint gap 大於 imposed movement」的幾何檢查不一定足夠；也只做 FEA stress check 而不檢查 physical clearance 也不完整。
 
@@ -34,7 +34,7 @@ canonical_owner: true
 - connection slot travel
 - secondary stress
 
-## Support restraint guard
+## 支承拘束防呆
 
 減少拘束有時可降低 movement-induced secondary stress，但不得因此省略 stability / redundancy。增加固定點也可能提高 unintended restraint。
 
@@ -42,11 +42,11 @@ canonical_owner: true
 
 `load transfer + stability + movement accommodation + constructability`
 
-## Inter-story standards routing
+## 層間變位標準 routing
 
 一般 curtain-wall movement 可參考 AAMA/FGIA 501.4、501.6、501.7 等相應方法；結構玻璃若有特殊 geometry / point supports，仍需 project-specific analysis，不能只因整體 mock-up movement PASS 就自動推定每個 local glass connection PASS。
 
-## Do not assume
+## 不可推論事項
 
 - joint clearance check = full seismic design
 - flexible silicone = unlimited movement capacity

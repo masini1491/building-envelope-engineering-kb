@@ -62,14 +62,14 @@ canonical_owner: true
 
 本次以建研所現行試驗項目確認 CNS 13971、13972、13973、13974、14281 仍為台灣帷幕牆試驗使用標準；**各 CNS 的最新修訂日期／版本號尚未在本輪逐一從 CNS 線上服務完成核對，故不在本頁猜測。**
 
-## Engineering notes
+## 工程備註
 
 - `CNS ↔ ASTM/AAMA` 的欄位是試驗用途 cross-reference，不應自動解讀為法規上的「完全等價」。
 - 專案規範可能指定較高壓力、較長 duration、不同 sequence、重測條件或失敗判定；應以專案契約為準。
 - Laboratory test、field test、diagnostic check 不可混為同一層級。例如 AAMA 501.2 是 field diagnostic water check，ASTM E331 則是 uniform static pressure 的試驗方法。
 - 規範版本可能更新；出具正式試驗計畫前必須重新確認 current edition 與專案指定版次。
 
-## Primary sources
+## 主要來源
 
 - 內政部建築研究所風雨風洞實驗室｜技術服務試驗項目及方法： https://www.lab.abri.gov.tw/cp.aspx?n=20771
 - ASTM International｜Building Standards / individual standard pages: https://store.astm.org/

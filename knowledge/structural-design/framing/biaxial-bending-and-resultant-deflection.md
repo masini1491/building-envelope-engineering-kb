@@ -19,7 +19,7 @@ Curtain-wall mullion / jamb / corner member / feature extrusion 不一定只承�
 - maintenance attachment
 - asymmetric composite framing
 
-## Axis discipline
+## 座標軸規則
 
 首先必須明確定義 CAD section axes 與 physical load direction。不能靠 `Ix > Iy` 就把 `x` 自動稱為 strong axis，也不能假設不同 CAD / FEA 軟體的軸向命名一致。
 
@@ -33,7 +33,7 @@ Curtain-wall mullion / jamb / corner member / feature extrusion 不一定只承�
 
 對非對稱截面，正負 extreme-fiber section modulus 可能不同。
 
-## Independent-axis linear analysis
+## 獨立軸線性分析
 
 在線性小變形且 principal / decoupled axes 合理的情況，可分別求：
 
@@ -42,7 +42,7 @@ Curtain-wall mullion / jamb / corner member / feature extrusion 不一定只承�
 
 若 axes 非 principal 或 `Ixy` 不可忽略，應採 unsymmetrical bending / transformed principal-axis method，而不是硬把 X/Y 當完全獨立。
 
-## Combined stress
+## 組合應力
 
 組合應力的 acceptance equation 必須依材料設計標準與 stress state 決定。
 
@@ -54,7 +54,7 @@ AI 不得自行採用：
 
 對簡單 elastic normal stress，可先計算各 load component 在各 extreme fiber 的 stress，再依 governing design specification 做 interaction。
 
-## Resultant deflection
+## 合成撓度
 
 若 `δx` 與 `δy` 是互相正交方向的 displacement component，而且工程問題關心 total spatial displacement magnitude，可計算：
 
@@ -69,7 +69,7 @@ AI 不得自行採用：
 
 因此不能永遠用 resultant magnitude 與單軸 criterion 比較。
 
-## Corner / feature framing
+## 轉角／造型 framing
 
 對轉角或突出造型構件，要特別確認：
 
@@ -79,11 +79,11 @@ AI 不得自行採用：
 4. connection stiffness / eccentricity 是否引入 torsion
 5. glass-edge relative displacement 是否控制 serviceability
 
-## Torsion guard
+## 扭轉防呆
 
 Biaxial bending 不等於 torsion。若 load line 不通過 shear center、connection 偏心或 framing geometry 造成 twist，還要另外處理 torsional response；不能只靠 `Mx + My` 完成設計。
 
-## Do not assume
+## 不可推論事項
 
 - 不得用 `Ix > Iy` 自動命名 strong / weak axis。
 - 不得把非對稱截面 `Sx+` 與 `Sx-` 當相同。
@@ -91,7 +91,7 @@ Biaxial bending 不等於 torsion。若 load line 不通過 shear center、conne
 - 不得把 resultant deflection 當所有 gasket / glass / sealant criterion 的唯一指標。
 - 不得忽略 torsion。
 
-## Routing
+## 相關頁面與 routing
 
 - [Mullion / Transom Design Baseline](mullion-transom-design-baseline.md)
 - [Multi-Part Extrusion Load Sharing](multi-part-extrusion-load-sharing.md)

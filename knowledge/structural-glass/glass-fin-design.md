@@ -1,17 +1,17 @@
 ---
-title: "玻璃肋／玻璃直料設計 Glass Fin Design"
+title: "玻璃肋／玻璃直料設計（Glass Fin Design）"
 verification_status: "HIGH_CONFIDENCE"
 verified_at: "2026-09-02"
 canonical_owner: true
 ---
 
-# 玻璃肋／玻璃直料設計 Glass Fin Design
+# 玻璃肋／玻璃直料設計（Glass Fin Design）
 
-## Scope
+## 適用範圍
 
 Glass fin / glass mullion 是以玻璃本身作為主要受彎或受軸構材的結構玻璃系統。設計時不能只把它當成「比較厚的玻璃面板」。
 
-## Design workflow
+## 設計流程
 
 至少分開處理：
 
@@ -60,11 +60,11 @@ Glass fin 的 global PASS 不代表 connection PASS。必須將支承反力傳�
 
 並分別檢查 local contact、bearing、bolt force、plate bending、weld / anchor 等。
 
-## Movement compatibility
+## 位移相容性
 
 結構玻璃系統常需要容許樓層側移與 thermal movement。固定點的位置與自由度應讓系統能傳力，也能避免不必要的 secondary stress。
 
-## Do not assume
+## 不可推論事項
 
 - glass fin = conventional aluminum mullion with a different E
 - global FEA stress contour = hole / contact stress 已經被捕捉
@@ -72,9 +72,9 @@ Glass fin 的 global PASS 不代表 connection PASS。必須將支承反力傳�
 - laminated fin nominal thickness can be used directly as section thickness
 - wind-only check covers seismic / movement condition
 
-## Related public standards
+## 相關公開標準
 
 - ASTM E3491-25 — laminated glass effective thickness
 - ASTM E1300-24 — building glass load resistance（注意 scope limitations）
 
-> Glass fin often requires specialist analysis beyond prescriptive façade-member checks. Use validated modeling assumptions and project-specific verification.
+> 玻璃肋通常需要超出一般外牆構件條文式檢核的專業分析；應採用經驗證的建模假設與專案特定驗證。

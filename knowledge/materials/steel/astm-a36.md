@@ -1,12 +1,12 @@
 ---
-title: "ASTM A36/A36M Carbon Structural Steel"
+title: "ASTM A36/A36M 碳素結構鋼（Carbon Structural Steel）"
 standard: "ASTM A36/A36M-19"
 verification_status: "VERIFIED_PRIMARY"
 verified_at: "2026-09-02"
 canonical_owner: true
 ---
 
-# ASTM A36/A36M Carbon Structural Steel
+# ASTM A36/A36M 碳素結構鋼（Carbon Structural Steel）
 
 ## 用途
 
@@ -19,18 +19,18 @@ ASTM A36/A36M 是常見 carbon structural steel 規範，涵蓋 structural quali
 - support frames
 - welded connection parts
 
-## Current edition snapshot
+## 現行版本快照
 
 ASTM 官方目前列 **A36/A36M-19** 為 Active。
 
-## Engineering notes
+## 工程備註
 
 - A36 是材料規範，不代表所有鋼製帷幕支撐件的設計、焊接、鍍鋅、螺栓或防蝕要求都已涵蓋。
 - 若構件後續熱浸鍍鋅，應另查 ASTM A123 family。
 - 若採焊接，仍須依適用 welding procedure / welding code 與專案要求處理。
 - 材料厚度、產品形式及 mechanical property 要求應回正式標準與 mill certificate。
 
-## CNS cross-reference caution
+## CNS 交叉對照注意事項
 
 台灣工程常會把 ASTM A36 與 CNS 2473 SS400 放在一起比較，但本 repository **不預設兩者完全等價**。
 
@@ -46,7 +46,7 @@ ASTM 官方目前列 **A36/A36M-19** 為 Active。
 - welding requirement
 - project approval basis
 
-## Primary source
+## 主要來源
 
 - ASTM A36/A36M-19: https://store.astm.org/a0036_a0036m-19.html
 

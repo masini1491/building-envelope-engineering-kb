@@ -1,11 +1,11 @@
 ---
-title: "Design Pressure 與 Test Pressure 分流"
+title: "設計風壓（Design Pressure）與試驗壓力（Test Pressure）分流"
 verification_status: "HIGH_CONFIDENCE"
 verified_at: "2026-09-02"
 canonical_owner: true
 ---
 
-# Design Pressure 與 Test Pressure 分流
+# 設計風壓（Design Pressure）與試驗壓力（Test Pressure）分流
 
 ## 核心原則
 
@@ -28,7 +28,7 @@ ASTM E330 / E330M 等試驗方法所使用的 pressure 是 performance-test inpu
 
 Test pressure 不應反向自動修改 design pressure。
 
-## Guardrails
+## 防呆規則
 
 - 不得將 test pressure 偷偷當成 design pressure。
 - 不得因 test pressure 高於 design pressure，就自動把其差值解讀成通用 safety factor。
@@ -51,7 +51,7 @@ Design load case 至少保存：
 
 Test pressure 則應使用獨立 object / namespace，避免與 structural design load 混用。
 
-## Related
+## 相關頁面
 
 - [Taiwan Design Wind Pressure Workflow](../wind/taiwan-design-wind-pressure-workflow.md)
 - [Curtain Wall Performance Test Crosswalk](../../standards/performance-testing/curtain-wall-performance-crosswalk.md)

@@ -1,11 +1,11 @@
 ---
-title: "金屬複合板與蜂巢板工程基線"
+title: "金屬複合板與蜂巢板基線"
 verification_status: "HIGH_CONFIDENCE"
 verified_at: "2026-09-02"
 canonical_owner: true
 ---
 
-# 金屬複合板與蜂巢板工程基線
+# 金屬複合板與蜂巢板基線
 
 本頁整理 aluminum composite material（ACM/MCM）、aluminum honeycomb panel 與其他 sandwich panel 在建築外殼工程中的基本判斷架構。
 
@@ -86,14 +86,14 @@ ASTM 自身明確說明 E84：
 - water-management details
 - warranty / fabrication limitations
 
-## Do not assume
+## 不可推論事項
 
 - `蜂巢板較厚 = 一定較強` 不成立。
 - `peel strength 合格 = panel wind-load capacity 合格` 不成立。
 - `E84 Class A = noncombustible` 不成立。
 - `某產品有 NFPA 285 report = 任意外牆組合皆 covered` 不成立。
 
-## Primary sources
+## 主要來源
 
 - ASTM C393/C393M-20: https://store.astm.org/c0393_c0393m-20.html
 - ASTM C365/C365M-22: https://store.astm.org/c0365_c0365m-22.html

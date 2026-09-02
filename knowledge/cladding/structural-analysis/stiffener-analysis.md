@@ -1,11 +1,11 @@
 ---
-title: "金屬面板補強料結構分析方法"
+title: "補強材結構分析"
 verification_status: "HIGH_CONFIDENCE"
 verified_at: "2026-09-02"
 canonical_owner: true
 ---
 
-# 金屬面板補強料結構分析方法
+# 補強材結構分析
 
 ## 角色
 
@@ -81,7 +81,7 @@ Stiffener 的 end condition 對效果很敏感：
 
 若需要精確 reaction，應由 plate/shell model 或經驗證 analytical model取得。
 
-## AI guard
+## AI 防呆
 
 不得：
 
@@ -91,7 +91,7 @@ Stiffener 的 end condition 對效果很敏感：
 - 把 free-ended stiffener 當 fixed-ended
 - 只驗證 stiffener stress，不驗證 connector / panel local response
 
-## Related
+## 相關頁面
 
 - [Metal Panel Analysis](metal-panel-analysis.md)
 - [Panel-to-Stiffener Connection](panel-to-stiffener-connection.md)

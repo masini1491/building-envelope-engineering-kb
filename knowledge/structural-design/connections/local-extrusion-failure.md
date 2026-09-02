@@ -146,7 +146,7 @@ canonical_owner: true
 
 應路由至適用的 Aluminum Design Manual / AWS aluminum welding design basis，再依 weld location 與 heat-affected zone 評估。
 
-## Recommended output
+## 建議輸出
 
 局部 connection calculation 至少記錄：
 
@@ -161,7 +161,7 @@ canonical_owner: true
 9. utilization ratio
 10. adjacent failure modes not yet checked
 
-## AI guard
+## AI 防呆
 
 AI 不得：
 
@@ -172,7 +172,7 @@ AI 不得：
 - 把 nominal extrusion wall thickness 當成所有 critical section 的實際有效厚度
 - 在焊接附近忽略 HAZ effect
 
-## Routing
+## 相關頁面與 routing
 
 - global framing：`../framing/mullion-transom-design-baseline.md`
 - fastener group：`fastener-group-analysis.md`

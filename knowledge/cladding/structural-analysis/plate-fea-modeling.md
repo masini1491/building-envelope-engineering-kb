@@ -1,11 +1,11 @@
 ---
-title: "Plate / Shell FEA 建模與結果判讀"
+title: "板件有限元素分析建模方法"
 verification_status: "HIGH_CONFIDENCE"
 verified_at: "2026-09-02"
 canonical_owner: true
 ---
 
-# Plate / Shell FEA 建模與結果判讀
+# 板件有限元素分析建模方法
 
 ## 目的
 
@@ -47,7 +47,7 @@ canonical_owner: true
 - support line / point
 - connector representation
 
-### Loads
+### 荷載
 
 - pressure magnitude and sign
 - load case source
@@ -157,7 +157,7 @@ FEA 不只應讀 panel stress；還應輸出：
 13. assumptions / exclusions
 14. acceptance criterion source
 
-## AI guard
+## AI 防呆
 
 不得：
 
@@ -168,7 +168,7 @@ FEA 不只應讀 panel stress；還應輸出：
 - 忽略 connector / interface stiffness
 - 因 solver 顯示 PASS 就省略 criterion provenance
 
-## Related
+## 相關頁面
 
 - [Metal Panel Analysis](metal-panel-analysis.md)
 - [Stiffener Analysis](stiffener-analysis.md)

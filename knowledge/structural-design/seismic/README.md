@@ -9,7 +9,7 @@ canonical_owner: true
 
 本目錄整理台灣建築外牆／帷幕系統作為附屬於建築物之部分構體、非結構構材與其接合系統時的地震設計 routing。
 
-## Current authority baseline
+## 現行權威來源基線
 
 截至 2026-09-02，內政部國土管理署《建築物耐震設計規範及解說》總頁列示：
 
@@ -50,7 +50,7 @@ canonical_owner: true
 
 **Force PASS 不代表 movement PASS；movement compatible 也不代表 attachment strength 已完成。**
 
-## Chapter 4 structural principle
+## 第四章結構原則
 
 第四章要求固定於建築物的部分構體、永久性非結構構材及其附件依規定地震力設計；其中附件包含 anchorage 與所需支撐。
 
@@ -61,7 +61,7 @@ canonical_owner: true
 
 因此 curtain-wall seismic check 的 load path 不應停在 façade member 本體。
 
-## External wall categories are not identical
+## 外牆分類不可視為相同
 
 現行官方第四章表 4-1 對「外部非結構牆及其接合」至少分成：
 
@@ -77,7 +77,7 @@ canonical_owner: true
 
 而應保存**component category + coefficient source + edition**。
 
-## Routing
+## 相關頁面與 routing
 
 - [Taiwan Façade Component Seismic Force](taiwan-facade-component-seismic-force.md)
 - [Seismic Connection Load Path](seismic-connection-load-path.md)
@@ -87,7 +87,7 @@ canonical_owner: true
 - [Splice / Sleeve Modeling](../framing/splice-and-sleeve-modeling.md)
 - [Glass-edge Relative Deflection](../framing/glass-edge-relative-deflection.md)
 
-## Do not assume
+## 不可推論事項
 
 - 不得從舊案直接複製 `SDS / Ip / ap / Rp`。
 - 不得把外牆本體、panel connection、anchor / fixing 使用同一組係數。
@@ -95,7 +95,7 @@ canonical_owner: true
 - 不得只做 strength check 而漏掉 inter-story movement compatibility。
 - 不得把美國 ASCE 7 component coefficient 直接當台灣法規值。
 
-## Primary source
+## 主要來源
 
 - 內政部國土管理署｜建築物耐震設計規範及解說：https://www.nlma.gov.tw/ch/legislation/regsearch/175
 - 官方第四章 PDF：https://www.nlma.gov.tw/filesys/file/chinese/publication/law/law2/111061504.pdf

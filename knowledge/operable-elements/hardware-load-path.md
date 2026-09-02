@@ -29,7 +29,7 @@ Hinge、friction stay、pivot、lock、keeper、restrictor、stopper 等 operabl
 
 每一層都應有獨立 verification。
 
-## Hardware reactions
+## 五金反力
 
 Hardware reaction distribution 受下列因素影響：
 
@@ -46,7 +46,7 @@ Hardware reaction distribution 受下列因素影響：
 
 `total force / number of hardware points`
 
-## Dead-load path
+## 自重荷載路徑
 
 玻璃與 sash 自重通常形成持續作用，常由 hinge / pivot / lower support 等主要承受。
 
@@ -59,7 +59,7 @@ Hardware reaction distribution 受下列因素影響：
 
 同一個 hardware point 可能同時承担多種 action，但不能因數量相同就假設 load share 相同。
 
-## Wind-load path
+## 風荷載路徑
 
 正、負風壓可能造成：
 
@@ -71,7 +71,7 @@ Hardware reaction distribution 受下列因素影響：
 
 因此 positive / negative case 應保留，不宜過早只取 absolute maximum。
 
-## Eccentricity
+## 偏心
 
 五金本體通常與 sash / outer frame 的 centroidal load path 有偏心。可能需要考慮：
 
@@ -82,7 +82,7 @@ Hardware reaction distribution 受下列因素影響：
 
 這些 demand 應再路由至 fastener-group 與 local-extrusion analysis。
 
-## Product rating vs installed demand
+## 產品額定值與安裝需求
 
 Manufacturer catalogue / hardware rating 若存在，仍須確認：
 
@@ -97,7 +97,7 @@ Manufacturer catalogue / hardware rating 若存在，仍須確認：
 
 不可只看單一 catalogue load 就宣告整個 connection PASS。
 
-## Recommended calculation output
+## 建議計算輸出
 
 至少保存：
 
@@ -112,7 +112,7 @@ Manufacturer catalogue / hardware rating 若存在，仍須確認：
 9. assumptions / limitations
 10. governing case
 
-## AI guard
+## AI 防呆
 
 不得：
 
@@ -123,7 +123,7 @@ Manufacturer catalogue / hardware rating 若存在，仍須確認：
 - 忽略 sash dead-load eccentricity
 - 將某一 proprietary hardware arrangement 泛化為所有 opening types
 
-## Related
+## 相關頁面
 
 - [Sash / Frame Structural Analysis](sash-frame-analysis.md)
 - [Hinge / Lock / Stay Connections](hinge-lock-stay-connections.md)

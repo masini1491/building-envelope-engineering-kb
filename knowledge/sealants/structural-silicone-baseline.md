@@ -9,7 +9,7 @@ canonical_owner: true
 
 本頁整理 structural sealant glazing（SSG）常見 ASTM 標準與工程分工，避免 AI 把「材料產品規格」「設計指引」「黏著／相容性試驗」「施工品質」混成同一要求。
 
-## Core standards
+## 核心標準
 
 - **ASTM C1184-23** — Standard Specification for Structural Silicone Sealants
   - 結構用矽利康 sealant 的材料規格。
@@ -23,7 +23,7 @@ canonical_owner: true
   - Structural sealant tensile adhesion 性能試驗方法。
   - 試驗結果不能單獨取代 project-specific adhesion / compatibility verification。
 
-## Project-specific verification
+## 專案特定驗證
 
 SSG 專案至少應區分：
 
@@ -37,18 +37,18 @@ SSG 專案至少應區分：
 8. shop / field QA and cure conditions
 9. manufacturer project review / warranty requirements（若契約要求）
 
-## Design guard
+## 設計防呆
 
 - 不得只用 `C1184 compliant` 推定某個 bite 尺寸足夠。
 - 不得自行假設所有 silicone 的 allowable design stress 相同。
 - 不得自行把某品牌 guideline 數值套到另一品牌或另一 substrate。
 - structural silicone 與 weatherseal silicone 的功能與設計責任應分開。
 
-## Compatibility / staining / accessory notes
+## 相容性／污染／配件注意事項
 
 實際專案常需要另外確認 gasket、setting block、spacer、backer rod、coating 等與 sealant 的 compatibility；若涉及 porous substrate staining，也可能需要其他 ASTM test method。此類要求應建立專案／廠商特定 verification，不應由 AI 猜測。
 
-## Primary sources
+## 主要來源
 
 - ASTM C1184-23: https://store.astm.org/c1184-23.html
 - ASTM C1401-23: https://store.astm.org/c1401-23.html

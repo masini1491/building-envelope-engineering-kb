@@ -21,7 +21,7 @@ canonical_owner: true
 - sealant / gasket durability
 - maintenance access and replacement
 
-## Performance testing routing
+## 性能試驗 routing
 
 可依系統與專案規範使用 ASTM / AAMA-FGIA 的 air, water, structural test families，例如：
 
@@ -34,7 +34,7 @@ canonical_owner: true
 
 是否適用到特定 skylight / roof-glazing system，仍須依該標準 scope 與專案規範確認。
 
-## Glass design
+## 玻璃設計
 
 玻璃產品規格與結構承載分開處理：
 
@@ -48,7 +48,7 @@ canonical_owner: true
 - ponding / snow / maintenance load（若專案適用）
 - glass edge condition and setting
 
-## Water-management principles
+## 水管理原則
 
 採光罩的水密不應只依賴外側一道 sealant。系統設計應先確認：
 
@@ -61,17 +61,17 @@ canonical_owner: true
 7. sealant joint geometry
 8. field access for repair
 
-## Mock-up / field-test note
+## Mock-up／現場試驗注意事項
 
 斜面玻璃的 corner、ridge、valley、gutter、splice 與 wall-to-skylight transition 往往是高風險位置。大型或非典型系統宜將這些 junction 納入 mock-up / field water verification，而不是只測標準直線區段。
 
-## Do not assume
+## 不可推論事項
 
 - `垂直 curtain wall 水密 PASS = skylight 水密 PASS` 不成立。
 - `外側 sealant 完整 = 無需 secondary drainage` 不成立。
 - `glass product standard compliant = overhead glazing structural/safety requirement completed` 不成立。
 
-## Sources
+## 來源
 
 - FGIA AAMA 501.2 / 503 store pages: https://store.fgiaonline.org/
 - ASTM building / fenestration standards: https://store.astm.org/

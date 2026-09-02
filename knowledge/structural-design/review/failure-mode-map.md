@@ -1,15 +1,15 @@
 ---
-title: "Façade Structural Failure-Mode Map"
+title: "建築外殼結構破壞模式圖（Failure-Mode Map）"
 verification_status: "HIGH_CONFIDENCE"
 verified_at: "2026-09-02"
 canonical_owner: true
 ---
 
-# Façade Structural Failure-Mode Map
+# 建築外殼結構破壞模式圖（Failure-Mode Map）
 
 本頁把 building-envelope structural design 視為一條由 load source 到 primary structure 的 failure-mode chain。
 
-## Top-level load path
+## 頂層荷載路徑
 
 ```text
 Environmental / imposed action
@@ -29,9 +29,9 @@ Primary building structure
 
 任一箭頭都代表 load-transfer assumption；任一 box 都可能有自己的 failure modes。
 
-## Failure-mode families
+## 破壞模式族群
 
-### A. Load-definition failure
+### A. 荷載定義失敗
 
 - wrong design pressure
 - positive / negative case omitted
@@ -39,7 +39,7 @@ Primary building structure
 - missing dead / seismic / movement / concentrated load
 - unsupported factor / criterion
 
-### B. Load-transfer failure
+### B. 荷載傳遞失敗
 
 - wrong tributary area / width
 - concentrated load incorrectly smeared
@@ -47,7 +47,7 @@ Primary building structure
 - component force not transferred into connections
 - eccentricity ignored
 
-### C. Global framing failure
+### C. 整體 framing 失敗
 
 - flexural yielding / allowable overstress
 - excessive deflection
@@ -58,7 +58,7 @@ Primary building structure
 - splice / sleeve mechanics wrong
 - composite action assumed without evidence
 
-### D. Glass / glazing failure
+### D. 玻璃／glazing 失敗
 
 - glass strength / load resistance
 - excessive deflection
@@ -68,7 +68,7 @@ Primary building structure
 - structural silicone demand / adhesion / compatibility
 - post-breakage / redundancy gap
 
-### E. Connection failure
+### E. 連接失敗
 
 - fastener tension / shear
 - fastener interaction
@@ -80,7 +80,7 @@ Primary building structure
 - bracket local bending
 - prying / stand-off eccentricity
 
-### F. Welded-connection failure
+### F. 焊接連接失敗
 
 - weld-group demand
 - effective throat / length error
@@ -89,7 +89,7 @@ Primary building structure
 - base-metal / HAZ failure
 - connected plate / angle / bracket failure
 
-### G. Anchor / substrate failure
+### G. 錨栓／基材失敗
 
 - anchor steel failure
 - concrete breakout / pullout / pryout where applicable
@@ -97,7 +97,7 @@ Primary building structure
 - wrong anchor category / evaluation basis
 - primary-structure interface not verified
 
-### H. Metal-panel / stiffener failure
+### H. 金屬面板／補強材失敗
 
 - panel skin stress / deflection
 - local fold / return failure
@@ -106,7 +106,7 @@ Primary building structure
 - perimeter attachment failure
 - FEA boundary / mesh / singularity interpretation error
 
-### I. Operable-element failure
+### I. 可開啟構件失敗
 
 - sash / vent frame bending / racking
 - hinge / stay / lock reaction overload
@@ -116,7 +116,7 @@ Primary building structure
 - loss of operability after loading
 - life-cycle / repeated-operation deterioration
 
-### J. Movement-compatibility failure
+### J. 位移相容性失敗
 
 - inter-story drift incompatibility
 - thermal movement restraint
@@ -126,7 +126,7 @@ Primary building structure
 - glass edge collision
 - sealant / gasket movement exceedance
 
-### K. Verification / evidence failure
+### K. 驗證／證據失敗
 
 - outdated standard edition
 - wrong standard scope
@@ -135,7 +135,7 @@ Primary building structure
 - unsupported PASS
 - missing calculation trace
 
-## Cascade concept
+## 連鎖失效概念
 
 Façade failure modes often cascade rather than occur independently.
 
@@ -169,7 +169,7 @@ member strength may PASS while glazing compatibility FAILS
 
 因此「一個假設只影響一個公式」通常不是安全假設。
 
-## Review question set
+## 審查問題集
 
 對任何 system / component，至少問：
 
@@ -184,7 +184,7 @@ member strength may PASS while glazing compatibility FAILS
 9. **Which standard / test covers each check?**
 10. **What has not yet been checked?**
 
-## Relation to canonical pages
+## 與 canonical 頁面的關係
 
 - load generation → `../load-generation/`
 - framing → `../framing/`

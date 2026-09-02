@@ -1,11 +1,11 @@
 ---
-title: "帷幕牆耐震連接 Load Path"
+title: "耐震連接荷載路徑"
 verification_status: "HIGH_CONFIDENCE"
 verified_at: "2026-09-02"
 canonical_owner: true
 ---
 
-# 帷幕牆耐震連接 Load Path
+# 耐震連接荷載路徑
 
 ## 核心概念
 
@@ -30,7 +30,7 @@ canonical_owner: true
 
 作為所有 fastener demand。
 
-## Eccentricity
+## 偏心
 
 典型 curtain-wall seismic connection 可能存在：
 
@@ -51,7 +51,7 @@ canonical_owner: true
 - connection / fixing 可能需要依其 own category 重新取得 governing coefficient；
 - 不得只把 panel force機械平均給 anchor。
 
-## Failure-mode checklist
+## 破壞模式檢核表
 
 至少考慮：
 
@@ -97,7 +97,7 @@ Routing：
 9. governing ratio / status
 10. missing data
 
-## Do not assume
+## 不可推論事項
 
 - seismic connection = wind connection with different load scalar
 - bolt count alone defines load sharing

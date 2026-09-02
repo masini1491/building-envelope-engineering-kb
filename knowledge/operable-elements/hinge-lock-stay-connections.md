@@ -1,17 +1,17 @@
 ---
-title: "Hinge / Lock / Stay 連接設計方法"
+title: "活動窗 Hinge／Lock／Stay 連接設計方法"
 verification_status: "HIGH_CONFIDENCE"
 verified_at: "2026-09-02"
 canonical_owner: true
 ---
 
-# Hinge / Lock / Stay 連接設計方法
+# 活動窗 Hinge／Lock／Stay 連接設計方法
 
 ## 角色
 
 活動窗五金連接通常同時包含 hardware body、multiple screws / bolts、薄壁鋁擠型、局部 reinforcement 與 eccentric load。不能只以單支螺絲 capacity 或螺絲數量作完整判定。
 
-## Connection decomposition
+## 連接拆解
 
 對每個五金節點至少拆成：
 
@@ -23,7 +23,7 @@ canonical_owner: true
 6. reinforcement / backing plate（若有）
 7. load transfer into sash / outer frame
 
-## Fastener-group analysis
+## 緊件群分析
 
 若 hardware 以多支 screw / bolt 固定，且 force 不通過 group centroid，應依 [fastener-group-analysis](../structural-design/connections/fastener-group-analysis.md) 建立：
 
@@ -35,7 +35,7 @@ canonical_owner: true
 
 不得無條件採 `total force / fastener count`。
 
-## Pull-out / thread engagement
+## 抗拔／螺紋咬合
 
 薄壁 aluminum extrusion 常可能由 connected material 先 governing，而不是 fastener shank。
 
@@ -51,7 +51,7 @@ canonical_owner: true
 
 詳見 [screw-pullout-and-thread-engagement](../structural-design/connections/screw-pullout-and-thread-engagement.md)。
 
-## Local extrusion behavior
+## 鋁擠型局部行為
 
 Hardware load 可能使 extrusion 發生：
 
@@ -63,7 +63,7 @@ Hardware load 可能使 extrusion 發生：
 
 若有 reinforcement，必須確認 reinforcement 自身以及 reinforcement-to-extrusion 的 load path；「有加鐵片／補強料」不等於已自動形成完整 composite section。
 
-## Hinge-specific notes
+## 鉸鏈特定注意事項
 
 Hinge / pivot 可能同時承受：
 
@@ -74,7 +74,7 @@ Hinge / pivot 可能同時承受：
 
 上下 hinge / pivot 的作用不必相同；實際分配須由 geometry / stiffness / hardware mechanism 決定。
 
-## Lock / keeper-specific notes
+## 鎖點／keeper 特定注意事項
 
 Locking points 主要可能承擔 wind restraint 與 sash sealing / closing function。應確認：
 
@@ -86,7 +86,7 @@ Locking points 主要可能承擔 wind restraint 與 sash sealing / closing func
 
 `lock connection strength PASS` 仍不等於 closing / sealing function 已驗證。
 
-## Friction stay / restrictor-specific notes
+## Friction stay／restrictor 特定注意事項
 
 Friction stay / restrictor 除 pressure reaction 外還可能有：
 
@@ -98,7 +98,7 @@ Friction stay / restrictor 除 pressure reaction 外還可能有：
 
 靜態強度計算不能替代 durability / life-cycle performance testing。
 
-## Hardware modification guard
+## 五金修改防呆
 
 若修改：
 
@@ -112,7 +112,7 @@ Friction stay / restrictor 除 pressure reaction 外還可能有：
 
 原有 test / rating 的適用性必須重新確認。
 
-## AI guard
+## AI 防呆
 
 不得：
 
@@ -123,7 +123,7 @@ Friction stay / restrictor 除 pressure reaction 外還可能有：
 - 忽略 fastener eccentricity
 - 把一次 static calculation 當作 life-cycle durability
 
-## Public-source routing
+## 公開來源 routing
 
 - AAMA/WDMA/CSA 101/I.S.2/A440-26 (NAFS)
 - AAMA 910-24

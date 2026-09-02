@@ -1,11 +1,11 @@
 ---
-title: "玻璃邊緣相對變形與 Framing Compatibility"
+title: "玻璃邊緣相對變形與 framing 相容性"
 verification_status: "HIGH_CONFIDENCE"
 verified_at: "2026-09-02"
 canonical_owner: true
 ---
 
-# 玻璃邊緣相對變形與 Framing Compatibility
+# 玻璃邊緣相對變形與 framing 相容性
 
 ## 核心概念
 
@@ -13,7 +13,7 @@ canonical_owner: true
 
 例如同一片玻璃上下邊或左右邊所接觸的 framing 若產生不同 displacement，玻璃 edge clearance、gasket、setting block、structural silicone 或 pressure plate 可能承受額外 movement demand。
 
-## Relative displacement
+## 相對位移
 
 若 glass edge 上兩個支承位置的 framing displacement 分別為：
 
@@ -26,13 +26,13 @@ canonical_owner: true
 
 對多點／連續支承，應沿 glass edge 檢查 displacement profile，而不是只比較兩個端點。
 
-## Why maximum mullion deflection is not enough
+## 為何只看直料最大撓度不足
 
 假設整支 mullion 以接近 rigid-body translation 的方式移動，即使 absolute deflection 很大，glass edge relative distortion 可能仍小。
 
 反過來，即使 global maximum deflection 不大，如果 glass top / bottom / center support 的位移差很大，局部 edge compatibility 仍可能控制。
 
-## Recommended workflow
+## 建議流程
 
 1. 建立 framing analysis model。
 2. 找出實際 glass-supported edge / contact locations。
@@ -47,7 +47,7 @@ canonical_owner: true
    比較。
 6. 保留 governing load case 與 sign / direction。
 
-## Direction matters
+## 方向很重要
 
 至少區分：
 
@@ -58,11 +58,11 @@ canonical_owner: true
 
 不同方向控制不同 failure mode，不能只取一個三維 resultant 後與所有 criterion 比較。
 
-## Glass support assumption
+## 玻璃支承假設
 
 ASTM E1300-24 的玻璃 load-resistance framework 假設支承邊具有足夠剛度，但這不代表 framing serviceability 自動滿足 glass-edge compatibility。玻璃結構檢核與 framing relative-displacement check 應分開。
 
-## Criterion guard
+## 判定基準防呆
 
 公開 KB 不保存「固定為 glass bite 某百分比」之類未確認通用性的數值。
 
@@ -72,14 +72,14 @@ ASTM E1300-24 的玻璃 load-resistance framework 假設支承邊具有足夠剛
 
 `INCOMPLETE — relative displacement computed, acceptance criterion not verified`
 
-## Do not assume
+## 不可推論事項
 
 - 不得用 mullion maximum deflection 直接代表 glass edge demand。
 - 不得把某一專案使用過的 bite percentage 泛化成 universal rule。
 - 不得忽略正／負風壓可能造成的不同 contact state。
 - 不得把三維 resultant displacement 當成所有 glazing interface 的唯一 demand。
 
-## Routing
+## 相關頁面與 routing
 
 - [ASTM E1300 Glass Load-Resistance Routing](../../glazing/ASTM-E1300-design-routing.md)
 - [Biaxial Bending and Resultant Deflection](biaxial-bending-and-resultant-deflection.md)

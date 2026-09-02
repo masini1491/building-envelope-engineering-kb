@@ -72,14 +72,14 @@ MCA 指出 oil canning 的可見程度會受觀看角度、日照角度與反射
 
 不要在完工後才用未事先定義的主觀標準判退。
 
-## Do not assume
+## 不可推論事項
 
 - 不要把 `H14 > H12` 的硬化程度排序直接等同於 flatness 排序。
 - 不要把 material standard 的原板 tolerance 當成已保證完成盒板外觀。
 - 不要把 tensile / yield strength 合格當成 oil canning 已被控制。
 - 不要在沒有專案定義的情況下自行發明完成面容許波幅。
 
-## Sources
+## 來源
 
 - Metal Construction Association, `Oil Canning in Metal Roof and Metal Wall Systems`: https://www.metalconstruction.org/index.php/online-education/oil-canning-in-metal-roof-and-metal-wall-systems
 - MCA, `Visual Acceptance for Single Skin Architectural Metal Wall Panels`: https://www.metalconstruction.org/view/download.php/online-education/education-materials/walls-educational-files/materials/visual-acceptance-for-single-skin-architectural-metal-wall-panels

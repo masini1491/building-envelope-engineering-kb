@@ -9,7 +9,7 @@ canonical_owner: true
 
 本頁整理建築外殼常見平板玻璃的 ASTM governing standards。用途是讓 AI 先判斷「玻璃產品規格」與「結構耐風設計」分屬不同標準，不直接用產品標準推算承載力。
 
-## Core standards
+## 核心標準
 
 - **ASTM C1036-25** — Standard Specification for Flat Glass
   - 基礎平板玻璃品質規格。
@@ -51,14 +51,14 @@ canonical_owner: true
 - 玻璃「符合產品規格」不代表建築師在任何視角下都不會看到 roller wave、anisotropy、bow / warp、coating nonuniformity 或 laminated optical effects。
 - 外觀接受標準若是專案重要要求，應在 mock-up / visual acceptance criteria 階段明確處理。
 
-## Do not assume
+## 不可推論事項
 
 - `tempered = exactly 4× annealed strength` 不得當成通用設計規則。
 - `laminated = two plies simply add thickness` 不得直接作為結構算法。
 - `C1048 compliant = E1300 PASS` 不成立。
 - 不得從標稱厚度自行猜 load resistance。
 
-## Primary sources
+## 主要來源
 
 - ASTM C1036-25: https://store.astm.org/c1036-25.html
 - ASTM C1048-25: https://store.astm.org/c1048-25.html

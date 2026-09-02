@@ -1,15 +1,15 @@
 ---
-title: "Structural Calculation Coverage / Completeness Status"
+title: "結構計算涵蓋範圍／完整性狀態"
 verification_status: "HIGH_CONFIDENCE"
 verified_at: "2026-09-02"
 canonical_owner: true
 ---
 
-# Structural Calculation Coverage / Completeness Status
+# 結構計算涵蓋範圍／完整性狀態
 
 本頁定義 structural review 的狀態語意，避免 `PASS` 被錯用成「整套系統已完成」。
 
-## Recommended statuses
+## 建議狀態
 
 - `PASS`：該**明確 scope** 的 demand / criterion 已有 traceable evidence，且結果符合要求。
 - `WARNING`：結果可用，但存在需揭露的假設、敏感性、版本或適用範圍限制。
@@ -17,7 +17,7 @@ canonical_owner: true
 - `INCOMPLETE`：缺少必要 input、criterion、model、capacity source 或 failure-mode check，無法完成判定。
 - `NOT_APPLICABLE`：有工程理由可說明該 failure mode 對本 system / load case 不適用。
 
-## Scope is mandatory
+## 必須明確定義範圍
 
 不可只寫：
 
@@ -31,7 +31,7 @@ canonical_owner: true
 - `thread_pullout: INCOMPLETE`
 - `seismic_story_drift_compatibility: NOT_APPLICABLE`（需附理由）
 
-## Overall status logic
+## 整體狀態邏輯
 
 建議 future calculator / AI review 使用保守的 aggregation：
 
@@ -42,7 +42,7 @@ canonical_owner: true
 
 這個 aggregation 不代表 governing code 的法律判定，而是 calculation-package completeness 的資訊模型。
 
-## Required evidence fields
+## 必要證據欄位
 
 每個 coverage item 建議至少保存：
 
@@ -60,7 +60,7 @@ missing_inputs: []
 notes: ...
 ```
 
-## `NOT_APPLICABLE` guard
+## `NOT_APPLICABLE` 防呆
 
 `NOT_APPLICABLE` 不能用來跳過不想算的項目。
 
@@ -72,7 +72,7 @@ notes: ...
 
 例如「沒有 weld」可以使 weld-group check `NOT_APPLICABLE`；但「目前沒有 weld capacity data」應是 `INCOMPLETE`，不是 N/A。
 
-## `WARNING` guard
+## `WARNING` 防呆
 
 適合 `WARNING` 的情形可能包括：
 
@@ -83,7 +83,7 @@ notes: ...
 
 若 uncertainty 足以改變 PASS / FAIL，應提升為 `INCOMPLETE`，不能只放 warning。
 
-## Coverage matrix
+## Coverage 矩陣
 
 系統級 review 建議至少有：
 
@@ -96,7 +96,7 @@ notes: ...
 | Connection | pull-out | yes/no | ... | ... | ... | ... |
 | Movement | story drift | yes/no | ... | ... | ... | ... |
 
-## Calculation package complete
+## 計算套件完整性
 
 只有當：
 

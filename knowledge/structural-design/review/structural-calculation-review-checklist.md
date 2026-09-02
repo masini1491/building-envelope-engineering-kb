@@ -1,11 +1,11 @@
 ---
-title: "帷幕牆結構計算審查 Checklist"
+title: "結構計算審查檢核表"
 verification_status: "HIGH_CONFIDENCE"
 verified_at: "2026-09-02"
 canonical_owner: true
 ---
 
-# 帷幕牆結構計算審查 Checklist
+# 結構計算審查檢核表
 
 本 checklist 用於工程計算書、AI 輸出或 future calculator 的 completeness review。
 

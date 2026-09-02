@@ -1,13 +1,13 @@
 ---
-title: "金屬面板結構分析方法"
+title: "金屬面板結構分析"
 verification_status: "HIGH_CONFIDENCE"
 verified_at: "2026-09-02"
 canonical_owner: true
 ---
 
-# 金屬面板結構分析方法
+# 金屬面板結構分析
 
-## Scope
+## 適用範圍
 
 本頁處理 solid metal sheet / plate、折盒板與具周邊折邊之 façade panel 的結構分析。複合板、蜂巢板另需依其 sandwich construction 與產品資料處理。
 
@@ -100,7 +100,7 @@ FEA 在以下位置常出現局部 peak：
 
 結構分析中的 elastic deflection 不等於完成面 oil canning prediction。完成面視覺仍受 residual stress、leveling、fabrication、thermal cycle、installation restraint 等影響。
 
-## AI guard
+## AI 防呆
 
 AI 不得：
 
@@ -111,7 +111,7 @@ AI 不得：
 - 把 linear static analysis 當成已驗證 buckling / post-buckling
 - 將非公開專案的實際 panel geometry 寫進 public KB
 
-## Related
+## 相關頁面
 
 - [Stiffener Analysis](stiffener-analysis.md)
 - [Panel-to-Stiffener Connection](panel-to-stiffener-connection.md)

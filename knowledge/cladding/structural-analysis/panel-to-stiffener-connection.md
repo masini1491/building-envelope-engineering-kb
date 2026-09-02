@@ -1,11 +1,11 @@
 ---
-title: "面板與補強料連接設計方法"
+title: "面板與補強材連接分析"
 verification_status: "HIGH_CONFIDENCE"
 verified_at: "2026-09-02"
 canonical_owner: true
 ---
 
-# 面板與補強料連接設計方法
+# 面板與補強材連接分析
 
 ## 角色
 
@@ -101,7 +101,7 @@ Spacing 同時影響：
 
 但模型選擇必須有來源。`tied` 只是 solver option，不是 engineering evidence。
 
-## AI guard
+## AI 防呆
 
 不得：
 
@@ -111,7 +111,7 @@ Spacing 同時影響：
 - 把 adhesive short-term coupon strength 當 long-term façade design strength
 - 把 connector spacing 從非公開專案照搬成通用 spacing
 
-## Related
+## 相關頁面
 
 - [Fastener Group Analysis](../../structural-design/connections/fastener-group-analysis.md)
 - [Screw Pull-out and Thread Engagement](../../structural-design/connections/screw-pullout-and-thread-engagement.md)

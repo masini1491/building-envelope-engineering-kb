@@ -1,11 +1,11 @@
 ---
-title: "ASTM 熱浸鍍鋅規範家族（A123 / A153 / A384 / A385 / A780）"
+title: "熱浸鍍鋅 ASTM 標準族群"
 verification_status: "VERIFIED_PRIMARY"
 verified_at: "2026-09-02"
 canonical_owner: true
 ---
 
-# ASTM 熱浸鍍鋅規範家族
+# 熱浸鍍鋅 ASTM 標準族群
 
 建築外殼鐵件若只寫「ASTM A123 熱浸鍍鋅」通常不足以涵蓋設計、製造、五金、變形控制與現場修補。建議把下列標準視為一個互補 family。
 
@@ -49,7 +49,7 @@ canonical_owner: true
 - 運輸／吊裝碰傷
 - erection damage
 
-## Engineering notes
+## 工程備註
 
 - 「熱浸鍍鋅」不是只有最終鍍層厚度問題；構件幾何、焊接、排氣／排液、變形與現場修補都會影響品質。
 - 專案圖說若只標 A123，仍應檢查 fastener/hardware 是否需要 A153，以及焊後／切割後 repair 是否需 A780。
@@ -64,7 +64,7 @@ canonical_owner: true
 
 **本頁僅建立 related cross-reference，不宣稱 CNS 與 ASTM A123 family 完全等價。** 後續應獨立建立 CNS 頁面並逐項比較 scope、分類與驗收要求。
 
-## Primary sources
+## 主要來源
 
 - ASTM A123/A123M-24: https://store.astm.org/a0123_a0123m-24.html
 - ASTM A384/A384M-24: https://store.astm.org/a0384_a0384m-24.html

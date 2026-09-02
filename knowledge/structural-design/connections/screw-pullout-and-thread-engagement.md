@@ -62,7 +62,7 @@ Screw pull-out / thread stripping 通常受到下列因素影響：
 
 若 screw 位於偏心 fastener group，pull-out demand 不得直接取 `total tension / number of screws`；應先依 [Fastener Group Analysis](fastener-group-analysis.md) 求每一支 screw 的 actual tension / shear demand，再進入 pull-out check。
 
-## AAMA TIR-A9 routing
+## AAMA TIR-A9 標準 routing
 
 FGIA 目前將 **AAMA TIR-A9-14, Design Guide for Metal Cladding Fasteners** 列為 Active，並包含後續 errata / addendum。舊工程計算中可能出現 TIR-A9-1991 / 2000 表格或公式，但 public KB 不應直接把舊版表格當 current canonical values。
 
@@ -73,11 +73,11 @@ FGIA 目前將 **AAMA TIR-A9-14, Design Guide for Metal Cladding Fasteners** 列
 - 確認 connected material applicability
 - 不重製受版權保護的完整表格
 
-## Safety-factor guard
+## 安全係數防呆
 
 若歷史計算書曾使用固定 `SF = x`，不能因此寫入 public KB 作為 universal safety factor。Safety / resistance treatment 必須由採用的 design standard、manufacturer engineering basis 或 project specification 提供。
 
-## Do not assume
+## 不可推論事項
 
 - `A2-70` 不等於已知 pull-out capacity。
 - thread engagement 越長不代表 capacity 可無限制線性增加。
@@ -85,14 +85,14 @@ FGIA 目前將 **AAMA TIR-A9-14, Design Guide for Metal Cladding Fasteners** 列
 - screw tension PASS 不代表 parent material threads PASS。
 - 舊 TIR-A9 表格值不可在未確認 current applicability 下直接複製。
 
-## Related failure modes
+## 相關破壞模式
 
 - [Fastener Group Analysis](fastener-group-analysis.md)
 - [Local Extrusion Failure](local-extrusion-failure.md)
 - [Load Path and Anchor Reactions](load-path-and-anchor-reactions.md)
 - stainless fastener property-class routing under `knowledge/fasteners/`
 
-## Public-source routing
+## 公開來源 routing
 
 - FGIA / AAMA TIR-A9-14 — Design Guide for Metal Cladding Fasteners（current store listing；版本使用前重新確認）。
 - The Aluminum Association — Aluminum Design Manual（parent aluminum member / connection design routing）。

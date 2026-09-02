@@ -1,11 +1,11 @@
 ---
-title: "帷幕牆耐震位移相容性"
+title: "耐震位移相容性"
 verification_status: "HIGH_CONFIDENCE"
 verified_at: "2026-09-02"
 canonical_owner: true
 ---
 
-# 帷幕牆耐震位移相容性
+# 耐震位移相容性
 
 ## 核心概念
 
@@ -87,7 +87,7 @@ Inter-story movement performance 可與 applicable laboratory / mock-up standard
 
 但 test specimen PASS 不代表所有不同 geometry / anchor / panel size 的 façade location automatically covered；必須確認 representation。
 
-## Do not assume
+## 不可推論事項
 
 - `story drift ratio × story height` 永遠就是 façade joint demand
 - 有 slotted hole 就等於可滑動到 slot 全長

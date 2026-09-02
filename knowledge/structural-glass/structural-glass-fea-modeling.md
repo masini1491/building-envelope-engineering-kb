@@ -1,17 +1,17 @@
 ---
-title: "結構玻璃有限元素分析 Modeling Guard"
+title: "結構玻璃有限元素分析建模防呆"
 verification_status: "HIGH_CONFIDENCE"
 verified_at: "2026-09-02"
 canonical_owner: true
 ---
 
-# 結構玻璃有限元素分析 Modeling Guard
+# 結構玻璃有限元素分析建模防呆
 
-## Scope
+## 適用範圍
 
 本頁提供 structural glass 使用 FEA 時的最低建模檢查項目，避免 AI 或工程師把漂亮的 contour plot 當成模型已被驗證。
 
-## Model definition
+## 模型定義
 
 建模前明確定義：
 
@@ -23,7 +23,7 @@ canonical_owner: true
 - contact / bearing 是否需要
 - load cases / combinations / imposed movements
 
-## Verification hierarchy
+## 驗證層級
 
 至少做：
 
@@ -36,7 +36,7 @@ canonical_owner: true
 7. comparison with applicable standard / public technical method
 8. test correlation when the behavior falls outside standard scope
 
-## Global vs local model
+## 全域模型與局部模型
 
 大型 glass fin / façade model可用 global model取得：
 
@@ -49,7 +49,7 @@ canonical_owner: true
 
 不得直接用 coarse global shell / frame model 的 nominal stress 取代孔邊局部 principal stress。
 
-## Linear-model guard
+## 線性模型防呆
 
 若可能存在：
 
@@ -61,7 +61,7 @@ canonical_owner: true
 
 則 linear static model可能只能作初步 screening，不得無條件視為 final design model。
 
-## Documentation minimum
+## 文件化最低要求
 
 公開 knowledge base 不保存專案模型，但方法文件應提醒正式 calculation package 至少記錄：
 
@@ -75,7 +75,7 @@ canonical_owner: true
 - acceptance criteria
 - model validation checks
 
-## Do not assume
+## 不可推論事項
 
 - FEA result = correct because solver converged
 - finer mesh always = more accurate without correct physics

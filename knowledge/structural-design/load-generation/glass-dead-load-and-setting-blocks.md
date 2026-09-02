@@ -29,13 +29,13 @@ canonical_owner: true
 6. 檢查 global bending / deflection 與 local bearing / local extrusion behavior。
 7. 將 end / connector reaction 繼續傳到 mullion / bracket / anchor。
 
-## Glass weight
+## 玻璃重量
 
 若沒有產品實際重量，可用密度與 glass make-up 做 preliminary estimate；但正式設計應優先使用實際產品／製造商資料，尤其 laminated / IGU / specialty glass 還包含 interlayer、spacer、coating 或其他構造。
 
 任何額外 dead-load factor 都必須帶 source，不得把舊專案常數直接當 universal rule。
 
-## Setting-block position matters
+## Setting block 位置很重要
 
 即使總玻璃重量相同，setting-block 位置改變也會改變：
 
@@ -53,7 +53,7 @@ canonical_owner: true
 - supported glass lite / panel
 - load per point
 
-## Structural silicone guard
+## 結構矽利康防呆
 
 除非 approved structural glazing system 明確設計 structural silicone 承受永久自重，否則不得假設 glass dead load 主要由 silicone 吊掛。
 
@@ -62,7 +62,7 @@ canonical_owner: true
 - wind-load transfer path
 - dead-load support path
 
-## Local check
+## 局部檢核
 
 Setting-block point load 除了造成 transom global bending，還可能控制：
 
@@ -74,14 +74,14 @@ Setting-block point load 除了造成 transom global bending，還可能控制�
 
 因此「整支 transom flexural stress PASS」不代表 setting-block region 已完成檢核。
 
-## Do not assume
+## 不可推論事項
 
 - 不得一律假設兩個 setting blocks 各承受 50%，除非 support geometry 與 stiffness 足以支持此假設。
 - 不得把 glass dead load 平均成 full-span UDL 來忽略 concentrated effect。
 - 不得用 nominal glass thickness alone 當產品實際重量的唯一依據。
 - 不得把 wind-load support model 自動套用到 dead load。
 
-## Public-source routing
+## 公開來源 routing
 
 - ASTM E1300-24：玻璃 load-resistance design routing；其 glass support assumption 不取代 framing dead-load support design。
 - Glass manufacturer / glazing manuals：setting block 與 edge support requirements 應依實際 glass make-up、support system 與產品技術資料確認。

@@ -15,7 +15,7 @@ canonical_owner: true
 
 每一層都可能形成 governing failure mode。
 
-## Reaction workflow
+## 反力計算流程
 
 1. 取得 governing positive / negative design pressure。
 2. 依 panel / glass / framing geometry 建立 tributary load。
@@ -26,7 +26,7 @@ canonical_owner: true
 7. 檢查 cast-in / post-installed anchor 的 concrete failure modes。
 8. 確認主體結構承載與 edge distance / embedment / reinforcement interaction。
 
-## Eccentricity guard
+## 偏心防呆
 
 帷幕 bracket 很少是完全零偏心的理想點支承。實際常有：
 
@@ -39,7 +39,7 @@ canonical_owner: true
 
 因此 anchor group force 不應只用 `總剪力 ÷ bolt 數量`。
 
-## Movement vs restraint
+## 位移與拘束
 
 很多 curtain wall connection 同時要達到兩個看似相反的目標：
 
@@ -56,7 +56,7 @@ canonical_owner: true
 
 不要把所有長孔都當成「一定能自由滑動」；實際 clamping force、washer、bolt pretension、surface friction 都可能影響。
 
-## Anchor family routing
+## 錨栓類型 routing
 
 - cast-in anchor / anchor rod：依實際產品、鋼材規格與 concrete design basis
 - post-installed mechanical anchor：ACI 318 Chapter 17 + ACI 355.2 / approved evaluation report as applicable
@@ -64,12 +64,12 @@ canonical_owner: true
 
 ASTM F1554 是 anchor bolt / rod 類材料與產品規格，不能拿來當 mechanical expansion anchor 的 capacity standard。
 
-## Fastener guard
+## 緊件防呆
 
 - A2-70 / A2-80 / project-specific A2-90 是 fastener property information，不等於 connection capacity。
 - connection capacity 還受 diameter、thread engagement、hole geometry、bearing material、edge distance、eccentricity、pretension、corrosion 與 installation quality 影響。
 
-## Do not assume
+## 不可推論事項
 
 - `2 bolts = each takes 50%` 不得無條件成立。
 - `slotted hole = zero force in slot direction` 不成立。

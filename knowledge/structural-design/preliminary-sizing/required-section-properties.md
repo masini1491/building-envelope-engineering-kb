@@ -1,11 +1,11 @@
 ---
-title: "Required Section Properties：I 與 S 的前期反推"
+title: "所需截面性質初步尺寸評估"
 verification_status: "HIGH_CONFIDENCE"
 verified_at: "2026-09-02"
 canonical_owner: true
 ---
 
-# Required Section Properties：I 與 S 的前期反推
+# 所需截面性質初步尺寸評估
 
 ## 用途
 
@@ -75,7 +75,7 @@ canonical_owner: true
 
 因此 required result 應保存 governing case 與 governing axis，而不是只輸出一組沒有來源的數字。
 
-## Do not assume
+## 不可推論事項
 
 - 有 `Ix` 不代表已有 `Sx`。
 - `Ix > Iy` 不代表 x 一定是實際 strong axis；必須依截面與 load orientation 定義。

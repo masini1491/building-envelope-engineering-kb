@@ -24,7 +24,7 @@ canonical_owner: true
 7. 將 reactions 傳至 hardware / fastener / local extrusion checks。
 8. 再以 whole-product performance test routing 驗證需要的 air / water / structural / operability performance。
 
-## Load cases
+## 荷載案例
 
 至少分開考慮：
 
@@ -37,7 +37,7 @@ canonical_owner: true
 
 不要一開始就把所有作用合成單一 envelope；不同 load direction 可能改變 hinge / lock 哪一側 governing。
 
-## Glass / infill dead load
+## 玻璃／填充材自重
 
 玻璃自重通常透過 setting block / glazing support 傳到 sash frame，再由 hinge / pivot / support hardware 傳回 outer frame。
 
@@ -47,7 +47,7 @@ canonical_owner: true
 
 不應直接假設全部 glass dead load 平均分到所有硬體。
 
-## Wind-load transfer
+## 風荷載傳遞
 
 風壓作用於 glass / infill 後，reaction 由 sash perimeter 傳入：
 
@@ -59,7 +59,7 @@ canonical_owner: true
 
 實際 distribution 取決於 frame stiffness、hardware spacing、locking-point layout 與 boundary condition。
 
-## Corner-joint behavior
+## 轉角接頭行為
 
 Corner joint 可能是：
 
@@ -72,19 +72,19 @@ Corner joint 可能是：
 
 不得只因外觀形成閉合框，就默認四角完全剛接。若 corner rotational stiffness 對分析有影響，應由產品資料、試驗或 validated model 支持。
 
-## Frame analysis choices
+## 框架分析選擇
 
-### Beam / frame model
+### 梁／框架模型
 
 適合幾何與 load path 清楚、截面可用 beam properties 表示、corner / hardware boundary condition 可合理 idealize 的情況。
 
-### Shell / solid model
+### 殼／實體模型
 
 當局部薄壁變形、hardware cut-out、corner joint、reinforcement、torsion 或 local contact 重要時，可需要更高階模型。
 
 模型精細度應由 failure mode 決定，不是越複雜越好。
 
-## Results to preserve
+## 應保存的結果
 
 至少保存：
 
@@ -96,7 +96,7 @@ Corner joint 可能是：
 - local reinforcement demand
 - glass-edge / gasket relative movement where relevant
 
-## Operability guard
+## 可操作性防呆
 
 結構計算即使應力與撓度均 PASS，也不自動代表窗仍可正常操作。
 
@@ -112,7 +112,7 @@ Corner joint 可能是：
 
 因此需要時應以 NAFS / AAMA 910 或 project-specific performance test 驗證。
 
-## AI guard
+## AI 防呆
 
 不得：
 
@@ -123,7 +123,7 @@ Corner joint 可能是：
 - 只算 aluminium member stress 就宣告整窗 structural PASS
 - 忽略 glass dead-load path
 
-## Public-source routing
+## 公開來源 routing
 
 - AAMA/WDMA/CSA 101/I.S.2/A440-26 (NAFS)
 - AAMA 910-24

@@ -305,7 +305,7 @@ factor_audit:
 - `/schemas/project-design-basis.schema.json`
 - `/schemas/structural-coverage.schema.json`
 
-## Public-safety rule
+## 公開安全規則
 
 本頁保存 generic audit methodology。實際專案的 factor、計算頁碼、技師姓名、公司名稱與 proprietary spreadsheet / calculation content 都屬當次 project context，不應 commit 到 public repository。
 

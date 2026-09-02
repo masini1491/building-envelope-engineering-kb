@@ -1,15 +1,15 @@
 ---
-title: "結構玻璃 Structural Glass"
+title: "結構玻璃（Structural Glass）"
 verification_status: "VERIFIED_PRIMARY"
 verified_at: "2026-09-02"
 canonical_owner: true
 ---
 
-# 結構玻璃 Structural Glass
+# 結構玻璃（Structural Glass）
 
 本目錄處理玻璃不只是 cladding / infill，而是作為 beam、fin、mullion、walkable panel、point-supported member 或其他主要受力構材的 building-envelope engineering 問題。
 
-## Core routing
+## 核心 routing
 
 結構玻璃問題應至少分成：
 
@@ -23,7 +23,7 @@ canonical_owner: true
 8. **Post-breakage / redundancy**：單片或單層破裂後的安全性、剩餘承載與 fall-out control。
 9. **Testing / validation**：必要時以 full-scale / component test、project-specific manufacturer review 或 validated analysis 補足標準 scope 的限制。
 
-## Current public standards baseline
+## 現行公開標準基線
 
 - **ASTM E1300-24** — Standard Practice for Determining Load Resistance of Glass in Buildings
   - 建築玻璃 load resistance 的核心 practice。
@@ -40,7 +40,7 @@ canonical_owner: true
 - **ASTM C1401-23** — Standard Guide for Structural Sealant Glazing
 - **ASTM C1135-19(2024)** — Standard Test Method for Determining Tensile Adhesion Properties of Structural Sealants
 
-## Structural-glass load-path rule
+## 結構玻璃荷載路徑規則
 
 不要把所有荷載都歸到同一條路徑。至少要區分：
 
@@ -53,7 +53,7 @@ canonical_owner: true
 
 例如 structural silicone 可以承擔 wind load transfer，但 glass dead load 是否由 silicone 承擔必須依實際 approved system 設計；很多系統會另外以 setting block、shoe、bearing support、fin 或其他 mechanical support 建立 dead-load path。
 
-## Do not assume
+## 不可推論事項
 
 - laminated glass nominal thickness = structural effective thickness
 - interlayer shear modulus 是固定材料常數
@@ -63,7 +63,7 @@ canonical_owner: true
 - glass fin 的 global stress check 可取代 hole / clamp / support 的 local stress check
 - heat-soak treatment 可取代結構設計或 post-breakage design
 
-## Public-repository rule
+## 公開 repository 規則
 
 本目錄只保存可泛化方法與公開來源。非公開專案文件若曾用於維護者理解問題，不得在此留下專案名稱、尺寸、荷載、圖號、節點、截圖或其他可識別資訊。
 
@@ -78,7 +78,7 @@ canonical_owner: true
 - `walkable-glass.md`
 - `post-breakage-and-redundancy.md`
 
-## Primary public sources
+## 主要公開來源
 
 - ASTM E1300-24: https://store.astm.org/e1300-24.html
 - ASTM E3491-25: https://store.astm.org/e3491-25.html

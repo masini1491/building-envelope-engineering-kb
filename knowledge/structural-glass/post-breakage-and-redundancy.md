@@ -7,11 +7,11 @@ canonical_owner: true
 
 # 結構玻璃破裂後行為與冗餘
 
-## Why it matters
+## 重要性
 
 當玻璃只作一般 infill 時，破裂後主要關切可能是 fallout、weather protection 與 replacement；當玻璃本身作為 fin、beam、walkway、point-supported primary member 時，破裂後還可能改變整個 load path。
 
-## Design questions
+## 設計問題
 
 至少問：
 
@@ -23,7 +23,7 @@ canonical_owner: true
 6. 是否會產生 falling glass / detached fitting hazard？
 7. 是否需要 temporary stability / evacuation / replacement strategy？
 
-## Redundancy is system-specific
+## 冗餘具系統特定性
 
 「膠合玻璃」本身不等於「已有結構冗餘」。是否有 residual capacity 取決於：
 
@@ -36,7 +36,7 @@ canonical_owner: true
 - temperature / duration
 - failure sequence
 
-## Analysis / testing routing
+## 分析／試驗 routing
 
 若 post-breakage behavior 對生命安全或系統穩定重要，可能需要：
 
@@ -48,16 +48,16 @@ canonical_owner: true
 
 Walkable glass 應特別參照 ASTM E2751/E2751M-21 的破裂後性能要求與設計框架。
 
-## Do not assume
+## 不可推論事項
 
 - heat-soaked fully tempered glass 不會破裂
 - laminated glass 破裂後等同原 intact stiffness
 - interlayer 一定能長期懸吊全部碎玻璃與結構荷載
 - redundant support points automatically prevent progressive failure
 
-## Public sources
+## 公開來源
 
 - ASTM E2751/E2751M-21: https://store.astm.org/e2751_e2751m-21.html
 - ASTM E1300-24: https://store.astm.org/e1300-24.html
 
-> Post-breakage design is often project- and system-specific;本頁只提供 failure-mode routing，不提供通用 residual-capacity 數值。
+> 破裂後設計通常具有專案與系統特定性；本頁只提供 failure-mode routing，不提供通用 residual-capacity 數值。
