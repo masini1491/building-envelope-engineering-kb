@@ -45,7 +45,7 @@
 6. 需要版本、來源或 provenance 時再讀 `references/`。
 7. Repository evidence 不足或 freshness 不明時，再查 current primary source。
 
-## Repository 結構
+## 儲存庫（Repository）結構
 
 - [`knowledge/`](knowledge/)：整理後、供工程師與 AI 直接使用的 canonical engineering knowledge。
 - [`references/`](references/)：**只保存可公開散布**的 public evidence dossier、版本、scope、限制與 provenance。
