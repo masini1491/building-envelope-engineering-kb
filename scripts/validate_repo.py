@@ -23,12 +23,20 @@ ALLOWED_VERIFICATION = {
 MARKDOWN_LINK_RE = re.compile(r"(?<!!)\[[^\]]*\]\(([^)]+)\)")
 MARKDOWN_HEADING_RE = re.compile(r"^(#{1,6})\s+(.+?)\s*$")
 CJK_RE = re.compile(r"[\u3400-\u9fff]")
+LATIN_RE = re.compile(r"[A-Za-z]")
 
 LANGUAGE_HEADING_ALLOWLIST = [
     re.compile(r"^(?:ASTM|CNS|AAMA|FGIA|ISO|ACI|AISC|AWS|NAFS|FEA)(?:[ /+&.0-9A-Z_-]*)$"),
     re.compile(r"^(?:A[24]-\d{2}|\d{4}-[HT]\d+)$"),
     re.compile(r"^(?:PASS|WARNING|FAIL|INCOMPLETE|NOT_APPLICABLE)$"),
     re.compile(r"^\d+\.\s+`[a-z0-9_]+`$"),
+    re.compile(r"^`[^`]+`$"),
+    re.compile(r"^CC BY 4\.0$"),
+]
+
+LANGUAGE_PREFIX_ALLOWLIST = [
+    re.compile(r"^(?:ASTM|CNS|AAMA|FGIA|ISO|ACI|AISC|AWS|NAFS|FEA)\b"),
+    re.compile(r"^(?:A[24]-\d{2}|\d{4}-[HT]\d+)\b"),
 ]
 
 FORBIDDEN_KNOWLEDGE_DIRS = {
@@ -261,17 +269,43 @@ def validate_indexes(errors: list[str]) -> None:
                         fail(errors, f"standards-index.json: stale dossier paths -> {stale}")
 
 
-def language_heading_allowed(heading: str) -> bool:
+def normalize_human_heading(heading: str) -> str:
     compact = re.sub(r"[*_]", "", heading).strip()
+    compact = re.sub(r"^(?:\d+\.|[A-Z]\.)\s+", "", compact)
+    return compact
+
+
+def language_heading_allowed(heading: str) -> bool:
+    compact = normalize_human_heading(heading)
     return any(pattern.fullmatch(compact) for pattern in LANGUAGE_HEADING_ALLOWLIST)
 
 
-def validate_language_policy(errors: list[str]) -> None:
-    knowledge = ROOT / "knowledge"
-    if not knowledge.exists():
-        return
+def language_prefix_allowed(heading: str) -> bool:
+    compact = normalize_human_heading(heading)
+    return any(pattern.match(compact) for pattern in LANGUAGE_PREFIX_ALLOWLIST)
 
-    for path in sorted(knowledge.rglob("*.md")):
+
+def heading_is_zh_tw_first(heading: str) -> bool:
+    compact = normalize_human_heading(heading)
+    if language_heading_allowed(compact):
+        return True
+
+    cjk = CJK_RE.search(compact)
+    if not cjk:
+        return False
+
+    latin = LATIN_RE.search(compact)
+    if not latin:
+        return True
+
+    if cjk.start() < latin.start():
+        return True
+
+    return language_prefix_allowed(compact)
+
+
+def validate_language_policy(errors: list[str]) -> None:
+    for path in sorted(ROOT.rglob("*.md")):
         text = path.read_text(encoding="utf-8")
         in_fence = False
         in_frontmatter = text.startswith("---\n")
@@ -303,7 +337,7 @@ def validate_language_policy(errors: list[str]) -> None:
                 )
                 continue
 
-            if CJK_RE.search(heading) or language_heading_allowed(heading):
+            if heading_is_zh_tw_first(heading):
                 continue
 
             fail(
