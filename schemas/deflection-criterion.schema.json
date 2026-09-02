@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://example.invalid/building-envelope-engineering-kb/deflection-criterion.schema.json",
+  "$id": "https://github.com/masini1491/building-envelope-engineering-kb/schemas/deflection-criterion.schema.json",
   "title": "Deflection Criterion",
   "type": "object",
   "additionalProperties": false,
@@ -14,30 +14,35 @@
     "constant_mm": {"type": ["number", "null"]},
     "manual_allowable_mm": {"type": ["number", "null"], "minimum": 0},
     "label": {"type": "string", "minLength": 1},
+    "component_scope": {"type": ["string", "null"], "description": "Examples: mullion, transom, glass edge, panel, sash, other."},
+    "response_direction": {"type": ["string", "null"], "description": "Physical response direction; do not infer from section-axis variable names."},
+    "load_or_serviceability_scope": {"type": ["string", "null"], "description": "Examples: wind, vertical dead load, relative glass-edge displacement, visual/serviceability."},
+    "limit_state": {"type": ["string", "null"]},
     "source": {"type": "string", "minLength": 1},
     "source_revision": {"type": ["string", "null"]},
+    "source_clause": {"type": ["string", "null"]},
     "confirmed": {"type": "boolean"},
     "notes": {"type": ["string", "null"]}
   },
   "allOf": [
     {
-      "if": {"properties": {"type": {"const": "ratio"}}},
+      "if": {"properties": {"type": {"const": "ratio"}}, "required": ["type"]},
       "then": {"required": ["n"]}
     },
     {
-      "if": {"properties": {"type": {"const": "absolute_mm"}}},
+      "if": {"properties": {"type": {"const": "absolute_mm"}}, "required": ["type"]},
       "then": {"required": ["absolute_mm"]}
     },
     {
-      "if": {"properties": {"type": {"const": "min_ratio_and_absolute"}}},
+      "if": {"properties": {"type": {"const": "min_ratio_and_absolute"}}, "required": ["type"]},
       "then": {"required": ["n", "absolute_mm"]}
     },
     {
-      "if": {"properties": {"type": {"const": "ratio_plus_constant"}}},
+      "if": {"properties": {"type": {"const": "ratio_plus_constant"}}, "required": ["type"]},
       "then": {"required": ["n", "constant_mm"]}
     },
     {
-      "if": {"properties": {"type": {"const": "custom_manual"}}},
+      "if": {"properties": {"type": {"const": "custom_manual"}}, "required": ["type"]},
       "then": {"required": ["manual_allowable_mm"]}
     }
   ]
