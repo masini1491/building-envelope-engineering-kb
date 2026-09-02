@@ -120,17 +120,29 @@ Schema 是 engineering interchange contract，不是 project instance。正式 c
 4. 補 AAMA 611、CNS 10007 / 1247 等尚未建立的 standards pages。
 5. 視實際需求再建立 `indexes/`，不要為了目錄完整而預先複製資料。
 
-## Copyright / licensing boundary
+## Licensing
 
-ASTM、AAMA-FGIA、ISO、CNS 與其他第三方標準可能受著作權或授權條款限制。本 repository 原則上只保存：
+本 repository 採雙授權模型，且只授權 repository maintainer 有權授權的原創內容：
 
-- 標準編號與版本資訊
-- 適用範圍與工程摘要
-- 必要 cross-reference
-- 合法可引用的最低充分內容
-- 官方或合法來源連結
-- 自行整理的工程解讀與注意事項
+- **工程知識／文件：CC BY 4.0** — 一般適用於 `README.md`、`AGENTS.md`、`CHAT_INIT.md`、`knowledge/`、repository-authored `references/` metadata/commentary、`templates/` 等文件內容。
+- **schemas／scripts／code：MIT License** — 一般適用於 `schemas/`、`scripts/`、`.github/` 與其他明確屬於 software/tooling 的內容。
 
-不把付費／受限制標準全文或未授權 PDF 直接 commit 到公開 repository。
+詳見：
 
-> Repository 自身的再利用授權條款尚未在本次 hardening 中代為選定；新增 LICENSE 前應由 maintainer 明確決定。
+- [`LICENSE.md`](LICENSE.md) — 授權範圍與雙授權總則
+- [`LICENSE-DOCS.md`](LICENSE-DOCS.md) — CC BY 4.0 文件授權說明
+- [`LICENSE-CODE`](LICENSE-CODE) — MIT License
+- [`THIRD-PARTY-NOTICE.md`](THIRD-PARTY-NOTICE.md) — 第三方標準、出版物、商標與技術資料不因出現在本 Repo 而被重新授權
+- [`DISCLAIMER.md`](DISCLAIMER.md) — engineering / AI review 免責與責任邊界
+
+## Copyright / third-party boundary
+
+ASTM、AAMA-FGIA、ISO、CNS、Aluminum Association、AWS、AISC、製造商資料與其他第三方作品可能受各自著作權、商標或授權條款限制。
+
+本 repository 的 CC BY 4.0 / MIT 授權**不會重新授權這些第三方原始作品**。Repo 原則上只保存標準編號、版本資訊、適用範圍、合法可引用的最低充分內容、自行整理的工程摘要／routing 與官方或合法來源連結；不把付費／受限制標準全文或未授權 PDF 直接 commit 到公開 repository。
+
+## Engineering responsibility boundary
+
+本 repository 可支援工程研究、初步分析、計算審查與 AI-assisted review，但不取代 project-specific professional engineering judgment、技師簽證、主管機關審查、正式試驗、施工核可或 project approval。
+
+**任何 AI / automated review 輸出的 `PASS` 都不構成專業工程認證、法規核准或施工授權。** 詳見 [`DISCLAIMER.md`](DISCLAIMER.md)。
