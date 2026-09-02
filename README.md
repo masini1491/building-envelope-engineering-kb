@@ -14,7 +14,7 @@
 6. **`INCOMPLETE` 是有效結果**：必要 input、criterion、capacity source、support model 或 provenance 不足時，不得補猜為 PASS。
 7. **公開安全（Public-safe）**：不公開未授權施工圖、計算書、可辨識專案條件、私人 provenance 或受版權限制全文。
 
-完整治理規則見 [`AGENTS.md`](AGENTS.md)。語言規則見 [`LANGUAGE.md`](LANGUAGE.md)。
+完整治理規則見 [`AGENTS.md`](AGENTS.md)。AI 工程回覆呈現規則見 [`AI_RESPONSE_CONTRACT.md`](AI_RESPONSE_CONTRACT.md)。語言規則見 [`LANGUAGE.md`](LANGUAGE.md)。
 
 ## 快速開始
 
@@ -38,9 +38,10 @@
 1. 讀本 README。
 2. 讀 [`CHAT_INIT.md`](CHAT_INIT.md)。
 3. 讀 [`AGENTS.md`](AGENTS.md)。
-4. 依問題只讀最低必要的 `knowledge/` router / canonical pages。
-5. 需要版本、來源或 provenance 時再讀 `references/`。
-6. Repository evidence 不足或 freshness 不明時，再查 current primary source。
+4. 讀 [`AI_RESPONSE_CONTRACT.md`](AI_RESPONSE_CONTRACT.md)，啟用本 Repo 的工程回答呈現 contract。
+5. 依問題只讀最低必要的 `knowledge/` router / canonical pages。
+6. 需要版本、來源或 provenance 時再讀 `references/`。
+7. Repository evidence 不足或 freshness 不明時，再查 current primary source。
 
 ## Repository 結構
 
@@ -88,8 +89,7 @@ Cross-reference 只代表用途相關，不代表 CNS / ASTM / AAMA-FGIA / ISO �
 - knowledge verification status
 - public-reference privacy rule
 - `LANGUAGE.md` 繁中 heading lint
-
-Repository 進入 consolidation / hardening 階段後，會再擴充 canonical ownership、orphan page、standard-version ownership 與 index consistency 等檢查。
+- architecture / index / canonical ownership lint
 
 ## 授權與責任
 
