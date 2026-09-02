@@ -29,7 +29,7 @@ canonical_owner: true
 - [Panel-to-Stiffener Connection](panel-to-stiffener-connection.md)
 - [Plate / Shell FEA Modeling](plate-fea-modeling.md)
 - [Metal Composite and Honeycomb Panels](../metal-composite-and-honeycomb-panels.md)
-- [Aluminum Panel Flatness and Oil Canning](../../engineering-notes/aluminum-panel-flatness-and-oil-canning.md)
+- [Aluminum Panel Flatness and Oil Canning](../aluminum-panel-flatness-and-oil-canning.md)
 
 ## 試驗與分析的區分
 
