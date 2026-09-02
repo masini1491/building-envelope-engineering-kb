@@ -6,7 +6,8 @@
 
 - `standards/`：規範的工程摘要與 cross-reference
 - `materials/`：鋁、鋼、不鏽鋼等材料
-- `glazing/`：建築玻璃產品與結構設計標準 routing
+- `glazing/`：建築玻璃產品與一般玻璃結構設計標準 routing
+- `structural-glass/`：glass fin、laminated effective thickness、point-supported glass、glass-to-glass structural silicone、movement、FEA、walkable glass、post-breakage / redundancy
 - `sealants/`：structural silicone、weatherseal 與接縫設計
 - `gaskets/`：EPDM / dense / cellular / silicone gasket 等
 - `fasteners/`：螺絲、螺栓、property class、設計與耐蝕
@@ -20,6 +21,8 @@
 - `skylights/`：採光罩與斜面玻璃
 - `building-physics/`：thermal、thermal bridge、condensation
 - `fire/`：perimeter fire barrier、fire-resistive joint 與外牆防火 routing
-- `case-knowledge/`：經抽象化、可公開的專案特殊知識
+- `case-knowledge/`：只用於公開來源可追溯案例，或完全去識別且無法反推出專案身分的通用 lesson pattern
 
-每個技術結論應連回 `references/` 中可追溯的 evidence；不要在多個頁面複製同一 canonical 結論。
+每個技術結論應連回 `references/` 中可追溯的公開 evidence；不要在多個頁面複製同一 canonical 結論。
+
+若知識最初來自非公開專案文件，public repository 只保留重新泛化、去識別且可由公開技術來源支持的方法論；不得留下專案名稱、尺寸、荷載、圖號、節點、截圖或私人 provenance。
