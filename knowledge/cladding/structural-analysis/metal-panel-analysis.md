@@ -116,6 +116,6 @@ AI 不得：
 - [Stiffener Analysis](stiffener-analysis.md)
 - [Panel-to-Stiffener Connection](panel-to-stiffener-connection.md)
 - [Plate / Shell FEA Modeling](plate-fea-modeling.md)
-- [Aluminum Panel Flatness and Oil Canning](../../engineering-notes/aluminum-panel-flatness-and-oil-canning.md)
+- [Aluminum Panel Flatness and Oil Canning](../aluminum-panel-flatness-and-oil-canning.md)
 
 > 本頁提供可重用的 engineering workflow，不提供固定 panel thickness、stiffener spacing 或 allowable value。
