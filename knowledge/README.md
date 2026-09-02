@@ -4,7 +4,7 @@
 
 使用原則：**先選 domain，再讀該 domain router；不要從本頁直接掃所有 leaf pages。**
 
-## Domain routing
+## 領域路由（Domain routing）
 
 - [`systems/`](systems/)：帷幕牆系統型式與 system-level 分類。
 - [`design-management/`](design-management/)：Project Design Basis、system development、跨部門 review、mock-up、材料／圖面 release 與 revision control。
