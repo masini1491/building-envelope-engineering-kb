@@ -82,7 +82,7 @@ Stiffener 可能用來：
 
 因此 `加 stiffener` 不是自動 PASS。
 
-## Downstream structural responsibility
+## 下游結構責任（Downstream structural responsibility）
 
 在 reaction-only handoff 模式下，這些 local effects 通常屬於 primary-structure engineer / designated steel designer 的 scope；帷幕端至少應提供足以讓對方建立 local model 的：
 
@@ -110,7 +110,7 @@ Stiffener 可能用來：
 
 這是合法且更精確的 review outcome。
 
-## Factor audit
+## 係數稽核（Factor audit）
 
 任何用來簡化 flange / web / torsion capacity 的 coefficient、allowable multiplier、company rule 或歷史 project factor，都必須有 provenance。
 
