@@ -65,7 +65,7 @@ canonical_owner: true
 
 詳見 [`secondary-support-interface-and-responsibility.md`](secondary-support-interface-and-responsibility.md)。
 
-## 核心 load path
+## 核心荷載路徑（load path）
 
 無論採哪一種責任模式，至少應能追溯：
 
@@ -121,7 +121,7 @@ canonical_owner: true
 - secondary-support geometry；
 - primary-structure receiving point。
 
-## 相關 routing
+## 相關路由（routing）
 
 - [`../connections/load-path-and-anchor-reactions.md`](../connections/load-path-and-anchor-reactions.md)
 - [`../connections/fastener-group-analysis.md`](../connections/fastener-group-analysis.md)
