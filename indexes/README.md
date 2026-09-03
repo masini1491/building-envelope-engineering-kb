@@ -24,6 +24,14 @@ python scripts/build_knowledge_manifests.py
 
 Repository CI 會使用 `--check` 確認 manifest 與 `knowledge/**/*.md` 路徑同步；新增、刪除或移動 knowledge page 後若未重建 manifest，CI 應失敗。
 
+## 穩定機器識別與人類用語
+
+Machine-readable routing 優先依穩定的 `id / path / slug` 工作；人類可讀 heading、翻譯或顯示 wording 不應成為唯一 routing identity。
+
+- 不只因標題翻譯、繁中用語改善或顯示名稱調整而 rename stable path／slug。
+- Human-facing title 可以改善而不改 path；這可保留 GitHub URL、cross-reference 與 manifest identity 的穩定性。
+- 若 ownership、domain placement 或 path 語意確實錯誤而必須 rename，應同步更新 links、重新產生 manifest 並通過 CI。
+
 ## 標準索引
 
 - `standards-index.json`：標準 ID → `references/standards/` dossier path。

@@ -37,11 +37,26 @@
 
 無法滿足時，不建立新 top-level domain。
 
+## 輸入完整性與第一次 Git write
+
+用來更新 canonical knowledge 的 evidence 必須先確認其 logical input 已完整。若出現下列任一情況，先視為 **`INCOMPLETE_INPUT`**：
+
+- 使用者明確表示還有下一張、下一份、下一段或尚未傳完；
+- 資料標示為第 `n/m` 部分而後續尚未取得；
+- tool／connector output 顯示 truncated、只回傳部分頁面或部分 range；
+- 判斷明顯依賴尚未提供的附件、頁面或上下文。
+
+`INCOMPLETE_INPUT` 可以先做暫時分析或指出目前缺口，但**不得把目前片段當成完整 evidence 更新 canonical conclusion**。只有資料已完整，或使用者明確把任務 scope 限定為目前收到的部分時，才進入正式 canonicalization。
+
+任何 project-derived、private、現場或可能敏感的 evidence，必須在**第一次 Git write 前**完成去識別、公開安全與版權邊界處理；不得先 commit raw project content、敏感截圖、可識別尺寸／荷載／代號或其他禁止材料，再依賴後續 commit 刪除。Git history 仍可能保留先前內容。
+
+敏感 raw artifact 若確有保留需求，應留在 public repository 之外；Git 只保存允許公開的 abstracted principle、redacted digest、非敏感 metadata 或合法 provenance。
+
 ## 批次資料吸收規則
 
 一次輸入多份標準、手冊、製造商資料、案例或工程觀察時，不得採「一份來源＝一個 knowledge page」。應先：
 
-1. 去識別與確認公開／版權邊界；
+1. 確認 logical input 已完整，並在第一次 Git write 前完成去識別、公開／版權邊界處理；
 2. 萃取可公開的 engineering claims；
 3. 對每個 claim 尋找既有 canonical owner；
 4. 更新既有 knowledge page 或 reference dossier；
@@ -53,6 +68,8 @@
 
 新增／吸收知識只有在下列條件都成立時才算完成：
 
+- 用來 canonicalize 的 logical input 已完整；若原始輸入曾為分段／截斷，已取得完整內容或使用者明確限定目前 scope；
+- 第一次 Git write 前已完成必要的去識別、公開安全與版權檢查；
 - canonical ownership 沒有重複；
 - 沒有不必要的新 top-level domain；
 - router／index／manifest 沒有被塞入 knowledge 本體；

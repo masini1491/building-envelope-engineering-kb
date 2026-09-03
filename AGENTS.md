@@ -81,10 +81,11 @@ AI 不應預設完整掃描 repository。`CHAT_INIT.md` 是 runtime 精簡 boots
 ### 一般工程問答
 
 1. 先讀 `CHAT_INIT.md`。
-2. 使用 `indexes/knowledge-index.json` 的 `id / aliases / entrypoint` 選擇最低必要 domain。
-3. 只讀該 entrypoint 與回答本題所需的 canonical pages；若 entrypoint 已足夠，停止擴張。
-4. 若答案需要標準版本、來源或 provenance，再用 `indexes/standards-index.json` 路由到對應 `references/standards/` dossier。
-5. 若 repository 內 evidence 不足或 freshness 不明，再外部查證 current primary source。
+2. 使用 `indexes/knowledge-index.json` 的 `id / aliases` 選擇最低必要 domain。
+3. 只讀該 domain 的 `indexes/knowledge-pages/<domain>.json`，用 `slug / path / section` 選擇最低必要 page；若已唯一命中 leaf page，直接讀 leaf，不必先經過 router。
+4. 題意仍有歧義、跨多個 subdomain，或需要先理解 domain 邊界時，才讀該 domain 的 `entrypoint / router`。
+5. 若答案需要標準版本、來源或 provenance，再用 `indexes/standards-index.json` 路由到對應 `references/standards/` dossier。
+6. 若 repository 內 evidence 不足或 freshness 不明，再外部查證 current primary source。
 
 一般明確問答**不需要無條件完整載入 `README.md`、本 `AGENTS.md` 與 `AI_RESPONSE_CONTRACT.md`**。
 
@@ -99,8 +100,9 @@ AI 不應預設完整掃描 repository。`CHAT_INIT.md` 是 runtime 精簡 boots
 1. 先 remote read-back GitHub `main`；不得只依舊聊天、cached copy 或 AI memory。
 2. 讀本 `AGENTS.md`。
 3. 若修改人類可讀內容，再讀 `LANGUAGE.md`。
-4. 依任務讀 relevant template / schema / validator；不要為維護單一 domain 而掃完整個 knowledge tree。
-5. 修改後以 repository 自動驗證 success 與 remote read-back 為完成條件。
+4. 若涉及新增、整理、吸收、匯入或重構 knowledge，再讀 `KNOWLEDGE_INGESTION.md` 並先執行新增知識決策門。
+5. 依任務讀 relevant template / schema / validator；不要為維護單一 domain 而掃完整個 knowledge tree。
+6. 修改後以 repository 自動驗證 success 與 remote read-back 為完成條件。
 
 `AI_RESPONSE_CONTRACT.md` 只負責回答如何呈現：結論優先、回答深度、已確認／推論／缺口分離、scope-qualified status、精簡與引用方式。它不得覆蓋本檔的 authority、工程數值、公開安全或 canonical ownership 規則。
 
@@ -228,6 +230,31 @@ Public reference dossier 應盡量記錄：
 - 有穩定中文詞但保留英文有助技術檢索時，優先採 `中文（English）`。
 - 不為追求「零英文」而創造台灣工程界不常用、可能改變技術語意的翻譯。
 
+## 穩定機器識別與人類用語
+
+若 repository 已使用 machine-readable routing，`id / path / slug` 等結構識別視為穩定 machine identity；人類可讀標題、翻譯或 wording 可以改善，但不應因此無必要改動 stable path。
+
+- 不只為了標題翻譯、術語潤飾或顯示一致性而 rename stable knowledge path／slug。
+- 標題與檔名不必逐字同步；人類 wording 改善不應破壞既有 GitHub URL、manifest routing 或 cross-reference。
+- 只有 ownership／domain placement／語意邊界確實錯誤，或 path 本身會持續誤導 routing 時才考慮 rename；rename 後必須同步 links、generated manifest 與 validation。
+
+## AI 可讀性／載入成本變更檢查
+
+新增、刪除、搬移、拆分、合併 rule、文件、router、index、manifest 或其他 AI-facing information surface 時，除了 correctness 與 authority，也必須檢查 retrieval impact；不以固定 KB、行數或 token 數作 universal gate。
+
+至少確認：
+
+- **固定載入影響**：是否增加一般 task 都要付出的 bootstrap／always-on context？低頻規則能否改成 condition-triggered routing？
+- **預設讀取頻率**：哪些 task 真的需要新內容？是否錯把低頻資訊放進高頻 surface？
+- **路由深度**：新增一層 lookup 是否真的換到足夠的 Context 節省？若 exact leaf 已可定位，不增加 routing ceremony。
+- **重複與 reconciliation**：是否建立第二份 policy、status、工程結論、inventory 或 evidence，讓 AI 日後必須判斷哪份才是 current authority？
+- **有限讀取品質**：大型 cohesive page 是否仍可依 heading／section 精準讀取，而不是為了變小就過度拆檔？
+- **搜尋雜訊**：舊 wording、舊 path、superseded content 是否會繼續污染 normal retrieval？
+- **衍生寫入閉包**：高頻內容修改是否會迫使不相關 README、index、snapshot 或其他 derived artifact 一起更新？能 deterministic generation／CI check 時優先避免手工同步。
+- **淨效果**：整體 retrieval cost 是下降、持平，還是只是把同樣內容拆散並增加 tool call／reconciliation？
+
+核心原則：**讓 AI 讀得少，不是讓 repository 變得碎；是讓它更快命中唯一、最新且足夠的 canonical authority。**
+
 ## 變更規則
 
 新增內容前先確認：
@@ -236,5 +263,7 @@ Public reference dossier 應盡量記錄：
 - 是否已有相同結論
 - 新證據是否真的改變現有結論
 - 是否需要更新 freshness / status，而不是新增重複文件
+
+涉及新增、整理、吸收、匯入或重構 knowledge 時，必須再遵守 `KNOWLEDGE_INGESTION.md`；涉及 AI-facing 結構變更時，必須通過上方「AI 可讀性／載入成本變更檢查」。
 
 Git history 作為主要演進紀錄，不在文件內維護冗長 completed changelog。
