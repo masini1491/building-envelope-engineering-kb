@@ -8,6 +8,14 @@
 
 同一維護任務應先完成必要檢查與修正，再以單一 batched commit／最少必要 push 寫入 `main`。不得採用「先 push 看 CI → 修一點再 push → 再看 CI」作為預設工作流程。
 
+## 決定性執行機會掃描（Execution Opportunity Scan）
+
+若目前已讀範圍直接出現 repository-owned validator、generator、parser、calculator、test 或其他可界定輸入／輸出與失敗語意的 deterministic workload，應先做最低充分 execution opportunity scan，而不是預設把 GitHub Actions 當成第一個 execution surface。
+
+只有候選同時具有實際價值且本任務允許執行時，才檢查該候選真正需要的 runtime、dependency、filesystem 或 network capability；不得為了盤點「ChatGPT 能做什麼」而完整掃描 repository 或 sandbox。
+
+若可由 exact commit／tree 的 canonical snapshot 在本 session 安全重現 deterministic check，優先於 remote push 前執行，以降低人工錯誤與 remote debugging noise。Sandbox 只作暫時計算 surface；執行結果是 evidence，不取得 GitHub persistence／write authority，也不成為新的 source of truth。
+
 ## 執行能力門
 
 準備執行 repository validator 前，先確認本次 AI session 實際具備所需能力，不從「模型會寫 Python」推論「目前環境一定能執行 Python」。
