@@ -92,7 +92,7 @@ AI 不應預設完整掃描 repository。`CHAT_INIT.md` 是 runtime 精簡 boots
 
 計算書、圖面、規範或完整 engineering review 除上述最低內容外，再讀 [`AI_RESPONSE_CONTRACT.md`](AI_RESPONSE_CONTRACT.md) 與對應 review / methodology canonical pages。
 
-### Repository 維護
+### 儲存庫（Repository）維護
 
 新增、修改、重構、移動或刪除 repository 內容前：
 
