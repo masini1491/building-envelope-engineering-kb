@@ -1,0 +1,8 @@
+{
+  "schema_version": 1,
+  "domain": "gaskets",
+  "purpose": "Page-level routing metadata only. Match slug/path, then open the target page for engineering content and verification status.",
+  "pages": [
+    {"path":"knowledge/gaskets/elastomeric-gasket-baseline.md","slug":"elastomeric-gasket-baseline","kind":"page"}
+  ]
+}

@@ -1,0 +1,8 @@
+{
+  "schema_version": 1,
+  "domain": "stone",
+  "purpose": "Page-level routing metadata only. Match slug/path, then open the target page for engineering content and verification status.",
+  "pages": [
+    {"path":"knowledge/stone/dimension-stone-cladding-baseline.md","slug":"dimension-stone-cladding-baseline","kind":"page"}
+  ]
+}

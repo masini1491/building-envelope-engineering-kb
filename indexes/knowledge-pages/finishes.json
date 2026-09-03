@@ -1,0 +1,8 @@
+{
+  "schema_version": 1,
+  "domain": "finishes",
+  "purpose": "Page-level routing metadata only. Match slug/path, then open the target page for engineering content and verification status.",
+  "pages": [
+    {"path":"knowledge/finishes/aluminum-organic-coatings-aama-2603-2604-2605.md","slug":"aluminum-organic-coatings-aama-2603-2604-2605","kind":"page"}
+  ]
+}

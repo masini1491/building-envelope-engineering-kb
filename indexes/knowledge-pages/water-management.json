@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "domain": "water-management",
+  "purpose": "Page-level routing metadata only. Match slug/path, then open the target page for engineering content and verification status.",
+  "pages": [
+    {"path":"knowledge/water-management/README.md","slug":"water-management","kind":"router"},
+    {"path":"knowledge/water-management/drainage-and-weep-design.md","slug":"drainage-and-weep-design","kind":"page"},
+    {"path":"knowledge/water-management/pressure-equalization-and-rainscreen.md","slug":"pressure-equalization-and-rainscreen","kind":"page"},
+    {"path":"knowledge/water-management/water-ingress-mechanisms.md","slug":"water-ingress-mechanisms","kind":"page"}
+  ]
+}

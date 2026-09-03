@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "domain": "cladding",
+  "purpose": "Page-level routing metadata only. Match slug/path, then open the target page for engineering content and verification status.",
+  "pages": [
+    {"path":"knowledge/cladding/aluminum-panel-flatness-and-oil-canning.md","slug":"aluminum-panel-flatness-and-oil-canning","kind":"page"},
+    {"path":"knowledge/cladding/metal-composite-and-honeycomb-panels.md","slug":"metal-composite-and-honeycomb-panels","kind":"page"},
+    {"path":"knowledge/cladding/structural-analysis/README.md","slug":"structural-analysis","kind":"router","section":"structural-analysis"},
+    {"path":"knowledge/cladding/structural-analysis/metal-panel-analysis.md","slug":"metal-panel-analysis","kind":"page","section":"structural-analysis"},
+    {"path":"knowledge/cladding/structural-analysis/panel-to-stiffener-connection.md","slug":"panel-to-stiffener-connection","kind":"page","section":"structural-analysis"},
+    {"path":"knowledge/cladding/structural-analysis/plate-fea-modeling.md","slug":"plate-fea-modeling","kind":"page","section":"structural-analysis"},
+    {"path":"knowledge/cladding/structural-analysis/stiffener-analysis.md","slug":"stiffener-analysis","kind":"page","section":"structural-analysis"}
+  ]
+}

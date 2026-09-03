@@ -1,0 +1,8 @@
+{
+  "schema_version": 1,
+  "domain": "performance-testing",
+  "purpose": "Page-level routing metadata only. Match slug/path, then open the target page for engineering content and verification status.",
+  "pages": [
+    {"path":"knowledge/performance-testing/curtain-wall-performance-crosswalk.md","slug":"curtain-wall-performance-crosswalk","kind":"page"}
+  ]
+}

@@ -1,0 +1,8 @@
+{
+  "schema_version": 1,
+  "domain": "systems",
+  "purpose": "Page-level routing metadata only. Match slug/path, then open the target page for engineering content and verification status.",
+  "pages": [
+    {"path":"knowledge/systems/curtain-wall-system-types.md","slug":"curtain-wall-system-types","kind":"page"}
+  ]
+}

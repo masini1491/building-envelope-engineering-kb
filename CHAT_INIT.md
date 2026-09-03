@@ -18,13 +18,15 @@
 
 ### 一般工程問答／查詢
 
-預設只需要：
+預設採下列最短路徑：
 
-1. 本 `CHAT_INIT.md`；
-2. [`indexes/knowledge-index.json`](indexes/knowledge-index.json) 選 domain / entrypoint；
-3. 對應的最低必要 `knowledge/` router 或 canonical page；
-4. 需要版本、來源、scope 或 provenance 時，再讀 [`indexes/standards-index.json`](indexes/standards-index.json) 與對應 `references/` dossier；
-5. Repository evidence 不足或 freshness 不明時，再查 current primary source。
+1. 讀本 `CHAT_INIT.md`。
+2. 讀 [`indexes/knowledge-index.json`](indexes/knowledge-index.json)，用 `id / aliases` 選出最可能的 domain。
+3. **只讀該 domain 的 `manifest`**（位於 `indexes/knowledge-pages/`），先比對 `slug / path / section`。
+4. 若 manifest 已直接命中一個明確 leaf page，直接讀該頁；**不必先經過 router**。
+5. 若題意仍有歧義、跨多個 subdomain，或需要先理解 domain 邊界，才讀 `entrypoint / router`。
+6. 需要標準版本、來源、scope 或 provenance 時，再讀 [`indexes/standards-index.json`](indexes/standards-index.json) 與對應 `references/` dossier。
+7. Repository evidence 不足或 freshness 不明時，再查 current primary source。
 
 **一般明確問答不需要無條件完整載入 `README.md`、`AGENTS.md` 與 `AI_RESPONSE_CONTRACT.md`。**
 
@@ -48,11 +50,21 @@
 
 維護時以 GitHub `main` 為 source of truth；修改前先 read-back current remote，避免依舊聊天或 cached copy 覆蓋新內容。
 
+新增、刪除或移動 `knowledge/**/*.md` 後，執行：
+
+```bash
+python scripts/build_knowledge_manifests.py
+```
+
+再執行 repository validation。`indexes/knowledge-pages/*.json` 是**由路徑自動產生的 routing artifact**，不得手工塞入工程結論或 verification status。
+
 ## 路由原則
 
-- 先用 `indexes/knowledge-index.json` 的 `id / aliases / entrypoint` 判斷最可能 domain。
-- `entrypoint` 是該 domain 的預設第一頁；只有明確標示 `router` 的項目才代表真正的 router page。
-- 進入 domain 後，若 entrypoint 已足以回答，就停止擴張讀取。
+- `knowledge-index.json` 只負責選 domain。
+- `indexes/knowledge-pages/<domain>.json` 只負責在該 domain 內選 page。
+- `entrypoint` 是 domain 的預設第一頁；只有明確標示 `router` 的項目才代表真正 router page。
+- Page manifest 只保存 `path / slug / kind / section`；工程內容、驗證狀態與 evidence 必須回到目標頁本身。
+- 若 leaf page 已精準命中，就不要為了流程完整而多讀一層 router。
 - 只有當現有頁面明確 cross-reference、問題跨 domain，或缺少必要 evidence 時，才繼續開下一頁。
 - 不因某頁列出很多相關連結，就自動全部載入。
 

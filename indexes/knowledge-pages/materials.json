@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "domain": "materials",
+  "purpose": "Page-level routing metadata only. Match slug/path, then open the target page for engineering content and verification status.",
+  "pages": [
+    {"path":"knowledge/materials/aluminum/3003-H14-vs-3004-H12.md","slug":"3003-H14-vs-3004-H12","kind":"page","section":"aluminum"},
+    {"path":"knowledge/materials/aluminum/6005-T5.md","slug":"6005-T5","kind":"page","section":"aluminum"},
+    {"path":"knowledge/materials/aluminum/6063-T5.md","slug":"6063-T5","kind":"page","section":"aluminum"},
+    {"path":"knowledge/materials/aluminum/6105-T5.md","slug":"6105-T5","kind":"page","section":"aluminum"},
+    {"path":"knowledge/materials/aluminum/common-curtain-wall-alloys.md","slug":"common-curtain-wall-alloys","kind":"page","section":"aluminum"},
+    {"path":"knowledge/materials/stainless-steel/stainless-steel-baseline.md","slug":"stainless-steel-baseline","kind":"page","section":"stainless-steel"},
+    {"path":"knowledge/materials/steel/astm-a36.md","slug":"astm-a36","kind":"page","section":"steel"}
+  ]
+}

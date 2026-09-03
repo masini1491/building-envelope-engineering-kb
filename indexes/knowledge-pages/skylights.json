@@ -1,0 +1,8 @@
+{
+  "schema_version": 1,
+  "domain": "skylights",
+  "purpose": "Page-level routing metadata only. Match slug/path, then open the target page for engineering content and verification status.",
+  "pages": [
+    {"path":"knowledge/skylights/skylight-and-sloped-glazing-baseline.md","slug":"skylight-and-sloped-glazing-baseline","kind":"page"}
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "domain": "operable-elements",
+  "purpose": "Page-level routing metadata only. Match slug/path, then open the target page for engineering content and verification status.",
+  "pages": [
+    {"path":"knowledge/operable-elements/README.md","slug":"operable-elements","kind":"router"},
+    {"path":"knowledge/operable-elements/hardware-load-path.md","slug":"hardware-load-path","kind":"page"},
+    {"path":"knowledge/operable-elements/hinge-lock-stay-connections.md","slug":"hinge-lock-stay-connections","kind":"page"},
+    {"path":"knowledge/operable-elements/performance-and-life-cycle.md","slug":"performance-and-life-cycle","kind":"page"},
+    {"path":"knowledge/operable-elements/sash-frame-analysis.md","slug":"sash-frame-analysis","kind":"page"}
+  ]
+}

@@ -1,0 +1,8 @@
+{
+  "schema_version": 1,
+  "domain": "corrosion-protection",
+  "purpose": "Page-level routing metadata only. Match slug/path, then open the target page for engineering content and verification status.",
+  "pages": [
+    {"path":"knowledge/corrosion-protection/hot-dip-galvanizing-astm-family.md","slug":"hot-dip-galvanizing-astm-family","kind":"page"}
+  ]
+}

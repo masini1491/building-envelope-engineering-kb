@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "domain": "sealants",
+  "purpose": "Page-level routing metadata only. Match slug/path, then open the target page for engineering content and verification status.",
+  "pages": [
+    {"path":"knowledge/sealants/structural-silicone-baseline.md","slug":"structural-silicone-baseline","kind":"page"},
+    {"path":"knowledge/sealants/structural-silicone-bite-routing.md","slug":"structural-silicone-bite-routing","kind":"page"},
+    {"path":"knowledge/sealants/weatherseal-joint-design.md","slug":"weatherseal-joint-design","kind":"page"}
+  ]
+}

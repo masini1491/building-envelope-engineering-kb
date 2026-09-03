@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "domain": "structural-glass",
+  "purpose": "Page-level routing metadata only. Match slug/path, then open the target page for engineering content and verification status.",
+  "pages": [
+    {"path":"knowledge/structural-glass/README.md","slug":"structural-glass","kind":"router"},
+    {"path":"knowledge/structural-glass/glass-fin-design.md","slug":"glass-fin-design","kind":"page"},
+    {"path":"knowledge/structural-glass/glass-to-glass-structural-silicone.md","slug":"glass-to-glass-structural-silicone","kind":"page"},
+    {"path":"knowledge/structural-glass/laminated-glass-effective-thickness.md","slug":"laminated-glass-effective-thickness","kind":"page"},
+    {"path":"knowledge/structural-glass/point-supported-drilled-glass.md","slug":"point-supported-drilled-glass","kind":"page"},
+    {"path":"knowledge/structural-glass/post-breakage-and-redundancy.md","slug":"post-breakage-and-redundancy","kind":"page"},
+    {"path":"knowledge/structural-glass/structural-glass-fea-modeling.md","slug":"structural-glass-fea-modeling","kind":"page"},
+    {"path":"knowledge/structural-glass/structural-glass-movement.md","slug":"structural-glass-movement","kind":"page"},
+    {"path":"knowledge/structural-glass/walkable-glass.md","slug":"walkable-glass","kind":"page"}
+  ]
+}

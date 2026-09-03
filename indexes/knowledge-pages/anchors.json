@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "domain": "anchors",
+  "purpose": "Page-level routing metadata only. Match slug/path, then open the target page for engineering content and verification status.",
+  "pages": [
+    {"path":"knowledge/anchors/anchor-standards-baseline.md","slug":"anchor-standards-baseline","kind":"page"},
+    {"path":"knowledge/anchors/cast-in-embedded-plate-design.md","slug":"cast-in-embedded-plate-design","kind":"page"},
+    {"path":"knowledge/anchors/post-installed-mechanical-anchor.md","slug":"post-installed-mechanical-anchor","kind":"page"}
+  ]
+}
