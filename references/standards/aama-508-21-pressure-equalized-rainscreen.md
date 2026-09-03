@@ -1,3 +1,14 @@
+---
+title: "AAMA 508-21 Pressure-Equalized Rainscreen 來源 dossier"
+verification_status: "VERIFIED_PRIMARY"
+verified_at: "2026-09-02"
+document_type: "reference-standard-dossier"
+standard_id: "AAMA 508"
+organization: "FGIA"
+current_status: "Active"
+edition: "AAMA 508-21"
+---
+
 # AAMA 508-21 Pressure-Equalized Rainscreen 來源 dossier
 
 - 驗證狀態：`VERIFIED_PRIMARY`
@@ -27,7 +38,7 @@ FGIA 官方頁面說明，AAMA 508-21 建立 pressure-equalized rainscreen wall 
 - 不得從舊版教材、舊版 AAMA 508 或網路摘要推導 current test pressure / chamber ratio / opening ratio / time constant。
 - 某個 detail 被稱為 `pressure equalized`，不代表已通過 AAMA 508-21。
 
-## 相關 routing
+## 相關路由（routing）
 
 - `knowledge/water-management/pressure-equalization-and-rainscreen.md`
 - `knowledge/water-management/drainage-and-weep-design.md`

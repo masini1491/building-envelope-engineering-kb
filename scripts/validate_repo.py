@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Repository integrity and information-architecture checks for the public engineering KB."""
+"""Repository integrity, AI-routing, and information-architecture checks for the public engineering KB."""
 
 from __future__ import annotations
 
@@ -141,6 +141,68 @@ def validate_frontmatter(errors: list[str]) -> None:
                 canonical_owners[canonical_key] = path
 
 
+def validate_standard_dossier_metadata(errors: list[str]) -> None:
+    standards_index = ROOT / "indexes" / "standards-index.json"
+    standards_root = ROOT / "references" / "standards"
+    if not standards_index.exists() or not standards_root.exists():
+        return
+
+    data = load_json(standards_index, errors)
+    if not isinstance(data, dict):
+        return
+    standards = data.get("standards", [])
+    if not isinstance(standards, list):
+        return
+
+    indexed_by_path: dict[str, str] = {}
+    for item in standards:
+        if not isinstance(item, dict):
+            continue
+        path_text = str(item.get("path", "")).strip()
+        standard_id = str(item.get("id", "")).strip()
+        if path_text and standard_id:
+            indexed_by_path[path_text] = standard_id
+
+    required = {
+        "title",
+        "verification_status",
+        "verified_at",
+        "document_type",
+        "standard_id",
+        "organization",
+        "current_status",
+        "edition",
+    }
+
+    for path in sorted(standards_root.glob("*.md")):
+        rel = str(path.relative_to(ROOT))
+        fm = parse_frontmatter(path.read_text(encoding="utf-8"))
+        missing = sorted(key for key in required if key not in fm)
+        if missing:
+            fail(errors, f"Standard dossier missing frontmatter keys: {rel} -> {missing}")
+            continue
+
+        status = fm.get("verification_status", "")
+        if status not in ALLOWED_VERIFICATION:
+            fail(errors, f"Standard dossier invalid verification_status: {rel} -> {status}")
+        if not fm.get("verified_at", "").strip():
+            fail(errors, f"Standard dossier missing verified_at: {rel}")
+        if fm.get("document_type") != "reference-standard-dossier":
+            fail(errors, f"Standard dossier document_type must be reference-standard-dossier: {rel}")
+        if not fm.get("organization", "").strip():
+            fail(errors, f"Standard dossier missing organization: {rel}")
+        if not fm.get("current_status", "").strip():
+            fail(errors, f"Standard dossier missing current_status: {rel}")
+
+        expected_id = indexed_by_path.get(rel)
+        if expected_id and fm.get("standard_id") != expected_id:
+            fail(
+                errors,
+                f"Standard dossier standard_id/index mismatch: {rel} -> "
+                f"frontmatter={fm.get('standard_id')!r}, index={expected_id!r}",
+            )
+
+
 def normalize_link_target(raw: str) -> str:
     raw = raw.strip()
     if raw.startswith("<") and raw.endswith(">"):
@@ -199,6 +261,8 @@ def validate_indexes(errors: list[str]) -> None:
     else:
         data = load_json(knowledge_index, errors)
         if isinstance(data, dict):
+            if data.get("schema_version") != 2:
+                fail(errors, "knowledge-index.json: schema_version must be 2")
             domains = data.get("domains", [])
             if not isinstance(domains, list):
                 fail(errors, "knowledge-index.json: domains must be an array")
@@ -211,16 +275,44 @@ def validate_indexes(errors: list[str]) -> None:
                         continue
                     domain_id = str(item.get("id", "")).strip()
                     path_text = str(item.get("path", "")).strip()
+                    entrypoint_text = str(item.get("entrypoint", "")).strip()
                     router_text = str(item.get("router", "")).strip()
+                    aliases = item.get("aliases", [])
+
                     if not domain_id or domain_id in ids:
                         fail(errors, f"knowledge-index.json: missing/duplicate domain id -> {domain_id!r}")
                     ids.add(domain_id)
+
                     if path_text:
                         indexed_dirs.add(path_text)
                         if not (ROOT / path_text).is_dir():
                             fail(errors, f"knowledge-index.json: missing domain path -> {path_text}")
-                    if router_text and not (ROOT / router_text).is_file():
-                        fail(errors, f"knowledge-index.json: missing router -> {router_text}")
+                    else:
+                        fail(errors, f"knowledge-index.json: domain path required -> {domain_id!r}")
+
+                    if not entrypoint_text or not (ROOT / entrypoint_text).is_file():
+                        fail(errors, f"knowledge-index.json: missing entrypoint -> {domain_id!r}: {entrypoint_text}")
+                    elif path_text and not entrypoint_text.startswith(path_text + "/"):
+                        fail(errors, f"knowledge-index.json: entrypoint outside domain -> {domain_id!r}: {entrypoint_text}")
+
+                    if router_text:
+                        if not (ROOT / router_text).is_file():
+                            fail(errors, f"knowledge-index.json: missing router -> {router_text}")
+                        elif path_text and not router_text.startswith(path_text + "/"):
+                            fail(errors, f"knowledge-index.json: router outside domain -> {domain_id!r}: {router_text}")
+
+                    if not isinstance(aliases, list) or not aliases:
+                        fail(errors, f"knowledge-index.json: aliases must be a non-empty array -> {domain_id!r}")
+                    else:
+                        normalized: set[str] = set()
+                        for alias in aliases:
+                            if not isinstance(alias, str) or not alias.strip():
+                                fail(errors, f"knowledge-index.json: empty/non-string alias -> {domain_id!r}")
+                                continue
+                            key = alias.strip().casefold()
+                            if key in normalized:
+                                fail(errors, f"knowledge-index.json: duplicate alias in domain -> {domain_id!r}: {alias!r}")
+                            normalized.add(key)
 
                 knowledge_root = ROOT / "knowledge"
                 actual_dirs = {
@@ -361,6 +453,7 @@ def main() -> int:
     validate_public_reference_policy(errors)
     validate_architecture(errors)
     validate_indexes(errors)
+    validate_standard_dossier_metadata(errors)
     validate_language_policy(errors)
 
     if errors:

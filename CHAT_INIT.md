@@ -1,20 +1,59 @@
 # 新聊天室初始化
 
-本 repository 是以台灣建築外殼工程實務為核心的公開技術知識庫。
+本 repository 是以台灣建築外殼工程實務為核心的公開技術知識庫。本檔是 AI 使用本 repository 時的**精簡啟動層（bootstrap）**；目標是在不犧牲工程治理的前提下，避免每個問題都先載入整套治理文件。
 
-新聊天室或新的 AI session 使用本 repository 時：
+## 最低啟動規則
 
-1. 先讀 `README.md`，確認 repository 定位與主題路由。
-2. 再讀 `AGENTS.md`，確認來源權威層級、驗證狀態、著作權、公開安全與工程數值使用規則。
-3. 讀 `AI_RESPONSE_CONTRACT.md`，啟用本 repository 的工程回覆呈現規則。
-4. 依目前問題只搜尋最低必要的 `knowledge/` 主題，不要預設完整掃描 repository。
-5. 若答案需要來源、版本、適用範圍或可信度判斷，再讀對應 `references/`。
-6. 若涉及現行法規、標準版本、產品資料或可能變動的業界資訊，確認資料時效性；repository 內證據不足時再外部查證。
-7. 回答時清楚區分：法規／正式標準／政府手冊／專案文件／製造商資料／工程經驗／推論；當混淆會影響判斷時，進一步區分已確認、工程推論與尚缺資料。
-8. Repository 沒有可靠設計數值、適用條件或等價證據時，不得自行猜測。
-9. 專案特殊知識若原始文件非公開，只能使用 repository 已保存的抽象化通用結論；不得要求、推定或公開機密原件與私人 provenance。
-10. 除非使用者另有要求，預設依 `LANGUAGE.md` **以繁體中文（台灣）回答**；標準正式名稱、材料牌號、schema key、公式符號與必要英文工程術語保留原文。
+所有任務先遵守以下最低規則：
 
-回答呈現採結論優先、最低充分展開；`PASS / WARNING / FAIL / INCOMPLETE / NOT_APPLICABLE` 只在適合的 review / verification task 使用，且必須有明確 scope，不以單一無範圍 `PASS` 代替系統性結論。
+1. **證據優先**：先取得足以支持本次結論的最低充分 evidence，再下工程判斷。
+2. **不得補猜工程數值**：Repository 沒有可靠設計數值、適用條件、係數、材料性質或等價證據時，明確標示未知／待驗證；不得自行生成看似合理的值。
+3. **單一權威歸屬**：同一工程結論、標準版本或狀態以 canonical owner 為準，其他頁只作 routing / cross-reference。
+4. **公開安全**：不得把私人專案名稱、圖號、尺寸、荷載、節點、截圖或非公開 provenance 寫入 public KB。
+5. **漸進式讀取**：不要預設掃完整個 repository；先路由，再讀回答問題所需的最低必要頁面。
+6. **來源分層**：法規／正式標準／政府資料／製造商資料／工程實務／推論不可混成同一證據層級。
+7. **繁體中文（台灣）優先**：除非使用者另有要求，回答依 `LANGUAGE.md` 的原則；正式標準名、材料牌號、schema key、公式與必要英文工程術語保留原文。
 
-核心原則：**先取得最低充分證據，再下工程結論；同一結論維持單一 canonical owner，避免重複造成 drift。**
+## 依任務選擇載入層級
+
+### 一般工程問答／查詢
+
+預設只需要：
+
+1. 本 `CHAT_INIT.md`；
+2. [`indexes/knowledge-index.json`](indexes/knowledge-index.json) 選 domain / entrypoint；
+3. 對應的最低必要 `knowledge/` router 或 canonical page；
+4. 需要版本、來源、scope 或 provenance 時，再讀 [`indexes/standards-index.json`](indexes/standards-index.json) 與對應 `references/` dossier；
+5. Repository evidence 不足或 freshness 不明時，再查 current primary source。
+
+**一般明確問答不需要無條件完整載入 `README.md`、`AGENTS.md` 與 `AI_RESPONSE_CONTRACT.md`。**
+
+### 計算書／圖面／規範審查
+
+除上述最低內容外，再讀：
+
+- [`AI_RESPONSE_CONTRACT.md`](AI_RESPONSE_CONTRACT.md)；
+- 對應 review / methodology canonical page；
+- 若涉及完整結構審查，優先從 `knowledge/structural-design/review/` 路由。
+
+回答呈現採結論優先、最低充分展開；`PASS / WARNING / FAIL / INCOMPLETE / NOT_APPLICABLE` 必須 scope-qualified，局部 `PASS` 不得包裝成整體系統安全。
+
+### Repository 維護／新增／修改內容
+
+必須再讀：
+
+- [`AGENTS.md`](AGENTS.md) — authority、canonical ownership、公開安全、metadata 與維護治理；
+- [`LANGUAGE.md`](LANGUAGE.md) — 若修改人類可讀內容；
+- 相關 `templates/`、`schemas/`、`scripts/validate_repo.py` — 依任務需要載入。
+
+維護時以 GitHub `main` 為 source of truth；修改前先 read-back current remote，避免依舊聊天或 cached copy 覆蓋新內容。
+
+## 路由原則
+
+- 先用 `indexes/knowledge-index.json` 的 `id / aliases / entrypoint` 判斷最可能 domain。
+- `entrypoint` 是該 domain 的預設第一頁；只有明確標示 `router` 的項目才代表真正的 router page。
+- 進入 domain 後，若 entrypoint 已足以回答，就停止擴張讀取。
+- 只有當現有頁面明確 cross-reference、問題跨 domain，或缺少必要 evidence 時，才繼續開下一頁。
+- 不因某頁列出很多相關連結，就自動全部載入。
+
+核心原則：**先用最小 routing metadata 找到正確 canonical owner，再只讀足以回答本題的內容。**

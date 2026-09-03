@@ -16,7 +16,7 @@
 6. **`INCOMPLETE` 是有效結果**：必要 input、criterion、capacity source、support model 或 provenance 不足時，不得補猜為 PASS。
 7. **公開安全（Public-safe）**：不公開未授權施工圖、計算書、可辨識專案條件、私人 provenance 或受版權限制全文。
 
-完整治理規則見 [`AGENTS.md`](AGENTS.md)。AI 工程回覆呈現規則見 [`AI_RESPONSE_CONTRACT.md`](AI_RESPONSE_CONTRACT.md)。語言規則見 [`LANGUAGE.md`](LANGUAGE.md)。
+完整治理規則見 [`AGENTS.md`](AGENTS.md)。AI 精簡啟動與載入策略見 [`CHAT_INIT.md`](CHAT_INIT.md)。AI 工程回覆呈現規則見 [`AI_RESPONSE_CONTRACT.md`](AI_RESPONSE_CONTRACT.md)。語言規則見 [`LANGUAGE.md`](LANGUAGE.md)。
 
 ## 快速開始
 
@@ -35,15 +35,15 @@
 
 ### 給 ChatGPT / Codex
 
-新 session 依序：
+新 session 優先讀 [`CHAT_INIT.md`](CHAT_INIT.md) 作為精簡 bootstrap，再依任務條件載入：
 
-1. 讀本 README。
-2. 讀 [`CHAT_INIT.md`](CHAT_INIT.md)。
-3. 讀 [`AGENTS.md`](AGENTS.md)。
-4. 讀 [`AI_RESPONSE_CONTRACT.md`](AI_RESPONSE_CONTRACT.md)，啟用本 Repo 的工程回答呈現 contract。
-5. 依問題只讀最低必要的 `knowledge/` router / canonical pages。
-6. 需要版本、來源或 provenance 時再讀 `references/`。
-7. Repository evidence 不足或 freshness 不明時，再查 current primary source。
+1. 一般工程問答：用 [`indexes/knowledge-index.json`](indexes/knowledge-index.json) 的 `aliases / entrypoint` 路由，只讀最低必要的 `knowledge/` 頁面。
+2. 需要標準版本、來源或 provenance：再用 [`indexes/standards-index.json`](indexes/standards-index.json) 找對應 `references/standards/` dossier。
+3. 計算書／圖面／規範審查：再讀 [`AI_RESPONSE_CONTRACT.md`](AI_RESPONSE_CONTRACT.md) 與相關 review methodology。
+4. Repository 維護／新增／修改：再讀 [`AGENTS.md`](AGENTS.md)，並依需要載入 `LANGUAGE.md`、templates、schemas 與 validator。
+5. Repository evidence 不足或 freshness 不明時，再查 current primary source。
+
+**一般明確問答不要求無條件完整載入 README、AGENTS 與 AI_RESPONSE_CONTRACT。** 目標是以最低充分上下文找到正確 canonical owner，降低重複 token 與 instruction dilution。
 
 ## 儲存庫（Repository）結構
 
@@ -52,7 +52,7 @@
   - `references/standards/` 是標準 current-edition / status 的優先 owner。
   - [`references/github-projects/`](references/github-projects/) 是 NON-NORMATIVE 軟體／實作參考。
 - [`schemas/`](schemas/)：AI / calculator / spreadsheet 共用的 machine-readable engineering data models。
-- `indexes/`：machine-readable routing / lookup index；只保存索引，不複製 knowledge 本體。
+- `indexes/`：machine-readable routing / lookup index；`knowledge-index.json` 提供 domain aliases 與 entrypoint，index 不複製 knowledge 本體。
 - [`templates/`](templates/)：新增 knowledge / reference 時的格式骨架。
 - [`scripts/`](scripts/) 與 `.github/`：repository validation / maintenance tooling。
 
@@ -88,10 +88,11 @@ Cross-reference 只代表用途相關，不代表 CNS / ASTM / AAMA-FGIA / ISO �
 
 - JSON / JSON Schema validation
 - Markdown relative-link existence
-- knowledge verification status
+- knowledge verification status / canonical ownership
 - public-reference privacy rule
+- standards dossier machine metadata / standards-index 對應
 - `LANGUAGE.md` 繁中 heading lint
-- architecture / index / canonical ownership lint
+- architecture / AI routing index lint
 
 ## 授權與責任
 

@@ -64,7 +64,7 @@
 - 整理後的工程結論放在 `knowledge/`。
 - **只有可公開散布的來源與 provenance** 放在 `references/`。
 - 通用 machine-readable engineering data models 放在 `schemas/`。
-- `indexes/` 僅在需要建立 standards / materials / cross-reference lookup index 時新增；不得和 `schemas/` 混為同一責任。
+- `indexes/` 保存 machine-readable routing / lookup metadata；不得複製 knowledge 本體或成為第二份工程結論 owner。
 - 同一標準／材料／工程結論只指定一個 canonical owner。
 - 其他頁面只摘要必要差異並連結 canonical owner，避免全文重複造成 drift。
 
@@ -72,19 +72,35 @@
 
 同一標準若被多個 knowledge pages 使用，current edition / status 應由一個 canonical standard page 或 public reference dossier 優先維護；其他頁面只引用 canonical routing。不得在多頁獨立維護互相衝突的 current-edition snapshot。
 
+`references/standards/` dossier 的 frontmatter 是 AI／validator 用的 machine-readable metadata；正文仍是人類可讀的 public provenance、scope 與限制。`indexes/standards-index.json` 只保存標準 ID → dossier path，不重複 edition/status。
+
 ## 人工智慧（AI）讀取規則
 
-AI 不應預設完整掃描 repository。
+AI 不應預設完整掃描 repository。`CHAT_INIT.md` 是 runtime 精簡 bootstrap；本 `AGENTS.md` 主要用於 **Repository 維護、內容新增／修改，以及需要完整治理規則的任務**。
 
-新 session：
+### 一般工程問答
 
-1. 讀 `README.md`。
-2. 讀 `CHAT_INIT.md`。
-3. 讀 `AGENTS.md`。
-4. 讀 [`AI_RESPONSE_CONTRACT.md`](AI_RESPONSE_CONTRACT.md)，啟用本 repository 的工程回覆呈現規則。
-5. 依題目只搜尋最低必要的 `knowledge/` 主題。
-6. 若答案需要查來源、版本或 evidence，再讀對應 `references/`。
-7. 若 repository 內 evidence 不足或 freshness 不明，再外部查證。
+1. 先讀 `CHAT_INIT.md`。
+2. 使用 `indexes/knowledge-index.json` 的 `id / aliases / entrypoint` 選擇最低必要 domain。
+3. 只讀該 entrypoint 與回答本題所需的 canonical pages；若 entrypoint 已足夠，停止擴張。
+4. 若答案需要標準版本、來源或 provenance，再用 `indexes/standards-index.json` 路由到對應 `references/standards/` dossier。
+5. 若 repository 內 evidence 不足或 freshness 不明，再外部查證 current primary source。
+
+一般明確問答**不需要無條件完整載入 `README.md`、本 `AGENTS.md` 與 `AI_RESPONSE_CONTRACT.md`**。
+
+### 審查／verification task
+
+計算書、圖面、規範或完整 engineering review 除上述最低內容外，再讀 [`AI_RESPONSE_CONTRACT.md`](AI_RESPONSE_CONTRACT.md) 與對應 review / methodology canonical pages。
+
+### Repository 維護
+
+新增、修改、重構、移動或刪除 repository 內容前：
+
+1. 先 remote read-back GitHub `main`；不得只依舊聊天、cached copy 或 AI memory。
+2. 讀本 `AGENTS.md`。
+3. 若修改人類可讀內容，再讀 `LANGUAGE.md`。
+4. 依任務讀 relevant template / schema / validator；不要為維護單一 domain 而掃完整個 knowledge tree。
+5. 修改後以 repository 自動驗證 success 與 remote read-back 為完成條件。
 
 `AI_RESPONSE_CONTRACT.md` 只負責回答如何呈現：結論優先、回答深度、已確認／推論／缺口分離、scope-qualified status、精簡與引用方式。它不得覆蓋本檔的 authority、工程數值、公開安全或 canonical ownership 規則。
 

@@ -1,3 +1,14 @@
+---
+title: "ASTM C1184 — Structural Silicone Sealants 來源 dossier"
+verification_status: "VERIFIED_PRIMARY"
+verified_at: "2026-09-02"
+document_type: "reference-standard-dossier"
+standard_id: "ASTM C1184"
+organization: "ASTM International"
+current_status: "Active"
+edition: "C1184-23"
+---
+
 # ASTM C1184 — Structural Silicone Sealants 來源 dossier
 
 - 驗證狀態：`VERIFIED_PRIMARY`
