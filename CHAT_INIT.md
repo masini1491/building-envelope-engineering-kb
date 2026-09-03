@@ -38,7 +38,7 @@
 
 回答呈現採結論優先、最低充分展開；`PASS / WARNING / FAIL / INCOMPLETE / NOT_APPLICABLE` 必須 scope-qualified，局部 `PASS` 不得包裝成整體系統安全。
 
-### Repository 維護／新增／修改內容
+### 儲存庫（Repository）維護／新增／修改內容
 
 必須再讀：
 
