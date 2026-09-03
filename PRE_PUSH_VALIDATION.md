@@ -37,29 +37,31 @@ Retrieval capability、GitHub connector capability 與 local execution capabilit
 
 1. remote read-back 最新 GitHub `main`，確認 base 未漂移；
 2. 完成所有預定修改，包含 deterministic generated artifact；
-3. 若有新增、刪除或移動 `knowledge/**/*.md`，先執行：
+3. 若本次修改包含人類可讀 Markdown，且完整 repository validation 暫時不可用，至少以 [`scripts/preflight_markdown_headings.py`](scripts/preflight_markdown_headings.py) 對本次 changed Markdown snapshot 執行繁中標題 preflight；這是窄範圍快速檢查，不等同完整 repository validation；
+4. 若有新增、刪除或移動 `knowledge/**/*.md`，先執行：
 
 ```bash
 python scripts/build_knowledge_manifests.py
 ```
 
-4. 若完整 repository snapshot 與 Python runtime 可用，至少執行：
+5. 若完整 repository snapshot 與 Python runtime 可用，至少執行：
 
 ```bash
 python scripts/build_knowledge_manifests.py --check
 python scripts/validate_repo.py
 ```
 
-5. 任一 deterministic check failure 時，**先在 remote push 前修正並重跑**；不得為了取得 CI 訊息而先把已知 failure 推到 `main`。
-6. 所有預定檔案與 generated artifact 應盡量合併為**單一 batched commit**，避免每個檔案各自形成會觸發 CI 的中間 commit。
-7. push 後仍保留 GitHub Actions 作為 remote independent confirmation；CI success 後再 remote read-back `main` 完成任務。
+6. 任一 deterministic check failure 時，**先在 remote push 前修正並重跑**；不得為了取得 CI 訊息而先把已知 failure 推到 `main`。
+7. 所有預定檔案與 generated artifact 應盡量合併為**單一 batched commit**，避免每個檔案各自形成會觸發 CI 的中間 commit。
+8. push 後仍保留 GitHub Actions 作為 remote independent confirmation；CI success 後再 remote read-back `main` 完成任務。
 
 ## 無法做完整 pre-push validation 時
 
 ChatGPT 的某些 GitHub 維護 session 可能只有 connector remote-write 能力，沒有完整 repository filesystem。此時：
 
 - 仍先 remote read-back 所有受影響 canonical files；
-- 以 deterministic generator／validator contract 做最低必要靜態檢查；
+- 若修改人類可讀 Markdown 且可 materialize／重建本次 changed-file snapshot，先執行 `scripts/preflight_markdown_headings.py <changed.md> [...]`；
+- 以 deterministic generator／validator contract 做其餘最低必要靜態檢查；
 - **一次完成所有可合理確認的修改，再做單一 remote commit**；
 - 不建立多個「試跑 CI」中間 commit；
 - 第一次 remote CI 若失敗，再讀取實際 failure log，將修正收斂成下一個單一 commit；不要逐條猜測式 push。
