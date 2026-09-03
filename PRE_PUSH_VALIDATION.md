@@ -58,7 +58,7 @@ ChatGPT 的某些 GitHub 維護 session 可能只有 connector remote-write 能�
 
 這個 fallback 不能宣稱等同完整 pre-push validation，但能降低 CI failure burst 與通知噪音。
 
-## CI 定位
+## 持續整合（CI）定位
 
 目前 `Repository 自動驗證` 保留在 `main` push／pull request，角色是**獨立的 remote enforcement**，不是主要除錯迴圈。
 
