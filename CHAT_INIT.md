@@ -50,6 +50,8 @@
 
 **若任務涉及新增、整理、吸收、匯入或重構 knowledge，建立任何新的 `knowledge/**/*.md` 前必須先讀 [`KNOWLEDGE_INGESTION.md`](KNOWLEDGE_INGESTION.md) 並執行其中的「新增知識決策門」。預設優先更新既有 canonical owner，不以新增檔案作為預設動作。**
 
+**任何準備寫入 GitHub 的 repository 維護任務，在第一次 remote write 前必須讀 [`PRE_PUSH_VALIDATION.md`](PRE_PUSH_VALIDATION.md) 並執行「推送前驗證門」；預設先收斂 deterministic checks，再以單一 batched commit／最少必要 push 寫入，GitHub Actions 只作 remote independent confirmation。**
+
 維護時以 GitHub `main` 為 source of truth；修改前先 read-back current remote，避免依舊聊天或 cached copy 覆蓋新內容。
 
 新增、刪除或移動 `knowledge/**/*.md` 後，執行：
