@@ -48,6 +48,8 @@
 - [`LANGUAGE.md`](LANGUAGE.md) — 若修改人類可讀內容；
 - 相關 `templates/`、`schemas/`、`scripts/validate_repo.py` — 依任務需要載入。
 
+**若任務涉及新增、整理、吸收、匯入或重構 knowledge，建立任何新的 `knowledge/**/*.md` 前必須先讀 [`KNOWLEDGE_INGESTION.md`](KNOWLEDGE_INGESTION.md) 並執行其中的「新增知識決策門」。預設優先更新既有 canonical owner，不以新增檔案作為預設動作。**
+
 維護時以 GitHub `main` 為 source of truth；修改前先 read-back current remote，避免依舊聊天或 cached copy 覆蓋新內容。
 
 新增、刪除或移動 `knowledge/**/*.md` 後，執行：
