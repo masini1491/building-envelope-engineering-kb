@@ -18,6 +18,21 @@
 
 完整治理規則見 [`AGENTS.md`](AGENTS.md)。AI 精簡啟動與載入策略見 [`CHAT_INIT.md`](CHAT_INIT.md)。AI 工程回覆呈現規則見 [`AI_RESPONSE_CONTRACT.md`](AI_RESPONSE_CONTRACT.md)。語言規則見 [`LANGUAGE.md`](LANGUAGE.md)。
 
+## 快速導入人工智慧（AI）
+
+本 repository 已設計為可直接交由 ChatGPT、Codex 或其他可讀取 GitHub repository 的 AI 使用，不需要把整個知識庫複製進 prompt，也不需要人工逐頁指定要讀哪些文件。
+
+最小導入方式：
+
+1. 將本 repository 提供給 AI。
+2. 要求 AI 先讀 [`CHAT_INIT.md`](CHAT_INIT.md)。
+3. AI 依 `knowledge-index → domain manifest → canonical leaf page` 漸進式載入最低必要內容。
+4. 只有在 Repository 維護、工程審查、標準 provenance 或其他特定任務時，才條件式載入對應治理文件。
+
+因此一般使用者不需要自行管理每一份知識文件，也不需要要求 AI 預先掃描整個 repository。
+
+**目標不是讓 AI 記住整個 Repo，而是讓 AI 能快速找到唯一、最新且足夠的工程權威內容。**
+
 ## 快速開始
 
 ### 給工程師／一般使用者
