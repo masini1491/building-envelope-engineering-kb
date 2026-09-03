@@ -101,8 +101,9 @@ AI 不應預設完整掃描 repository。`CHAT_INIT.md` 是 runtime 精簡 boots
 2. 讀本 `AGENTS.md`。
 3. 若修改人類可讀內容，再讀 `LANGUAGE.md`。
 4. 若涉及新增、整理、吸收、匯入或重構 knowledge，再讀 `KNOWLEDGE_INGESTION.md` 並先執行新增知識決策門。
-5. 依任務讀 relevant template / schema / validator；不要為維護單一 domain 而掃完整個 knowledge tree。
-6. 修改後以 repository 自動驗證 success 與 remote read-back 為完成條件。
+5. 準備第一次 remote write 前，讀 [`PRE_PUSH_VALIDATION.md`](PRE_PUSH_VALIDATION.md) 並執行推送前驗證門；能在本 session 執行 deterministic checks 時先完成驗證，再以單一 batched commit／最少必要 push 寫入。
+6. 依任務讀 relevant template / schema / validator；不要為維護單一 domain 而掃完整個 knowledge tree。
+7. 修改後以 repository 自動驗證 success 與 remote read-back 為完成條件。
 
 `AI_RESPONSE_CONTRACT.md` 只負責回答如何呈現：結論優先、回答深度、已確認／推論／缺口分離、scope-qualified status、精簡與引用方式。它不得覆蓋本檔的 authority、工程數值、公開安全或 canonical ownership 規則。
 
