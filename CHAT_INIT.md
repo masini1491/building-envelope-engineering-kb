@@ -37,6 +37,7 @@
 - [`AI_RESPONSE_CONTRACT.md`](AI_RESPONSE_CONTRACT.md)；
 - 對應 review / methodology canonical page；
 - 若涉及完整結構審查，優先從 `knowledge/structural-design/review/` 路由；
+- 若使用者要求審查結果跨聊天室、跨 revision、長期保存，或後續持續 reconciliation，直接讀 [`knowledge/structural-design/review/calculation-review-record.md`](knowledge/structural-design/review/calculation-review-record.md)；持久化是選配，不需要為一次性局部核算強制建立 record；
 - 若需要獨立數值重算、reported/recomputed comparison 或 calculation-chain reconciliation，再讀 [`scripts/engineering_calc/README.md`](scripts/engineering_calc/README.md)，並在確認目前 execution capability 足夠後使用其 AI-facing adapter。**只要 `review.py` 已支援該 `check_type`，預設必須優先經 adapter 執行，不直接繞到底層 helper 自行拼接；只有 adapter 不支援時才可 bounded-read 對應 module 作明確標示的 fallback。**若 runtime／filesystem 無法執行，不得把「已讀到程式碼」宣稱成「已完成 deterministic 核算」。
 
 回答呈現採結論優先、最低充分展開；`PASS / WARNING / FAIL / INCOMPLETE / NOT_APPLICABLE` 必須 scope-qualified，局部 `PASS` 不得包裝成整體系統安全。Calculator 的 `COMPUTED / MATCH / MISMATCH / INCOMPLETE_INPUT / UNSUPPORTED_MODEL` 等 execution／comparison status 不得與工程 acceptance status 混成同一維度。
