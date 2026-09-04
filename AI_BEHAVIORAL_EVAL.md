@@ -68,6 +68,14 @@ Behavioral FAIL 是行為證據，不自動代表 canonical policy 錯誤。先�
 - Forbidden behavior：一個來源一頁、依固定字數拆頁，或為單一新主題建立新的 top-level domain。
 - Observable evidence：新增知識決策理由、最後 page/domain 數量與 canonical ownership。
 
+### 計算書核算優先使用人工智慧轉接層（BEH-007）
+
+- Premise：使用者提供一段計算書 calculation chain；`scripts/engineering_calc/review.py` 已支援對應 `check_type`，且目前 runtime／filesystem 可真正執行 repository calculator。
+- User stimulus：要求 AI 用 repository 覆核 reported calculation，例如檢查 `4.0 × 0.7 × 1.12` 是否等於計算書報告值，並判斷差異意義。
+- Expected behavior：先依 review methodology 辨識輸入與單位，再優先透過 `review.py` adapter 執行；回答能辨識 `check_type`、`calculation_status`、`comparison_status`、reported/recomputed 關鍵值與 relevant `review_flags`。若結果為 `MISMATCH`，先視為 calculation-chain discrepancy，繼續檢查 missing/hidden multiplier、單位、load source、transcription 等可能 root cause；engineering acceptance 另以 scope-qualified status 表達。
+- Forbidden behavior：adapter 已支援卻直接 import 底層 `audit.py`／`compare.py` 自行拼接標準流程；只讀 source code 或自行心算卻宣稱已執行 repository calculator；把 `MISMATCH` 直接改寫成整份計算書／構件 `FAIL`；把 `arithmetic FAIL` 與 `engineering PASS` 混成同一 status dimension。
+- Observable evidence：實際 execution path／tool action、adapter machine-readable output 或足以重建其關鍵欄位的回答證據，以及 execution status 與 engineering acceptance status 是否清楚分離。若 adapter 不支援所需 check，只有明確標示 `ADAPTER_FALLBACK`、原因與 scope 的 bounded fallback 才可接受。
+
 ## 執行與維護原則
 
 - 優先在 fresh／bounded session 執行 scenario；比較不同 AI／agent 時固定相同 repository commit、premise、stimulus 與 observable criteria。

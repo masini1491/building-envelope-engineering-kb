@@ -14,7 +14,7 @@ ChatGPT 從計算書抽取 reported inputs、公式、假設與 reported results
 
 建議流程：
 
-`計算書 → ChatGPT 抽取與辨識模型 → deterministic helper 重算 → calculation-chain reconciliation → reported/recomputed comparison → ChatGPT 依 canonical methodology 判讀差異與完整性`
+`計算書 → ChatGPT 抽取與辨識模型 → AI-facing adapter → deterministic helper 重算 → calculation-chain reconciliation → reported/recomputed comparison → ChatGPT 依 canonical methodology 判讀差異與完整性`
 
 ## 人工智慧（AI）導入入口
 
@@ -25,6 +25,8 @@ python -m scripts.engineering_calc.review input.json
 ```
 
 也可由 stdin 傳入 JSON。adapter 把 AI 抽取的結構化輸入送入既有 deterministic helper，再回傳 machine-readable 結果；它**不負責選擇工程模型或產生工程設計值**。
+
+**Adapter-first 是預設 execution contract。**只要 `review.py` 已支援所需 `check_type`，ChatGPT 不應直接 import `audit.py`、`compare.py`、`beam.py`、`connection.py` 或其他底層 helper 來自行重建 invocation／status contract。只有 adapter 尚未支援所需能力時，才可 bounded-read 最低必要底層 module 作 fallback，並在回答中明確標示 `ADAPTER_FALLBACK` 與 fallback scope；不得把 fallback 描述成標準 adapter execution。
 
 執行前必須確認 Python runtime、repository/package filesystem 與必要 dependency 真正可用。只具備 GitHub read access、能看到 source code，**不等於**程式已在目前 execution environment 成功執行。
 
@@ -41,7 +43,19 @@ python -m scripts.engineering_calc.review input.json
 - `calculation_status`：`COMPUTED / INCOMPLETE_INPUT / UNSUPPORTED_MODEL`。
 - `comparison_status`：`MATCH / MISMATCH / NOT_PROVIDED / INCOMPLETE`。
 
-這些 status 只描述**計算執行／數值比對**；不得改寫成整體工程 `PASS`。
+這些 status 只描述**計算執行／數值比對**；不得改寫成整體工程 `PASS`。例如 visible factors 重算得到 `MISMATCH` 時，先記錄為 calculation-chain discrepancy，再查單位、遺漏係數、不同 load source、hidden multiplier 或 transcription error；在 root cause 未確認前，不得僅因 arithmetic mismatch 宣稱整體工程 `FAIL`。
+
+### 回答中的執行證據
+
+若回答聲稱「已使用 Repository deterministic calculator 核算」，至少應能讓讀者辨識：
+
+- 使用的 adapter `check_type`；
+- `calculation_status` 與 `comparison_status`；
+- reported 與 recomputed 的關鍵值；
+- relevant `review_flags`；
+- 若未走 adapter，明確標示 `ADAPTER_FALLBACK` 與原因。
+
+不要求把完整 JSON 原樣貼給使用者，但不得只寫「已用 helper 重算」而無法區分真正 execution、手算、模型心算或 source-code inspection。
 
 ## 工具邊界
 
@@ -82,7 +96,7 @@ python -m scripts.engineering_calc.review input.json
 
 `design pressure → multiplier / tributary width → line load → beam response → support reaction → fastener-group demand → connection demand/capacity arithmetic`
 
-若 `audit.py` 或 `compare.py` 發現 `MISMATCH`，回到該步驟檢查單位、係數、effective width、boundary condition、load combination 或 hidden multiplier，不直接用後段結果覆蓋差異。施工圖、材料表與計算書的一致性仍屬 document cross-check，不能因 deterministic arithmetic MATCH 而省略。
+若 adapter 回傳 `MISMATCH`，回到該步驟檢查單位、係數、effective width、boundary condition、load combination 或 hidden multiplier，不直接用後段結果覆蓋差異，也不直接把 comparison status 升格為 engineering acceptance status。施工圖、材料表與計算書的一致性仍屬 document cross-check，不能因 deterministic arithmetic `MATCH` 而省略。
 
 ## 漸進式擴充原則
 
