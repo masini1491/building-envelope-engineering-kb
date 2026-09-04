@@ -14,7 +14,7 @@ ChatGPT 從計算書抽取 reported inputs、公式、假設與 reported results
 
 建議流程：
 
-`計算書 → ChatGPT 抽取與辨識模型 → deterministic helper 重算 → reported/recomputed comparison → ChatGPT 依 canonical methodology 判讀差異與完整性`
+`計算書 → ChatGPT 抽取與辨識模型 → deterministic helper 重算 → calculation-chain reconciliation → reported/recomputed comparison → ChatGPT 依 canonical methodology 判讀差異與完整性`
 
 ## 工具邊界
 
@@ -23,18 +23,45 @@ ChatGPT 從計算書抽取 reported inputs、公式、假設與 reported results
 - 不自行生成 allowable stress、design strength、safety factor、design pressure、standard edition 或規範等價關係。
 - 單位轉換必須明確；無法確認單位時應停止或標示缺口，不可猜測。
 - comparison tolerance 只代表數值一致性門檻，不是工程允許誤差。
+- `connection.py` 的 capacity 必須由可追溯的規範、產品資料或專案條件明確提供；工具不內建 universal fastener capacity。
+- `beam.py` 不推論支承、splice rigidity 或 semi-rigid behavior；boundary condition 不明時，ChatGPT 應把 structural model 視為 `INCOMPLETE`。
 - local calculation result 不得直接升格成 overall structural PASS。
 
-## 第一階段模組
+## 目前模組
 
 - `units.py`：少量明確、可追溯的工程單位轉換。
 - `compare.py`：reported 與 recomputed 數值比較。
 - `section_required.py`：required section property 的 deterministic arithmetic。
-- `beam.py`：目前只提供明確邊界條件的 closed-form beam sanity check。
+- `beam.py`：closed-form simple-span sanity check，以及線彈性 1D Euler-Bernoulli beam direct-stiffness solver；可處理多跨、不同 `EI`、節點集中力／力矩與各 span UDL，但只輸出 nodal response、support reaction 與 element end actions。
 - `fastener_group.py`：平面扣件群在 direct in-plane force 與 `Mz` 下的彈性分配核算。
+- `connection.py`：需求／容量比、projected bearing stress、shear/tension demand 與 externally-established thread-engagement requirement 的 arithmetic helper；不自行選 failure-mode equation 或 interaction equation。
+- `audit.py`：計算鏈數值 reconciliation，包括乘積鏈與靜力 force balance；用來找出 reported calculation 中間值不連續，不代表工程模型已正確。
 
-對應 deterministic tests 位於 `tests/engineering_calc/`。
+對應 deterministic tests 位於 `tests/engineering_calc/`，並由 repository CI 執行。
+
+## 多跨梁核算使用原則
+
+`beam.py` 的 general solver 每個 node 只有 transverse displacement 與 rotation 兩個 DOF。使用前，ChatGPT 必須先依計算書與 canonical methodology 明確辨識：
+
+- node / support / splice 位置；
+- 哪些 node restrain translation；
+- 哪些 node restrain rotation；
+- 每段 `E / I`；
+- 每段 UDL；
+- point load / moment 的實際作用位置。
+
+任意 point load 應在作用位置建立 node 後再輸入。現階段 solver 不包含 semi-rigid rotational spring、Timoshenko shear deformation、geometric/material nonlinearity、torsion 或 3D frame behavior；需要這些效應時不得用本工具結果取代適當分析模型。
+
+## 計算書核算建議
+
+對既有帷幕計算書，優先把數值鏈拆成可重算步驟，例如：
+
+`design pressure → multiplier / tributary width → line load → beam response → support reaction → fastener-group demand → connection demand/capacity arithmetic`
+
+若 `audit.py` 或 `compare.py` 發現中間值 `MISMATCH`，ChatGPT 應回到該步驟檢查單位、係數、effective width、boundary condition、load combination 或 hidden multiplier，而不是直接用後段結果覆蓋差異。
+
+施工圖、材料表與計算書之間的 weld size、fastener size、reinforcement、section property、support condition 等一致性，仍屬 document cross-check；不能因 deterministic arithmetic MATCH 而省略。
 
 ## 漸進式擴充原則
 
-只有在公式、輸入、輸出、適用條件與失敗語意可明確界定時才新增 helper。複雜連續梁、焊道群、tributary-load distribution 與高階 audit orchestration 應在各自 canonical methodology 與驗證案例足夠後再加入，不以一支大型萬用 calculator 混合所有工程責任。
+只有在公式、輸入、輸出、適用條件與失敗語意可明確界定時才新增 helper。下一階段可再依 canonical methodology 與實際計算書需求加入 weld group、transom dead-load / setting-block、biaxial member check、panel/stiffener 與 structural silicone；玻璃與標準高度耦合的計算應在 edition/provenance 與驗證案例足夠後再實作，不以一支大型萬用 calculator 混合所有工程責任。
