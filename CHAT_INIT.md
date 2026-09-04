@@ -36,7 +36,8 @@
 
 - [`AI_RESPONSE_CONTRACT.md`](AI_RESPONSE_CONTRACT.md)；
 - 對應 review / methodology canonical page；
-- 若涉及完整結構審查，優先從 `knowledge/structural-design/review/` 路由。
+- 若涉及完整結構審查，優先從 `knowledge/structural-design/review/` 路由；
+- 若需要獨立數值重算、reported/recomputed comparison 或 calculation-chain reconciliation，再讀 [`scripts/engineering_calc/README.md`](scripts/engineering_calc/README.md)，並在確認目前 execution capability 足夠後使用其 AI-facing adapter。若 runtime／filesystem 無法執行，不得把「已讀到程式碼」宣稱成「已完成 deterministic 核算」。
 
 回答呈現採結論優先、最低充分展開；`PASS / WARNING / FAIL / INCOMPLETE / NOT_APPLICABLE` 必須 scope-qualified，局部 `PASS` 不得包裝成整體系統安全。
 

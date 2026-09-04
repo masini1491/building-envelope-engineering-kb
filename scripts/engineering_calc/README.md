@@ -16,6 +16,33 @@ ChatGPT 從計算書抽取 reported inputs、公式、假設與 reported results
 
 `計算書 → ChatGPT 抽取與辨識模型 → deterministic helper 重算 → calculation-chain reconciliation → reported/recomputed comparison → ChatGPT 依 canonical methodology 判讀差異與完整性`
 
+## 人工智慧（AI）導入入口
+
+當 ChatGPT 已依 `CHAT_INIT.md` 與對應 canonical methodology 確認需要 deterministic numerical verification 時，優先使用：
+
+```bash
+python -m scripts.engineering_calc.review input.json
+```
+
+也可由 stdin 傳入 JSON。adapter 把 AI 抽取的結構化輸入送入既有 deterministic helper，再回傳 machine-readable 結果；它**不負責選擇工程模型或產生工程設計值**。
+
+執行前必須確認 Python runtime、repository/package filesystem 與必要 dependency 真正可用。只具備 GitHub read access、能看到 source code，**不等於**程式已在目前 execution environment 成功執行。
+
+### 輸入契約
+
+最外層固定使用 `check_type / units / inputs / reported_results / tolerance`。`units` 必填且不得猜測；`reported_results` 可省略；`tolerance` 只代表 numerical agreement，不是 engineering acceptance criterion。
+
+目前 adapter 支援：`beam`、`required_inertia`、`required_section_modulus`、`section_property_utilization`、`fastener_group`、`demand_capacity`、`projected_bearing_stress`、`shear_tension_demand`、`thread_engagement`、`audit_product`、`audit_force_balance`。
+
+### 輸出契約
+
+最外層固定回傳 `calculation_status / comparison_status / check_type / computed / comparisons / review_flags`。
+
+- `calculation_status`：`COMPUTED / INCOMPLETE_INPUT / UNSUPPORTED_MODEL`。
+- `comparison_status`：`MATCH / MISMATCH / NOT_PROVIDED / INCOMPLETE`。
+
+這些 status 只描述**計算執行／數值比對**；不得改寫成整體工程 `PASS`。
+
 ## 工具邊界
 
 - calculator 確認 arithmetic correctness，不等於確認 engineering correctness。
@@ -32,36 +59,31 @@ ChatGPT 從計算書抽取 reported inputs、公式、假設與 reported results
 - `units.py`：少量明確、可追溯的工程單位轉換。
 - `compare.py`：reported 與 recomputed 數值比較。
 - `section_required.py`：required section property 的 deterministic arithmetic。
-- `beam.py`：closed-form simple-span sanity check，以及線彈性 1D Euler-Bernoulli beam direct-stiffness solver；可處理多跨、不同 `EI`、節點集中力／力矩與各 span UDL，但只輸出 nodal response、support reaction 與 element end actions。
-- `fastener_group.py`：平面扣件群在 direct in-plane force 與 `Mz` 下的彈性分配核算。
-- `connection.py`：需求／容量比、projected bearing stress、shear/tension demand 與 externally-established thread-engagement requirement 的 arithmetic helper；不自行選 failure-mode equation 或 interaction equation。
-- `audit.py`：計算鏈數值 reconciliation，包括乘積鏈與靜力 force balance；用來找出 reported calculation 中間值不連續，不代表工程模型已正確。
+- `beam.py`：線彈性 1D Euler-Bernoulli beam direct-stiffness solver。
+- `beam_extrema.py`：由 beam result 重建 constant-UDL element 的跨內 shear / moment / deflection，輸出 element/global 最大絕對值與位置。
+- `fastener_group.py`：平面扣件群彈性分配核算。
+- `connection.py`：需求／容量比、bearing、shear/tension 與 thread-engagement arithmetic helper。
+- `audit.py`：乘積鏈與靜力 force balance reconciliation。
+- `review.py`：AI-facing JSON adapter，統一 invocation、execution status、reported comparison 與 review flags。
 
 對應 deterministic tests 位於 `tests/engineering_calc/`，並由 repository CI 執行。
 
 ## 多跨梁核算使用原則
 
-`beam.py` 的 general solver 每個 node 只有 transverse displacement 與 rotation 兩個 DOF。使用前，ChatGPT 必須先依計算書與 canonical methodology 明確辨識：
+使用前，ChatGPT 必須先依計算書與 canonical methodology 明確辨識 node / support / splice、restrained DOF、每段 `E / I`、每段 UDL 與 point load / moment 位置。任意 point load 應在作用位置建立 node 後再輸入。
 
-- node / support / splice 位置；
-- 哪些 node restrain translation；
-- 哪些 node restrain rotation；
-- 每段 `E / I`；
-- 每段 UDL；
-- point load / moment 的實際作用位置。
+現階段 solver 不包含 semi-rigid rotational spring、Timoshenko shear deformation、geometric/material nonlinearity、torsion 或 3D frame behavior；需要這些效應時不得用本工具結果取代適當分析模型。
 
-任意 point load 應在作用位置建立 node 後再輸入。現階段 solver 不包含 semi-rigid rotational spring、Timoshenko shear deformation、geometric/material nonlinearity、torsion 或 3D frame behavior；需要這些效應時不得用本工具結果取代適當分析模型。
+`beam_extrema.py` 只適用目前 solver 的 adjacent-node、constant-UDL element；simple-span 的跨中 `Mmax / δmax` 因此不會只靠 element end action 判斷。
 
 ## 計算書核算建議
 
-對既有帷幕計算書，優先把數值鏈拆成可重算步驟，例如：
+優先把數值鏈拆成：
 
 `design pressure → multiplier / tributary width → line load → beam response → support reaction → fastener-group demand → connection demand/capacity arithmetic`
 
-若 `audit.py` 或 `compare.py` 發現中間值 `MISMATCH`，ChatGPT 應回到該步驟檢查單位、係數、effective width、boundary condition、load combination 或 hidden multiplier，而不是直接用後段結果覆蓋差異。
-
-施工圖、材料表與計算書之間的 weld size、fastener size、reinforcement、section property、support condition 等一致性，仍屬 document cross-check；不能因 deterministic arithmetic MATCH 而省略。
+若 `audit.py` 或 `compare.py` 發現 `MISMATCH`，回到該步驟檢查單位、係數、effective width、boundary condition、load combination 或 hidden multiplier，不直接用後段結果覆蓋差異。施工圖、材料表與計算書的一致性仍屬 document cross-check，不能因 deterministic arithmetic MATCH 而省略。
 
 ## 漸進式擴充原則
 
-只有在公式、輸入、輸出、適用條件與失敗語意可明確界定時才新增 helper。下一階段可再依 canonical methodology 與實際計算書需求加入 weld group、transom dead-load / setting-block、biaxial member check、panel/stiffener 與 structural silicone；玻璃與標準高度耦合的計算應在 edition/provenance 與驗證案例足夠後再實作，不以一支大型萬用 calculator 混合所有工程責任。
+只有在公式、輸入、輸出、適用條件與失敗語意可明確界定時才新增 helper。下一階段可再依 canonical methodology 與實際計算書需求加入 weld group、transom dead-load / setting-block、biaxial member check、panel/stiffener 與 structural silicone；玻璃與標準高度耦合的計算應在 edition/provenance 與驗證案例足夠後再實作。
