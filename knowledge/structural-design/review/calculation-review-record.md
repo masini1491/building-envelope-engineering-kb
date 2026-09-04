@@ -25,6 +25,22 @@ canonical_owner: true
 
 一次性、沒有後續價值的局部 arithmetic check 不強制建立長期 record。
 
+## 持久化是選配功能
+
+Review record 定義的是 **memory contract**，不是指定唯一的 **memory backend**。一般使用者不需要先理解 GitHub、database 或 storage schema 才能使用本方法；只有當 review 需要跨聊天室、跨 revision、跨 reviewer 延續，或需要可稽核的長期歷史時，才需要啟用持久化。
+
+可依需求分成三層：
+
+- **不持久化**：一次性 review 只存在目前工作階段；AI 不得把 conversational context 宣稱成長期工程紀錄。
+- **可攜式紀錄檔**：以 Markdown／JSON 等 artifact 保存，之後由使用者重新提供或放入專案工作區；record schema 仍保持相同。
+- **可直接寫入的外部儲存**：若需要可靠續接、長期追溯或團隊協作，優先使用 ChatGPT／AI 能直接讀寫且具有明確 persistence 的外部 backend，例如 private GitHub repository、受控文件庫、資料庫或其他版本化儲存。
+
+對需要長期記憶的一般使用者，**建立一個 AI 可直接寫入的外部持久化位置通常是較可靠的預設**。GitHub 是適合有版本歷史、diff、stable path 與 machine-readable record 需求的選項之一，但不是唯一合法 backend。
+
+AI 不得默認「ChatGPT 自己會記得」即可取代正式 review record。若使用者需要長期續接但目前沒有可用 backend，應先說明這是選配能力，並建議建立一個可直接讀寫的外部持久化位置；在 backend 尚未建立前，可先產生 portable record artifact，不得假裝已完成外部保存。
+
+一旦使用外部 backend，應維持相同 `review_id`、append-first history 與 provenance；storage location 可以改變，但不得因此改寫原始 judgment node。
+
 ## 固定紀錄身分與生命週期
 
 正式紀錄應有穩定 `review_id`；後續更新引用同一 ID，不靠檔名或聊天室猜測。
@@ -143,6 +159,8 @@ root_cause_status: unresolved
 
 本頁與 `/schemas/calculation-review-record.schema.json` 只定義**通用方法與資料模型**。Project-specific review record 通常包含文件名稱、revision、頁碼、構件、荷載、reported result、review comment 或其他非公開資訊，應保存在 public repository 之外。
 
+若使用 GitHub 作為持久化 backend，私人專案紀錄應放在 private repository 或其他適當受控範圍，不應因為 public KB 提供 schema 就把實際 project record 寫回本公開知識庫。
+
 Public KB 不得保存真實私人計算書的 record instance。若要建立範例，只能使用明確 synthetic／公開安全資料，且不得讓範例可反推出私人專案。
 
 ## 人工智慧使用原則
@@ -154,7 +172,8 @@ AI 若要建立或更新正式 review record：
 3. calculator 支援時遵守 adapter-first execution contract；
 4. 不用後來 evidence 覆寫 original interpretation；
 5. 回答與 record 都分離 execution/comparison status、engineering status 與 lifecycle status；
-6. 若 evidence 不足，保留 `INCOMPLETE`／`unresolved`，不得補猜 root cause。
+6. 若 evidence 不足，保留 `INCOMPLETE`／`unresolved`，不得補猜 root cause；
+7. 只有使用者需要長期續接時才啟用 persistence；若已選定可寫入 backend，優先把正式 record 寫入該 backend，而不是只留在聊天內容中。
 
 對應 machine-readable interchange contract：[`/schemas/calculation-review-record.schema.json`](../../../schemas/calculation-review-record.schema.json)。
 
