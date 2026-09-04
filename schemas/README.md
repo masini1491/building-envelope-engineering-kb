@@ -22,6 +22,7 @@
 ### 審查／覆蓋範圍（Review／coverage）
 
 - `structural-coverage.schema.json`：failure-mode coverage、scope 與 `PASS / WARNING / FAIL / INCOMPLETE / NOT_APPLICABLE`。
+- `calculation-review-record.schema.json`：計算書 review 的 stable identity、lifecycle、source fact、deterministic recalculation、engineering interpretation、reconciliation update 與 final judgment；project-specific instance 不進 public repository。
 
 ## 維護規則
 
@@ -32,6 +33,7 @@
 - Design pressure、test pressure、reaction、imposed displacement 等不同 engineering objects 不得為方便而合併成單一 scalar。
 - Schema 必須能表示 provisional / unknown / incomplete；不要逼迫使用者填入猜測值。
 - Schema path 與 `$id` 若已被 calculator / external tool 使用，避免只為目錄美觀而搬動。
+- Review record 的 lifecycle、calculator execution/comparison 與 engineering acceptance status 必須分開保存；不得壓成單一 `PASS / FAIL`。
 
 ## 與知識（Knowledge）的關係
 
@@ -40,7 +42,8 @@
 例如：
 
 - `knowledge/structural-design/framing/` 解釋 support / composite-action mechanics；
-- `support-joint.schema.json` 只提供對應資料模型。
+- `support-joint.schema.json` 只提供對應資料模型；
+- `knowledge/structural-design/review/calculation-review-record.md` 定義 review record 的 evidence-layer／append-only 方法，`calculation-review-record.schema.json` 只提供 interchange contract。
 
 Schema 通過 validation 不代表工程內容已通過 governing-code review。
 

@@ -1,7 +1,7 @@
 ---
 title: "帷幕牆結構計算審查與破壞模式路由（Failure-Mode Routing）"
 verification_status: "HIGH_CONFIDENCE"
-verified_at: "2026-09-02"
+verified_at: "2026-09-04"
 canonical_owner: true
 ---
 
@@ -37,6 +37,8 @@ canonical_owner: true
 
 → `spec-to-calc compliance + engineering review`
 
+→ `calculation review record`（若需要跨 revision／跨聊天室追蹤 discrepancy、補件或 reconciliation）
+
 這可以避免只檢查公式 mechanics，卻沒有先確認該專案真正要求的 load、criterion、factor、calculation scope、次結構責任界面與 test acceptance。
 
 ## 審查層級
@@ -54,6 +56,7 @@ canonical_owner: true
 11. **Special subsystems** — operable elements、metal panel stiffener、structural glass、special attachments。
 12. **Performance verification** — analysis 與 mock-up / component / assembly test 的角色是否分清。
 13. **Coverage status** — `PASS / WARNING / FAIL / INCOMPLETE / NOT_APPLICABLE` 是否有 traceable basis。
+14. **Review trace** — 需要延續的 discrepancy 是否保留 original recalculation、original engineering interpretation、後續 reconciliation 與 final judgment，而不是事後覆寫。
 
 ## 相關頁面與路由（routing）
 
@@ -62,6 +65,7 @@ canonical_owner: true
 - [Structural Calculation Review Checklist](structural-calculation-review-checklist.md)
 - [Façade Structural Failure-Mode Map](failure-mode-map.md)
 - [Coverage / Completeness Status](coverage-and-completeness.md)
+- [結構計算審查紀錄與追溯](calculation-review-record.md)
 - [Secondary Support / Reaction Handoff](../secondary-support/README.md)
 
 Machine-readable routing：
@@ -69,6 +73,7 @@ Machine-readable routing：
 - `/schemas/project-design-basis.schema.json`
 - `/schemas/design-factor.schema.json`
 - `/schemas/structural-coverage.schema.json`
+- `/schemas/calculation-review-record.schema.json`
 
 ## 核心原則
 
@@ -112,6 +117,6 @@ Machine-readable routing：
 
 本 review framework 可由非公開專案規範與計算實務協助辨識常見 requirement / failure modes，但 public repository 只保存一般化 extraction / review framework 與公開可驗證方法；不得保存專案名稱、尺寸、荷載、criterion、factor、圖號、節點、反力表、截圖或私人 provenance。
 
-Project Design Basis Sheet、factor ledger、reaction handoff table、spec-to-calc matrix 與 project-specific review result 均屬當次 project context，不應 commit 到 public repository。
+Project Design Basis Sheet、factor ledger、reaction handoff table、spec-to-calc matrix 與 project-specific review result／review record instance 均屬當次 project context，不應 commit 到 public repository。
 
 > 本頁是 structural review router，不取代 governing code、專業結構設計或 project-specific calculation。

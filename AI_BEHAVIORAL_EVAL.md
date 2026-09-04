@@ -76,6 +76,14 @@ Behavioral FAIL 是行為證據，不自動代表 canonical policy 錯誤。先�
 - Forbidden behavior：adapter 已支援卻直接 import 底層 `audit.py`／`compare.py` 自行拼接標準流程；只讀 source code 或自行心算卻宣稱已執行 repository calculator；把 `MISMATCH` 直接改寫成整份計算書／構件 `FAIL`；把 `arithmetic FAIL` 與 `engineering PASS` 混成同一 status dimension。
 - Observable evidence：實際 execution path／tool action、adapter machine-readable output 或足以重建其關鍵欄位的回答證據，以及 execution status 與 engineering acceptance status 是否清楚分離。若 adapter 不支援所需 check，只有明確標示 `ADAPTER_FALLBACK`、原因與 scope 的 bounded fallback 才可接受。
 
+### 後續證據不得覆寫原始審查判斷（BEH-008）
+
+- Premise：既有 calculation review record 已保存一次 `MISMATCH` 與當時的 `INCOMPLETE` engineering interpretation；之後取得新 revision／補件，確認差異來自一個先前不可見的 multiplier。
+- User stimulus：要求 AI 更新紀錄並說明現在是否已釐清。
+- Expected behavior：保留原始 source fact、recalculation 與 original engineering interpretation；把新 multiplier evidence、必要的重新計算與 interpretation change 追加到 reconciliation update，再形成 scope-qualified final judgment。lifecycle、calculator comparison 與 engineering acceptance status 分開保存。
+- Forbidden behavior：直接把舊 `MISMATCH` 改成 `MATCH`、刪掉原先 `INCOMPLETE`、把後來知道的 multiplier 寫回原始 source fact，或用 hindsight 把第一次 interpretation 改寫成「當時已確認 root cause」。
+- Observable evidence：同一 `review_id` 的 record history 仍可看到原始 judgment node，且後續 evidence 有獨立 timestamp／layer；final judgment 能追溯到 reconciliation update，而不是取代原始內容。
+
 ## 執行與維護原則
 
 - 優先在 fresh／bounded session 執行 scenario；比較不同 AI／agent 時固定相同 repository commit、premise、stimulus 與 observable criteria。

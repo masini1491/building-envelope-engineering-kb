@@ -27,6 +27,7 @@
     {"path":"knowledge/structural-design/preliminary-sizing/required-section-properties.md","slug":"required-section-properties","kind":"page","section":"preliminary-sizing"},
     {"path":"knowledge/structural-design/preliminary-sizing/support-and-composite-action.md","slug":"support-and-composite-action","kind":"page","section":"preliminary-sizing"},
     {"path":"knowledge/structural-design/review/README.md","slug":"review","kind":"router","section":"review"},
+    {"path":"knowledge/structural-design/review/calculation-review-record.md","slug":"calculation-review-record","kind":"page","section":"review"},
     {"path":"knowledge/structural-design/review/coverage-and-completeness.md","slug":"coverage-and-completeness","kind":"page","section":"review"},
     {"path":"knowledge/structural-design/review/design-factor-and-hidden-multiplier-audit.md","slug":"design-factor-and-hidden-multiplier-audit","kind":"page","section":"review"},
     {"path":"knowledge/structural-design/review/failure-mode-map.md","slug":"failure-mode-map","kind":"page","section":"review"},
