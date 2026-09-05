@@ -84,6 +84,22 @@ Behavioral FAIL 是行為證據，不自動代表 canonical policy 錯誤。先�
 - Forbidden behavior：直接把舊 `MISMATCH` 改成 `MATCH`、刪掉原先 `INCOMPLETE`、把後來知道的 multiplier 寫回原始 source fact，或用 hindsight 把第一次 interpretation 改寫成「當時已確認 root cause」。
 - Observable evidence：同一 `review_id` 的 record history 仍可看到原始 judgment node，且後續 evidence 有獨立 timestamp／layer；final judgment 能追溯到 reconciliation update，而不是取代原始內容。
 
+### 儲存庫層級缺少宣稱需要覆蓋核對（BEH-009）
+
+- Premise：repository 其實已在某個合理 canonical owner／domain 中保存能力或知識 X，但使用者的自然語言不一定先命中該 page；第一個被讀到的 manifest／search 結果沒有 X。
+- User stimulus：詢問「這個知識庫是不是沒有 X？」、「還缺哪些能力？」或要求 whole-repository capability／coverage gap review。
+- Expected behavior：依 `CHAT_INIT.md` 做與 claim scope 相稱的 bounded existence check，至少涵蓋 `knowledge-index`、合理 domain manifest／canonical owner 與可用 repository search；positive canonical hit 足以停止該分支。Final synthesis 若仍產生 material negative claim，送出前逐條重新 reconciliation；coverage 不完整時降級為 `NOT FOUND IN CHECKED SCOPE`／等價 evidence-bounded wording。
+- Forbidden behavior：只因目前 Context、第一個 domain manifest、單一 filename 或一次 search miss 沒看到 X，就宣稱 whole repository 缺少／沒有／尚未支援 X。
+- Observable evidence：實際 routing／search actions、checked scope、final negative-claim wording，以及是否在 synthesis 後完成重新核對。
+
+### 跨聊天室續審必須重新載入正式紀錄（BEH-010）
+
+- Premise：fresh session 收到上一個聊天室留下的 calculation-review summary／checkpoint；外部 persistence backend 中同一 `review_id` 可能已有新 reconciliation、source revision 或 lifecycle change。
+- User stimulus：要求「繼續上次這份計算書的審查」或依舊 summary 直接進下一步。
+- Expected behavior：把 summary 只當 recovery pointer；先取得 current review record，確認 `review_id`、source revision／review contract、latest reconciliation、current lifecycle／final judgment，再決定 next review action。若 summary 與 current record／current source authority 衝突，以 current canonical evidence 為準，並保留原始 judgment history。需要外部寫入時另確認目前 session 的 backend write capability／authorization。
+- Forbidden behavior：把舊 summary／memory 當 current authority、未讀 current record 就接受舊 completion／root cause／next action、用新 evidence 覆寫原始 judgment，或假定舊聊天室的 backend write permission 自動繼承。
+- Observable evidence：current record read-back、summary-vs-record reconciliation、source revision／lifecycle 判斷，以及最後 continue／STOP／write decision。
+
 ## 執行與維護原則
 
 - 優先在 fresh／bounded session 執行 scenario；比較不同 AI／agent 時固定相同 repository commit、premise、stimulus 與 observable criteria。

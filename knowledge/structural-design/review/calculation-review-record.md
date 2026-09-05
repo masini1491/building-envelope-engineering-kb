@@ -1,7 +1,7 @@
 ---
 title: "結構計算審查紀錄與追溯"
 verification_status: "HIGH_CONFIDENCE"
-verified_at: "2026-09-04"
+verified_at: "2026-09-05"
 canonical_owner: true
 ---
 
@@ -41,9 +41,33 @@ AI 不得默認「ChatGPT 自己會記得」即可取代正式 review record。�
 
 一旦使用外部 backend，應維持相同 `review_id`、append-first history 與 provenance；storage location 可以改變，但不得因此改寫原始 judgment node。
 
+## 跨聊天室續接與重新載入（Rehydration）
+
+舊聊天室 summary、checkpoint、handoff 或模型 memory 只可作為**尋找既有紀錄的 recovery pointer**，不得升格成 current review authority。Fresh session 若要延續既有 review，應先從可用 persistence backend／project workspace 重新取得 current record，再決定從哪裡續審。
+
+建議重新載入順序：
+
+`review_id / backend → current record → source revision / review contract → latest reconciliation updates → current lifecycle / final judgment → next authorized review action`
+
+一般原則：
+
+- 先確認 `review_id` 與 source revision／package identity，避免把相似計算書、舊 revision 或另一個 judgment node 接錯。
+- 重新讀取目前 record 的 source facts、recalculations、engineering interpretations、latest reconciliation 與 final judgment；不要只依舊 summary 重建狀態。
+- 若 summary／checkpoint 與 current record、current source revision 或較高權威 project criteria 衝突，以 current canonical evidence 為準；舊 summary 降為 stale recovery context，但原始 review judgment node 仍依 append-first 規則保留。
+- Fresh session 不得假定舊聊天室的 backend access、write permission 或 execution capability 自動繼承；需要更新外部 record 時，仍須確認目前 session 具有必要讀寫能力與授權。
+- 若 current record 無法取得，明確標示 rehydration incomplete；不得把記憶中的 completion、root cause 或 next action 當成已重新確認。
+
 ## 固定紀錄身分與生命週期
 
 正式紀錄應有穩定 `review_id`；後續更新引用同一 ID，不靠檔名或聊天室猜測。
+
+### 審查單元與容器邊界
+
+Calculation package、PDF、資料夾、聊天室、batch 或 aggregate report 都可以是 physical container，但不因此成為其中所有審查問題的單一 semantic identity。
+
+原則上，一個 `review_id` 應代表**一個可獨立形成 engineering judgment、reconciliation lifecycle 與 final disposition 的 review unit**。同一份 calculation package 若同時存在彼此可獨立追查、補件、close 或 supersede 的 discrepancy／review issue，可以建立多個 `review_id`，並各自保留來源與判斷證據鏈。
+
+這不要求現行 schema 預先為每個 child event 增加 ID。只有實際 consumer 需要在同一 `review_id` 內唯一引用多個同型 recomputation／interpretation／update，而且現有 pointer 已不足時，才應依真實使用需求擴充 stable child identity。不得只因事件都放在同一 JSON／Markdown container，就假定 array order、檔名或相近 timestamp 足以取代 semantic identity。
 
 建議 lifecycle：
 
@@ -130,6 +154,16 @@ Contract 若有實質缺陷，不應事後靜默改寫；建立修正版 record 
 
 Final judgment 不刪除前面曾經出現的 `MISMATCH`、錯誤抽取或 provisional interpretation。
 
+## 證據來源精度（Provenance Precision）
+
+Review record 應保存**實際證據能證明的 precision**；schema 欄位存在、格式完整或某一 provenance field 已知，不代表其他 provenance 也已驗證。
+
+- `repository_commit` 已知，只能證明 calculator／repository version 可被識別；不自動代表 Python version、OS、raw adapter input、environment 或其他 execution metadata 已知。
+- Source 只提供 date、minute-level timestamp、revision 或 page locator 時，只保存該 precision；不得把後來取得或模型推測的細節回填成「當時已知」。
+- Schema 若要求 machine timestamp，應清楚區分「record／execution event 建立時間」與「source evidence 實際發生時間」；不得用前者冒充後者的精度。
+- `MATCH`、`MISMATCH`、`PASS` 或其他 status 只證明它實際涵蓋的 comparison／engineering scope；不能因 status 欄位完整就推導未記錄的 runtime、source 或 acceptance evidence。
+- `unknown / unavailable / unverified` 應維持未知邊界；schema completeness 不得被誤認為 evidence completeness。後續取得更高精度 provenance 時，以追加／reconciliation 方式升級，不改寫歷史認知狀態。
+
 ## 狀態必須分維度
 
 不得把不同責任的 status 壓成單一 `PASS / FAIL`：
@@ -168,12 +202,15 @@ Public KB 不得保存真實私人計算書的 record instance。若要建立範
 AI 若要建立或更新正式 review record：
 
 1. 先辨識既有 `review_id`，避免同一 judgment node 重複建檔；
-2. 新資料先判斷屬於 source fact、recomputation、engineering interpretation 或 reconciliation；
-3. calculator 支援時遵守 adapter-first execution contract；
-4. 不用後來 evidence 覆寫 original interpretation；
-5. 回答與 record 都分離 execution/comparison status、engineering status 與 lifecycle status；
-6. 若 evidence 不足，保留 `INCOMPLETE`／`unresolved`，不得補猜 root cause；
-7. 只有使用者需要長期續接時才啟用 persistence；若已選定可寫入 backend，優先把正式 record 寫入該 backend，而不是只留在聊天內容中。
+2. 先確認 review unit granularity；不要把同一 physical package 中可獨立 reconciliation 的多個問題因共用 container 而壓成一個 judgment identity；
+3. 新資料先判斷屬於 source fact、recomputation、engineering interpretation 或 reconciliation；
+4. calculator 支援時遵守 adapter-first execution contract；
+5. 不用後來 evidence 覆寫 original interpretation；
+6. 回答與 record 都分離 execution/comparison status、engineering status 與 lifecycle status；
+7. provenance 只保存當下可證明的 precision；不得因 schema 欄位存在而補猜未知 metadata；
+8. 若 evidence 不足，保留 `INCOMPLETE`／`unresolved`，不得補猜 root cause；
+9. Fresh session 續接正式 review 時，先由 current record rehydrate，不依舊 summary／memory 直接延續；
+10. 只有使用者需要長期續接時才啟用 persistence；若已選定可寫入 backend，優先把正式 record 寫入該 backend，而不是只留在聊天內容中。
 
 對應 machine-readable interchange contract：[`/schemas/calculation-review-record.schema.json`](../../../schemas/calculation-review-record.schema.json)。
 

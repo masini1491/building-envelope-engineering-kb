@@ -26,7 +26,8 @@
 4. 若 manifest 已直接命中一個明確 leaf page，直接讀該頁；**不必先經過 router**。
 5. 若題意仍有歧義、跨多個 subdomain，或需要先理解 domain 邊界，才讀 `entrypoint / router`。
 6. 需要標準版本、來源、scope 或 provenance 時，再讀 [`indexes/standards-index.json`](indexes/standards-index.json) 與對應 `references/` dossier。
-7. Repository evidence 不足或 freshness 不明時，再查 current primary source。
+7. 若問題要求判斷「repository 有沒有／缺少什麼／尚未支援什麼」，不得只因目前已讀 domain、單一 manifest 或一次 search 沒命中就宣稱不存在。先以 `knowledge-index → 合理 domain manifest／canonical owner → 可用 repository search` 做與 claim scope 相稱的 bounded existence check；找到充分 positive hit 後可停止該分支。最終回答若仍要提出 material negative claim，送出前再逐條 reconciliation；coverage 不足時使用 `NOT FOUND IN CHECKED SCOPE` 或等價的 evidence-bounded wording。
+8. Repository evidence 不足或 freshness 不明時，再查 current primary source。
 
 **一般明確問答不需要無條件完整載入 `README.md`、`AGENTS.md` 與 `AI_RESPONSE_CONTRACT.md`。**
 

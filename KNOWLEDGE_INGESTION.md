@@ -21,6 +21,18 @@
 9. **References 與 knowledge 分工不變**：公開來源、標準 provenance 與版本資訊放在 `references/`；整理後的工程判斷放在 `knowledge/`。不要為減少一次讀檔而把 evidence dossier 複製進 knowledge page。
 10. **Metadata 不做預測性堆疊**：只有 routing、validator、canonical ownership、provenance／freshness 或已有實際工具消費需求時才增加 metadata 欄位；不要為「AI 也許會用」而預先塞大量 keyword、summary 或重複狀態。
 
+## 上下文凝聚檢查（Context Cohesion Gate）
+
+拆頁除了檢查「能不能少讀」，也要確認拆分後 AI 是否仍能可靠重建共同 premise。若兩段內容仍共同演化，且需要高頻同步相同的 current state、工程假設、判斷邏輯、blocker、validation boundary 或 next action，代表 ownership／evidence boundary 尚未充分收斂。
+
+此時優先：
+
+- 保持 cohesive canonical owner；
+- 用 heading／section-level bounded read、thin pointer 或 Hot／Cold 分流降低不必要載入；
+- 等 evidence、責任邊界與獨立 retrieval intent 穩定後再拆。
+
+不得只為降低單次 loaded context，把仍需共同理解的 reasoning unit 過早拆成多個需要高頻 cross-file synchronization 的頁面。**Context 減量只有在不增加 stale premise、drift 與 reconciliation cost 時才是真正的 retrieval optimization。**
+
 ## 建立新頁前的強制說明
 
 若決策結果仍是「需要新增 leaf page」，AI 在實際建立檔案前應能用一句話回答：
