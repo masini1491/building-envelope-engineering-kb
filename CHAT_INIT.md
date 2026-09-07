@@ -14,6 +14,18 @@
 6. **來源分層**：法規／正式標準／政府資料／製造商資料／工程實務／推論不可混成同一證據層級。
 7. **繁體中文（台灣）優先**：除非使用者另有要求，回答依 `LANGUAGE.md` 的原則；正式標準名、材料牌號、schema key、公式與必要英文工程術語保留原文。
 
+## 儲存庫讀取取得與復原
+
+當本次問題需要 current repository content，而首選 GitHub／repository-native read path 不可用時，應只降低**取得機制**，不得降低 authority：
+
+`repository-native connector → public canonical GitHub/raw read → minimum user-supplied canonical section → REPOSITORY READ BLOCKED`
+
+- 本 repository 為 public 時，connector unavailable 後可改用官方 GitHub／raw canonical read-only surface；fallback 不授權任何 repository mutation。
+- 若仍無法取得 current canonical content，只要求本次 decision 所需的最低必要 file／section，不預設要求使用者貼完整 repository。
+- 無法可靠建立 current state 時標示 `REPOSITORY READ BLOCKED`／等價 evidence gap；不得用舊聊天、cache、模型 memory 或相似工程內容補成 repository fact。
+
+核心原則：**Fail over the read mechanism, not the authority.**
+
 ## 依任務選擇載入層級
 
 ### 一般工程問答／查詢
@@ -27,7 +39,8 @@
 5. 若題意仍有歧義、跨多個 subdomain，或需要先理解 domain 邊界，才讀 `entrypoint / router`。
 6. 需要標準版本、來源、scope 或 provenance 時，再讀 [`indexes/standards-index.json`](indexes/standards-index.json) 與對應 `references/` dossier。
 7. 若問題要求判斷「repository 有沒有／缺少什麼／尚未支援什麼」，不得只因目前已讀 domain、單一 manifest 或一次 search 沒命中就宣稱不存在。先以 `knowledge-index → 合理 domain manifest／canonical owner → 可用 repository search` 做與 claim scope 相稱的 bounded existence check；找到充分 positive hit 後可停止該分支。最終回答若仍要提出 material negative claim，送出前再逐條 reconciliation；coverage 不足時使用 `NOT FOUND IN CHECKED SCOPE` 或等價的 evidence-bounded wording。
-8. Repository evidence 不足或 freshness 不明時，再查 current primary source。
+8. Repository search／filename／snippet 命中只作 discovery evidence；先辨識 owner、authority class 與 currentness，再回 current canonical target。**`found` 不等於 authoritative/current，正如 `not found` 不等於 absent。**
+9. Repository evidence 不足或 freshness 不明時，再查 current primary source。
 
 **一般明確問答不需要無條件完整載入 `README.md`、`AGENTS.md` 與 `AI_RESPONSE_CONTRACT.md`。**
 
@@ -64,6 +77,17 @@ python scripts/build_knowledge_manifests.py
 ```
 
 再執行 repository validation。`indexes/knowledge-pages/*.json` 是**由路徑自動產生的 routing artifact**，不得手工塞入工程結論或 verification status。
+
+## 儲存庫新鮮度補查（Freshness Probe）
+
+長期問答／審查若跟隨 floating `main`，不要把 session 開始時讀到的 repository identity 永久視為 current。當使用者明確表示 KB 已更新，或在跨階段續審、repository mutation、completion acceptance／最終工程結論等 material boundary 前，而 currentness 會影響判斷時，先做一次低成本 HEAD probe。
+
+- HEAD unchanged：沿用已確認 working context，不全文重讀。
+- HEAD changed：先做 bounded diff，僅重讀會影響本次 routing／authority／engineering conclusion／validation 的 changed owner。
+- 固定 SHA／tag baseline 不因 upstream `main` 前進而自行升級。
+- Probe unavailable 時保留 freshness gap；只有 current decision materially 依賴最新 repository authority 時才 STOP，否則在標示 limitation 下維持最低風險工作。
+
+核心原則：**Check identity cheaply, reload selectively.**
 
 ## 路由原則
 

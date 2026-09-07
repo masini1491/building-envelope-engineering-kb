@@ -1,7 +1,7 @@
 ---
 title: "結構計算審查紀錄與追溯"
 verification_status: "HIGH_CONFIDENCE"
-verified_at: "2026-09-05"
+verified_at: "2026-09-07"
 canonical_owner: true
 ---
 
@@ -56,6 +56,30 @@ AI 不得默認「ChatGPT 自己會記得」即可取代正式 review record。�
 - 若 summary／checkpoint 與 current record、current source revision 或較高權威 project criteria 衝突，以 current canonical evidence 為準；舊 summary 降為 stale recovery context，但原始 review judgment node 仍依 append-first 規則保留。
 - Fresh session 不得假定舊聊天室的 backend access、write permission 或 execution capability 自動繼承；需要更新外部 record 時，仍須確認目前 session 具有必要讀寫能力與授權。
 - 若 current record 無法取得，明確標示 rehydration incomplete；不得把記憶中的 completion、root cause 或 next action 當成已重新確認。
+
+## 主動換聊天室與最低充分檢查點
+
+Review 很長不代表一定要換聊天室；**真正觸發 handoff 的是 stale premise、retrieval confusion 或高影響 decision 前的 session-health risk**。AI 不得捏造 hidden context meter、token 百分比或「剩餘容量」來當換聊天室證據。
+
+可支持主動 handoff 的 material signals：
+
+- 同一 review 已跨多個 revision／Stage／大量 tool evidence，而目前判斷只需要其中一小部分 current working set；
+- 回答開始反覆重新定位 current source revision、`review_id`、latest reconciliation 或 final judgment，才能避免把舊 branch 當現況；
+- 使用者需要再次糾正已明確成立的 material scope／evidence／revision，而且原因與長 session 的 stale-context confusion 一致；
+- 已做過 bounded summary／checkpoint，但很快又出現相同 retrieval confusion；
+- 下一步即將形成 final review judgment、正式 comment／disposition、repository／backend mutation或其他高影響決定，而目前 session risk 足以影響 correctness。
+
+處理順序：
+
+`bounded reconciliation / compaction if sufficient → risk remains? → persist current formal record if enabled → minimum checkpoint → recommend fresh session → current-record rehydration`
+
+最低充分 checkpoint 只保存後續重建所需 pointer／state，例如：
+
+`review_id / backend → source revision → current lifecycle / comparison / engineering / root-cause status → latest reconciliation pointer → unresolved gaps → next authorized action / STOP`
+
+Checkpoint 是 conversation recovery aid，不取代 formal review record；若 persistence 已啟用，先把 material current state依本頁 contract 寫入正式 record，再用 checkpoint 指向它。Fresh session 仍必須依前節重新讀 current record，不得把 checkpoint 升格成 authority。
+
+若一次 bounded canonical reconciliation 已足以消除風險，留在同一聊天室即可；**length alone ≠ handoff trigger**。
 
 ## 固定紀錄身分與生命週期
 
@@ -210,7 +234,8 @@ AI 若要建立或更新正式 review record：
 7. provenance 只保存當下可證明的 precision；不得因 schema 欄位存在而補猜未知 metadata；
 8. 若 evidence 不足，保留 `INCOMPLETE`／`unresolved`，不得補猜 root cause；
 9. Fresh session 續接正式 review 時，先由 current record rehydrate，不依舊 summary／memory 直接延續；
-10. 只有使用者需要長期續接時才啟用 persistence；若已選定可寫入 backend，優先把正式 record 寫入該 backend，而不是只留在聊天內容中。
+10. 當 observable stale-premise／retrieval risk 已足以影響下一個高影響 review decision，先做 bounded reconciliation；風險仍在時建立最低充分 checkpoint，必要時主動建議 fresh session，不用聊天長度或虛構 context 百分比作觸發；
+11. 只有使用者需要長期續接時才啟用 persistence；若已選定可寫入 backend，優先把正式 record 寫入該 backend，而不是只留在聊天內容中。
 
 對應 machine-readable interchange contract：[`/schemas/calculation-review-record.schema.json`](../../../schemas/calculation-review-record.schema.json)。
 
