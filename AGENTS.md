@@ -107,6 +107,8 @@ AI 不應預設完整掃描 repository。`CHAT_INIT.md` 是 runtime 精簡 boots
 6. 依任務讀 relevant template / schema / validator；不要為維護單一 domain 而掃完整個 knowledge tree。
 7. 修改後以 repository 自動驗證 success 與 remote read-back 為完成條件。
 
+使用者的泛用確認（例如「好」、「繼續」、「好，繼續」、「go ahead」）只延續前文已明確建立的 maintenance／mutation scope。若前文已列出具體 proposed batch，該確認可授權該 batch；但不自動涵蓋執行途中 AI 新發現的 adjacent cleanup、feature、schema expansion、新 knowledge page、tooling change 或其他額外 mutation。這些新工作必須依現行 governance 取得獨立 admission／明確授權後才可寫入。
+
 `AI_RESPONSE_CONTRACT.md` 只負責回答如何呈現：結論優先、回答深度、已確認／推論／缺口分離、scope-qualified status、精簡與引用方式。它不得覆蓋本檔的 authority、工程數值、公開安全或 canonical ownership 規則。
 
 ## 工程數值防呆

@@ -18,13 +18,16 @@
 
 當本次問題需要 current repository content，而首選 GitHub／repository-native read path 不可用時，應只降低**取得機制**，不得降低 authority：
 
-`repository-native connector → public canonical GitHub/raw read → minimum user-supplied canonical section → REPOSITORY READ BLOCKED`
+`repository-native connector → public canonical read / direct canonical download → user-mediated exact artifact handoff → minimum user-supplied canonical section → REPOSITORY READ BLOCKED`
 
-- 本 repository 為 public 時，connector unavailable 後可改用官方 GitHub／raw canonical read-only surface；fallback 不授權任何 repository mutation。
-- 若仍無法取得 current canonical content，只要求本次 decision 所需的最低必要 file／section，不預設要求使用者貼完整 repository。
-- 無法可靠建立 current state 時標示 `REPOSITORY READ BLOCKED`／等價 evidence gap；不得用舊聊天、cache、模型 memory 或相似工程內容補成 repository fact。
+- 本 repository／artifact 為 public 時，connector unavailable 後可改用官方 GitHub／raw content、direct canonical download 或其他 canonical read-only surface；fallback 不授權任何 repository mutation。
+- 若 exact canonical source／download target 已確認，但目前 connector、browser、sandbox 或 runtime 無法取得所需 bytes，而使用者可由自己的 browser／host 正常下載，可請使用者從該 exact target 原樣下載後直接上傳目前聊天室，再由該 artifact 繼續。
+- User-mediated handoff 只解決 transport，不提升 authority。保留可得的 source URL／repository ref／revision／filename／provenance；若 artifact identity 會影響工程判斷或 validation，使用 hash、Git blob/tree、size 或其他最低充分 evidence 綁回原 source。無法可靠綁定時標示 identity gap，不把「已上傳」本身當 canonical proof。
+- 若完整 artifact 不必要，只要求本次 decision 所需的最低必要 file／section，不預設要求使用者提供整個 repository。
+- 同一 acquisition mechanism class 已確認被阻擋後，不做無界的等價 retry；只有 blocked state material 改變，或新 path 確實提供不同 capability 時才重試／切換。
+- 無法可靠建立 current canonical content／artifact 時標示 `REPOSITORY READ BLOCKED`／等價 evidence gap；不得用舊聊天、cache、模型 memory 或相似工程內容補成 repository fact。
 
-核心原則：**Fail over the read mechanism, not the authority.**
+核心原則：**Fail over the read mechanism, not the authority. Recover with the lowest-sufficient canonical path.**
 
 ## 依任務選擇載入層級
 
