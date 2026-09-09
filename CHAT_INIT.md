@@ -44,6 +44,7 @@
 7. 若問題要求判斷「repository 有沒有／缺少什麼／尚未支援什麼」，不得只因目前已讀 domain、單一 manifest 或一次 search 沒命中就宣稱不存在。先以 `knowledge-index → 合理 domain manifest／canonical owner → 可用 repository search` 做與 claim scope 相稱的 bounded existence check；找到充分 positive hit 後可停止該分支。最終回答若仍要提出 material negative claim，送出前再逐條 reconciliation；coverage 不足時使用 `NOT FOUND IN CHECKED SCOPE` 或等價的 evidence-bounded wording。
 8. Repository search／filename／snippet 命中只作 discovery evidence；先辨識 owner、authority class 與 currentness，再回 current canonical target。**`found` 不等於 authoritative/current，正如 `not found` 不等於 absent。**
 9. Repository evidence 不足或 freshness 不明時，再查 current primary source。
+10. 同一 session 已確認 current HEAD、domain manifest／router／canonical leaf 後，若沒有 freshness trigger 或 material scope change，優先 reuse 已載 route／owner；同一 leaf follow-up 不重新 fetch，同 domain 新題沿用已載 manifest，只讀新的最低必要 target。取得本題最低充分 evidence 後立即 STOP retrieval。
 
 **一般明確問答不需要無條件完整載入 `README.md`、`AGENTS.md` 與 `AI_RESPONSE_CONTRACT.md`。**
 
@@ -101,5 +102,7 @@ python scripts/build_knowledge_manifests.py
 - 若 leaf page 已精準命中，就不要為了流程完整而多讀一層 router。
 - 只有當現有頁面明確 cross-reference、問題跨 domain，或缺少必要 evidence 時，才繼續開下一頁。
 - 不因某頁列出很多相關連結，就自動全部載入。
+- 同一 session 已確認且仍 current 的 manifest／router／leaf 可直接 reuse；沒有 material trigger 時，不為流程完整重做相同 routing。
+- **Sufficient then STOP**：已取得支持本題結論的最低充分 canonical evidence 後，停止擴張 retrieval，不把「多讀幾頁」當成可靠度本身。
 
 核心原則：**先用最小 routing metadata 找到正確 canonical owner，再只讀足以回答本題的內容。**

@@ -65,8 +65,11 @@ python scripts/build_knowledge_manifests.py
 
 ```bash
 python scripts/build_knowledge_manifests.py --check
+python scripts/check_ai_fastpath.py
 python scripts/validate_repo.py
 ```
+
+其中 `check_ai_fastpath.py` 專門檢查 AI hot-path 的 routing-only boundary、manifest／target 對應、route ambiguity 與 growth review signal；`WARN` 是 architecture review signal，不等同 repository validation failure。
 
 6. 任一 deterministic check failure 時，**先在 remote push 前修正並重跑**；不得為了取得 CI 訊息而先把已知 failure 推到 `main`。
 7. remote write 前再確認 `main` 仍以 intended base 為 current ancestor／未發生會影響本次修改的 material drift；若 base 已漂移，先 bounded read-back／reconcile，必要時重建 validation snapshot。
@@ -79,6 +82,7 @@ ChatGPT 的某些 GitHub 維護 session 可能只有 connector remote-write 能�
 
 - 仍先 remote read-back 所有受影響 canonical files，並盡量從同一 pinned revision 取得本次靜態檢查所需 inputs；
 - 若修改人類可讀 Markdown 且可 materialize／重建本次 changed-file snapshot，先執行 `scripts/preflight_markdown_headings.py <changed.md> [...]`；
+- 若修改 AI routing／bootstrap／manifest contract，而完整 snapshot 不足以執行 `scripts/check_ai_fastpath.py`，至少檢查 changed routing surface 的 target、allowed routing metadata 與新增 heading；不得宣稱 full fast-path `PASS`。
 - 以 deterministic generator／validator contract 做其餘最低必要靜態檢查；
 - 若無法建立單一 revision snapshot，清楚標示 snapshot／full validation limitation，不捏造 `PASS`；
 - **一次完成所有可合理確認的修改，再做單一 remote commit**；

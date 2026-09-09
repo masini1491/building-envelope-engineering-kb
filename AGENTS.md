@@ -258,6 +258,18 @@ Public reference dossier 應盡量記錄：
 - **衍生寫入閉包**：高頻內容修改是否會迫使不相關 README、index、snapshot 或其他 derived artifact 一起更新？能 deterministic generation／CI check 時優先避免手工同步。
 - **淨效果**：整體 retrieval cost 是下降、持平，還是只是把同樣內容拆散並增加 tool call／reconciliation？
 
+### 熱路徑（hot-path）成長棘輪
+
+既有 legacy 不因歷史大小自動 `FAIL`；但新的 AI-facing mutation 不得無理由惡化一般工程問答的最低充分工作集。核心是 **new writes must not worsen hot-path retrieval cost without a concrete retrieval／correctness benefit**。
+
+- 不為單一低頻需求增加一般 task 都必讀的 bootstrap owner、固定 tool call 或額外 routing hop。
+- 不把同一 authority／status／工程結論複製到 index、router、manifest 與 leaf，讓後續回答必須多做 reconciliation。
+- 若新 routing structure 讓 normal path 變長，必須能說明增加的 hop 換來什麼明確的 precision、correctness、scope isolation 或 Context 節省；否則維持較短路徑。
+- `CHAT_INIT.md`、`knowledge-index.json`、domain manifest 等 hot surface 的大小只作 review signal，不是 universal correctness threshold；由 [`scripts/check_ai_fastpath.py`](scripts/check_ai_fastpath.py) 對 routing-only invariants、target existence、route ambiguity 與 growth signal 做 deterministic regression check。
+- Ratchet 主要約束新的 mutation，不要求為了形式一次重寫全部 legacy；高頻舊 surface 可依實際 retrieval pain 逐步 normalize。
+
+核心原則：**不要最佳化「檔案越小越好」；要最佳化「本題最低充分 working set 越小、authority 越清楚越好」。**
+
 核心原則：**讓 AI 讀得少，不是讓 repository 變得碎；是讓它更快命中唯一、最新且足夠的 canonical authority。**
 
 ## 變更規則

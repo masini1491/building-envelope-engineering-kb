@@ -30,5 +30,8 @@ jobs:
       - name: 檢查 AI 頁面路由 manifest
         run: python scripts/build_knowledge_manifests.py --check
 
+      - name: 檢查 AI 快速路由退化
+        run: python scripts/check_ai_fastpath.py
+
       - name: 執行 repository 驗證
         run: python scripts/validate_repo.py
