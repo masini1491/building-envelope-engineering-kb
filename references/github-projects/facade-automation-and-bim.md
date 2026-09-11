@@ -1,6 +1,6 @@
 # 帷幕自動化／BIM GitHub 專案參考（Façade Automation）
 
-查證日期：2026-09-02
+查證日期：2026-09-11
 
 本頁收錄與帷幕牆幾何、panelization、CAD/BIM、自動提料、跨軟體資料交換直接相關的公開 GitHub repository。全部屬 **NON-NORMATIVE REFERENCE**。
 
@@ -30,7 +30,7 @@ https://github.com/1006867586/curtainwall-tool
 
 套裁、鋼材快查、五金提料等 browser utility。適合參考 façade engineer 日常 UX、cutting optimisation、hardware quantity aggregation；數據與公式需另行驗證。
 
-## 建築工程軟體（AEC）整合：Revit／Rhino
+## 建築工程軟體（AEC）整合：Revit／Rhino／IFC
 
 ### `mcneel/rhino.inside-revit`
 
@@ -56,6 +56,20 @@ https://github.com/IfcOpenShell/IfcOpenShell
 
 IFC parsing / geometry / query / manipulation / `ifccsv` / `ifcdiff` / IDS audit。可研究 `IfcCurtainWall` / quantity / property extraction 與 BIM → engineering pipeline。IFC property 存在不等於工程值已驗證。
 
+### `buildingSMART/IDS`
+
+https://github.com/buildingSMART/IDS
+
+buildingSMART Information Delivery Specification 的公開 specification repository。正式 IDS 1.0 authority 應回 [`../standards/buildingsmart-ids-1-0.md`](../standards/buildingsmart-ids-1-0.md)；GitHub repository 適合研究 schema、examples、implementer evolution 與 machine-checkable information contract。
+
+對 façade workflow 特別值得研究：把 required IFC entity／classification／material／property／value 寫成可執行 information requirement，再由工程 validator 另行檢查數值來源、設計條件與 acceptance criteria。
+
+### `buildingSMART/validate`
+
+https://github.com/buildingSMART/validate
+
+buildingSMART validation service architecture，公開 README 顯示 syntax check、schema check、Gherkin-rules check 等分層。適合研究「資料格式 → schema → domain rule」的 validation pipeline；其中 Gherkin／software rule 仍需回其 rule provenance，不因 validator PASS 就成為 façade engineering approval。
+
 ### `specklesystems/speckle-sharp-connectors`
 
 https://github.com/specklesystems/speckle-sharp-connectors
@@ -70,11 +84,12 @@ DXF read / modify / write 與 entity inspection。對未來 `aluminum extrusion 
 
 ## 建議研究鏈
 
-`Rhino / Grasshopper / Revit / DXF`
+`Rhino / Grasshopper / Revit / IFC / DXF`
 → geometry + metadata
+→ IDS / information contract
 → normalized façade object
 → section / structural model
-→ calculation / QA
+→ engineering validation / QA
 → controlled BIM / drawing output
 
-> CAD/BIM automation 是資料與流程層，不自行建立 engineering authority。
+> CAD/BIM automation 與 IDS 解決的是資料、交換與可驗證資訊契約；它們不自行建立 engineering authority。

@@ -6,7 +6,11 @@
     {"id": "ASTM C1135", "path": "references/standards/astm-c1135.md"},
     {"id": "ASTM C1184", "path": "references/standards/astm-c1184.md"},
     {"id": "ASTM C1401", "path": "references/standards/astm-c1401.md"},
+    {"id": "buildingSMART IDS 1.0", "path": "references/standards/buildingsmart-ids-1-0.md"},
     {"id": "CNS 2253", "path": "references/standards/cns-2253.md"},
-    {"id": "CNS 2257", "path": "references/standards/cns-2257.md"}
+    {"id": "CNS 2257", "path": "references/standards/cns-2257.md"},
+    {"id": "EAD 090010-00-0404", "path": "references/standards/ead-090010-00-0404-bonded-glazing.md"},
+    {"id": "EAD 090017-00-0404", "path": "references/standards/ead-090017-00-0404-point-supported-glazing.md"},
+    {"id": "EAD 090018-00-0404", "path": "references/standards/ead-090018-00-0404-thermal-bridge-brackets.md"}
   ]
 }
