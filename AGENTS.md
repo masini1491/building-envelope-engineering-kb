@@ -76,6 +76,34 @@
 
 `references/standards/` dossier 的 frontmatter 是 AI／validator 用的 machine-readable metadata；正文仍是人類可讀的 public provenance、scope 與限制。`indexes/standards-index.json` 只保存標準 ID → dossier path，不重複 edition/status。
 
+## 共通人工智慧工作流程手冊採用
+
+本 repository 正式採用 `masini1491/ai-development-playbook` 作為跨專案共通的 AI workflow／repository execution／validation／debugging／context／research methodology。
+
+Project AI mode: ChatGPT-Only  
+AI Development Playbook: masini1491/ai-development-playbook  
+Playbook baseline: main
+
+`Playbook baseline: main` 是 floating baseline。只有本次任務實際需要 activate Playbook 時，才先以最低成本、read-only identity probe 將 `main` resolve 為當次 exact immutable commit，再從該 revision 的 `CHAT_INIT.md` 進入最低充分 canonical owner；一般工程問答不為了 Playbook adoption 執行這個 probe。
+
+### 權威邊界（Authority boundary）
+
+本 repository 的 engineering knowledge、public safety、canonical ownership、repository-specific governance、routing 與 task-specific authority 永遠高於 shared Playbook methodology。Playbook 不得覆蓋或放寬本 repository 已存在的限制。
+
+- Canonical technical source(s): 本 repository 由 `CHAT_INIT.md` 路由到的 current canonical owner(s)
+- Current coordination surface: `none`
+- Required validation: `PRE_PUSH_VALIDATION.md`
+- Project-specific exceptions or restrictions: 本 repository 的 engineering／public-safety／canonical-ownership／routing governance 與下列 conditional activation boundary
+
+採用 Playbook 本身不會跳過 Current Write Target、Task／Stage authorization、permission、credential、execution capability、validation 或其他本 repository 已存在的 authority gate。
+
+### 專案特定的條件式啟用
+
+- 一般工程問答、knowledge retrieval、標準／材料／構造查詢與一般工程資料查證，維持本 repository `CHAT_INIT.md` 的既有最低必要 routing；不得只因採用 Playbook 就固定載入本 `AGENTS.md`、resolve Playbook baseline 或讀取 Playbook。
+- 只有 repository maintenance、Git／write authority、deterministic execution／materialization、validation／debugging、AI context／retrieval architecture、research／architecture workflow **governance** 或其他共通 AI development／repository workflow 治理型任務，才依本段 adoption state activate Playbook。一般工程 research／標準查證本身不是 activation trigger。
+- `ChatGPT-Only` 只決定本 repository 不依賴 Codex 作為 AI workflow actor；實際工作仍必須同時滿足本 repository governance、Current Write Target、Task／Stage authorization、permission、credential 與 execution capability。
+- 不把 Playbook 的完整 normative rules 複製進本 repository；需要時回 Playbook current declared baseline 的 canonical owner。
+
 ## 人工智慧（AI）讀取規則
 
 AI 不應預設完整掃描 repository。`CHAT_INIT.md` 是 runtime 精簡 bootstrap；本 `AGENTS.md` 主要用於 **Repository 維護、內容新增／修改，以及需要完整治理規則的任務**。

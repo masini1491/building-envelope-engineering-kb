@@ -82,6 +82,22 @@ python scripts/build_knowledge_manifests.py
 
 再執行 repository validation。`indexes/knowledge-pages/*.json` 是**由路徑自動產生的 routing artifact**，不得手工塞入工程結論或 verification status。
 
+### 共通人工智慧開發治理的條件式啟用
+
+本 repository 的一般工程問答／knowledge retrieval 不因採用外部 AI workflow Playbook 而增加固定 bootstrap。預設 hot path 仍為：
+
+`CHAT_INIT → knowledge-index → domain manifest → canonical leaf → sufficient then STOP`
+
+一般工程資料、標準、材料、構造或其他工程 evidence 查證仍屬本 knowledge base 的 engineering retrieval，不因出現 research／查證需求就 activate shared Playbook。
+
+只有本次任務實際涉及 repository maintenance、Git／write authority、deterministic execution／materialization、validation／debugging、AI context／retrieval architecture、research／architecture workflow governance 或其他共通 AI development／repository workflow 治理時，才讀 `AGENTS.md` 取得 current Playbook adoption state。
+
+若 `AGENTS.md` 宣告採用 `masini1491/ai-development-playbook`，依其 declared baseline 執行：
+
+`read AGENTS adoption state → resolve declared floating baseline to exact SHA → Playbook CHAT_INIT → minimum-sufficient canonical owner → return to this repository authority`
+
+不要因此完整掃描 Playbook；shared Playbook 也不得覆蓋本 repository 的 engineering knowledge、public safety、canonical ownership、routing 或 repository-specific governance。
+
 ## 儲存庫新鮮度補查（Freshness Probe）
 
 長期問答／審查若跟隨 floating `main`，不要把 session 開始時讀到的 repository identity 永久視為 current。當使用者明確表示 KB 已更新，或在跨階段續審、repository mutation、completion acceptance／最終工程結論等 material boundary 前，而 currentness 會影響判斷時，先做一次低成本 HEAD probe。
