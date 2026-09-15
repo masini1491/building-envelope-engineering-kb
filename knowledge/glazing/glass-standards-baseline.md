@@ -46,6 +46,13 @@ canonical_owner: true
 7. project-specific allowable probability / safety requirements
 8. coating / frit / holes / notches / edge condition 等是否另有影響
 
+## 相關專題 routing
+
+- 複層玻璃（IGU）的 sealing-system durability、fogging、ASTM E2188／E2189／E2190 與 IGCC／IGMA certification：
+  [`insulating-glass-unit-durability-and-certification.md`](insulating-glass-unit-durability-and-certification.md)
+- Fully tempered glass 的 Heat Soak、NiS spontaneous-breakage risk 與 ISO 20657／EN 14179-1：
+  [`heat-soak-and-nickel-sulfide-risk.md`](heat-soak-and-nickel-sulfide-risk.md)
+
 ## 外觀／變形防呆
 
 - 玻璃「符合產品規格」不代表建築師在任何視角下都不會看到 roller wave、anisotropy、bow / warp、coating nonuniformity 或 laminated optical effects。

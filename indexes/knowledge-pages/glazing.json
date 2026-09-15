@@ -4,6 +4,8 @@
   "purpose": "Page-level routing metadata only. Match slug/path, then open the target page for engineering content and verification status.",
   "pages": [
     {"path":"knowledge/glazing/ASTM-E1300-design-routing.md","slug":"ASTM-E1300-design-routing","kind":"page"},
-    {"path":"knowledge/glazing/glass-standards-baseline.md","slug":"glass-standards-baseline","kind":"page"}
+    {"path":"knowledge/glazing/glass-standards-baseline.md","slug":"glass-standards-baseline","kind":"page"},
+    {"path":"knowledge/glazing/heat-soak-and-nickel-sulfide-risk.md","slug":"heat-soak-and-nickel-sulfide-risk","kind":"page"},
+    {"path":"knowledge/glazing/insulating-glass-unit-durability-and-certification.md","slug":"insulating-glass-unit-durability-and-certification","kind":"page"}
   ]
 }
