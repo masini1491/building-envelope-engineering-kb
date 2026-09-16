@@ -1,6 +1,6 @@
 # 建築外殼工程知識庫（Building Envelope Engineering Knowledge Base）
 
-以台灣建築外殼工程實務為核心的公開技術知識庫，供工程師與 AI（例如 ChatGPT / Codex）查詢、交叉驗證、計算審查與持續維護。
+以台灣建築外殼工程實務為核心的公開技術知識庫，供工程師與 AI（例如 ChatGPT、Codex、Claude Code、Gemini CLI、GitHub Copilot）查詢、交叉驗證、計算審查與持續維護。
 
 範圍包含帷幕牆、玻璃與結構玻璃、鋁板／金屬外牆、石材、採光罩、材料與扣件、表面處理、防蝕、結構耐風／耐震、錨栓、背撐／次結構、性能試驗、水管理、活動窗、建築物理、防火，以及相關 CNS / ASTM / AAMA-FGIA / ISO 與台灣工程實務。
 
@@ -20,7 +20,7 @@
 
 ## 快速導入人工智慧（AI）
 
-本 repository 已設計為可直接交由 ChatGPT、Codex 或其他可讀取 GitHub repository 的 AI 使用，不需要把整個知識庫複製進 prompt，也不需要人工逐頁指定要讀哪些文件。
+本 repository 已設計為可直接交由 ChatGPT、Codex 或其他可讀取 GitHub repository 的 AI 使用，不需要把整個知識庫複製進 prompt，也不需要人工逐頁指定要讀哪些文件。Claude Code、Gemini CLI 與 GitHub Copilot 另提供 thin native bootstrap adapter，仍共同 hand off 到本 repository 的 canonical `CHAT_INIT.md`。
 
 最小導入方式：
 
@@ -28,6 +28,8 @@
 2. 要求 AI 先讀 [`CHAT_INIT.md`](CHAT_INIT.md)。
 3. AI 依 `knowledge-index → domain manifest → canonical leaf page` 漸進式載入最低必要內容。
 4. 只有在 Repository 維護、工程審查、標準 provenance 或其他特定任務時，才條件式載入對應治理文件。
+
+Native bootstrap adapter：Claude Code 使用 [`CLAUDE.md`](CLAUDE.md)、Gemini CLI 使用 [`GEMINI.md`](GEMINI.md)、GitHub Copilot 使用 [`.github/copilot-instructions.md`](.github/copilot-instructions.md)。這些 adapter 只提供 compatibility handoff，不改變 `Project AI mode` 或 execution authority；目前已有 deterministic static validation，但不宣稱各 host 的 live cross-runtime behavioral conformance 已完整驗證。
 
 因此一般使用者不需要自行管理每一份知識文件，也不需要要求 AI 預先掃描整個 repository。
 
@@ -48,7 +50,7 @@
 - [`knowledge/design-management/curtain-wall-design-workflow.md`](knowledge/design-management/curtain-wall-design-workflow.md) — 帷幕設計作業流程
 - [`knowledge/performance-testing/curtain-wall-performance-crosswalk.md`](knowledge/performance-testing/curtain-wall-performance-crosswalk.md) — CNS / ASTM / AAMA-FGIA 性能試驗 crosswalk
 
-### 給 ChatGPT / Codex
+### 給 AI Agent
 
 新 session 優先讀 [`CHAT_INIT.md`](CHAT_INIT.md) 作為精簡 bootstrap，再依任務條件載入：
 
@@ -108,6 +110,7 @@ Cross-reference 只代表用途相關，不代表 CNS / ASTM / AAMA-FGIA / ISO �
 - standards dossier machine metadata / standards-index 對應
 - `LANGUAGE.md` 繁中 heading lint
 - architecture / AI routing index lint
+- cross-agent bootstrap adapter presence / authority boundary / drift regression
 
 ## 授權與責任
 

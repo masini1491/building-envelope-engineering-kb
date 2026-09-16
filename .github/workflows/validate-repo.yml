@@ -27,6 +27,12 @@ jobs:
       - name: 執行工程計算工具測試
         run: python -m unittest discover -s tests/engineering_calc -p "test_*.py"
 
+      - name: 執行跨 AI 啟動轉接測試
+        run: python -m unittest discover -s tests/ai_routing -p "test_*.py"
+
+      - name: 檢查跨 AI 啟動轉接
+        run: python scripts/check_cross_agent_adapters.py
+
       - name: 檢查 AI 頁面路由 manifest
         run: python scripts/build_knowledge_manifests.py --check
 

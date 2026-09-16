@@ -8,8 +8,9 @@
 - 不要預設掃描整個 repository，也不要為一般工程問答固定載入 `README.md`、`AGENTS.md`、`AI_RESPONSE_CONTRACT.md`、全部 manifests 或全部 `knowledge/`。
 - 一般工程問答維持 `CHAT_INIT → knowledge-index → domain manifest → canonical leaf → sufficient then STOP`。
 - Repository 維護、修改、Git／write、validation 或 AI context／retrieval architecture 任務，依 `CHAT_INIT.md` 再讀 `AGENTS.md` 與其指向的最低充分 owners。
-- 若 runtime 同時載入其他 agent-instruction surfaces，重複的 routing 只視為 compatibility handoff，不形成多份 authority。
-- 本檔存在只代表 bootstrap compatibility；不代表 task authorization、repository write authority、credential capability、execution authority 或 completion evidence。
+- 若 runtime 同時載入其他 agent-instruction surfaces，重疊的 bootstrap／routing 只視為 compatibility handoff，不形成平行 authority。
+- 本 adapter 不會改變本 repository 的 `Project AI mode: ChatGPT-Only`；相容性只讓此 host discover、read、route、follow current canonical governance，不會讓此 host 自動成為 canonical executor。
+- 本檔存在不代表 task authorization、repository write authority、runtime execution authority、credential／deployment authority 或 completion evidence。
 
 ## 權威邊界
 

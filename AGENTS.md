@@ -101,7 +101,7 @@ Playbook baseline: main
 
 - 一般工程問答、knowledge retrieval、標準／材料／構造查詢與一般工程資料查證，維持本 repository `CHAT_INIT.md` 的既有最低必要 routing；不得只因採用 Playbook 就固定載入本 `AGENTS.md`、resolve Playbook baseline 或讀取 Playbook。
 - 只有 repository maintenance、Git／write authority、deterministic execution／materialization、validation／debugging、AI context／retrieval architecture、research／architecture workflow **governance** 或其他共通 AI development／repository workflow 治理型任務，才依本段 adoption state activate Playbook。一般工程 research／標準查證本身不是 activation trigger。
-- `ChatGPT-Only` 只決定本 repository 不依賴 Codex 作為 AI workflow actor；實際工作仍必須同時滿足本 repository governance、Current Write Target、Task／Stage authorization、permission、credential 與 execution capability。
+- `Project AI mode` 的 actor topology 以 current Playbook `PROJECT_MODES.md` 為 canonical owner；本 repository 的 `ChatGPT-Only` 不因 `CLAUDE.md`、`GEMINI.md` 或 Copilot repository instructions 等 compatibility adapter 存在而改變。Cross-agent compatibility 不構成 executor admission；實際工作仍必須同時滿足本 repository governance、Current Write Target、Task／Stage authorization、permission、credential 與 execution capability。
 - 不把 Playbook 的完整 normative rules 複製進本 repository；需要時回 Playbook current declared baseline 的 canonical owner。
 
 ## 人工智慧（AI）讀取規則
