@@ -4,7 +4,7 @@
 
 範圍包含帷幕牆、玻璃與結構玻璃、鋁板／金屬外牆、石材、採光罩、材料與扣件、表面處理、防蝕、結構耐風／耐震、錨栓、背撐／次結構、性能試驗、水管理、活動窗、建築物理、防火，以及相關 CNS / ASTM / AAMA-FGIA / ISO 與台灣工程實務。
 
-本知識庫採 **AI-assisted engineering knowledge management** 方式維護，由維護者以工程實務判斷主導，並使用 ChatGPT 協助資料整理、交叉查證、知識重構與文件維護；工程結論仍以現行法規、正式標準、政府資料、製造商正式文件與其他可追溯工程證據為依據。**ChatGPT 是知識整理工具，不是工程權威來源。**
+本知識庫採 **AI-assisted engineering knowledge management** 方式維護，由維護者以工程實務判斷主導，並使用 ChatGPT 協助資料整理、交叉查證、知識重構與文件維護；工程結論仍以現行法規、正式標準、政府資料、製造商正式文件與其他可追溯工程證據為依據。**ChatGPT 是知識整理工具，不是工程權威來源。**\n\n本 Repo 採用 [`masini1491/ai-development-playbook`](https://github.com/masini1491/ai-development-playbook) 作為共通 AI workflow 方法論；工程知識與 repository-specific governance 仍以本 Repo 為準，Playbook 僅在需要共通開發治理時條件式啟用。
 
 ## 適用對象與使用情境
 
@@ -30,7 +30,7 @@
 
 ## 快速導入人工智慧（AI）
 
-本 repository 已設計為可直接交由 ChatGPT、Codex 或其他可讀取 GitHub repository 的 AI 使用，不需要把整個知識庫複製進 prompt，也不需要人工逐頁指定要讀哪些文件。Claude Code、Gemini CLI 與 GitHub Copilot 另提供 thin native bootstrap adapter，仍共同 hand off 到本 repository 的 canonical `CHAT_INIT.md`。
+本 repository 已設計為可直接交由 ChatGPT、Codex 或其他可讀取 GitHub repository 的 AI 使用，不需要把整個知識庫複製進 prompt，也不需要人工逐頁指定要讀哪些文件。Claude Code、Gemini CLI 與 GitHub Copilot 另提供 thin native bootstrap adapter，仍共同 hand off 到本 repository 的 canonical `CHAT_INIT.md`。\n\n> **給 ChatGPT：**「請讀取 `masini1491/building-envelope-engineering-kb` 最新 `CHAT_INIT.md`，再依我的問題使用本知識庫。」
 
 最小導入方式：
 
