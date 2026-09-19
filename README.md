@@ -32,7 +32,7 @@
 
 ## 快速導入人工智慧（AI）
 
-本 repository 已設計為可直接交由 ChatGPT、Codex 或其他可讀取 GitHub repository 的 AI 使用，不需要把整個知識庫複製進 prompt，也不需要人工逐頁指定要讀哪些文件。Claude Code、Gemini CLI 與 GitHub Copilot 另提供 thin native bootstrap adapter，仍共同 hand off 到本 repository 的 canonical `CHAT_INIT.md`。
+本 repository 已設計為可直接交由 ChatGPT、Codex 或其他可讀取 GitHub repository 的 AI 使用，不需要把整個知識庫複製進 prompt，也不需要人工逐頁指定要讀哪些文件。Claude Code、Gemini CLI 與 GitHub Copilot 另提供 thin host-specific bootstrap adapter，仍共同 hand off 到本 repository 的 canonical `CHAT_INIT.md`。
 
 > **給 ChatGPT：**「請讀取 `masini1491/building-envelope-engineering-kb` 最新 `CHAT_INIT.md`，再依我的問題使用本知識庫。」
 
@@ -43,7 +43,7 @@
 3. AI 依 `knowledge-index → domain manifest → canonical leaf page` 漸進式載入最低必要內容。
 4. 只有在 Repository 維護、工程審查、標準 provenance 或其他特定任務時，才條件式載入對應治理文件。
 
-Native bootstrap adapter：Claude Code 使用 [`CLAUDE.md`](CLAUDE.md)、Gemini CLI 使用 [`GEMINI.md`](GEMINI.md)、GitHub Copilot 使用 [`.github/copilot-instructions.md`](.github/copilot-instructions.md)。這些 adapter 只提供 compatibility handoff，不改變 `Project AI mode` 或 execution authority；目前已有 deterministic static validation，但不宣稱各 host 的 live cross-runtime behavioral conformance 已完整驗證。
+Host-specific bootstrap adapter：Claude Code 使用 [`CLAUDE.md`](CLAUDE.md)、Gemini CLI 使用 [`GEMINI.md`](GEMINI.md)、GitHub Copilot 使用 [`.github/copilot-instructions.md`](.github/copilot-instructions.md)。這些 adapter 只提供 compatibility handoff，不改變 `Project AI mode` 或 execution authority；目前已有 deterministic static validation，但不宣稱各 host 的 live cross-runtime behavioral conformance 已完整驗證。
 
 因此一般使用者不需要自行管理每一份知識文件，也不需要要求 AI 預先掃描整個 repository。
 
@@ -124,7 +124,7 @@ Cross-reference 只代表用途相關，不代表 CNS / ASTM / AAMA-FGIA / ISO �
 - standards dossier machine metadata / standards-index 對應
 - `LANGUAGE.md` 繁中 heading lint
 - architecture / AI routing index lint
-- cross-agent bootstrap adapter presence / authority boundary / drift regression
+- cross-agent bootstrap adapter presence / authority boundary / host-specific contract regression
 
 ## 授權與責任
 

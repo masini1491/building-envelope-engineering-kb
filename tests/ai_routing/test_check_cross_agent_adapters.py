@@ -50,12 +50,16 @@ class CrossAgentAdapterTests(unittest.TestCase):
         findings = validator.validate(root)
         self.assertTrue(any(item.code == "CROSS_AGENT_ADAPTER_AUTHORITY" for item in findings))
 
-    def test_adapter_drift_fails(self) -> None:
+    def test_claude_host_specific_contract_is_required(self) -> None:
         root = self.make_root()
-        path = root / "GEMINI.md"
-        path.write_text(path.read_text(encoding="utf-8") + "\n額外 host-specific policy。\n", encoding="utf-8")
+        path = root / "CLAUDE.md"
+        text = path.read_text(encoding="utf-8").replace(
+            "一般 Claude Code task 應先由 `CHAT_INIT.md` 進入最低充分 routing",
+            "一般 Claude Code task 依既有規則處理",
+        )
+        path.write_text(text, encoding="utf-8")
         findings = validator.validate(root)
-        self.assertTrue(any(item.code == "CROSS_AGENT_ADAPTER_DRIFT" for item in findings))
+        self.assertTrue(any(item.code == "CROSS_AGENT_ADAPTER_HOST_CONTRACT" for item in findings))
 
 
 if __name__ == "__main__":

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate thin cross-agent bootstrap adapters without granting execution authority."""
+"""Validate thin host-specific bootstrap adapters without granting execution authority."""
 
 from __future__ import annotations
 
@@ -23,6 +23,14 @@ REQUIRED_PHRASES = (
     "不代表 task authorization、repository write authority、runtime execution authority、credential／deployment authority 或 completion evidence",
     "current canonical authority 為準",
 )
+HOST_SPECIFIC_REQUIRED_PHRASES = {
+    "CLAUDE.md": (
+        "精簡路由轉接（thin routing shim）",
+        "Claude Code 在沒有 `CLAUDE.md` 時可能原生讀取 `AGENTS.md`",
+        "一般 Claude Code task 應先由 `CHAT_INIT.md` 進入最低充分 routing",
+        "upstream version-specific behavior",
+    ),
+}
 MAX_LINES = 28
 
 
@@ -35,7 +43,6 @@ class Finding:
 
 def validate(root: Path = ROOT) -> list[Finding]:
     findings: list[Finding] = []
-    texts: dict[str, str] = {}
 
     for relative, host in CROSS_AGENT_ADAPTERS.items():
         path = root / relative
@@ -44,7 +51,6 @@ def validate(root: Path = ROOT) -> list[Finding]:
             continue
 
         text = path.read_text(encoding="utf-8")
-        texts[relative] = text
 
         if host not in text:
             findings.append(Finding("FAIL", "CROSS_AGENT_ADAPTER_HOST", f"{relative}: host identity missing: {host}"))
@@ -61,6 +67,16 @@ def validate(root: Path = ROOT) -> list[Finding]:
                     Finding("FAIL", "CROSS_AGENT_ADAPTER_AUTHORITY", f"{relative}: authority boundary missing: {phrase}")
                 )
 
+        for phrase in HOST_SPECIFIC_REQUIRED_PHRASES.get(relative, ()):
+            if phrase not in text:
+                findings.append(
+                    Finding(
+                        "FAIL",
+                        "CROSS_AGENT_ADAPTER_HOST_CONTRACT",
+                        f"{relative}: host-specific bootstrap responsibility missing: {phrase}",
+                    )
+                )
+
         if "```" in text or "~~~" in text:
             findings.append(
                 Finding("FAIL", "CROSS_AGENT_ADAPTER_FENCE", f"{relative}: thin adapter must not contain fenced blocks")
@@ -72,20 +88,6 @@ def validate(root: Path = ROOT) -> list[Finding]:
                     "FAIL",
                     "CROSS_AGENT_ADAPTER_SIZE",
                     f"{relative}: {len(text.splitlines())} lines exceeds thin-adapter limit {MAX_LINES}",
-                )
-            )
-
-    if len(texts) == len(CROSS_AGENT_ADAPTERS):
-        normalized = [
-            texts[relative].replace(host, "<HOST>")
-            for relative, host in CROSS_AGENT_ADAPTERS.items()
-        ]
-        if len(set(normalized)) != 1:
-            findings.append(
-                Finding(
-                    "FAIL",
-                    "CROSS_AGENT_ADAPTER_DRIFT",
-                    "adapter bodies must remain identical except for host identity",
                 )
             )
 
