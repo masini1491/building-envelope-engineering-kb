@@ -1,6 +1,6 @@
 # 新聊天室初始化
 
-本 repository 是以台灣建築外殼工程實務為核心的公開技術知識庫。本檔是 AI 使用本 repository 時的**精簡啟動層（bootstrap）**；目標是在不犧牲工程治理的前提下，避免每個問題都先載入整套治理文件。
+本 repository 是以台灣建築外殼工程實務為核心的公開技術知識庫。本檔是 AI 使用本 repository 時的**精簡啟動層（bootstrap）**；目標是在不犧牲工程治理的前提下，讓一般工程問答以最低充分 Context 直接命中 current canonical authority。
 
 ## 最低啟動規則
 
@@ -16,18 +16,11 @@
 
 ## 儲存庫讀取取得與復原
 
-當本次問題需要 current repository content，而首選 GitHub／repository-native read path 不可用時，應只降低**取得機制**，不得降低 authority：
+本次問題 materially 依賴 current repository content 時，優先使用 repository-native read；首選機制不可用時，可依最低充分 canonical path 降級：
 
-`repository-native connector → public canonical read / direct canonical download → user-mediated exact artifact handoff → minimum user-supplied canonical section → REPOSITORY READ BLOCKED`
+`repository-native read → public canonical read / direct canonical download → user-mediated exact artifact / minimum canonical section → REPOSITORY READ BLOCKED`
 
-- 本 repository／artifact 為 public 時，connector unavailable 後可改用官方 GitHub／raw content、direct canonical download 或其他 canonical read-only surface；fallback 不授權任何 repository mutation。
-- 若 exact canonical source／download target 已確認，但目前 connector、browser、sandbox 或 runtime 無法取得所需 bytes，而使用者可由自己的 browser／host 正常下載，可請使用者從該 exact target 原樣下載後直接上傳目前聊天室，再由該 artifact 繼續。
-- User-mediated handoff 只解決 transport，不提升 authority。保留可得的 source URL／repository ref／revision／filename／provenance；若 artifact identity 會影響工程判斷或 validation，使用 hash、Git blob/tree、size 或其他最低充分 evidence 綁回原 source。無法可靠綁定時標示 identity gap，不把「已上傳」本身當 canonical proof。
-- 若完整 artifact 不必要，只要求本次 decision 所需的最低必要 file／section，不預設要求使用者提供整個 repository。
-- 同一 acquisition mechanism class 已確認被阻擋後，不做無界的等價 retry；只有 blocked state material 改變，或新 path 確實提供不同 capability 時才重試／切換。
-- 無法可靠建立 current canonical content／artifact 時標示 `REPOSITORY READ BLOCKED`／等價 evidence gap；不得用舊聊天、cache、模型 memory 或相似工程內容補成 repository fact。
-
-核心原則：**Fail over the read mechanism, not the authority. Recover with the lowest-sufficient canonical path.**
+Fallback 只改變 transport，不改變 source authority、task authority或 write authority。若 source identity 會影響判斷，保留可得的 repository／ref／revision／path／hash 等最低充分 evidence；無法可靠建立 current canonical content 時，不得用舊聊天、cache、AI memory、search hit或相似工程內容補成 repository fact。同一 acquisition mechanism 已證實 blocked 時，不做無界等價 retry。
 
 ## 依任務選擇載入層級
 
@@ -37,16 +30,14 @@
 
 1. 讀本 `CHAT_INIT.md`。
 2. 讀 [`indexes/knowledge-index.json`](indexes/knowledge-index.json)，用 `id / aliases` 選出最可能的 domain。
-3. **只讀該 domain 的 `manifest`**（位於 `indexes/knowledge-pages/`），先比對 `slug / path / section`。
-4. 若 manifest 已直接命中一個明確 leaf page，直接讀該頁；**不必先經過 router**。
-5. 若題意仍有歧義、跨多個 subdomain，或需要先理解 domain 邊界，才讀 `entrypoint / router`。
-6. 需要標準版本、來源、scope 或 provenance 時，再讀 [`indexes/standards-index.json`](indexes/standards-index.json) 與對應 `references/` dossier。
-7. 若問題要求判斷「repository 有沒有／缺少什麼／尚未支援什麼」，不得只因目前已讀 domain、單一 manifest 或一次 search 沒命中就宣稱不存在。先以 `knowledge-index → 合理 domain manifest／canonical owner → 可用 repository search` 做與 claim scope 相稱的 bounded existence check；找到充分 positive hit 後可停止該分支。最終回答若仍要提出 material negative claim，送出前再逐條 reconciliation；coverage 不足時使用 `NOT FOUND IN CHECKED SCOPE` 或等價的 evidence-bounded wording。
-8. Repository search／filename／snippet 命中只作 discovery evidence；先辨識 owner、authority class 與 currentness，再回 current canonical target。**`found` 不等於 authoritative/current，正如 `not found` 不等於 absent。**
-9. Repository evidence 不足或 freshness 不明時，再查 current primary source。
-10. 同一 session 已確認 current HEAD、domain manifest／router／canonical leaf 後，若沒有 freshness trigger 或 material scope change，優先 reuse 已載 route／owner；同一 leaf follow-up 不重新 fetch，同 domain 新題沿用已載 manifest，只讀新的最低必要 target。取得本題最低充分 evidence 後立即 STOP retrieval。
+3. 只讀該 domain 的 `indexes/knowledge-pages/<domain>.json`，用 `slug / path / section` 選擇最低必要 page。
+4. Manifest 已唯一命中 leaf page時直接讀 leaf；題意仍有歧義、跨多個 subdomain或需要理解 domain 邊界時，才讀 `entrypoint / router`。
+5. 需要標準版本、來源、scope或 provenance 時，再讀 [`indexes/standards-index.json`](indexes/standards-index.json) 與對應 `references/` dossier。
+6. Repository evidence不足或 freshness不明時，再查 current primary source。
 
-**一般明確問答不需要無條件完整載入 `README.md`、`AGENTS.md` 與 `AI_RESPONSE_CONTRACT.md`。**
+Repository-level absence claim需要與 claim scope相稱的 bounded coverage；單一 manifest／search未命中只代表 checked scope未找到，不能單獨證明不存在。Search／filename／snippet命中也只作 discovery evidence，最後仍回 current canonical owner判斷 authority與語意。Coverage不足時使用 `NOT FOUND IN CHECKED SCOPE` 或等價 evidence-bounded wording。
+
+**一般明確問答不需要無條件完整載入 `README.md`、`AGENTS.md`、`AI_RESPONSE_CONTRACT.md` 或 shared AI Development Playbook。**
 
 ### 計算書／圖面／規範審查
 
@@ -55,70 +46,51 @@
 - [`AI_RESPONSE_CONTRACT.md`](AI_RESPONSE_CONTRACT.md)；
 - 對應 review / methodology canonical page；
 - 若涉及完整結構審查，優先從 `knowledge/structural-design/review/` 路由；
-- 若使用者要求審查結果跨聊天室、跨 revision、長期保存，或後續持續 reconciliation，直接讀 [`knowledge/structural-design/review/calculation-review-record.md`](knowledge/structural-design/review/calculation-review-record.md)；持久化是選配，不需要為一次性局部核算強制建立 record；
-- 若需要獨立數值重算、reported/recomputed comparison 或 calculation-chain reconciliation，再讀 [`scripts/engineering_calc/README.md`](scripts/engineering_calc/README.md)，並在確認目前 execution capability 足夠後使用其 AI-facing adapter。**只要 `review.py` 已支援該 `check_type`，預設必須優先經 adapter 執行，不直接繞到底層 helper 自行拼接；只有 adapter 不支援時才可 bounded-read 對應 module 作明確標示的 fallback。**若 runtime／filesystem 無法執行，不得把「已讀到程式碼」宣稱成「已完成 deterministic 核算」。
+- 若使用者要求審查結果跨聊天室、跨 revision、長期保存或後續持續 reconciliation，讀 [`knowledge/structural-design/review/calculation-review-record.md`](knowledge/structural-design/review/calculation-review-record.md)；一次性局部核算不強制建立 record；
+- 若需要獨立數值重算、reported/recomputed comparison或 calculation-chain reconciliation，再讀 [`scripts/engineering_calc/README.md`](scripts/engineering_calc/README.md)，並在 execution capability成立後使用其 AI-facing adapter。只要 `review.py` 已支援該 `check_type`，預設優先經 adapter執行；只有 adapter不支援時才 bounded-read對應 module作明確 fallback。Runtime／filesystem無法執行時，不得把「已讀到程式碼」宣稱成「已完成 deterministic 核算」。
 
-回答呈現採結論優先、最低充分展開；`PASS / WARNING / FAIL / INCOMPLETE / NOT_APPLICABLE` 必須 scope-qualified，局部 `PASS` 不得包裝成整體系統安全。Calculator 的 `COMPUTED / MATCH / MISMATCH / INCOMPLETE_INPUT / UNSUPPORTED_MODEL` 等 execution／comparison status 不得與工程 acceptance status 混成同一維度。
+回答呈現採結論優先、最低充分展開；`PASS / WARNING / FAIL / INCOMPLETE / NOT_APPLICABLE` 必須 scope-qualified，局部 `PASS` 不得包裝成整體系統安全。Calculator 的 `COMPUTED / MATCH / MISMATCH / INCOMPLETE_INPUT / UNSUPPORTED_MODEL` 等 execution／comparison status 不得與工程 acceptance status混成同一維度。
 
 ### 儲存庫（Repository）維護／新增／修改內容
 
-必須再讀：
+Repository maintenance 是 shared AI Development Playbook 的 activation trigger。先讀 [`AGENTS.md`](AGENTS.md) 取得 current project governance／adoption state，再依 selected shared baseline 關閉本次 action真正需要的共通 contract；本檔不重複 Git／write／permission／runtime／validation／completion mechanics。
 
-- [`AGENTS.md`](AGENTS.md) — authority、canonical ownership、公開安全、metadata 與維護治理；
-- [`LANGUAGE.md`](LANGUAGE.md) — 若修改人類可讀內容；
-- 相關 `templates/`、`schemas/`、`scripts/validate_repo.py` — 依任務需要載入。
+本 repository 的 local conditional owners：
 
-**若任務涉及新增、整理、吸收、匯入或重構 knowledge，建立任何新的 `knowledge/**/*.md` 前必須先讀 [`KNOWLEDGE_INGESTION.md`](KNOWLEDGE_INGESTION.md) 並執行其中的「新增知識決策門」。預設優先更新既有 canonical owner，不以新增檔案作為預設動作。**
-
-**任何準備寫入 GitHub 的 repository 維護任務，在第一次 remote write 前必須讀 [`PRE_PUSH_VALIDATION.md`](PRE_PUSH_VALIDATION.md) 並執行「推送前驗證門」；預設先收斂 deterministic checks，再以單一 batched commit／最少必要 push 寫入，GitHub Actions 只作 remote independent confirmation。**
-
-維護時以 GitHub `main` 為 source of truth；修改前先 read-back current remote，避免依舊聊天或 cached copy 覆蓋新內容。
-
-新增、刪除或移動 `knowledge/**/*.md` 後，執行：
-
-```bash
-python scripts/build_knowledge_manifests.py
-```
-
-再執行 repository validation。`indexes/knowledge-pages/*.json` 是**由路徑自動產生的 routing artifact**，不得手工塞入工程結論或 verification status。
+- 修改人類可讀內容 → [`LANGUAGE.md`](LANGUAGE.md)
+- 新增、整理、吸收、匯入或重構 knowledge → [`KNOWLEDGE_INGESTION.md`](KNOWLEDGE_INGESTION.md)，並先執行「新增知識決策門」
+- 準備第一次 remote write → [`PRE_PUSH_VALIDATION.md`](PRE_PUSH_VALIDATION.md)
+- Template／schema／router／validator 變更 → 只讀本次修改直接相關的 local owner／tooling
+- 新增、刪除或移動 `knowledge/**/*.md` → 執行 `python scripts/build_knowledge_manifests.py`；`indexes/knowledge-pages/*.json` 只作 generated routing artifact，不得手工加入工程結論或 verification status
 
 ### 共通人工智慧開發治理的條件式啟用
 
-本 repository 的一般工程問答／knowledge retrieval 不因採用外部 AI workflow Playbook 而增加固定 bootstrap。預設 hot path 仍為：
+一般工程問答、knowledge retrieval、標準／材料／構造查詢與一般工程 evidence research 維持 project-native hot path：
 
 `CHAT_INIT → knowledge-index → domain manifest → canonical leaf → sufficient then STOP`
 
-一般工程資料、標準、材料、構造或其他工程 evidence 查證仍屬本 knowledge base 的 engineering retrieval，不因出現 research／查證需求就 activate shared Playbook。
+只有 repository maintenance、Git／write、deterministic execution／materialization、validation／debugging、AI context／retrieval architecture、research／architecture workflow governance或其他共通 AI development／repository workflow治理型任務，才讀 `AGENTS.md` 取得 current Playbook adoption state並 activate shared baseline。
 
-只有本次任務實際涉及 repository maintenance、Git／write authority、deterministic execution／materialization、validation／debugging、AI context／retrieval architecture、research／architecture workflow governance 或其他共通 AI development／repository workflow 治理時，才讀 `AGENTS.md` 取得 current Playbook adoption state。
+Shared baseline activation後的 exact-revision resolution、owner loading、Action Contract Closure與 completion evidence由 AI Development Playbook current canonical owners負責；本 repository只保留自己的 engineering knowledge、public safety、canonical ownership、routing與其他 project-specific authority。
 
-若 `AGENTS.md` 宣告採用 `masini1491/ai-development-playbook`，依其 declared baseline 執行：
+## 已驗證內容重用與新鮮度
 
-`read AGENTS adoption state → resolve declared floating baseline to exact SHA → Playbook CHAT_INIT → minimum-sufficient canonical owner → return to this repository authority`
+同一 session 已確認 current repository identity、domain manifest／router／canonical leaf後，沒有 material freshness或 scope trigger時直接 reuse，不為 routing ceremony重複 fetch。
 
-不要因此完整掃描 Playbook；shared Playbook 也不得覆蓋本 repository 的 engineering knowledge、public safety、canonical ownership、routing 或 repository-specific governance。
+Material trigger包括：使用者明確要求 latest/current或表示 KB 已更新、已知 repository mutation、跨階段續審、task scope／owner materially改變，或 currentness會改變工程結論／completion claim。
 
-## 儲存庫新鮮度補查（Freshness Probe）
-
-長期問答／審查若跟隨 floating `main`，不要把 session 開始時讀到的 repository identity 永久視為 current。當使用者明確表示 KB 已更新，或在跨階段續審、repository mutation、completion acceptance／最終工程結論等 material boundary 前，而 currentness 會影響判斷時，先做一次低成本 HEAD probe。
-
-- HEAD unchanged：沿用已確認 working context，不全文重讀。
-- HEAD changed：先做 bounded diff，僅重讀會影響本次 routing／authority／engineering conclusion／validation 的 changed owner。
-- 固定 SHA／tag baseline 不因 upstream `main` 前進而自行升級。
-- Probe unavailable 時保留 freshness gap；只有 current decision materially 依賴最新 repository authority 時才 STOP，否則在標示 limitation 下維持最低風險工作。
-
-核心原則：**Check identity cheaply, reload selectively.**
+- HEAD unchanged：沿用已確認 working context。
+- HEAD changed：先做 bounded diff，只重讀會影響本題 routing／authority／engineering conclusion／validation 的 changed owner。
+- 固定 SHA／tag baseline：不因 upstream `main` 前進自行升級。
+- Probe unavailable：保留 freshness gap；只有 current decision materially依賴 latest authority時才停止依賴該 claim。
 
 ## 路由原則
 
 - `knowledge-index.json` 只負責選 domain。
-- `indexes/knowledge-pages/<domain>.json` 只負責在該 domain 內選 page。
-- `entrypoint` 是 domain 的預設第一頁；只有明確標示 `router` 的項目才代表真正 router page。
-- Page manifest 只保存 `path / slug / kind / section`；工程內容、驗證狀態與 evidence 必須回到目標頁本身。
-- 若 leaf page 已精準命中，就不要為了流程完整而多讀一層 router。
-- 只有當現有頁面明確 cross-reference、問題跨 domain，或缺少必要 evidence 時，才繼續開下一頁。
-- 不因某頁列出很多相關連結，就自動全部載入。
-- 同一 session 已確認且仍 current 的 manifest／router／leaf 可直接 reuse；沒有 material trigger 時，不為流程完整重做相同 routing。
-- **Sufficient then STOP**：已取得支持本題結論的最低充分 canonical evidence 後，停止擴張 retrieval，不把「多讀幾頁」當成可靠度本身。
+- `indexes/knowledge-pages/<domain>.json` 只負責在該 domain內選 page。
+- `entrypoint` 是 domain預設第一頁；只有明確標示 `router` 的項目才代表真正 router page。
+- Page manifest只保存 `path / slug / kind / section`；工程內容、驗證狀態與 evidence回到目標 canonical page。
+- Exact leaf已精準命中時，不為流程完整增加 routing hop；只有 cross-reference、跨 domain或 evidence缺口才繼續擴張 retrieval。
+- **Sufficient then STOP**：已取得支持本題結論的最低充分 canonical evidence後停止擴張，不把「多讀幾頁」當成可靠度本身。
 
 核心原則：**先用最小 routing metadata 找到正確 canonical owner，再只讀足以回答本題的內容。**
