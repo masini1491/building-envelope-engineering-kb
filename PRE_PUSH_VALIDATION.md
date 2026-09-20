@@ -1,100 +1,86 @@
 # 推送前驗證門（Pre-push Validation Gate）
 
-本檔只用於 AI／維護者準備把 repository 變更寫入 GitHub 時；一般工程問答不需載入。目標是把可預期的 deterministic failure 留在 remote push 之前處理，避免 ChatGPT 維護過程以多個中間 commit 反覆觸發 GitHub Actions failure 與 Email 通知。
+本檔是 `building-envelope-engineering-kb` 的 **repository-specific pre-push validation recipe**。只在準備寫入本 repository 時載入；一般工程問答不需要。
+
+共通 methodology 不在此重複維護：Action Contract Closure／AI Context 由 selected Playbook `AI_CONTEXT.md` 擁有；repository identity／write／permission 由 `REPOSITORY_EXECUTION.md` 擁有；GitHub object mutation／Actions mechanics 由 `GITHUB_OPERATIONS.md` 擁有；runtime／materialization capability 由 `CHATGPT_RUNTIME_EXECUTION.md` 擁有；snapshot／evidence identity 由 `INFORMATION_INTEGRITY.md` 擁有；validation／completion semantics 由 `DEBUG_VALIDATION.md` 擁有。本檔只追加本 KB 實際要跑哪些 deterministic checks、何時需要 generated artifact，以及 remote confirmation 的 local contract。
 
 ## 核心預設
 
-**不要把 GitHub Actions 當成互動式除錯器。**
-
-同一維護任務應先完成必要檢查與修正，再以單一 batched commit／最少必要 push 寫入 `main`。不得採用「先 push 看 CI → 修一點再 push → 再看 CI」作為預設工作流程。
+在 shared pre-action contract 已 closure 的前提下，先收斂本次 candidate，再執行下列最低充分 local checks；不要把 GitHub Actions 當成第一個互動式除錯 surface。若 current capability不足以執行某個 required local check，保留該 evidence gap，不把「未執行」寫成 PASS 或 repository failure。
 
 ## 決定性執行機會掃描（Execution Opportunity Scan）
 
-若目前已讀範圍直接出現 repository-owned validator、generator、parser、calculator、test 或其他可界定輸入／輸出與失敗語意的 deterministic workload，應先做最低充分 execution opportunity scan，而不是預設把 GitHub Actions 當成第一個 execution surface。
+是否由目前 ChatGPT/runtime 執行 repository-owned validator、generator、test或其他 deterministic workload，直接依 selected Playbook `CHATGPT_RUNTIME_EXECUTION.md` → `Execution Opportunity Scan`／`Execution Capability Gate`。本 KB 不另建第二份 capability methodology。
 
-只有候選同時具有實際價值且本任務允許執行時，才檢查該候選真正需要的 runtime、dependency、filesystem 或 network capability；不得為了盤點「ChatGPT 能做什麼」而完整掃描 repository 或 sandbox。
+本 repository 已知的主要 deterministic surfaces包括：
 
-若可由 exact commit／tree 的 canonical snapshot 在本 session 安全重現 deterministic check，優先於 remote push 前執行，以降低人工錯誤與 remote debugging noise。Sandbox 只作暫時計算 surface；執行結果是 evidence，不取得 GitHub persistence／write authority，也不成為新的 source of truth。
+- `scripts/preflight_markdown_headings.py`
+- `scripts/build_knowledge_manifests.py`
+- `scripts/check_cross_agent_adapters.py`
+- `scripts/check_ai_fastpath.py`
+- `scripts/validate_repo.py`
+- `tests/engineering_calc/`
+- `tests/ai_routing/`
+
+只有 current diff／validation contract需要時才執行或 materialize 對應 surface；存在工具不代表每次全部必跑。
 
 ## 單一快照一致性（Snapshot Consistency Guard）
 
-若 pre-push check 需要從 remote repository 取得多個檔案、validator、generated-input 或其他 canonical inputs，再組成 local／ephemeral snapshot 執行 deterministic validation，**同一次 validation run 的 repository inputs 必須對齊同一個 exact canonical revision**。
-
-推薦流程：
-
-`resolve branch/ref → pin exact commit SHA → fetch all validation inputs @ same SHA → build minimum snapshot → execute check → write 前再確認 branch 未漂移`
-
-- `main`／tag／moving ref 只用來選擇 revision；開始取 validation inputs 前先 resolve 成 immutable commit SHA。
-- 同一 run 不得混用來自不同 commit 的 `AGENTS.md`、target file、validator、manifest 或其他 repository-owned input，即使每次取得時名義上都叫 `main`。
-- validator 本身若屬本 repository canonical tooling，也應從同一 pinned revision 取得；除非 validation contract 明確指定 external/versioned validator。
-- snapshot 只需包含該 check 真正需要的最低充分檔案，不因 consistency 要求而強制 full clone。
-- 若目前 retrieval/runtime 無法保證必要 inputs 來自同一 revision，標示 `SNAPSHOT CONSISTENCY UNAVAILABLE`；不得把 mixed-revision result 宣稱為該 canonical revision 的 pre-push `PASS`。
-- validation 後 remote `main` 若已前進，既有 result 仍只對 pinned revision 成立；準備 mutation 前必須重新確認 intended base，必要時重新建立 snapshot。
-
-核心原則：**One validation snapshot, one canonical revision.**
+多檔 validator／test 所需 snapshot identity與 same-revision要求，直接依 selected Playbook `INFORMATION_INTEGRITY.md` → `Snapshot Consistency Guard`。本地附加要求只有：repository-owned validator／test若納入同一 run，必須來自該 run 所宣稱的同一 KB revision；無法建立時不得宣稱該 revision 的 full validation PASS。
 
 ## 執行能力門
 
-準備執行 repository validator 前，先確認本次 AI session 實際具備所需能力，不從「模型會寫 Python」推論「目前環境一定能執行 Python」。
-
-至少依任務確認：
-
-1. Python runtime 可實際執行；
-2. 必要 dependency 可用；
-3. validator 所需的 canonical repository snapshot／filesystem 已完整取得；
-4. 只有檢查本身需要時，才要求 network、Git CLI 或其他外部服務。
-
-Retrieval capability、GitHub connector capability 與 local execution capability 必須分開判斷。
-
-若缺少 runtime、dependency 或完整 repository snapshot，應明確標示 **pre-push validation unavailable**；不得把「本 session 無法執行」說成 repository validation failure，也不得假裝已跑過檢查。
+Runtime、dependency、filesystem、network與 materialization capability直接依 selected Playbook `CHATGPT_RUNTIME_EXECUTION.md`。本 KB 不從「模型會寫 Python」推論 runtime可用，也不因 local execution unavailable 就把 repository本身判成 FAIL。
 
 ## 推送前流程
 
-在 remote write 前，依目前可用能力執行：
+在 current authorized candidate 上依實際 diff執行：
 
-1. remote read-back 最新 GitHub `main`，resolve 並記錄 intended base commit SHA；本次需要 materialize 的多檔 validation inputs 依上方 Snapshot Consistency Guard 從該 pinned revision 取得；
-2. 完成所有預定修改，包含 deterministic generated artifact；
-3. 若本次修改包含人類可讀 Markdown，且完整 repository validation 暫時不可用，至少以 [`scripts/preflight_markdown_headings.py`](scripts/preflight_markdown_headings.py) 對本次 changed Markdown snapshot 執行繁中標題 preflight；這是窄範圍快速檢查，不等同完整 repository validation；
-4. 若有新增、刪除或移動 `knowledge/**/*.md`，先執行：
+1. **人類可讀 Markdown 有變更**：若完整 repository validation暫時不可用，但 changed-file snapshot可可靠 materialize，至少執行：
 
-```bash
-python scripts/build_knowledge_manifests.py
-```
+   ```bash
+   python scripts/preflight_markdown_headings.py <changed.md> [...]
+   ```
 
-5. 若完整 repository snapshot 與 Python runtime 可用，至少執行：
+2. **新增、刪除或移動 `knowledge/**/*.md`**：先更新 generated routing artifact：
 
-```bash
-python scripts/build_knowledge_manifests.py --check
-python scripts/check_ai_fastpath.py
-python scripts/validate_repo.py
-```
+   ```bash
+   python scripts/build_knowledge_manifests.py
+   ```
 
-其中 `check_ai_fastpath.py` 專門檢查 AI hot-path 的 routing-only boundary、manifest／target 對應、route ambiguity 與 growth review signal；`WARN` 是 architecture review signal，不等同 repository validation failure。
+3. **完整 repository snapshot與必要 Python dependency可用**：以目前 CI baseline做 local-equivalent deterministic validation：
 
-6. 任一 deterministic check failure 時，**先在 remote push 前修正並重跑**；不得為了取得 CI 訊息而先把已知 failure 推到 `main`。
-7. remote write 前再確認 `main` 仍以 intended base 為 current ancestor／未發生會影響本次修改的 material drift；若 base 已漂移，先 bounded read-back／reconcile，必要時重建 validation snapshot。
-8. 所有預定檔案與 generated artifact 應盡量合併為**單一 batched commit**，避免每個檔案各自形成會觸發 CI 的中間 commit。
-9. push 後仍保留 GitHub Actions 作為 remote independent confirmation；CI success 後再 remote read-back `main` 完成任務。
+   ```bash
+   python -m unittest discover -s tests/engineering_calc -p "test_*.py"
+   python -m unittest discover -s tests/ai_routing -p "test_*.py"
+   python scripts/check_cross_agent_adapters.py
+   python scripts/build_knowledge_manifests.py --check
+   python scripts/check_ai_fastpath.py
+   python scripts/validate_repo.py
+   ```
+
+   `validate_repo.py` 的 JSON Schema檢查使用 `jsonschema`；CI current baseline為 Python 3.12。若 local environment缺 dependency，應標示該 check未執行，而不是自行降低 assertion。
+
+4. **只改特定 tooling／routing surface**：可先跑與 diff直接相關的 targeted check縮短 feedback loop，但 targeted PASS不取代本 Stage／current recipe真正要求的較大 validation scope。
+
+5. Candidate準備完成後，依 shared repository／GitHub contract重新確認 destination ref沒有 material drift，再進行 authorized mutation。Multi-file coherent change優先形成單一 candidate commit。
 
 ## 無法做完整 pre-push validation 時
 
-ChatGPT 的某些 GitHub 維護 session 可能只有 connector remote-write 能力，沒有完整 repository filesystem。此時：
+若目前 session無法可靠 materialize full canonical snapshot：
 
-- 仍先 remote read-back 所有受影響 canonical files，並盡量從同一 pinned revision 取得本次靜態檢查所需 inputs；
-- 若修改人類可讀 Markdown 且可 materialize／重建本次 changed-file snapshot，先執行 `scripts/preflight_markdown_headings.py <changed.md> [...]`；
-- 若修改 AI routing／bootstrap／manifest contract，而完整 snapshot 不足以執行 `scripts/check_ai_fastpath.py`，至少檢查 changed routing surface 的 target、allowed routing metadata 與新增 heading；不得宣稱 full fast-path `PASS`。
-- 以 deterministic generator／validator contract 做其餘最低必要靜態檢查；
-- 若無法建立單一 revision snapshot，清楚標示 snapshot／full validation limitation，不捏造 `PASS`；
-- **一次完成所有可合理確認的修改，再做單一 remote commit**；
-- 不建立多個「試跑 CI」中間 commit；
-- 第一次 remote CI 若失敗，再讀取實際 failure log，將修正收斂成下一個單一 commit；不要逐條猜測式 push。
+- 只對能建立 exact identity的 changed files／validator input做 targeted deterministic check；
+- Markdown changed-file snapshot可可靠建立時，優先執行 heading preflight；
+- AI routing／bootstrap／manifest contract有變更時，至少確認 changed routing target、stable pointer與 affected deterministic checker contract；若 corresponding test/runtime不可執行，明確保留 limitation；
+- 不以 mixed-revision、model-reconstructed canonical bytes或未執行 command宣稱 full validation PASS；
+- Candidate仍應保持單一 bounded batch，remote CI作為後續 independent confirmation，而不是用多個猜測式 push逐步除錯。
 
-這個 fallback 不能宣稱等同完整 pre-push validation，但能降低 CI failure burst 與通知噪音。
+這是 capability fallback，不改變 required validation的語意，也不把較窄 evidence升格成 repository-wide PASS。
 
 ## 持續整合（CI）定位
 
-目前 `Repository 自動驗證` 保留在 `main` push／pull request，角色是**獨立的 remote enforcement**，不是主要除錯迴圈。
+Current remote enforcement 是 `.github/workflows/validate-repo.yml` 的 **Repository 自動驗證**。它目前在 `main` push／pull request執行與上方 local-equivalent baseline對應的 engineering-calculator tests、AI-routing tests、cross-agent adapter check、knowledge manifest check、AI fast-path check與 repository validation。
 
-是否未來改成 local-only、manual、path-filtered 或其他 placement，應依實際 mutation path、多人協作、CI 成本與通知噪音重新評估；validator 存在不代表永遠必須固定在同一 execution placement。
+GitHub Actions 的 run／tested commit／PASS scope與 completion semantics依 selected Playbook `GITHUB_OPERATIONS.md`／`DEBUG_VALIDATION.md`；workflow success 是 remote independent confirmation，不取代 candidate形成前能執行的 deterministic checks。完成 repository mutation 後，仍需 canonical remote read-back證明 current `main` 實際包含 intended bounded change。
 
-> 原則：**先在能控制的地方把 deterministic error 消掉，再讓 CI 驗證已收斂的候選版本；不要用一排 remote failure 取代本來可以在 push 前完成的檢查。**
+> 核心原則：**Shared Playbook 擁有共通 validation／execution methodology；本檔只擁有 building-envelope-engineering-kb 的 deterministic validation recipe。**

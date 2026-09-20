@@ -84,7 +84,7 @@ Project AI mode: ChatGPT-Only
 AI Development Playbook: masini1491/ai-development-playbook  
 Playbook baseline: main
 
-`Playbook baseline: main` 是 floating baseline。只有本次任務實際需要 activate Playbook 時，才先以最低成本、read-only identity probe 將 `main` resolve 為當次 exact immutable commit，再從該 revision 的 `CHAT_INIT.md` 進入最低充分 canonical owner；一般工程問答不為了 Playbook adoption 執行這個 probe。
+本 repository 的 `CHAT_INIT.md` 先負責 project-native task classification 與 shared Playbook activation decision。一般工程問答不因 adoption 額外載入 shared Playbook；activation 成立時，再依 declared baseline 進入該 Playbook 的 current `CHAT_INIT.md` 與最低充分 canonical owner。Floating baseline 的 exact-revision resolution、freshness 與 selective reload semantics 由 shared Playbook 擁有，本檔不維護第二份流程。
 
 ### 權威邊界（Authority boundary）
 
@@ -95,14 +95,14 @@ Playbook baseline: main
 - Required validation: `PRE_PUSH_VALIDATION.md`
 - Project-specific exceptions or restrictions: 本 repository 的 engineering／public-safety／canonical-ownership／routing governance 與下列 conditional activation boundary
 
-採用 Playbook 本身不會跳過 Current Write Target、Task／Stage authorization、permission、credential、execution capability、validation 或其他本 repository 已存在的 authority gate。
+共通 AI engineering semantics 由 selected Playbook canonical owners負責：Project AI mode／Actor Admission、AI context／retrieval cost／Action Contract Closure、repository identity／write／permission、GitHub operations、deterministic runtime／materialization、validation／completion evidence等，都不在本檔複製完整規則。本檔只保存 KB 的 project mapping、較嚴限制與工程 domain authority。
 
 ### 專案特定的條件式啟用
 
 - 一般工程問答、knowledge retrieval、標準／材料／構造查詢與一般工程資料查證，維持本 repository `CHAT_INIT.md` 的既有最低必要 routing；不得只因採用 Playbook 就固定載入本 `AGENTS.md`、resolve Playbook baseline 或讀取 Playbook。
-- 只有 repository maintenance、Git／write authority、deterministic execution／materialization、validation／debugging、AI context／retrieval architecture、research／architecture workflow **governance** 或其他共通 AI development／repository workflow 治理型任務，才依本段 adoption state activate Playbook。一般工程 research／標準查證本身不是 activation trigger。
-- `Project AI mode` 的 actor topology 以 current Playbook `PROJECT_MODES.md` 為 canonical owner；本 repository 的 `ChatGPT-Only` 不因 `CLAUDE.md`、`GEMINI.md` 或 Copilot repository instructions 等 compatibility adapter 存在而改變。Cross-agent compatibility 不構成 executor admission；實際工作仍必須同時滿足本 repository governance、Current Write Target、Task／Stage authorization、permission、credential 與 execution capability。
-- 不把 Playbook 的完整 normative rules 複製進本 repository；需要時回 Playbook current declared baseline 的 canonical owner。
+- Repository maintenance、Git／write、deterministic execution／materialization、validation／debugging、AI context／retrieval architecture、research／architecture workflow governance 或其他共通 AI development／repository workflow 治理型任務，才 activate shared Playbook。一般工程 research／標準查證本身不是 activation trigger。
+- 本 repository 的 `ChatGPT-Only` 只選擇 AI collaboration profile；實際 path/action authority仍受本 repository current governance與 task-specific authority限制。Compatibility adapter只提供 host routing，不改變 Project AI mode 或 executor admission。
+- Activation 後只讀本次 action／decision真正需要的 shared canonical owner；不要完整掃描 Playbook，也不要把 shared normative rules搬回本 repository。
 
 ## 人工智慧（AI）讀取規則
 
@@ -125,17 +125,17 @@ AI 不應預設完整掃描 repository。`CHAT_INIT.md` 是 runtime 精簡 boots
 
 ### 儲存庫（Repository）維護
 
-新增、修改、重構、移動或刪除 repository 內容前：
+Repository maintenance 是 shared Playbook activation trigger。建立 current repository identity並讀取本檔後，依 selected Playbook `CHAT_INIT.md` 關閉本次 action真正適用的共通 contract；generic repository identity、write／permission、GitHub mutation、execution capability、validation／completion與 scope-admission semantics不在本檔重述。
 
-1. 先 remote read-back GitHub `main`；不得只依舊聊天、cached copy 或 AI memory。
-2. 讀本 `AGENTS.md`。
-3. 若修改人類可讀內容，再讀 `LANGUAGE.md`。
-4. 若涉及新增、整理、吸收、匯入或重構 knowledge，再讀 `KNOWLEDGE_INGESTION.md` 並先執行新增知識決策門。
-5. 準備第一次 remote write 前，讀 [`PRE_PUSH_VALIDATION.md`](PRE_PUSH_VALIDATION.md) 並執行推送前驗證門；能在本 session 執行 deterministic checks 時先完成驗證，再以單一 batched commit／最少必要 push 寫入。
-6. 依任務讀 relevant template / schema / validator；不要為維護單一 domain 而掃完整個 knowledge tree。
-7. 修改後以 repository 自動驗證 success 與 remote read-back 為完成條件。
+本 repository 只追加下列 local conditional owners：
 
-使用者的泛用確認（例如「好」、「繼續」、「好，繼續」、「go ahead」）只延續前文已明確建立的 maintenance／mutation scope。若前文已列出具體 proposed batch，該確認可授權該 batch；但不自動涵蓋執行途中 AI 新發現的 adjacent cleanup、feature、schema expansion、新 knowledge page、tooling change 或其他額外 mutation。這些新工作必須依現行 governance 取得獨立 admission／明確授權後才可寫入。
+- 修改人類可讀內容 → `LANGUAGE.md`
+- 新增、整理、吸收、匯入或重構 knowledge → `KNOWLEDGE_INGESTION.md`，並先執行其中的「新增知識決策門」
+- 準備第一次 remote write → `PRE_PUSH_VALIDATION.md` 的 KB-specific validation recipe
+- template／schema／router／validator 變更 → 只讀本次修改直接相關的 local owner／tooling，不為維護單一 domain 掃描完整 knowledge tree
+- 修改後的 completion claim → 依 shared completion-evidence contract，加上本 repository validation recipe 與 canonical remote read-back
+
+AI 在執行中發現的 adjacent cleanup、feature、schema expansion、新 knowledge page、tooling change或其他額外工作，不因被發現或被建議就自動加入目前 mutation scope；是否 admission 依 current user／project authority與 shared Action Contract Closure處理。
 
 `AI_RESPONSE_CONTRACT.md` 只負責回答如何呈現：結論優先、回答深度、已確認／推論／缺口分離、scope-qualified status、精簡與引用方式。它不得覆蓋本檔的 authority、工程數值、公開安全或 canonical ownership 規則。
 
@@ -273,32 +273,21 @@ Public reference dossier 應盡量記錄：
 
 ## AI 可讀性／載入成本變更檢查
 
-新增、刪除、搬移、拆分、合併 rule、文件、router、index、manifest 或其他 AI-facing information surface 時，除了 correctness 與 authority，也必須檢查 retrieval impact；不以固定 KB、行數或 token 數作 universal gate。
+跨專案通用的 AI Context surface、retrieval-cost、Progressive Routing、Direct-leaf Bypass、Action Contract Closure 與 hot-path growth semantics，由 selected AI Development Playbook 的 `AI_CONTEXT.md` 擁有；本 repository 不維護第二份完整方法論。
 
-至少確認：
+本 KB 只保留下列 project-specific mapping／invariants：
 
-- **固定載入影響**：是否增加一般 task 都要付出的 bootstrap／always-on context？低頻規則能否改成 condition-triggered routing？
-- **預設讀取頻率**：哪些 task 真的需要新內容？是否錯把低頻資訊放進高頻 surface？
-- **路由深度**：新增一層 lookup 是否真的換到足夠的 Context 節省？若 exact leaf 已可定位，不增加 routing ceremony。
-- **重複與 reconciliation**：是否建立第二份 policy、status、工程結論、inventory 或 evidence，讓 AI 日後必須判斷哪份才是 current authority？
-- **有限讀取品質**：大型 cohesive page 是否仍可依 heading／section 精準讀取，而不是為了變小就過度拆檔？
-- **搜尋雜訊**：舊 wording、舊 path、superseded content 是否會繼續污染 normal retrieval？
-- **衍生寫入閉包**：高頻內容修改是否會迫使不相關 README、index、snapshot 或其他 derived artifact 一起更新？能 deterministic generation／CI check 時優先避免手工同步。
-- **淨效果**：整體 retrieval cost 是下降、持平，還是只是把同樣內容拆散並增加 tool call／reconciliation？
+- 一般工程問答 hot path 維持 `CHAT_INIT → knowledge-index → domain manifest → canonical leaf → sufficient then STOP`。
+- `indexes/` 與 manifest 只保存 routing metadata，不得複製工程結論、verification status或形成第二份 technical authority。
+- Exact leaf 已唯一命中時，不為流程形式增加 router／index hop；新增 AI-facing layer 必須能指出對本 KB 的 precision、correctness、scope isolation、Context 節省或 regression detectability。
+- Human-readable wording 改善不得無必要破壞 stable `id / path / slug`；需要 rename 時仍依本檔「穩定機器識別與人類用語」處理。
+- [`scripts/check_ai_fastpath.py`](scripts/check_ai_fastpath.py) 是本 KB 的 deterministic routing regression owner，檢查 routing-only boundary、manifest／target 對應、route ambiguity與 growth review signal；它不取代 shared retrieval methodology或工程 content authority。
 
 ### 熱路徑（hot-path）成長棘輪
 
-既有 legacy 不因歷史大小自動 `FAIL`；但新的 AI-facing mutation 不得無理由惡化一般工程問答的最低充分工作集。核心是 **new writes must not worsen hot-path retrieval cost without a concrete retrieval／correctness benefit**。
+新的 KB-specific routing／metadata／checker mutation 不得在沒有 concrete local benefit時增加一般工程問答的固定 owner、tool call、routing hop或 reconciliation burden。既有 legacy 不因檔案大小自動失敗；是否調整應以實際 routing ambiguity、retrieval pain或 deterministic regression evidence為依據。
 
-- 不為單一低頻需求增加一般 task 都必讀的 bootstrap owner、固定 tool call 或額外 routing hop。
-- 不把同一 authority／status／工程結論複製到 index、router、manifest 與 leaf，讓後續回答必須多做 reconciliation。
-- 若新 routing structure 讓 normal path 變長，必須能說明增加的 hop 換來什麼明確的 precision、correctness、scope isolation 或 Context 節省；否則維持較短路徑。
-- `CHAT_INIT.md`、`knowledge-index.json`、domain manifest 等 hot surface 的大小只作 review signal，不是 universal correctness threshold；由 [`scripts/check_ai_fastpath.py`](scripts/check_ai_fastpath.py) 對 routing-only invariants、target existence、route ambiguity 與 growth signal 做 deterministic regression check。
-- Ratchet 主要約束新的 mutation，不要求為了形式一次重寫全部 legacy；高頻舊 surface 可依實際 retrieval pain 逐步 normalize。
-
-核心原則：**不要最佳化「檔案越小越好」；要最佳化「本題最低充分 working set 越小、authority 越清楚越好」。**
-
-核心原則：**讓 AI 讀得少，不是讓 repository 變得碎；是讓它更快命中唯一、最新且足夠的 canonical authority。**
+核心原則：**Shared Playbook 擁有共通 retrieval methodology；本 KB 只擁有自己的 hot path、routing surfaces 與 deterministic regression contract。**
 
 ## 變更規則
 
@@ -309,6 +298,6 @@ Public reference dossier 應盡量記錄：
 - 新證據是否真的改變現有結論
 - 是否需要更新 freshness / status，而不是新增重複文件
 
-涉及新增、整理、吸收、匯入或重構 knowledge 時，必須再遵守 `KNOWLEDGE_INGESTION.md`；涉及 AI-facing 結構變更時，必須通過上方「AI 可讀性／載入成本變更檢查」。
+涉及新增、整理、吸收、匯入或重構 knowledge 時，必須再遵守 `KNOWLEDGE_INGESTION.md`；涉及 AI-facing 結構變更時，先依 selected Playbook `AI_CONTEXT.md` 的共通 retrieval-cost contract，再套用上方本 KB 的「AI 可讀性／載入成本變更檢查」project-specific mapping。
 
 Git history 作為主要演進紀錄，不在文件內維護冗長 completed changelog。
