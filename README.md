@@ -41,7 +41,7 @@
 1. 將本 repository 提供給 AI。
 2. 要求 AI 先讀 [`CHAT_INIT.md`](CHAT_INIT.md)。
 3. AI 依 `knowledge-index → domain manifest → canonical leaf page` 漸進式載入最低必要內容。
-4. 只有在 Repository 維護、工程審查、標準 provenance 或其他特定任務時，才條件式載入對應治理文件。
+4. 工程審查、標準 provenance 等任務只按需載入本 Repo 的對應 local owner；只有 Repository 維護、AI context／retrieval architecture 或其他共通 AI development／repository workflow 治理型任務，才依 `AGENTS.md` 的 adoption state 條件式啟用 shared Playbook。
 
 Host-specific bootstrap adapter：Claude Code 使用 [`CLAUDE.md`](CLAUDE.md)、Gemini CLI 使用 [`GEMINI.md`](GEMINI.md)、GitHub Copilot 使用 [`.github/copilot-instructions.md`](.github/copilot-instructions.md)。這些 adapter 只提供 compatibility handoff，不改變 `Project AI mode` 或 execution authority；目前已有 deterministic static validation，但不宣稱各 host 的 live cross-runtime behavioral conformance 已完整驗證。
 
@@ -68,10 +68,10 @@ Host-specific bootstrap adapter：Claude Code 使用 [`CLAUDE.md`](CLAUDE.md)、
 
 新 session 優先讀 [`CHAT_INIT.md`](CHAT_INIT.md) 作為精簡 bootstrap，再依任務條件載入：
 
-1. 一般工程問答：用 [`indexes/knowledge-index.json`](indexes/knowledge-index.json) 的 `aliases / entrypoint` 路由，只讀最低必要的 `knowledge/` 頁面。
+1. 一般工程問答：先用 [`indexes/knowledge-index.json`](indexes/knowledge-index.json) 選 domain，再讀該 domain 的 `indexes/knowledge-pages/<domain>.json` manifest 選 canonical leaf；只有題意仍有歧義、跨 subdomain 或需要理解 domain 邊界時，才讀 `entrypoint / router`。
 2. 需要標準版本、來源或 provenance：再用 [`indexes/standards-index.json`](indexes/standards-index.json) 找對應 `references/standards/` dossier。
 3. 計算書／圖面／規範審查：再讀 [`AI_RESPONSE_CONTRACT.md`](AI_RESPONSE_CONTRACT.md) 與相關 review methodology。
-4. Repository 維護／新增／修改：再讀 [`AGENTS.md`](AGENTS.md)，並依需要載入 `LANGUAGE.md`、templates、schemas 與 validator。
+4. Repository 維護／新增／修改：先讀 [`AGENTS.md`](AGENTS.md) 取得 current governance／Playbook adoption state並條件式啟用 shared Playbook；人類可讀內容、knowledge mutation與 remote write再分別按需載入 [`LANGUAGE.md`](LANGUAGE.md)、[`KNOWLEDGE_INGESTION.md`](KNOWLEDGE_INGESTION.md)、[`PRE_PUSH_VALIDATION.md`](PRE_PUSH_VALIDATION.md) 及本次修改直接相關的 template／schema／validator。
 5. Repository evidence 不足或 freshness 不明時，再查 current primary source。
 
 **一般明確問答不要求無條件完整載入 README、AGENTS 與 AI_RESPONSE_CONTRACT。** 目標是以最低充分上下文找到正確 canonical owner，降低重複 token 與 instruction dilution。
@@ -115,16 +115,16 @@ Cross-reference 只代表用途相關，不代表 CNS / ASTM / AAMA-FGIA / ISO �
 
 ## 自動驗證
 
-`.github/workflows/validate-repo.yml` 執行 `scripts/validate_repo.py`。目前 baseline 包含：
+`.github/workflows/validate-repo.yml` 是目前的 remote validation baseline。Workflow 使用 Python 3.12，依序執行：
 
-- JSON / JSON Schema validation
-- Markdown relative-link existence
-- knowledge verification status / canonical ownership
-- public-reference privacy rule
-- standards dossier machine metadata / standards-index 對應
-- `LANGUAGE.md` 繁中 heading lint
-- architecture / AI routing index lint
-- cross-agent bootstrap adapter presence / authority boundary / host-specific contract regression
+- engineering calculator tests（`tests/engineering_calc/`）
+- AI routing tests（`tests/ai_routing/`）
+- cross-agent bootstrap adapter check（`scripts/check_cross_agent_adapters.py`）
+- knowledge routing manifest check（`scripts/build_knowledge_manifests.py --check`）
+- AI fast-path regression check（`scripts/check_ai_fastpath.py`）
+- repository integrity validation（`scripts/validate_repo.py`）
+
+其中 `scripts/validate_repo.py` 負責 JSON / JSON Schema、Markdown relative links、knowledge verification status / canonical ownership、public-reference privacy、standards dossier metadata / index mapping、繁中 heading lint、architecture / routing integrity 等 repository-level checks。完整 pre-push local recipe 與 shared validation semantics 分別以 [`PRE_PUSH_VALIDATION.md`](PRE_PUSH_VALIDATION.md) 與 declared AI Development Playbook canonical owners 為準。
 
 ## 授權與責任
 
