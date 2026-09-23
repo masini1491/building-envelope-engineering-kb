@@ -82,13 +82,16 @@
 
 Project AI mode: ChatGPT-Only  
 AI Development Playbook: masini1491/ai-development-playbook  
-Playbook baseline: main
+Playbook baseline: main  
+Shared reporting contract: declared Playbook baseline → `REPORTING.md`
 
-本 repository 的 `CHAT_INIT.md` 先負責 project-native task classification 與 shared Playbook activation decision。一般工程問答不因 adoption 額外載入 shared Playbook；activation 成立時，再依 declared baseline 進入該 Playbook 的 current `CHAT_INIT.md` 與最低充分 canonical owner。Floating baseline 的 exact-revision resolution、freshness 與 selective reload semantics 由 shared Playbook 擁有，本檔不維護第二份流程。
+本 repository 的 `CHAT_INIT.md` 先負責 project-native task classification 與 shared Playbook activation decision。一般工程問答不因 adoption 啟用 shared Playbook 的其他 governance owners；但 substantive user-facing engineering reply 依 declared baseline 的 `REPORTING.md` 作為窄化的 activation-independent reporting contract。Reporting direct-leaf 不會啟用 shared `CHAT_INIT.md`，也不建立新的 Task、write、execution、validation 或 completion authority。其他 shared activation 成立時，再依 declared baseline 進入該 Playbook 的 current `CHAT_INIT.md` 與最低充分 canonical owner。Floating baseline 的 exact-revision resolution、freshness 與 selective reload semantics 由 shared Playbook 擁有，本檔不維護第二份流程。
 
 ### 權威邊界（Authority boundary）
 
 本 repository 的 engineering knowledge、public safety、canonical ownership、repository-specific governance、routing 與 task-specific authority 永遠高於 shared Playbook methodology。Playbook 不得覆蓋或放寬本 repository 已存在的限制。
+
+**採用 Playbook 本身不會新增或擴張 Task、repository write、execution、credential、validation、release／deployment、secret 或其他 project-specific authority。**
 
 - Canonical technical source(s): 本 repository 由 `CHAT_INIT.md` 路由到的 current canonical owner(s)
 - Current coordination surface: `none`
@@ -99,7 +102,7 @@ Playbook baseline: main
 
 ### 專案特定的條件式啟用
 
-- 一般工程問答、knowledge retrieval、標準／材料／構造查詢與一般工程資料查證，維持本 repository `CHAT_INIT.md` 的既有最低必要 routing；不得只因採用 Playbook 就固定載入本 `AGENTS.md`、resolve Playbook baseline 或讀取 Playbook。
+- 一般工程問答、knowledge retrieval、標準／材料／構造查詢與一般工程資料查證，維持本 repository `CHAT_INIT.md` 的既有最低必要 routing。Declared baseline 的 `REPORTING.md` 是窄化的 reporting-only exception；除這個 direct-leaf contract 外，不得只因採用 Playbook 就啟用 shared `CHAT_INIT.md` 或其他 owners。
 - Repository maintenance、Git／write、deterministic execution／materialization、validation／debugging、AI context／retrieval architecture、research／architecture workflow governance 或其他共通 AI development／repository workflow 治理型任務，才 activate shared Playbook。一般工程 research／標準查證本身不是 activation trigger。
 - 本 repository 的 `ChatGPT-Only` 只選擇 AI collaboration profile；實際 path/action authority仍受本 repository current governance與 task-specific authority限制。Compatibility adapter只提供 host routing，不改變 Project AI mode 或 executor admission。
 - Activation 後只讀本次 action／decision真正需要的 shared canonical owner；不要完整掃描 Playbook，也不要把 shared normative rules搬回本 repository。
@@ -137,7 +140,7 @@ Repository maintenance 是 shared Playbook activation trigger。建立 current r
 
 AI 在執行中發現的 adjacent cleanup、feature、schema expansion、新 knowledge page、tooling change或其他額外工作，不因被發現或被建議就自動加入目前 mutation scope；是否 admission 依 current user／project authority與 shared Action Contract Closure處理。
 
-`AI_RESPONSE_CONTRACT.md` 只負責回答如何呈現：結論優先、回答深度、已確認／推論／缺口分離、scope-qualified status、精簡與引用方式。它不得覆蓋本檔的 authority、工程數值、公開安全或 canonical ownership 規則。
+`AI_RESPONSE_CONTRACT.md` 只保存本 KB 相對於 shared `REPORTING.md` 的 engineering-specific reporting delta，例如工程 status、計算／審查呈現、evidence gap 與 private-project boundary。跨專案共通的 result-first、scope fidelity、progress integrity、reporting timestamp 與 pre-send presentation gate 由 declared Playbook baseline 的 `REPORTING.md` 擁有；本檔不得複製第二份 common reporting policy。
 
 ## 工程數值防呆
 

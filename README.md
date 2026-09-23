@@ -28,7 +28,7 @@
 6. **`INCOMPLETE` 是有效結果**：必要 input、criterion、capacity source、support model 或 provenance 不足時，不得補猜為 PASS。
 7. **公開安全（Public-safe）**：不公開未授權施工圖、計算書、可辨識專案條件、私人 provenance 或受版權限制全文。
 
-完整治理規則見 [`AGENTS.md`](AGENTS.md)。AI 精簡啟動與載入策略見 [`CHAT_INIT.md`](CHAT_INIT.md)。AI 工程回覆呈現規則見 [`AI_RESPONSE_CONTRACT.md`](AI_RESPONSE_CONTRACT.md)。語言規則見 [`LANGUAGE.md`](LANGUAGE.md)。
+完整治理規則見 [`AGENTS.md`](AGENTS.md)。AI 精簡啟動與載入策略見 [`CHAT_INIT.md`](CHAT_INIT.md)。跨專案共通 user-facing reporting 由 declared AI Development Playbook baseline 的 `REPORTING.md` 擁有；本 Repo 的工程特定增量見 [`AI_RESPONSE_CONTRACT.md`](AI_RESPONSE_CONTRACT.md)。語言規則見 [`LANGUAGE.md`](LANGUAGE.md)。
 
 ## 快速導入人工智慧（AI）
 
@@ -41,7 +41,7 @@
 1. 將本 repository 提供給 AI。
 2. 要求 AI 先讀 [`CHAT_INIT.md`](CHAT_INIT.md)。
 3. AI 依 `knowledge-index → domain manifest → canonical leaf page` 漸進式載入最低必要內容。
-4. 工程審查、標準 provenance 等任務只按需載入本 Repo 的對應 local owner；只有 Repository 維護、AI context／retrieval architecture 或其他共通 AI development／repository workflow 治理型任務，才依 `AGENTS.md` 的 adoption state 條件式啟用 shared Playbook。
+4. Substantive user-facing engineering reply 依 `AGENTS.md` 宣告的 Playbook baseline direct-leaf 使用 shared `REPORTING.md`；這是 reporting-only exception，不啟用其他 shared governance。工程審查、標準 provenance 等任務只按需載入本 Repo 的對應 local owner；只有 Repository 維護、AI context／retrieval architecture 或其他共通 AI development／repository workflow 治理型任務，才依 `AGENTS.md` 的 adoption state 條件式啟用 shared Playbook。
 
 Host-specific bootstrap adapter：Claude Code 使用 [`CLAUDE.md`](CLAUDE.md)、Gemini CLI 使用 [`GEMINI.md`](GEMINI.md)、GitHub Copilot 使用 [`.github/copilot-instructions.md`](.github/copilot-instructions.md)。這些 adapter 只提供 compatibility handoff，不改變 `Project AI mode` 或 execution authority；目前已有 deterministic static validation，但不宣稱各 host 的 live cross-runtime behavioral conformance 已完整驗證。
 
@@ -70,11 +70,11 @@ Host-specific bootstrap adapter：Claude Code 使用 [`CLAUDE.md`](CLAUDE.md)、
 
 1. 一般工程問答：先用 [`indexes/knowledge-index.json`](indexes/knowledge-index.json) 選 domain，再讀該 domain 的 `indexes/knowledge-pages/<domain>.json` manifest 選 canonical leaf；只有題意仍有歧義、跨 subdomain 或需要理解 domain 邊界時，才讀 `entrypoint / router`。
 2. 需要標準版本、來源或 provenance：再用 [`indexes/standards-index.json`](indexes/standards-index.json) 找對應 `references/standards/` dossier。
-3. 計算書／圖面／規範審查：再讀 [`AI_RESPONSE_CONTRACT.md`](AI_RESPONSE_CONTRACT.md) 與相關 review methodology。
+3. 計算書／圖面／規範審查：再讀 [`AI_RESPONSE_CONTRACT.md`](AI_RESPONSE_CONTRACT.md) 的 KB-specific engineering reporting delta 與相關 review methodology；共通 reporting 仍由 declared Playbook baseline 的 `REPORTING.md` 擁有。
 4. Repository 維護／新增／修改：先讀 [`AGENTS.md`](AGENTS.md) 取得 current governance／Playbook adoption state並條件式啟用 shared Playbook；人類可讀內容、knowledge mutation與 remote write再分別按需載入 [`LANGUAGE.md`](LANGUAGE.md)、[`KNOWLEDGE_INGESTION.md`](KNOWLEDGE_INGESTION.md)、[`PRE_PUSH_VALIDATION.md`](PRE_PUSH_VALIDATION.md) 及本次修改直接相關的 template／schema／validator。
 5. Repository evidence 不足或 freshness 不明時，再查 current primary source。
 
-**一般明確問答不要求無條件完整載入 README、AGENTS 與 AI_RESPONSE_CONTRACT。** 目標是以最低充分上下文找到正確 canonical owner，降低重複 token 與 instruction dilution。
+**一般明確問答不要求無條件完整載入 README、AGENTS 與 AI_RESPONSE_CONTRACT。** Shared `REPORTING.md` 只走 reporting-only direct-leaf，不因此啟用其他 Playbook owners。目標是以最低充分上下文找到正確 canonical owner，降低重複 token 與 instruction dilution。
 
 ## 儲存庫（Repository）結構
 

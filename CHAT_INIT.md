@@ -14,6 +14,16 @@
 6. **來源分層**：法規／正式標準／政府資料／製造商資料／工程實務／推論不可混成同一證據層級。
 7. **繁體中文（台灣）優先**：除非使用者另有要求，回答依 `LANGUAGE.md` 的原則；正式標準名、材料牌號、schema key、公式與必要英文工程術語保留原文。
 
+## 共通回覆契約（Shared reporting）
+
+形成 substantive user-facing engineering reply 時，shared reporting 是 adoption-level 的窄化例外，不因一般工程問答維持 project-native route 而失效：
+
+1. 只 bounded-read `AGENTS.md` 的 current adoption declaration，取得唯一的 `Playbook baseline`；不要因此完整載入 governance。
+2. Baseline 是 moving ref 時，以最低成本解析足以支持本次 reporting action 的 exact revision；同一 session 已驗證且沒有 material freshness trigger 時可重用。
+3. 直接讀該 revision 的 `REPORTING.md`，套用共通 result-first、scope fidelity、progress integrity、reporting timestamp 與 pre-send contract。
+4. 這個 reporting-only direct-leaf **不會**啟用 shared `CHAT_INIT.md`、Git／validation／research／Codex execution 或其他 Playbook owners，也不擴張任何 Task／write／execution／completion authority。
+5. 只有 task 需要 KB-specific engineering presentation rule 時，再讀 `AI_RESPONSE_CONTRACT.md`；它只保存 project-specific delta，不是第二份 shared reporting owner。
+
 ## 儲存庫讀取取得與復原
 
 本次問題 materially 依賴 current repository content 時，優先使用 repository-native read；首選機制不可用時，可依最低充分 canonical path 降級：
@@ -37,7 +47,7 @@ Fallback 只改變 transport，不改變 source authority、task authority或 wr
 
 Repository-level absence claim需要與 claim scope相稱的 bounded coverage；單一 manifest／search未命中只代表 checked scope未找到，不能單獨證明不存在。Search／filename／snippet命中也只作 discovery evidence，最後仍回 current canonical owner判斷 authority與語意。Coverage不足時使用 `NOT FOUND IN CHECKED SCOPE` 或等價 evidence-bounded wording。
 
-**一般明確問答不需要無條件完整載入 `README.md`、`AGENTS.md`、`AI_RESPONSE_CONTRACT.md` 或 shared AI Development Playbook。**
+**一般明確問答不需要無條件完整載入 `README.md`、`AGENTS.md`、`AI_RESPONSE_CONTRACT.md` 或 shared AI Development Playbook 的其他 owners；上方 `REPORTING.md` reporting-only direct-leaf 例外不等於 shared Playbook activation。**
 
 ### 計算書／圖面／規範審查
 
