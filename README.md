@@ -34,7 +34,7 @@
 
 本 repository 已設計為可直接交由 ChatGPT、Codex 或其他可讀取 GitHub repository 的 AI 使用，不需要把整個知識庫複製進 prompt，也不需要人工逐頁指定要讀哪些文件。Claude Code、Gemini CLI 與 GitHub Copilot 另提供 thin host-specific bootstrap adapter，仍共同 hand off 到本 repository 的 canonical `CHAT_INIT.md`。
 
-> **給 ChatGPT：**「請讀取 `masini1491/building-envelope-engineering-kb` 最新 `CHAT_INIT.md`，再依我的問題使用本知識庫。」
+> **給 ChatGPT：**「若目前可使用已連接的 GitHub repository access，請先用它讀取 `masini1491/building-envelope-engineering-kb` 最新 `CHAT_INIT.md`，再依我的問題使用本知識庫。」
 
 最小導入方式：
 
