@@ -45,7 +45,7 @@ python -m scripts.engineering_calc.review input.json
 
 這些 status 只描述**計算執行／數值比對**；不得改寫成整體工程 `PASS`。例如 visible factors 重算得到 `MISMATCH` 時，先記錄為 calculation-chain discrepancy，再查單位、遺漏係數、不同 load source、hidden multiplier 或 transcription error；在 root cause 未確認前，不得僅因 arithmetic mismatch 宣稱整體工程 `FAIL`。
 
-### `wind_pressure` V1 輸入契約
+### 風壓（`wind_pressure`）V1 輸入契約
 
 此 check_type 的自然語言 intake 不由 adapter 負責；ChatGPT 應先依 wind knowledge owner 整理／追問 project facts，再送入完整結構化 payload。最低輸入為：
 
