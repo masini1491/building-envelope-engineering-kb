@@ -94,11 +94,27 @@ Shared reporting contract: declared Playbook baseline → `REPORTING.md`
 **採用 Playbook 本身不會新增或擴張 Task、repository write、execution、credential、validation、release／deployment、secret 或其他 project-specific authority。**
 
 - Canonical technical source(s): 本 repository 由 `CHAT_INIT.md` 路由到的 current canonical owner(s)
-- Current coordination surface: `none`
+- Current coordination surfaces:
+  - `/TASKS.md` — Hot coordination；只保存目前可執行／critical-path work
+  - `/BACKLOG.md` — Cold Registry；保存值得長期記住、但目前不應自動執行的 future work
+- ChatGPT Coordination Write Allowlist:
+  - `/TASKS.md`
+  - `/BACKLOG.md`
 - Required validation: `PRE_PUSH_VALIDATION.md`
 - Project-specific exceptions or restrictions: 本 repository 的 engineering／public-safety／canonical-ownership／routing governance 與下列 conditional activation boundary
 
 共通 AI engineering semantics 由 selected Playbook canonical owners負責：Project AI mode／Actor Admission、AI context／retrieval cost／Action Contract Closure、repository identity／write／permission、GitHub operations、deterministic runtime／materialization、validation／completion evidence等，都不在本檔複製完整規則。本檔只保存 KB 的 project mapping、較嚴限制與工程 domain authority。
+
+### 協調資訊（Coordination）邊界
+
+本 repository 採用 Hot／Cold 雙 surface：
+
+- `TASKS.md` 是目前 Hot coordination owner；只有 current executable／critical-path work 可進入。沒有 Hot work時收斂為 `EMPTY`。
+- `BACKLOG.md` 是 Cold Registry；保存 future feature、trigger-based work、non-blocking debt 與其他值得長期記住但目前不應進入 executable Context 的項目。
+- `BACKLOG.md` 項目不具 execution authority；使用者選中、trigger成立或 current evidence使其成為 critical path後，必須先依 current authority重新 reconcile，再 promote 到 `TASKS.md`。
+- AI 主動提出的改善預設以 `CANDIDATE` 保存；只有使用者／current project decision已明確承諾未來要做時才標成 `COMMITTED`。Persistence 本身不增加 recommendation authority。
+- 一般工程問答與普通 cold-start 不載入 `BACKLOG.md`；只有 roadmap／debt review、使用者指定 cold item、trigger evaluation，或 Hot coordination明確指向時才讀取。
+- 完成的 Hot work不在 `TASKS.md` 長期保留作 changelog；completion history以 Git history與 canonical artifacts為準。
 
 ### 專案特定的條件式啟用
 
