@@ -15,7 +15,7 @@ from .fastener_group import elastic_in_plane_group
 from .section_required import required_inertia, required_section_modulus, utilization
 from .connection import demand_capacity, projected_bearing_stress, shear_tension_demand, thread_engagement_ratio
 from .audit import audit_product, audit_force_balance
-
+from .wind_pressure import (\n    WindPressureInputError,\n    WindPressureUnsupportedError,\n    calculate_wall_design_pressure,\n)\n
 class IncompleteInputError(ValueError): pass
 class UnsupportedModelError(ValueError): pass
 
@@ -81,6 +81,56 @@ def _beam(p,inp):
     flat.update({"global.max_abs_shear":glob.max_abs_shear,"global.max_abs_moment":glob.max_abs_moment,"global.max_abs_deflection":glob.max_abs_deflection})
     return _final(p,"beam",computed,flat)
 
+
+def _wind_pressure(p, inp):
+    required_strings = [
+        "region",
+        "terrain_category",
+        "enclosure",
+        "governing_wind_source",
+    ]
+    values = {}
+    for key in required_strings:
+        value = inp.get(key)
+        if not isinstance(value, str) or not value.strip():
+            raise IncompleteInputError(f"inputs.{key} is required")
+        values[key] = value.strip()
+
+    if "building_category" not in inp:
+        raise IncompleteInputError("inputs.building_category is required")
+    values["building_category"] = inp["building_category"]
+    values["district"] = inp.get("district")
+
+    try:
+        computed = calculate_wall_design_pressure(
+            region=values["region"],
+            district=values["district"],
+            building_category=values["building_category"],
+            terrain_category=values["terrain_category"],
+            kzt=_num(inp, "kzt"),
+            enclosure=values["enclosure"],
+            h_m=_num(inp, "h_m"),
+            z_m=_num(inp, "z_m"),
+            effective_area_m2=_num(inp, "effective_area_m2"),
+            least_horizontal_dimension_m=_num(inp, "least_horizontal_dimension_m"),
+            governing_wind_source=values["governing_wind_source"],
+        )
+    except WindPressureUnsupportedError as exc:
+        raise UnsupportedModelError(str(exc)) from exc
+    except WindPressureInputError as exc:
+        raise IncompleteInputError(str(exc)) from exc
+
+    flat = {
+        "zone4.positive_kpa": computed["pressures"]["zone4"]["positive_kpa"],
+        "zone4.negative_kpa": computed["pressures"]["zone4"]["negative_kpa"],
+        "zone5.positive_kpa": computed["pressures"]["zone5"]["positive_kpa"],
+        "zone5.negative_kpa": computed["pressures"]["zone5"]["negative_kpa"],
+        "qz_kpa": computed["velocity_pressure"]["qz"]["q_kpa"],
+        "qh_kpa": computed["velocity_pressure"]["qh"]["q_kpa"],
+        "corner_a_m": computed["corner_zone"]["a_m"],
+    }
+    return _final(p, "wind_pressure", computed, flat)
+
 def _simple(p,inp,check):
     if check=="required_inertia": computed={"required_inertia":required_inertia(_num(inp,"i_trial"),_num(inp,"delta_trial"),_num(inp,"delta_allow"))}
     elif check=="required_section_modulus": computed={"required_section_modulus":required_section_modulus(_num(inp,"moment_max"),_num(inp,"allowable_stress"))}
@@ -105,8 +155,7 @@ def run_review(payload):
     try:
         p=_map(payload,"payload"); _units(p); inp=_map(p.get("inputs"),"inputs"); check=p.get("check_type")
         if not isinstance(check,str) or not check: raise IncompleteInputError("check_type must be a non-empty string")
-        return _beam(p,inp) if check=="beam" else _simple(p,inp,check)
-    except UnsupportedModelError as e: status="UNSUPPORTED_MODEL"; flag=f"UNSUPPORTED_MODEL:{e}"
+        if check=="beam": return _beam(p,inp)\n        if check=="wind_pressure": return _wind_pressure(p,inp)\n        return _simple(p,inp,check)\n    except UnsupportedModelError as e: status="UNSUPPORTED_MODEL"; flag=f"UNSUPPORTED_MODEL:{e}"
     except (IncompleteInputError,TypeError,ValueError) as e: status="INCOMPLETE_INPUT"; flag=f"INCOMPLETE_INPUT:{e}"
     return {"calculation_status":status,"comparison_status":"INCOMPLETE","check_type":payload.get("check_type") if isinstance(payload,Mapping) else None,"computed":{},"comparisons":{},"review_flags":[flag]}
 

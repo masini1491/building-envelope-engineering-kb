@@ -34,7 +34,7 @@ python -m scripts.engineering_calc.review input.json
 
 最外層固定使用 `check_type / units / inputs / reported_results / tolerance`。`units` 必填且不得猜測；`reported_results` 可省略；`tolerance` 只代表 numerical agreement，不是 engineering acceptance criterion。
 
-目前 adapter 支援：`beam`、`required_inertia`、`required_section_modulus`、`section_property_utilization`、`fastener_group`、`demand_capacity`、`projected_bearing_stress`、`shear_tension_demand`、`thread_engagement`、`audit_product`、`audit_force_balance`。
+目前 adapter 支援：`beam`、`required_inertia`、`required_section_modulus`、`section_property_utilization`、`fastener_group`、`demand_capacity`、`projected_bearing_stress`、`shear_tension_demand`、`thread_engagement`、`audit_product`、`audit_force_balance`、`wind_pressure`。
 
 ### 輸出契約
 
@@ -44,6 +44,28 @@ python -m scripts.engineering_calc.review input.json
 - `comparison_status`：`MATCH / MISMATCH / NOT_PROVIDED / INCOMPLETE`。
 
 這些 status 只描述**計算執行／數值比對**；不得改寫成整體工程 `PASS`。例如 visible factors 重算得到 `MISMATCH` 時，先記錄為 calculation-chain discrepancy，再查單位、遺漏係數、不同 load source、hidden multiplier 或 transcription error；在 root cause 未確認前，不得僅因 arithmetic mismatch 宣稱整體工程 `FAIL`。
+
+### `wind_pressure` V1 輸入契約
+
+此 check_type 的自然語言 intake 不由 adapter 負責；ChatGPT 應先依 wind knowledge owner 整理／追問 project facts，再送入完整結構化 payload。最低輸入為：
+
+- `region`，以及該縣市需要細分時的 `district`
+- `building_category`（1–5）
+- `terrain_category`（A／B／C）
+- `kzt`
+- `enclosure`（`enclosed`／`partially_enclosed`；`open` 目前 fail closed）
+- `h_m / z_m / effective_area_m2 / least_horizontal_dimension_m`
+- `governing_wind_source = "code"`
+
+`units` 仍為最外層必填。V1 reference data 位於 `references/government/taiwan-wind-code-103-v1.json`；kernel 自動解析 `V10(C) / I / α / zg / GCpi`，並計算 `K(z) / K(h) / q(z) / q(h) / a / GCp`。部分封閉式建築物之正內風壓速度壓，V1 明確採 2.2 節允許的 `q(h)`，不在缺少開口高度時猜測 `zh0`。
+
+可比較的 reported key 包括：
+
+- `zone4.positive_kpa / zone4.negative_kpa`
+- `zone5.positive_kpa / zone5.negative_kpa`
+- `qz_kpa / qh_kpa / corner_a_m`
+
+超出 V1 applicability 時回 `UNSUPPORTED_MODEL`；必要 project facts／行政區資料不足時回 `INCOMPLETE_INPUT`。這些 execution status 不代表整體耐風設計 PASS／FAIL。
 
 ### 回答中的執行證據
 
@@ -78,7 +100,7 @@ python -m scripts.engineering_calc.review input.json
 - `fastener_group.py`：平面扣件群彈性分配核算。
 - `connection.py`：需求／容量比、bearing、shear/tension 與 thread-engagement arithmetic helper。
 - `audit.py`：乘積鏈與靜力 force balance reconciliation。
-- `review.py`：AI-facing JSON adapter，統一 invocation、execution status、reported comparison 與 review flags。
+- `wind_pressure.py`：103 年修正版《建築物耐風設計規範及解說》V1 外牆風壓 deterministic kernel；目前只支援 `h > 18 m`、封閉式／部分封閉式、圖 3.2 Zone 4／5。\n- `review.py`：AI-facing JSON adapter，統一 invocation、execution status、reported comparison 與 review flags。
 
 對應 deterministic tests 位於 `tests/engineering_calc/`，並由 repository CI 執行。
 
