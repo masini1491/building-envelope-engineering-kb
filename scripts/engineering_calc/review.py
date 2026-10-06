@@ -15,7 +15,12 @@ from .fastener_group import elastic_in_plane_group
 from .section_required import required_inertia, required_section_modulus, utilization
 from .connection import demand_capacity, projected_bearing_stress, shear_tension_demand, thread_engagement_ratio
 from .audit import audit_product, audit_force_balance
-from .wind_pressure import (\n    WindPressureInputError,\n    WindPressureUnsupportedError,\n    calculate_wall_design_pressure,\n)\n
+from .wind_pressure import (
+    WindPressureInputError,
+    WindPressureUnsupportedError,
+    calculate_wall_design_pressure,
+)
+
 class IncompleteInputError(ValueError): pass
 class UnsupportedModelError(ValueError): pass
 
@@ -155,7 +160,10 @@ def run_review(payload):
     try:
         p=_map(payload,"payload"); _units(p); inp=_map(p.get("inputs"),"inputs"); check=p.get("check_type")
         if not isinstance(check,str) or not check: raise IncompleteInputError("check_type must be a non-empty string")
-        if check=="beam": return _beam(p,inp)\n        if check=="wind_pressure": return _wind_pressure(p,inp)\n        return _simple(p,inp,check)\n    except UnsupportedModelError as e: status="UNSUPPORTED_MODEL"; flag=f"UNSUPPORTED_MODEL:{e}"
+        if check=="beam": return _beam(p,inp)
+        if check=="wind_pressure": return _wind_pressure(p,inp)
+        return _simple(p,inp,check)
+    except UnsupportedModelError as e: status="UNSUPPORTED_MODEL"; flag=f"UNSUPPORTED_MODEL:{e}"
     except (IncompleteInputError,TypeError,ValueError) as e: status="INCOMPLETE_INPUT"; flag=f"INCOMPLETE_INPUT:{e}"
     return {"calculation_status":status,"comparison_status":"INCOMPLETE","check_type":payload.get("check_type") if isinstance(payload,Mapping) else None,"computed":{},"comparisons":{},"review_flags":[flag]}
 

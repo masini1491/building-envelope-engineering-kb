@@ -100,7 +100,8 @@ python -m scripts.engineering_calc.review input.json
 - `fastener_group.py`：平面扣件群彈性分配核算。
 - `connection.py`：需求／容量比、bearing、shear/tension 與 thread-engagement arithmetic helper。
 - `audit.py`：乘積鏈與靜力 force balance reconciliation。
-- `wind_pressure.py`：103 年修正版《建築物耐風設計規範及解說》V1 外牆風壓 deterministic kernel；目前只支援 `h > 18 m`、封閉式／部分封閉式、圖 3.2 Zone 4／5。\n- `review.py`：AI-facing JSON adapter，統一 invocation、execution status、reported comparison 與 review flags。
+- `wind_pressure.py`：103 年修正版《建築物耐風設計規範及解說》V1 外牆風壓 deterministic kernel；目前只支援 `h > 18 m`、封閉式／部分封閉式、圖 3.2 Zone 4／5。
+- `review.py`：AI-facing JSON adapter，統一 invocation、execution status、reported comparison 與 review flags。
 
 對應 deterministic tests 位於 `tests/engineering_calc/`，並由 repository CI 執行。
 
