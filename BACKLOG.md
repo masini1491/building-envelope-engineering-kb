@@ -10,21 +10,18 @@ Cold item **不具 execution authority**。要開始實作前，必須依 curren
 - `COMMITTED`：已決定未來需要處理，但目前不是 Hot。
 - Persistence 不代表 recommendation 更正確，也不代表可跳過 current research、admission、validation 或 authority gate。
 
-## 候選（CANDIDATE）
+## 已承諾（COMMITTED）
 
-### 耐風設計風壓 V2：低樓層與屋頂區域（KB-CAND-001）
+### 玻璃耐風承載力 deterministic capability（KB-P1-B）
 
-- **Why**：目前 `wind_pressure` V1 只支援 `h > 18 m` 外牆 Zone 4／5；低樓層與屋頂仍是明確 capability gap。
-- **Evidence**：現有 V1 已將這些 case fail closed；外部 calculator review 顯示使用者實務上會需要 `h <= 18 m` 與 roof Zone 1／2／3。
-- **Trigger**：使用者要求計算 V1 範圍外的低樓層／屋頂風壓，或決定擴充完整台灣耐風規範 coverage。
-- **Current obligation**：僅保存候選方向；實作前重新以現行官方耐風規範建立 applicability、係數與 regression evidence。
-
-### 玻璃耐風承載力 deterministic capability（KB-CAND-002）
-
+- **Origin**：原 `KB-CAND-002`；使用者已明確選定 P1，因此升為未來需處理的 committed work，但目前依 serial Stage 設計保持 Cold。
 - **Why**：風壓算出後，目前 KB 尚不能直接回答指定玻璃 make-up 是否具有足夠 load resistance／deflection performance。
-- **Evidence**：KB 已有 glass standards routing，明確將 ASTM E1300 類 load-resistance design 與產品標準分開；外部 calculator review 顯示 glass-strength workflow具有高實用價值。
-- **Trigger**：使用者要求由 design pressure 接續做玻璃厚度／承載力檢核，或決定建立 wind-pressure → glass 的 executable chain。
-- **Current obligation**：保持 `CANDIDATE`；實作前重新確認 current ASTM E1300 edition、可合法 machine-encode 的方法與 validation examples，不複製外部網站未驗證演算法。
+- **Current evidence**：KB current standard owner確認 ASTM E1300-24 為現行 load-resistance routing；bounded reuse discovery顯示 `normanrichardson/structuralglass`（MIT）可作玻璃 mechanics／stress-deflection ADAPT 候選，但不是 current E1300-24 exact load-resistance chart engine。其他已檢查 implementation包含 surrogate／舊版 E1300／非 exact chart路徑，僅適合 REFERENCE-ONLY。
+- **Authority gap**：目前公開一手來源不足以合法、完整地重建 E1300-24 所需全部 chart/table data；不得從第三方 repository 內附的受版權標準 PDF／轉錄表直接吸收到 public KB，也不得把近似 plate-theory／surrogate 說成 ASTM E1300 exact。
+- **Trigger**：`KB-P1-A` 完成後，依使用者已選定的 P1 順序重新 promote；或更早取得 current E1300-24 可合法使用的 exact data／validated implementation evidence。
+- **Current obligation**：下一 Stage先完成 current E1300-24 exact-method admission／reuse boundary；若 exact E1300 kernel仍被 source-rights/evidence gate阻擋，應留下明確 blocker並評估「validated mechanics adapter」是否可作較窄、非 E1300-exact capability，不得假裝完整完成。
+
+## 候選（CANDIDATE）
 
 ### 鋁直料／橫料構件強度檢核（KB-CAND-003）
 
