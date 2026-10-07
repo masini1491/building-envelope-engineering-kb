@@ -569,6 +569,11 @@ def calculate_wall_design_pressure(
             "apply_low_slope_wall_reduction": bool(apply_low_slope_wall_reduction),
             "effective_area_m2": area,
             "least_horizontal_dimension_m": width,
+            "apply_parapet_zone3_as_zone2": bool(apply_parapet_zone3_as_zone2),
+            "parapet_all_sides": bool(parapet_all_sides),
+            "parapet_height_m": (
+                float(parapet_height_m) if parapet_height_m is not None else None
+            ),
         },
         "applicability": {
             "status": "SUPPORTED",
@@ -614,6 +619,9 @@ def calculate_roof_design_pressure(
     effective_area_m2: float,
     least_horizontal_dimension_m: float,
     governing_wind_source: str,
+    apply_parapet_zone3_as_zone2: bool = False,
+    parapet_all_sides: bool = False,
+    parapet_height_m: float | None = None,
     data: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Calculate h <= 18 m roof Zone 1/2/3 design pressures under Figure 3.1."""
@@ -644,6 +652,33 @@ def calculate_roof_design_pressure(
         )
 
     gcp = figure_3_1_roof_gcp(area, roof_slope_deg, data=ref)
+    parapet_applied = False
+    if apply_parapet_zone3_as_zone2:
+        if gcp["slope_branch"] != "le_7":
+            raise WindPressureInputError(
+                "Figure 3.1(b) parapet Zone 3 relief is only eligible for roof_slope_deg <= 7"
+            )
+        if not parapet_all_sides:
+            raise WindPressureInputError(
+                "parapet_all_sides must be true when parapet Zone 3 relief is requested"
+            )
+        if parapet_height_m is None:
+            raise WindPressureInputError(
+                "parapet_height_m is required when parapet Zone 3 relief is requested"
+            )
+        parapet_height = float(parapet_height_m)
+        if not math.isfinite(parapet_height) or parapet_height < 0.9:
+            raise WindPressureInputError(
+                "parapet_height_m must be finite and >= 0.9 for Figure 3.1(b) parapet relief"
+            )
+        gcp = dict(gcp)
+        gcp["zone3_negative"] = gcp["zone2_negative"]
+        gcp["parapet_zone3_as_zone2_applied"] = True
+        parapet_applied = True
+    else:
+        gcp = dict(gcp)
+        gcp["parapet_zone3_as_zone2_applied"] = False
+
     qh = common["qh"]
     gcpi = common["gcpi_magnitude"]
     positive = qh["q_kpa"] * gcp["positive_all_zones"] + qh["q_kpa"] * gcpi
@@ -691,6 +726,7 @@ def calculate_roof_design_pressure(
             "status": "SUPPORTED",
             "route": "FIGURE_3_1_LOW_RISE_ROOF",
             "slope_branch": gcp["slope_branch"],
+            "parapet_zone3_as_zone2_applied": parapet_applied,
             "governing_wind_source": "code",
             "partially_enclosed_internal_velocity_pressure_basis": "q(h)",
         },

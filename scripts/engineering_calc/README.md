@@ -58,10 +58,11 @@ python -m scripts.engineering_calc.review input.json
 - `surface`（省略時為 `wall`；屋頂使用 `roof`）
 - `h > 18 m` 外牆另需 `z_m`
 - 低樓層屋頂另需 `roof_slope_deg`；目前支援 `0°`～`45°`
+- 低樓層屋頂若要採圖 3.1(b) 註 1 的女兒牆 Zone 3→Zone 2 處理，需明確設定 `apply_parapet_zone3_as_zone2 = true`、`parapet_all_sides = true`，並提供 `parapet_height_m >= 0.9`；僅適用 `roof_slope_deg <= 7`
 - 低樓層外牆若要採圖 3.1(a) 註 1 的 10% 折減，需明確設定 `apply_low_slope_wall_reduction = true` 並提供 `roof_slope_deg <= 10`
 - `governing_wind_source = "code"`
 
-`units` 仍為最外層必填。reference data 位於 `references/government/taiwan-wind-code-103-v2.json`；kernel 自動解析 `V10(C) / I / α / zg / GCpi`，並計算 `K(z) / K(h) / q(z) / q(h) / a / GCp`。部分封閉式建築物之正內風壓速度壓，V1 明確採 2.2 節允許的 `q(h)`，不在缺少開口高度時猜測 `zh0`。
+`units` 仍為最外層必填。reference data 位於 `references/government/taiwan-wind-code-103-v2.json`；kernel 自動解析 `V10(C) / I / α / zg / GCpi`，並計算 `K(z) / K(h) / q(z) / q(h) / a / GCp`。部分封閉式建築物之正內風壓速度壓，目前明確採 2.2 節允許的 `q(h)`，不在缺少開口高度時猜測 `zh0`。
 
 可比較的 reported key 包括：
 

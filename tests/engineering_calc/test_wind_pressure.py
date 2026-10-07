@@ -136,14 +136,14 @@ class TaiwanWindPressureTests(unittest.TestCase):
 
         middle = figure_3_1_roof_gcp(1.0, 7.0001)
         self.assertEqual(middle["figure"], "3.1(c)")
-        self.assertAlmostEqual(middle["positive_all_zones"], 0.6249)
+        self.assertAlmostEqual(middle["positive_all_zones"], 1.0415)
         self.assertAlmostEqual(middle["zone1_negative"], -1.8747)
         self.assertAlmostEqual(middle["zone2_negative"], -3.5411)
         self.assertAlmostEqual(middle["zone3_negative"], -5.4158)
 
         middle_max = figure_3_1_roof_gcp(10.0, 27.0)
         self.assertEqual(middle_max["figure"], "3.1(c)")
-        self.assertAlmostEqual(middle_max["positive_all_zones"], 1.0415)
+        self.assertAlmostEqual(middle_max["positive_all_zones"], 0.6249)
         self.assertAlmostEqual(middle_max["zone1_negative"], -1.6664)
         self.assertAlmostEqual(middle_max["zone2_negative"], -2.4996)
         self.assertAlmostEqual(middle_max["zone3_negative"], -4.166)
@@ -169,6 +169,92 @@ class TaiwanWindPressureTests(unittest.TestCase):
         self.assertEqual(result["selection_method"], "SEMILOG_INTERPOLATION")
         self.assertAlmostEqual(result["positive_all_zones"], (0.6249 + 0.4166) / 2)
         self.assertAlmostEqual(result["zone2_negative"], (-3.7494 - 2.2913) / 2)
+
+    def test_figure_3_1_c_positive_semilog_matches_official_curve_direction(self):
+        result = figure_3_1_roof_gcp(10 ** 0.5, 20.0)
+        self.assertEqual(result["figure"], "3.1(c)")
+        self.assertAlmostEqual(result["positive_all_zones"], (1.0415 + 0.6249) / 2)
+        self.assertGreater(
+            figure_3_1_roof_gcp(1.0, 20.0)["positive_all_zones"],
+            figure_3_1_roof_gcp(10.0, 20.0)["positive_all_zones"],
+        )
+
+    def test_low_slope_parapet_zone3_relief_is_explicit_and_bounded(self):
+        baseline = calculate_roof_design_pressure(
+            region="臺北市",
+            district=None,
+            building_category=3,
+            terrain_category="B",
+            kzt=1.0,
+            enclosure="enclosed",
+            h_m=15.0,
+            roof_slope_deg=5.0,
+            effective_area_m2=1.0,
+            least_horizontal_dimension_m=20.0,
+            governing_wind_source="code",
+        )
+        relieved = calculate_roof_design_pressure(
+            region="臺北市",
+            district=None,
+            building_category=3,
+            terrain_category="B",
+            kzt=1.0,
+            enclosure="enclosed",
+            h_m=15.0,
+            roof_slope_deg=5.0,
+            effective_area_m2=1.0,
+            least_horizontal_dimension_m=20.0,
+            governing_wind_source="code",
+            apply_parapet_zone3_as_zone2=True,
+            parapet_all_sides=True,
+            parapet_height_m=0.9,
+        )
+        self.assertNotAlmostEqual(
+            baseline["pressures"]["zone3"]["negative_kpa"],
+            baseline["pressures"]["zone2"]["negative_kpa"],
+        )
+        self.assertAlmostEqual(
+            relieved["pressures"]["zone3"]["negative_kpa"],
+            relieved["pressures"]["zone2"]["negative_kpa"],
+        )
+        self.assertTrue(
+            relieved["applicability"]["parapet_zone3_as_zone2_applied"]
+        )
+
+        with self.assertRaises(WindPressureInputError):
+            calculate_roof_design_pressure(
+                region="臺北市",
+                district=None,
+                building_category=3,
+                terrain_category="B",
+                kzt=1.0,
+                enclosure="enclosed",
+                h_m=15.0,
+                roof_slope_deg=8.0,
+                effective_area_m2=1.0,
+                least_horizontal_dimension_m=20.0,
+                governing_wind_source="code",
+                apply_parapet_zone3_as_zone2=True,
+                parapet_all_sides=True,
+                parapet_height_m=0.9,
+            )
+        with self.assertRaises(WindPressureInputError):
+            calculate_roof_design_pressure(
+                region="臺北市",
+                district=None,
+                building_category=3,
+                terrain_category="B",
+                kzt=1.0,
+                enclosure="enclosed",
+                h_m=15.0,
+                roof_slope_deg=5.0,
+                effective_area_m2=1.0,
+                least_horizontal_dimension_m=20.0,
+                governing_wind_source="code",
+                apply_parapet_zone3_as_zone2=True,
+                parapet_all_sides=True,
+                parapet_height_m=0.89,
+            )
 
     def test_low_rise_corner_width_rule(self):
         self.assertAlmostEqual(low_rise_corner_width(15.0, 20.0), 2.0)
@@ -341,6 +427,34 @@ class TaiwanWindPressureTests(unittest.TestCase):
         self.assertEqual(roof["calculation_status"], "COMPUTED")
         self.assertEqual(roof["comparison_status"], "MATCH")
         self.assertEqual(roof["computed"]["reference"]["figure"], "3.1(b)")
+
+        parapet_roof = run_review(
+            {
+                "check_type": "wind_pressure",
+                "units": {"pressure": "kPa"},
+                "inputs": {
+                    "surface": "roof",
+                    "region": "臺北市",
+                    "building_category": 3,
+                    "terrain_category": "B",
+                    "kzt": 1.0,
+                    "enclosure": "enclosed",
+                    "h_m": 15.0,
+                    "roof_slope_deg": 5.0,
+                    "effective_area_m2": 1.0,
+                    "least_horizontal_dimension_m": 20.0,
+                    "governing_wind_source": "code",
+                    "apply_parapet_zone3_as_zone2": True,
+                    "parapet_all_sides": True,
+                    "parapet_height_m": 0.9,
+                },
+            }
+        )
+        self.assertEqual(parapet_roof["calculation_status"], "COMPUTED")
+        self.assertAlmostEqual(
+            parapet_roof["computed"]["pressures"]["zone3"]["negative_kpa"],
+            parapet_roof["computed"]["pressures"]["zone2"]["negative_kpa"],
+        )
 
     def test_review_adapter_incomplete_and_unsupported(self):
         incomplete = run_review(
