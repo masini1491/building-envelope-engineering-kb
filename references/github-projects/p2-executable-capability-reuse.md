@@ -95,7 +95,7 @@ Temporary non-merge probe：
 - observation：project宣稱已用 ISO 10211 test cases驗證，且含 declarative geometry／adaptive mesh／temperature與Ψ/fRsi outputs。
 - boundary：不直接 copy、vendor或改寫其 implementation；只作 architecture/reuse landscape evidence。
 
-## Production kernel admission 結果
+## 正式 kernel 納入結果（Production kernel admission）
 
 Disposition：`ADMITTED / NUMERICAL_BACKEND_ONLY`
 
