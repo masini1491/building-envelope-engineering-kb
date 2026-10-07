@@ -94,7 +94,7 @@ python -m scripts.engineering_calc.review input.json
 - `connection.py` 的 capacity 必須由可追溯的規範、產品資料或專案條件明確提供；工具不內建 universal fastener capacity。
 - `beam.py` 不推論支承、splice rigidity 或 semi-rigid behavior；boundary condition 不明時，ChatGPT 應把 structural model 視為 `INCOMPLETE`。
 - local calculation result 不得直接升格成 overall structural PASS。
-- `thermal_bridge_2d.py` 的材料導熱係數、mesh 與 boundary condition 都必須由 caller／project provenance 提供；kernel 不內建材料表、不猜 indoor/outdoor surface resistance。其 `NUMERICAL_BACKEND_ONLY` 輸出與 Case 1／Case 2 regression PASS 都不得升格成完整 ISO 10211 compliance。
+- `thermal_bridge_2d.py` 的材料導熱係數、mesh 與 boundary condition 都必須由 caller／project provenance 提供；kernel 不內建材料表、不猜 indoor/outdoor surface resistance。它會 fail closed 檢查 index／退化元素／edge-connectivity／manifold edge、duplicate／orphan vertices 與 boundary references，但不自行證明任意 caller mesh 的完整 computational-geometry conformity（例如重疊元素或 T-junction）；這仍是 mesh-generator／caller contract。其 `NUMERICAL_BACKEND_ONLY` 輸出與 Case 1／Case 2 regression PASS 都不得升格成完整 ISO 10211 compliance。
 
 ## 目前模組
 
