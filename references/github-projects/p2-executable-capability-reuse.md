@@ -70,7 +70,7 @@ COMSOL 公開 application documentation重現 ISO 10211:2017 的 2D validation c
 - capability：triangular／quadrilateral FEM assembly、sparse systems、boundary DOFs與 post-processing primitives
 - adoption boundary：可作 numerical backend；本 repo 自己擁有 thermal-bridge input/output contract、material/boundary provenance與 validation semantics。不得把 scikit-fem examples 當 ISO authority。
 
-#### Thermal backend probe evidence
+#### 熱傳 backend probe evidence
 
 Temporary non-merge probe：
 
@@ -95,7 +95,7 @@ Temporary non-merge probe：
 - observation：project宣稱已用 ISO 10211 test cases驗證，且含 declarative geometry／adaptive mesh／temperature與Ψ/fRsi outputs。
 - boundary：不直接 copy、vendor或改寫其 implementation；只作 architecture/reuse landscape evidence。
 
-## Production kernel admission boundary
+## Production kernel admission 邊界
 
 下一個 Hot 可以開始 production kernel，但必須維持下列 boundary：
 
