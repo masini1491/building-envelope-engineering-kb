@@ -14,12 +14,14 @@ Cold item **不具 execution authority**。要開始實作前，必須依 curren
 
 ### 玻璃耐風承載力 deterministic capability（KB-P1-B）
 
-- **Origin**：原 `KB-CAND-002`；使用者已明確選定 P1，因此升為未來需處理的 committed work，但目前依 serial Stage 設計保持 Cold。
-- **Why**：風壓算出後，目前 KB 尚不能直接回答指定玻璃 make-up 是否具有足夠 load resistance／deflection performance。
-- **Current evidence**：KB current standard owner確認 ASTM E1300-24 為現行 load-resistance routing；bounded reuse discovery顯示 `normanrichardson/structuralglass`（MIT）可作玻璃 mechanics／stress-deflection ADAPT 候選，但不是 current E1300-24 exact load-resistance chart engine。其他已檢查 implementation包含 surrogate／舊版 E1300／非 exact chart路徑，僅適合 REFERENCE-ONLY。
-- **Authority gap**：目前公開一手來源不足以合法、完整地重建 E1300-24 所需全部 chart/table data；不得從第三方 repository 內附的受版權標準 PDF／轉錄表直接吸收到 public KB，也不得把近似 plate-theory／surrogate 說成 ASTM E1300 exact。
-- **Trigger**：`KB-P1-A` 完成後，依使用者已選定的 P1 順序重新 promote；或更早取得 current E1300-24 可合法使用的 exact data／validated implementation evidence。
-- **Current obligation**：下一 Stage先完成 current E1300-24 exact-method admission／reuse boundary；若 exact E1300 kernel仍被 source-rights/evidence gate阻擋，應留下明確 blocker並評估「validated mechanics adapter」是否可作較窄、非 E1300-exact capability，不得假裝完整完成。
+- **Status**：`COMMITTED / BLOCKED`。P1-A Wind V2 已完成；本項已完成 current exact-method／reuse admission，但目前沒有合法且足以實作 E1300-24 exact kernel 的 public data path，因此保持 Cold，不建立假性 Hot work。
+- **Origin**：原 `KB-CAND-002`；使用者已明確選定 P1，故未來仍需處理，不因本次 blocker退回一般 candidate。
+- **Why**：風壓算出後，目前 KB 尚不能直接回答指定玻璃 make-up 是否具有足夠 ASTM E1300 load resistance／deflection performance。
+- **Current evidence**：KB current standard owner確認 ASTM E1300-24 為現行 load-resistance routing。bounded reuse discovery確認 `normanrichardson/structuralglass`（MIT）適合作 mechanics／stress-deflection ADAPT reference，但不是 E1300-24 exact load-resistance chart engine；另檢查的 E1300 surrogate、舊版 implementation與 classical plate-theory替代路徑都只能作 REFERENCE-ONLY。
+- **Authority / rights blocker**：目前公開一手來源不足以合法、完整地重建 E1300-24 所需 chart/table data。第三方 repository 中的標準 PDF、轉錄表或 surrogate calibration不得直接吸收到 public KB；近似 plate theory／NCSEA mechanics也不得改名成 ASTM E1300 exact。
+- **Rejected substitute**：本次已明確評估「先做 generic glass plate-response／user-supplied allowable adapter」作為 P1替代；依現有 engineering goal與設計占卜均不採用，因其不能回答原 P1 的 E1300 load-resistance問題，且會製造 capability naming／authority混淆。
+- **Trigger**：取得 current E1300-24 可合法 machine-encode 的 exact chart/table data、官方／授權 reusable implementation，或其他足以關閉同等方法與驗證邊界的 evidence後，fresh-reconcile並 promote到 `TASKS.md`。
+- **Current obligation**：保留 blocker與 reuse findings；未達 trigger前不要重複用 surrogate／plate-theory繞過 exact-method gate。
 
 ## 候選（CANDIDATE）
 
