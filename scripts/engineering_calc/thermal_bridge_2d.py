@@ -296,7 +296,13 @@ def solve_steady_state_2d(
             )
         normalized_edges: list[tuple[int, int]] = []
         for raw_edge in boundary.edge_node_pairs:
-            if len(raw_edge) != 2:
+            try:
+                edge_length = len(raw_edge)
+            except TypeError as exc:
+                raise ThermalBridgeInputError(
+                    "surface boundary edges must contain two nodes"
+                ) from exc
+            if edge_length != 2:
                 raise ThermalBridgeInputError("surface boundary edges must contain two nodes")
             left = _int_index(raw_edge[0], "surface boundary edge node")
             right = _int_index(raw_edge[1], "surface boundary edge node")
@@ -327,6 +333,12 @@ def solve_steady_state_2d(
         )
 
     mesh = MeshTri(points.T, triangle_array.T)
+    try:
+        mesh.is_valid(raise_=True)
+    except ValueError as exc:
+        raise ThermalBridgeInputError(
+            "mesh failed backend structural validation"
+        ) from exc
     element = ElementTriP1()
     basis = Basis(mesh, element)
 
