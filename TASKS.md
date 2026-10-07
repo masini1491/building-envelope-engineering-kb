@@ -4,7 +4,7 @@
 
 ## 目前執行中的工作
 
-### P1 耐風 V2 正確性修正（KB-P1-A-FIX）
+### 耐風 V2 正確性修正（P1／KB-P1-A-FIX）
 
 - **來源**：2026-10-07 對已完成 P1-A 的 official-source read-back audit。
 - **目標**：修正已 admission 的低樓層 Figure 3.1 implementation，不擴張到新的高樓屋頂 capability。
