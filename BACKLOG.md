@@ -25,6 +25,14 @@ Cold item **不具 execution authority**。要開始實作前，必須依 curren
 
 ## 候選（CANDIDATE）
 
+### 高樓層屋頂 Zone 1／2／3 wind-pressure coverage（KB-CAND-008）
+
+- **Why**：current Wind V2 已支援 `h > 18 m` 外牆與 `h <= 18 m` 屋頂，但官方 Figure 3.2 同時定義 `h > 18 m` 屋頂 Zone 1／2／3，且 `θ > 10°` 時另路由至 Figure 3.1(c)／(d)。
+- **Evidence**：2026-10-07 official Figure 3.2 read-back確認 roof zone geometry、parapet note與 `θ > 10°` routing確實存在；目前 kernel 明確 fail closed。
+- **Trigger**：使用者需要 `h > 18 m` 屋頂局部構材／外部被覆物設計風壓，或後續決定補齊完整 Figure 3.2 roof coverage。
+- **Current obligation**：未 admission 前保持 Cold；實作時需單獨設計 low-slope Figure 3.2 negative-only external coefficient contract、`θ > 10°` Figure 3.1(c)/(d) routing、high-rise `a` geometry與 parapet option，不得在 P1 bug-fix 中順手擴張。
+
+
 ### 鋁直料／橫料構件強度檢核（KB-CAND-003）
 
 - **Why**：KB 已有 beam solver 與 mullion/transom methodology，但缺少 aluminum member capacity／local-buckling execution layer。

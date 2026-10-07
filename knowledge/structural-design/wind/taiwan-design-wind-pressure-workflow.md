@@ -73,7 +73,7 @@ canonical_owner: true
 
 ## 局部構材與外部被覆物設計風壓 deterministic capability
 
-本知識庫已定義第一版可執行外牆設計風壓能力，目的不是要求使用者先知道規範參數，而是讓 ChatGPT 先整理 project facts，再由可追溯的 machine-readable 規範資料與 deterministic kernel 完成計算。
+本知識庫已定義第二版可執行局部構材／外部被覆物設計風壓能力，目的不是要求使用者先知道規範參數，而是讓 ChatGPT 先整理 project facts，再由可追溯的 machine-readable 規範資料與 deterministic kernel 完成計算。
 
 ### 自然語言 intake
 
@@ -98,7 +98,7 @@ canonical_owner: true
 
 已在同一輪對話提供的條件不得重新詢問。分類仍有歧義時，先請使用者確認分類，不得把自然語言猜測直接送入 calculator。
 
-### 第一版（V1）適用範圍
+### 第二版（V2）適用範圍
 
 目前 `wind_pressure` 支援：
 
@@ -116,6 +116,8 @@ canonical_owner: true
 
 圖 3.1(a) 註 1 對 `θ <= 10°` 牆面外風壓係數允許降低 10%；kernel **不自動套用**，只有使用者／design basis明確指定時才以 `apply_low_slope_wall_reduction = true` 採用。
 
+圖 3.1(b) 註 1 對 `θ <= 7°` 且屋頂四周皆有高度 `>= 0.9 m` 女兒牆之情況，允許 Zone 3 按 Zone 2 處理；kernel 同樣採 **explicit option**，只有 `apply_parapet_zone3_as_zone2 = true`、`parapet_all_sides = true` 且 `parapet_height_m >= 0.9` 時才套用，不由 AI 自動猜測。
+
 目前不支援並應 fail closed：
 
 - 開放式建築物（不得只把 `GCpi=0` 後繼續套圖 3.1／3.2）
@@ -130,7 +132,7 @@ machine-readable 規範資料由：
 
 `references/government/taiwan-wind-code-103-v2.json`
 
-保存。它只收錄本 V1 真正會執行的 103 年規範資料、來源與適用界線；外部網站計算器只可作 reference-only cross-check，不得成為 canonical engineering truth。
+保存。它只收錄本 V2 真正會執行的 103 年規範資料、來源與適用界線；外部網站計算器只可作 reference-only cross-check，不得成為 canonical engineering truth。
 
 風速壓採 2.6 節：
 
@@ -146,6 +148,8 @@ machine-readable 規範資料由：
 
 圖 3.1(a)～(d) 的 machine transcription 以正式圖表為 governing authority，並用規範解說所載「台灣 `GCp = ASCE 7-02 GCp × 2.083`」交叉驗證控制點。低樓層外牆的面積平台為 1～50 m²；低樓層屋頂為 1～10 m²，中間在 `log10(A)` 軸線性內插。第三方 calculator 不參與 canonical coefficient admission。
 
+Figure 3.1(c) 的正外風壓曲線隨有效受風面積增加而下降；machine-readable control values 必須維持此方向。Figure 3.1(b) 的女兒牆 relief 僅是條件式 zone treatment，不改寫原始圖表係數。
+
 圖 3.2 的牆面 `GCp` 以圖中 2 m² 與 50 m² 平台為 anchor，中間依圖的對數面積軸做線性內插；圖 3.2 解說採 ASCE 7-02 `GCp × 2.083` 的換算。角隅區：
 
 `a = max(0.10 B, 0.9 m)`
@@ -156,5 +160,5 @@ machine-readable 規範資料由：
 
 `scripts/engineering_calc/review.py` 以 `check_type = "wind_pressure"` 提供統一 adapter。adapter 的 `MATCH / MISMATCH` 只表示 reported 與 recomputed numerical agreement，不代表整體耐風設計 `PASS / FAIL`。
 
-若 input 不足，回傳 `INCOMPLETE_INPUT`；若條件超出 V1 applicability，回傳 `UNSUPPORTED_MODEL`。不得為了得到數值而自行補造 `Kzt`、地況、封閉類型、有效受風面積或 governing wind source。
+若 input 不足，回傳 `INCOMPLETE_INPUT`；若條件超出 V2 applicability，回傳 `UNSUPPORTED_MODEL`。不得為了得到數值而自行補造 `Kzt`、地況、封閉類型、有效受風面積或 governing wind source。
 

@@ -113,6 +113,17 @@ def _wind_pressure(p, inp):
     h_m = _num(inp, "h_m")
     try:
         if surface == "roof":
+            apply_parapet = inp.get("apply_parapet_zone3_as_zone2", False)
+            if not isinstance(apply_parapet, bool):
+                raise IncompleteInputError(
+                    "inputs.apply_parapet_zone3_as_zone2 must be boolean"
+                )
+            parapet_all_sides = inp.get("parapet_all_sides", False)
+            if not isinstance(parapet_all_sides, bool):
+                raise IncompleteInputError("inputs.parapet_all_sides must be boolean")
+            parapet_height = None
+            if "parapet_height_m" in inp and inp.get("parapet_height_m") is not None:
+                parapet_height = _num(inp, "parapet_height_m")
             computed = calculate_roof_design_pressure(
                 region=values["region"],
                 district=values["district"],
@@ -125,6 +136,9 @@ def _wind_pressure(p, inp):
                 effective_area_m2=_num(inp, "effective_area_m2"),
                 least_horizontal_dimension_m=_num(inp, "least_horizontal_dimension_m"),
                 governing_wind_source=values["governing_wind_source"],
+                apply_parapet_zone3_as_zone2=apply_parapet,
+                parapet_all_sides=parapet_all_sides,
+                parapet_height_m=parapet_height,
             )
         else:
             z_value = None

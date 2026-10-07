@@ -673,9 +673,12 @@
             }
           },
           "parapet_rule": {
+            "eligible_when_roof_slope_deg_lte": 7,
+            "requires_parapet_on_all_sides": true,
             "eligible_when_parapet_height_m_gte": 0.9,
             "effect": "zone3_may_be_treated_as_zone2",
-            "source": "Figure 3.1(b) note 1"
+            "source": "Figure 3.1(b) note 1",
+            "application": "explicit_option_only"
           }
         },
         {
@@ -686,8 +689,8 @@
           "max_slope_deg": 27,
           "base_asce_7_02_control_values": {
             "positive_all_zones": {
-              "low": 0.3,
-              "high": 0.5
+              "low": 0.5,
+              "high": 0.3
             },
             "zone1_negative": {
               "low": -0.9,
@@ -730,6 +733,6 @@
         }
       ]
     },
-    "machine_transcription_boundary": "Figure 3.1 control values are encoded from the governing Taiwan figures and cross-checked against the code commentary's ASCE 7-02 × 2.083 relationship. Third-party calculators are reference-only."
+    "machine_transcription_boundary": "Figure 3.1 control values are encoded from the governing Taiwan figures and cross-checked against the code commentary's ASCE 7-02 × 2.083 relationship. Figure 3.1(c) positive pressure decreases with increasing effective wind area. Figure 3.1(b) parapet relief is explicit-option-only. Third-party calculators are reference-only."
   }
 }
