@@ -569,11 +569,6 @@ def calculate_wall_design_pressure(
             "apply_low_slope_wall_reduction": bool(apply_low_slope_wall_reduction),
             "effective_area_m2": area,
             "least_horizontal_dimension_m": width,
-            "apply_parapet_zone3_as_zone2": bool(apply_parapet_zone3_as_zone2),
-            "parapet_all_sides": bool(parapet_all_sides),
-            "parapet_height_m": (
-                float(parapet_height_m) if parapet_height_m is not None else None
-            ),
         },
         "applicability": {
             "status": "SUPPORTED",
@@ -721,6 +716,11 @@ def calculate_roof_design_pressure(
             "roof_slope_deg": float(roof_slope_deg),
             "effective_area_m2": area,
             "least_horizontal_dimension_m": width,
+            "apply_parapet_zone3_as_zone2": bool(apply_parapet_zone3_as_zone2),
+            "parapet_all_sides": bool(parapet_all_sides),
+            "parapet_height_m": (
+                float(parapet_height_m) if parapet_height_m is not None else None
+            ),
         },
         "applicability": {
             "status": "SUPPORTED",
