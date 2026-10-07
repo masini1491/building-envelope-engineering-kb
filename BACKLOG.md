@@ -8,62 +8,50 @@ Cold item **不具 execution authority**。要開始實作前，必須依 curren
 
 - `CANDIDATE`：值得保留與未來重新評估，但尚未承諾一定實作。
 - `COMMITTED`：已決定未來需要處理，但目前不是 Hot。
+- `COMMITTED / BLOCKED`：已決定需要處理，但 current authority／rights／validation evidence 不足以安全實作。
 - Persistence 不代表 recommendation 更正確，也不代表可跳過 current research、admission、validation 或 authority gate。
 
 ## 已承諾（COMMITTED）
 
 ### 玻璃耐風承載力 deterministic capability（KB-P1-B）
 
-- **Status**：`COMMITTED / BLOCKED`。P1-A Wind V2 已完成；本項已完成 current exact-method／reuse admission，但目前沒有合法且足以實作 E1300-24 exact kernel 的 public data path，因此保持 Cold，不建立假性 Hot work。
-- **Origin**：原 `KB-CAND-002`；使用者已明確選定 P1，故未來仍需處理，不因本次 blocker退回一般 candidate。
-- **Why**：風壓算出後，目前 KB 尚不能直接回答指定玻璃 make-up 是否具有足夠 ASTM E1300 load resistance／deflection performance。
-- **Current evidence**：KB current standard owner確認 ASTM E1300-24 為現行 load-resistance routing。bounded reuse discovery確認 `normanrichardson/structuralglass`（MIT）適合作 mechanics／stress-deflection ADAPT reference，但不是 E1300-24 exact load-resistance chart engine；另檢查的 E1300 surrogate、舊版 implementation與 classical plate-theory替代路徑都只能作 REFERENCE-ONLY。
-- **Authority / rights blocker**：目前公開一手來源不足以合法、完整地重建 E1300-24 所需 chart/table data。第三方 repository 中的標準 PDF、轉錄表或 surrogate calibration不得直接吸收到 public KB；近似 plate theory／NCSEA mechanics也不得改名成 ASTM E1300 exact。
-- **Rejected substitute**：本次已明確評估「先做 generic glass plate-response／user-supplied allowable adapter」作為 P1替代；依現有 engineering goal與設計占卜均不採用，因其不能回答原 P1 的 E1300 load-resistance問題，且會製造 capability naming／authority混淆。
-- **Trigger**：取得 current E1300-24 可合法 machine-encode 的 exact chart/table data、官方／授權 reusable implementation，或其他足以關閉同等方法與驗證邊界的 evidence後，fresh-reconcile並 promote到 `TASKS.md`。
-- **Current obligation**：保留 blocker與 reuse findings；未達 trigger前不要重複用 surrogate／plate-theory繞過 exact-method gate。
+- **Status**：`COMMITTED / BLOCKED`。目前沒有合法且足以實作 E1300-24 exact kernel 的 public data path。
+- **Current evidence**：ASTM E1300-24 為 current load-resistance routing；`normanrichardson/structuralglass`（MIT）可作 mechanics reference，但不是 current E1300-24 exact chart engine。
+- **Boundary**：不得把第三方標準 PDF／轉錄表、surrogate 或 classical plate-theory 包裝成 ASTM E1300 exact。
+- **Trigger**：取得 current E1300-24 可合法 machine-encode 的 exact data、官方／授權 reusable implementation，或其他足以關閉同等方法與 validation boundary 的 evidence。
+
+### 鋁直料／橫料構件強度檢核（P2／KB-P2-A）
+
+- **Status**：`COMMITTED / BLOCKED`。
+- **Current evidence**：Aluminum Association 目前仍以 `Aluminum Design Manual 2020` 作結構鋁設計出版物；其公開說明確認 ADM 包含 structural-component strength、buckling、weld-affected strength、concentrated-force與 screw-chase pull-out 等 provisions，但完整設計規則為付費出版物。
+- **Existing safe capability**：本 repo 已有 beam response、required section property、user-supplied allowable/capacity utilization與 local-demand arithmetic；這些 capability 不自行衍生 ADM allowable/design strength。
+- **Blocker**：目前沒有足夠的 public primary evidence 可合法 machine-encode ADM member-strength／local-buckling exact equations、alloy/temper design values與完整 applicability。
+- **Rejected substitute**：不得把 `M/S`、`V/A`、user-supplied allowable 比較包裝成「ADM aluminum member capacity」，也不另造與既有 helpers 重疊的假性 strength kernel。
+- **Trigger**：取得 licensed/project-provided ADM design basis與可合法使用的必要數值／equations，或可驗證、license-compatible 的 current implementation。
+
+### 自攻螺絲連接容量檢核（P2／KB-P2-B）
+
+- **Status**：`COMMITTED / BLOCKED`。
+- **Current evidence**：FGIA store 仍將 `AAMA TIR-A9-14 — Design Guide for Metal Cladding Fasteners` 標為 Active，並列 2015 errata 與 2020 addendum；其用途正是 curtain-wall framing/component fastener selection。
+- **Existing safe capability**：本 repo 已有 fastener-group demand、projected bearing demand、independent shear/tension utilization及 externally-established thread-engagement comparison。
+- **Blocker**：current TIR-A9 design data／tables與 applicable ADM screw/parent-material resistance provisions並非 public machine-encodable authority；manufacturer/evaluation-report capacity仍需 project/product-specific evidence。
+- **Rejected substitute**：不得從舊 TIR-A9、第三方 calculator或 generic screw formula猜出 pull-out／pull-over／bearing capacity。
+- **Trigger**：取得 current licensed TIR-A9/ADM design basis與 exact fastener/product evidence，或可驗證且授權相容的 current implementation。
 
 ## 候選（CANDIDATE）
 
 ### 高樓層屋頂 Zone 1／2／3 wind-pressure coverage（KB-CAND-008）
 
-- **Why**：current Wind V2 已支援 `h > 18 m` 外牆與 `h <= 18 m` 屋頂，但官方 Figure 3.2 同時定義 `h > 18 m` 屋頂 Zone 1／2／3，且 `θ > 10°` 時另路由至 Figure 3.1(c)／(d)。
-- **Evidence**：2026-10-07 official Figure 3.2 read-back確認 roof zone geometry、parapet note與 `θ > 10°` routing確實存在；目前 kernel 明確 fail closed。
-- **Trigger**：使用者需要 `h > 18 m` 屋頂局部構材／外部被覆物設計風壓，或後續決定補齊完整 Figure 3.2 roof coverage。
-- **Current obligation**：未 admission 前保持 Cold；實作時需單獨設計 low-slope Figure 3.2 negative-only external coefficient contract、`θ > 10°` Figure 3.1(c)/(d) routing、high-rise `a` geometry與 parapet option，不得在 P1 bug-fix 中順手擴張。
-
-
-### 鋁直料／橫料構件強度檢核（KB-CAND-003）
-
-- **Why**：KB 已有 beam solver 與 mullion/transom methodology，但缺少 aluminum member capacity／local-buckling execution layer。
-- **Evidence**：現有 calculator 可求 beam response；外部 calculator review 顯示「風壓 → line load → member capacity」是常用工作流。
-- **Trigger**：需要把現有 beam result 接到鋁構件 flexure／shear／local element capacity。
-- **Current obligation**：實作前確認 current Aluminum Design Manual／專案 design basis、alloy/temper與 section classification；不得把外部 calculator 的簡化公式當 authority。
-
-### 自攻螺絲連接容量檢核（KB-CAND-004）
-
-- **Why**：KB 已有 fastener-group demand 與 screw pull-out/thread-engagement knowledge，但尚無 code／product-evidence-based pull-out、pull-over、bearing capacity kernel。
-- **Evidence**：現有 connection methodology已區分 screw body、parent material、pull-out／thread stripping與 bearing 等 failure modes；外部 calculator review顯示可形成完整 connection chain。
-- **Trigger**：使用者需要從 fastener-group demand 接續檢核 individual screw／connected material failure modes。
-- **Current obligation**：先建立 current AAMA/FGIA、Aluminum Design Manual、manufacturer/evaluation-report authority mapping與適用範圍，再決定 deterministic formulas。
-
-### 二維熱橋 deterministic solver（KB-CAND-005）
-
-- **Why**：KB 現有 thermal／condensation knowledge仍是 methodology；缺少 2D steady-state conduction、surface temperature、heat-flow與 Ψ-value execution capability。
-- **Evidence**：現有 thermal baseline 已要求 assembly-level與 thermal-bridge analysis；外部 calculator review顯示 ISO 10211 類 benchmark-driven 2D solver可提供實質能力。
-- **Trigger**：需要計算 bracket、slab edge、frame／insulation interface等局部熱橋或 condensation screening。
-- **Current obligation**：先研究 mature solver/library reuse、ISO 10211 current requirements與 benchmark suite；不為形式自建 FEA solver。
+- **Why**：current Wind V2 已支援 `h > 18 m` 外牆與 `h <= 18 m` 屋頂，但官方 Figure 3.2 同時定義 `h > 18 m` 屋頂 Zone 1／2／3。
+- **Trigger**：需要 `h > 18 m` 屋頂局部構材／外部被覆物設計風壓。
+- **Current obligation**：另行設計 Figure 3.2 roof coefficient/routing；不得順手併入其他 Stage。
 
 ### 玻璃熱傳與結露 screening（KB-CAND-006）
 
-- **Why**：常見 façade 問題需要由已知 U-value／optical properties／boundary conditions推導表面溫度、fRsi或 dew-point risk。
-- **Evidence**：KB 已有 thermal-and-condensation baseline；外部 calculator review顯示 U-value／condensation screening可作為較輕量 executable capability。
-- **Trigger**：使用者提供可追溯的 glazing thermal properties並要求 thermal／condensation calculation。
-- **Current obligation**：只考慮 verified user/project/manufacturer inputs；不吸收外部網站未完成原廠追溯的產品 catalog。
+- **Why**：需要由已知 U-value／boundary conditions推導表面溫度、fRsi或 dew-point risk。
+- **Current obligation**：只使用 verified project/manufacturer inputs；不吸收未追溯產品 catalog。
 
 ### 玻璃／金屬板非線性 FEA execution adapter（KB-CAND-007）
 
-- **Why**：KB 已有 glass 與 metal-panel FEA governance，但沒有可直接執行的 validated nonlinear solver route。
-- **Evidence**：現有 canonical pages已定義 mesh、nonlinearity、boundary、reaction與validation要求；外部 calculator review顯示此能力有價值，但 implementation／validation成本高。
-- **Trigger**：出現無法由既有 analytical helpers可靠處理、且 repeated consumer justification 足夠的 nonlinear glass／sheet-metal use case。
-- **Current obligation**：優先 bounded reuse discovery與 solver adapter／benchmark architecture；不預設自行開發完整 FEA engine。
+- **Why**：現有 glass／metal-panel FEA governance沒有 validated nonlinear execution route。
+- **Current obligation**：優先 solver adapter／benchmark architecture；不預設自行開發完整 FEA engine。
