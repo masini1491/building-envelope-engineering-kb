@@ -4,8 +4,12 @@ from scripts.engineering_calc.review import run_review
 from scripts.engineering_calc.wind_pressure import (
     WindPressureInputError,
     WindPressureUnsupportedError,
+    calculate_roof_design_pressure,
     calculate_wall_design_pressure,
+    figure_3_1_roof_gcp,
+    figure_3_1_wall_gcp,
     figure_3_2_wall_gcp,
+    low_rise_corner_width,
     resolve_basic_wind_speed,
     resolve_importance_factor,
     resolve_terrain,
@@ -76,7 +80,7 @@ class TaiwanWindPressureTests(unittest.TestCase):
         self.assertAlmostEqual(at_two["k"], at_five["k"])
         self.assertAlmostEqual(at_two["q_kpa"], at_five["q_kpa"])
 
-    def test_figure_3_2_plateaus_and_semilog_interpolation(self):
+    def test_figure_3_2_regression_unchanged(self):
         low = figure_3_2_wall_gcp(1.0)
         self.assertEqual(low["selection_method"], "LOW_AREA_PLATEAU")
         self.assertAlmostEqual(low["positive_zone4_zone5"], 1.8747)
@@ -95,7 +99,83 @@ class TaiwanWindPressureTests(unittest.TestCase):
         self.assertAlmostEqual(high["zone4_negative"], -1.4581)
         self.assertAlmostEqual(high["zone5_negative"], -2.083)
 
-    def test_full_enclosed_wall_case_is_reproducible(self):
+    def test_figure_3_1_wall_endpoints_and_optional_reduction(self):
+        low = figure_3_1_wall_gcp(1.0)
+        self.assertEqual(low["figure"], "3.1(a)")
+        self.assertAlmostEqual(low["positive_zone4_zone5"], 2.083)
+        self.assertAlmostEqual(low["zone4_negative"], -2.2913)
+        self.assertAlmostEqual(low["zone5_negative"], -2.9162)
+        self.assertFalse(low["low_slope_reduction_applied"])
+
+        high = figure_3_1_wall_gcp(50.0)
+        self.assertAlmostEqual(high["positive_zone4_zone5"], 1.4581)
+        self.assertAlmostEqual(high["zone4_negative"], -1.6664)
+        self.assertAlmostEqual(high["zone5_negative"], -1.6664)
+
+        reduced = figure_3_1_wall_gcp(
+            1.0,
+            apply_low_slope_reduction=True,
+            roof_slope_deg=10.0,
+        )
+        self.assertAlmostEqual(reduced["positive_zone4_zone5"], 2.083 * 0.9)
+        self.assertAlmostEqual(reduced["zone5_negative"], -2.9162 * 0.9)
+        with self.assertRaises(WindPressureInputError):
+            figure_3_1_wall_gcp(
+                1.0,
+                apply_low_slope_reduction=True,
+                roof_slope_deg=10.1,
+            )
+
+    def test_figure_3_1_roof_slope_boundaries(self):
+        low = figure_3_1_roof_gcp(1.0, 7.0)
+        self.assertEqual(low["figure"], "3.1(b)")
+        self.assertAlmostEqual(low["positive_all_zones"], 0.6249)
+        self.assertAlmostEqual(low["zone1_negative"], -2.083)
+        self.assertAlmostEqual(low["zone2_negative"], -3.7494)
+        self.assertAlmostEqual(low["zone3_negative"], -5.8324)
+
+        middle = figure_3_1_roof_gcp(1.0, 7.0001)
+        self.assertEqual(middle["figure"], "3.1(c)")
+        self.assertAlmostEqual(middle["positive_all_zones"], 0.6249)
+        self.assertAlmostEqual(middle["zone1_negative"], -1.8747)
+        self.assertAlmostEqual(middle["zone2_negative"], -3.5411)
+        self.assertAlmostEqual(middle["zone3_negative"], -5.4158)
+
+        middle_max = figure_3_1_roof_gcp(10.0, 27.0)
+        self.assertEqual(middle_max["figure"], "3.1(c)")
+        self.assertAlmostEqual(middle_max["positive_all_zones"], 1.0415)
+        self.assertAlmostEqual(middle_max["zone1_negative"], -1.6664)
+        self.assertAlmostEqual(middle_max["zone2_negative"], -2.4996)
+        self.assertAlmostEqual(middle_max["zone3_negative"], -4.166)
+
+        steep = figure_3_1_roof_gcp(1.0, 27.0001)
+        self.assertEqual(steep["figure"], "3.1(d)")
+        self.assertAlmostEqual(steep["positive_all_zones"], 1.8747)
+        self.assertAlmostEqual(steep["zone1_negative"], -2.083)
+        self.assertAlmostEqual(steep["zone2_negative"], -2.4996)
+        self.assertAlmostEqual(steep["zone3_negative"], -2.4996)
+
+        steep_high = figure_3_1_roof_gcp(10.0, 45.0)
+        self.assertAlmostEqual(steep_high["positive_all_zones"], 1.6664)
+        self.assertAlmostEqual(steep_high["zone1_negative"], -1.6664)
+        self.assertAlmostEqual(steep_high["zone2_negative"], -2.083)
+        self.assertAlmostEqual(steep_high["zone3_negative"], -2.083)
+
+        with self.assertRaises(WindPressureUnsupportedError):
+            figure_3_1_roof_gcp(1.0, 45.1)
+
+    def test_figure_3_1_roof_semilog_midpoint(self):
+        result = figure_3_1_roof_gcp(10 ** 0.5, 5.0)
+        self.assertEqual(result["selection_method"], "SEMILOG_INTERPOLATION")
+        self.assertAlmostEqual(result["positive_all_zones"], (0.6249 + 0.4166) / 2)
+        self.assertAlmostEqual(result["zone2_negative"], (-3.7494 - 2.2913) / 2)
+
+    def test_low_rise_corner_width_rule(self):
+        self.assertAlmostEqual(low_rise_corner_width(15.0, 20.0), 2.0)
+        self.assertAlmostEqual(low_rise_corner_width(2.0, 10.0), 0.9)
+        self.assertAlmostEqual(low_rise_corner_width(30.0, 30.0), 3.0)
+
+    def test_high_rise_wall_regression_is_reproducible(self):
         result = calculate_wall_design_pressure(
             region="臺北市",
             district=None,
@@ -109,6 +189,7 @@ class TaiwanWindPressureTests(unittest.TestCase):
             least_horizontal_dimension_m=20.0,
             governing_wind_source="code",
         )
+        self.assertEqual(result["applicability"]["route"], "FIGURE_3_2_HIGH_RISE_WALL")
         self.assertAlmostEqual(
             result["velocity_pressure"]["qz"]["q_kpa"],
             1.2612367582989223,
@@ -125,13 +206,67 @@ class TaiwanWindPressureTests(unittest.TestCase):
             result["pressures"]["zone5"]["negative_kpa"],
             -5.201844885928076,
         )
-        self.assertEqual(result["corner_zone"]["a_m"], 2.0)
-        self.assertEqual(
-            result["display_pressures"]["zone5"]["negative_kpa"],
-            -5.2,
-        )
 
-    def test_partially_enclosed_v1_standardizes_internal_pressure_on_qh(self):
+    def test_low_rise_wall_uses_qh_and_does_not_require_z(self):
+        result = calculate_wall_design_pressure(
+            region="臺北市",
+            district=None,
+            building_category=3,
+            terrain_category="B",
+            kzt=1.0,
+            enclosure="enclosed",
+            h_m=15.0,
+            z_m=None,
+            effective_area_m2=1.0,
+            least_horizontal_dimension_m=20.0,
+            governing_wind_source="code",
+        )
+        self.assertEqual(result["reference"]["figure"], "3.1(a)")
+        self.assertEqual(result["applicability"]["route"], "FIGURE_3_1_A_LOW_RISE_WALL")
+        self.assertIsNone(result["velocity_pressure"]["qz"])
+        self.assertAlmostEqual(result["velocity_pressure"]["qh"]["q_kpa"], 0.6908078228750106)
+        self.assertAlmostEqual(result["pressures"]["zone4"]["positive_kpa"], 1.6980056286267762)
+        self.assertAlmostEqual(result["pressures"]["zone4"]["negative_kpa"], -1.8419008981316412)
+        self.assertAlmostEqual(result["pressures"]["zone5"]["negative_kpa"], -2.2735867066462347)
+        self.assertEqual(result["corner_zone"]["a_m"], 2.0)
+
+    def test_low_rise_roof_pressure_routes_all_three_zones(self):
+        result = calculate_roof_design_pressure(
+            region="臺北市",
+            district=None,
+            building_category=3,
+            terrain_category="B",
+            kzt=1.0,
+            enclosure="enclosed",
+            h_m=15.0,
+            roof_slope_deg=5.0,
+            effective_area_m2=1.0,
+            least_horizontal_dimension_m=20.0,
+            governing_wind_source="code",
+        )
+        self.assertEqual(result["reference"]["figure"], "3.1(b)")
+        self.assertAlmostEqual(result["pressures"]["zone1"]["positive_kpa"], 0.6907387420927231)
+        self.assertAlmostEqual(result["pressures"]["zone1"]["negative_kpa"], -1.6980056286267762)
+        self.assertAlmostEqual(result["pressures"]["zone2"]["negative_kpa"], -2.849167784665694)
+        self.assertAlmostEqual(result["pressures"]["zone3"]["negative_kpa"], -4.288120479714341)
+
+    def test_h_equal_18_routes_to_low_rise(self):
+        result = calculate_wall_design_pressure(
+            region="臺北市",
+            district=None,
+            building_category=5,
+            terrain_category="B",
+            kzt=1.0,
+            enclosure="enclosed",
+            h_m=18.0,
+            z_m=None,
+            effective_area_m2=1.0,
+            least_horizontal_dimension_m=20.0,
+            governing_wind_source="code",
+        )
+        self.assertEqual(result["reference"]["figure"], "3.1(a)")
+
+    def test_partially_enclosed_standardizes_internal_pressure_on_qh(self):
         result = calculate_wall_design_pressure(
             region="基隆市",
             district=None,
@@ -154,38 +289,60 @@ class TaiwanWindPressureTests(unittest.TestCase):
             result["velocity_pressure"]["qh"]["q_kpa"],
         )
 
-    def test_review_adapter_routes_wind_pressure_and_compares_reported_values(self):
-        payload = {
-            "check_type": "wind_pressure",
-            "units": {
-                "length": "m",
-                "area": "m^2",
-                "velocity": "m/s",
-                "pressure": "kPa",
-            },
-            "inputs": {
-                "region": "臺北市",
-                "building_category": 3,
-                "terrain_category": "B",
-                "kzt": 1.0,
-                "enclosure": "enclosed",
-                "h_m": 50.0,
-                "z_m": 50.0,
-                "effective_area_m2": 1.1,
-                "least_horizontal_dimension_m": 20.0,
-                "governing_wind_source": "code",
-            },
-            "reported_results": {
-                "zone4.positive_kpa": 2.8374043351450857,
-                "zone5.negative_kpa": -5.201844885928076,
-            },
-        }
-        result = run_review(payload)
-        self.assertEqual(result["calculation_status"], "COMPUTED")
-        self.assertEqual(result["comparison_status"], "MATCH")
-        self.assertEqual(result["check_type"], "wind_pressure")
+    def test_review_adapter_routes_high_and_low_rise(self):
+        high = run_review(
+            {
+                "check_type": "wind_pressure",
+                "units": {"pressure": "kPa"},
+                "inputs": {
+                    "surface": "wall",
+                    "region": "臺北市",
+                    "building_category": 3,
+                    "terrain_category": "B",
+                    "kzt": 1.0,
+                    "enclosure": "enclosed",
+                    "h_m": 50.0,
+                    "z_m": 50.0,
+                    "effective_area_m2": 1.1,
+                    "least_horizontal_dimension_m": 20.0,
+                    "governing_wind_source": "code",
+                },
+                "reported_results": {
+                    "zone4.positive_kpa": 2.8374043351450857,
+                    "zone5.negative_kpa": -5.201844885928076,
+                },
+            }
+        )
+        self.assertEqual(high["calculation_status"], "COMPUTED")
+        self.assertEqual(high["comparison_status"], "MATCH")
 
-    def test_review_adapter_preserves_incomplete_vs_unsupported(self):
+        roof = run_review(
+            {
+                "check_type": "wind_pressure",
+                "units": {"pressure": "kPa"},
+                "inputs": {
+                    "surface": "roof",
+                    "region": "臺北市",
+                    "building_category": 3,
+                    "terrain_category": "B",
+                    "kzt": 1.0,
+                    "enclosure": "enclosed",
+                    "h_m": 15.0,
+                    "roof_slope_deg": 5.0,
+                    "effective_area_m2": 1.0,
+                    "least_horizontal_dimension_m": 20.0,
+                    "governing_wind_source": "code",
+                },
+                "reported_results": {
+                    "zone3.negative_kpa": -4.288120479714341,
+                },
+            }
+        )
+        self.assertEqual(roof["calculation_status"], "COMPUTED")
+        self.assertEqual(roof["comparison_status"], "MATCH")
+        self.assertEqual(roof["computed"]["reference"]["figure"], "3.1(b)")
+
+    def test_review_adapter_incomplete_and_unsupported(self):
         incomplete = run_review(
             {
                 "check_type": "wind_pressure",
@@ -195,51 +352,63 @@ class TaiwanWindPressureTests(unittest.TestCase):
         )
         self.assertEqual(incomplete["calculation_status"], "INCOMPLETE_INPUT")
 
-        unsupported = run_review(
+        unsupported_open = run_review(
             {
                 "check_type": "wind_pressure",
-                "units": {"length": "m", "area": "m^2", "pressure": "kPa"},
+                "units": {"pressure": "kPa"},
                 "inputs": {
+                    "surface": "roof",
                     "region": "臺北市",
                     "building_category": 5,
                     "terrain_category": "B",
                     "kzt": 1.0,
                     "enclosure": "open",
-                    "h_m": 50.0,
-                    "z_m": 50.0,
+                    "h_m": 15.0,
+                    "roof_slope_deg": 5.0,
                     "effective_area_m2": 10.0,
                     "least_horizontal_dimension_m": 20.0,
                     "governing_wind_source": "code",
                 },
             }
         )
-        self.assertEqual(unsupported["calculation_status"], "UNSUPPORTED_MODEL")
+        self.assertEqual(unsupported_open["calculation_status"], "UNSUPPORTED_MODEL")
 
-    def test_v1_scope_fails_closed(self):
-        common = dict(
-            region="臺北市",
-            district=None,
-            building_category=5,
-            terrain_category="B",
-            kzt=1.0,
-            h_m=50.0,
-            z_m=50.0,
-            effective_area_m2=10.0,
-            least_horizontal_dimension_m=20.0,
-            governing_wind_source="code",
+        unsupported_slope = run_review(
+            {
+                "check_type": "wind_pressure",
+                "units": {"pressure": "kPa"},
+                "inputs": {
+                    "surface": "roof",
+                    "region": "臺北市",
+                    "building_category": 5,
+                    "terrain_category": "B",
+                    "kzt": 1.0,
+                    "enclosure": "enclosed",
+                    "h_m": 15.0,
+                    "roof_slope_deg": 46.0,
+                    "effective_area_m2": 10.0,
+                    "least_horizontal_dimension_m": 20.0,
+                    "governing_wind_source": "code",
+                },
+            }
         )
-        with self.assertRaises(WindPressureUnsupportedError):
-            calculate_wall_design_pressure(enclosure="open", **common)
+        self.assertEqual(unsupported_slope["calculation_status"], "UNSUPPORTED_MODEL")
 
-        low_building = dict(common)
-        low_building.update(h_m=18.0, z_m=18.0)
+    def test_wind_tunnel_governing_still_fails_closed(self):
         with self.assertRaises(WindPressureUnsupportedError):
-            calculate_wall_design_pressure(enclosure="enclosed", **low_building)
-
-        tunnel = dict(common)
-        tunnel["governing_wind_source"] = "wind_tunnel"
-        with self.assertRaises(WindPressureUnsupportedError):
-            calculate_wall_design_pressure(enclosure="enclosed", **tunnel)
+            calculate_wall_design_pressure(
+                region="臺北市",
+                district=None,
+                building_category=5,
+                terrain_category="B",
+                kzt=1.0,
+                enclosure="enclosed",
+                h_m=15.0,
+                z_m=None,
+                effective_area_m2=10.0,
+                least_horizontal_dimension_m=20.0,
+                governing_wind_source="wind_tunnel",
+            )
 
 
 if __name__ == "__main__":

@@ -45,7 +45,7 @@ python -m scripts.engineering_calc.review input.json
 
 這些 status 只描述**計算執行／數值比對**；不得改寫成整體工程 `PASS`。例如 visible factors 重算得到 `MISMATCH` 時，先記錄為 calculation-chain discrepancy，再查單位、遺漏係數、不同 load source、hidden multiplier 或 transcription error；在 root cause 未確認前，不得僅因 arithmetic mismatch 宣稱整體工程 `FAIL`。
 
-### 風壓（`wind_pressure`）V1 輸入契約
+### 風壓（`wind_pressure`）輸入契約
 
 此 check_type 的自然語言 intake 不由 adapter 負責；ChatGPT 應先依 wind knowledge owner 整理／追問 project facts，再送入完整結構化 payload。最低輸入為：
 
@@ -54,18 +54,22 @@ python -m scripts.engineering_calc.review input.json
 - `terrain_category`（A／B／C）
 - `kzt`
 - `enclosure`（`enclosed`／`partially_enclosed`；`open` 目前 fail closed）
-- `h_m / z_m / effective_area_m2 / least_horizontal_dimension_m`
+- `h_m / effective_area_m2 / least_horizontal_dimension_m`
+- `surface`（省略時為 `wall`；屋頂使用 `roof`）
+- `h > 18 m` 外牆另需 `z_m`
+- 低樓層屋頂另需 `roof_slope_deg`；目前支援 `0°`～`45°`
+- 低樓層外牆若要採圖 3.1(a) 註 1 的 10% 折減，需明確設定 `apply_low_slope_wall_reduction = true` 並提供 `roof_slope_deg <= 10`
 - `governing_wind_source = "code"`
 
-`units` 仍為最外層必填。V1 reference data 位於 `references/government/taiwan-wind-code-103-v1.json`；kernel 自動解析 `V10(C) / I / α / zg / GCpi`，並計算 `K(z) / K(h) / q(z) / q(h) / a / GCp`。部分封閉式建築物之正內風壓速度壓，V1 明確採 2.2 節允許的 `q(h)`，不在缺少開口高度時猜測 `zh0`。
+`units` 仍為最外層必填。reference data 位於 `references/government/taiwan-wind-code-103-v2.json`；kernel 自動解析 `V10(C) / I / α / zg / GCpi`，並計算 `K(z) / K(h) / q(z) / q(h) / a / GCp`。部分封閉式建築物之正內風壓速度壓，V1 明確採 2.2 節允許的 `q(h)`，不在缺少開口高度時猜測 `zh0`。
 
 可比較的 reported key 包括：
 
-- `zone4.positive_kpa / zone4.negative_kpa`
-- `zone5.positive_kpa / zone5.negative_kpa`
-- `qz_kpa / qh_kpa / corner_a_m`
+- 外牆：`zone4.positive_kpa / zone4.negative_kpa`、`zone5.positive_kpa / zone5.negative_kpa`
+- 低樓層屋頂：`zone1.* / zone2.* / zone3.*`
+- 共通：`qh_kpa / corner_a_m`；`h > 18 m` 外牆另有 `qz_kpa`
 
-超出 V1 applicability 時回 `UNSUPPORTED_MODEL`；必要 project facts／行政區資料不足時回 `INCOMPLETE_INPUT`。這些 execution status 不代表整體耐風設計 PASS／FAIL。
+超出 admitted applicability（例如開放式、風洞 governing、`h > 18 m` 屋頂或 `roof_slope_deg > 45`）時回 `UNSUPPORTED_MODEL`；必要 project facts／行政區資料不足時回 `INCOMPLETE_INPUT`。這些 execution status 不代表整體耐風設計 PASS／FAIL。
 
 ### 回答中的執行證據
 
@@ -100,7 +104,7 @@ python -m scripts.engineering_calc.review input.json
 - `fastener_group.py`：平面扣件群彈性分配核算。
 - `connection.py`：需求／容量比、bearing、shear/tension 與 thread-engagement arithmetic helper。
 - `audit.py`：乘積鏈與靜力 force balance reconciliation。
-- `wind_pressure.py`：103 年修正版《建築物耐風設計規範及解說》V1 外牆風壓 deterministic kernel；目前只支援 `h > 18 m`、封閉式／部分封閉式、圖 3.2 Zone 4／5。
+- `wind_pressure.py`：103 年修正版《建築物耐風設計規範及解說》風壓 deterministic kernel；支援 `h > 18 m` 外牆圖 3.2 Zone 4／5，以及 `h <= 18 m` 外牆圖 3.1(a) 與屋頂圖 3.1(b)～(d) Zone 1／2／3。
 - `review.py`：AI-facing JSON adapter，統一 invocation、execution status、reported comparison 與 review flags。
 
 對應 deterministic tests 位於 `tests/engineering_calc/`，並由 repository CI 執行。

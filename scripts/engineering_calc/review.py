@@ -18,6 +18,7 @@ from .audit import audit_product, audit_force_balance
 from .wind_pressure import (
     WindPressureInputError,
     WindPressureUnsupportedError,
+    calculate_roof_design_pressure,
     calculate_wall_design_pressure,
 )
 
@@ -105,35 +106,68 @@ def _wind_pressure(p, inp):
         raise IncompleteInputError("inputs.building_category is required")
     values["building_category"] = inp["building_category"]
     values["district"] = inp.get("district")
+    surface = str(inp.get("surface", "wall")).strip().lower()
+    if surface not in {"wall", "roof"}:
+        raise IncompleteInputError("inputs.surface must be wall or roof")
 
+    h_m = _num(inp, "h_m")
     try:
-        computed = calculate_wall_design_pressure(
-            region=values["region"],
-            district=values["district"],
-            building_category=values["building_category"],
-            terrain_category=values["terrain_category"],
-            kzt=_num(inp, "kzt"),
-            enclosure=values["enclosure"],
-            h_m=_num(inp, "h_m"),
-            z_m=_num(inp, "z_m"),
-            effective_area_m2=_num(inp, "effective_area_m2"),
-            least_horizontal_dimension_m=_num(inp, "least_horizontal_dimension_m"),
-            governing_wind_source=values["governing_wind_source"],
-        )
+        if surface == "roof":
+            computed = calculate_roof_design_pressure(
+                region=values["region"],
+                district=values["district"],
+                building_category=values["building_category"],
+                terrain_category=values["terrain_category"],
+                kzt=_num(inp, "kzt"),
+                enclosure=values["enclosure"],
+                h_m=h_m,
+                roof_slope_deg=_num(inp, "roof_slope_deg"),
+                effective_area_m2=_num(inp, "effective_area_m2"),
+                least_horizontal_dimension_m=_num(inp, "least_horizontal_dimension_m"),
+                governing_wind_source=values["governing_wind_source"],
+            )
+        else:
+            z_value = None
+            if "z_m" in inp and inp.get("z_m") is not None:
+                z_value = _num(inp, "z_m")
+            apply_reduction = inp.get("apply_low_slope_wall_reduction", False)
+            if not isinstance(apply_reduction, bool):
+                raise IncompleteInputError(
+                    "inputs.apply_low_slope_wall_reduction must be boolean"
+                )
+            roof_slope = None
+            if "roof_slope_deg" in inp and inp.get("roof_slope_deg") is not None:
+                roof_slope = _num(inp, "roof_slope_deg")
+            computed = calculate_wall_design_pressure(
+                region=values["region"],
+                district=values["district"],
+                building_category=values["building_category"],
+                terrain_category=values["terrain_category"],
+                kzt=_num(inp, "kzt"),
+                enclosure=values["enclosure"],
+                h_m=h_m,
+                z_m=z_value,
+                effective_area_m2=_num(inp, "effective_area_m2"),
+                least_horizontal_dimension_m=_num(inp, "least_horizontal_dimension_m"),
+                governing_wind_source=values["governing_wind_source"],
+                roof_slope_deg=roof_slope,
+                apply_low_slope_wall_reduction=apply_reduction,
+            )
     except WindPressureUnsupportedError as exc:
         raise UnsupportedModelError(str(exc)) from exc
     except WindPressureInputError as exc:
         raise IncompleteInputError(str(exc)) from exc
 
     flat = {
-        "zone4.positive_kpa": computed["pressures"]["zone4"]["positive_kpa"],
-        "zone4.negative_kpa": computed["pressures"]["zone4"]["negative_kpa"],
-        "zone5.positive_kpa": computed["pressures"]["zone5"]["positive_kpa"],
-        "zone5.negative_kpa": computed["pressures"]["zone5"]["negative_kpa"],
-        "qz_kpa": computed["velocity_pressure"]["qz"]["q_kpa"],
         "qh_kpa": computed["velocity_pressure"]["qh"]["q_kpa"],
         "corner_a_m": computed["corner_zone"]["a_m"],
     }
+    qz = computed["velocity_pressure"].get("qz")
+    if qz is not None:
+        flat["qz_kpa"] = qz["q_kpa"]
+    for zone, pressures in computed["pressures"].items():
+        flat[f"{zone}.positive_kpa"] = pressures["positive_kpa"]
+        flat[f"{zone}.negative_kpa"] = pressures["negative_kpa"]
     return _final(p, "wind_pressure", computed, flat)
 
 def _simple(p,inp,check):

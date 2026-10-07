@@ -71,7 +71,7 @@ canonical_owner: true
 
 > 本頁提供 workflow 與 authority routing，不取代正式耐風計算書或專案風洞報告。
 
-## 外牆設計風壓 V1 deterministic capability
+## 局部構材與外部被覆物設計風壓 deterministic capability
 
 本知識庫已定義第一版可執行外牆設計風壓能力，目的不是要求使用者先知道規範參數，而是讓 ChatGPT 先整理 project facts，再由可追溯的 machine-readable 規範資料與 deterministic kernel 完成計算。
 
@@ -100,33 +100,39 @@ canonical_owner: true
 
 ### 第一版（V1）適用範圍
 
-目前 `wind_pressure` V1 只支援：
+目前 `wind_pressure` 支援：
 
 - 103 年修正版《建築物耐風設計規範及解說》
-- 外牆之局部構材與外部被覆物
-- `h > 18 m`
 - 封閉式或部分封閉式建築物
-- 圖 3.2 牆面 Zone 4／Zone 5
-- 依有效受風面積作對數軸內插
+- `h > 18 m` 外牆：圖 3.2 Zone 4／Zone 5
+- `h <= 18 m` 外牆：圖 3.1(a) Zone 4／Zone 5
+- `h <= 18 m` 雙斜／四斜屋頂：圖 3.1(b)～(d) Zone 1／Zone 2／Zone 3，`0° <= θ <= 45°`
+- 依有效受風面積在圖示平台間作對數軸內插
 - 規範法（`governing_wind_source = code`）
+
+低樓層圖 3.1 的角隅寬度採：
+
+`a = max(min(0.4h, 0.1B), 0.9m, 0.04B)`
+
+圖 3.1(a) 註 1 對 `θ <= 10°` 牆面外風壓係數允許降低 10%；kernel **不自動套用**，只有使用者／design basis明確指定時才以 `apply_low_slope_wall_reduction = true` 採用。
 
 目前不支援並應 fail closed：
 
-- `h <= 18 m`
-- 開放式建築物（不得只把 `GCpi=0` 後繼續套圖 3.2）
+- 開放式建築物（不得只把 `GCpi=0` 後繼續套圖 3.1／3.2）
 - 已由正式風洞結果 governing 的案件
-- 圖 3.2 以外的屋頂、其他幾何或其他 provision
+- `h > 18 m` 的屋頂局部構材／外部被覆物
+- `θ > 45°` 或圖 3.1／3.2 以外的其他幾何／provision
 - 需要超出目前 admitted reference dataset 的行政區／係數或規範版本
 
 ### 公式與 reference ownership
 
 machine-readable 規範資料由：
 
-`references/government/taiwan-wind-code-103-v1.json`
+`references/government/taiwan-wind-code-103-v2.json`
 
 保存。它只收錄本 V1 真正會執行的 103 年規範資料、來源與適用界線；外部網站計算器只可作 reference-only cross-check，不得成為 canonical engineering truth。
 
-V1 的風速壓採 2.6 節：
+風速壓採 2.6 節：
 
 `q(z) = 0.06 K(z) Kzt [I V10(C)]²`
 
@@ -136,7 +142,9 @@ V1 的風速壓採 2.6 節：
 
 且 `z <= 5 m` 時依規範採 5 m 計算。
 
-對部分封閉式建築物的正內風壓，2.2 節允許內風速壓採 `q(zh0)` 或 `q(h)`。為使 V1 deterministic 且不在缺少開口高度時猜測，V1 明確固定採規範允許的 `q(h)`；若未來要支援 `q(zh0)`，必須另行擴充 input contract 與 regression。
+對部分封閉式建築物的正內風壓，2.2 節允許內風速壓採 `q(zh0)` 或 `q(h)`。為使 deterministic kernel 不在缺少開口高度時猜測，目前明確固定採規範允許的 `q(h)`；若未來要支援 `q(zh0)`，必須另行擴充 input contract 與 regression。
+
+圖 3.1(a)～(d) 的 machine transcription 以正式圖表為 governing authority，並用規範解說所載「台灣 `GCp = ASCE 7-02 GCp × 2.083`」交叉驗證控制點。低樓層外牆的面積平台為 1～50 m²；低樓層屋頂為 1～10 m²，中間在 `log10(A)` 軸線性內插。第三方 calculator 不參與 canonical coefficient admission。
 
 圖 3.2 的牆面 `GCp` 以圖中 2 m² 與 50 m² 平台為 anchor，中間依圖的對數面積軸做線性內插；圖 3.2 解說採 ASCE 7-02 `GCp × 2.083` 的換算。角隅區：
 
