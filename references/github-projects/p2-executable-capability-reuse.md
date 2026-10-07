@@ -95,7 +95,7 @@ Temporary non-merge probe：
 - observation：project宣稱已用 ISO 10211 test cases驗證，且含 declarative geometry／adaptive mesh／temperature與Ψ/fRsi outputs。
 - boundary：不直接 copy、vendor或改寫其 implementation；只作 architecture/reuse landscape evidence。
 
-## Production kernel admission 邊界
+## 正式 kernel 納入邊界（Production kernel admission boundary）
 
 下一個 Hot 可以開始 production kernel，但必須維持下列 boundary：
 
