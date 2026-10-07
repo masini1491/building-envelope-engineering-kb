@@ -5,7 +5,7 @@ verified_at: "2026-10-07"
 document_type: "reuse-admission"
 ---
 
-# P2 可執行能力 reuse 與 authority admission
+# 可執行能力 reuse 與 authority admission（P2）
 
 ## 範圍
 
@@ -19,11 +19,11 @@ document_type: "reuse-admission"
 
 ## 鋁構件強度
 
-### Authority
+### 權威來源（Authority）
 
 The Aluminum Association 目前公開 bookstore／standards surface 仍列 **Aluminum Design Manual 2020**。官方發布資訊說明此版包含 structural-component strength、buckling、weld-affected strengths、concentrated-force provisions 與 screw-chase pull-out 等更新。
 
-### Admission 結果
+### 納入判定（Admission）
 
 `BLOCKED_EXACT_STANDARD_KERNEL`
 
@@ -31,11 +31,11 @@ The Aluminum Association 目前公開 bookstore／standards surface 仍列 **Alu
 
 ## 自攻螺絲連接容量
 
-### Authority
+### 權威來源（Authority）
 
 FGIA store 在 2026-10-07 read-back 仍把 **AAMA TIR-A9-14 — Design Guide for Metal Cladding Fasteners** 標示為 Active，並列出 2015 errata 與 2020 addendum。其公開描述明確涵蓋 metal curtain wall framing members/components 的 fastener selection。
 
-### Admission 結果
+### 納入判定（Admission）
 
 `BLOCKED_EXACT_STANDARD_KERNEL`
 
@@ -43,11 +43,11 @@ FGIA store 在 2026-10-07 read-back 仍把 **AAMA TIR-A9-14 — Design Guide for
 
 ## 二維熱橋 solver
 
-### Current standard
+### 現行標準（Current standard）
 
 ISO 官方頁面確認 **ISO 10211:2017, Edition 2** 仍為 current；其 scope 包括 2D／3D thermal-bridge numerical models、heat flows、surface temperatures、boundary conditions與 thermal properties。
 
-### Public benchmark evidence
+### 公開 benchmark 證據
 
 COMSOL 公開 application documentation重現 ISO 10211:2017 的 2D validation cases：
 
@@ -56,9 +56,9 @@ COMSOL 公開 application documentation重現 ISO 10211:2017 的 2D validation c
 
 這些公開 reproduction可作 independent regression evidence，但不能因此宣稱本 repo 已取得或可重製 ISO 10211 全文。
 
-### Reuse candidates
+### 可重用候選
 
-#### kinnala/scikit-fem
+#### 有限元素 backend 候選：kinnala/scikit-fem
 
 - disposition：`ADAPT_CANDIDATE`
 - reviewed revision：`53d7555ec355477e3b88f6397e206979b689d14c`
@@ -68,7 +68,7 @@ COMSOL 公開 application documentation重現 ISO 10211:2017 的 2D validation c
 - capability：triangular／quadrilateral FEM assembly、sparse systems、boundary DOFs與post-processing primitives
 - adoption boundary：可作 numerical backend；本 repo 自己擁有 thermal-bridge input/output contract、material/boundary provenance與validation semantics。不得把 scikit-fem examples 當 ISO authority。
 
-#### schoenenbach/thermal-bridge
+#### 熱橋應用參考：schoenenbach/thermal-bridge
 
 - disposition：`REFERENCE_ONLY`
 - license：AGPLv3
@@ -87,7 +87,7 @@ COMSOL 公開 application documentation重現 ISO 10211:2017 的 2D validation c
 
 在以上 gate 關閉前，不建立 Ψ-value compliance、condensation acceptance、DXF importer、3D solver或 UI。
 
-## Sources
+## 來源（Sources）
 
 - The Aluminum Association, Aluminum Design Manual 2020: https://www.aluminum.org/aluminum-design-manual-2020
 - The Aluminum Association, Aluminum Structures FAQ: https://www.aluminum.org/sites/default/files/2021-09/DesigningAluminumStructuresFAQs20201012_0.pdf
