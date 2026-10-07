@@ -34,7 +34,7 @@ python -m scripts.engineering_calc.review input.json
 
 最外層固定使用 `check_type / units / inputs / reported_results / tolerance`。`units` 必填且不得猜測；`reported_results` 可省略；`tolerance` 只代表 numerical agreement，不是 engineering acceptance criterion。
 
-目前 adapter 支援：`beam`、`required_inertia`、`required_section_modulus`、`section_property_utilization`、`fastener_group`、`demand_capacity`、`projected_bearing_stress`、`shear_tension_demand`、`thread_engagement`、`audit_product`、`audit_force_balance`、`wind_pressure`。
+目前 adapter 支援：`beam`、`required_inertia`、`required_section_modulus`、`section_property_utilization`、`fastener_group`、`demand_capacity`、`projected_bearing_stress`、`shear_tension_demand`、`thread_engagement`、`audit_product`、`audit_force_balance`、`wind_pressure`。`thermal_bridge_2d.py` 在目前 Stage **尚未接入 `review.py`**；若需要直接使用，屬明確的 lower-level `ADAPTER_FALLBACK`，不得描述成已支援的 AI-facing `check_type`。
 
 ### 輸出契約
 
@@ -94,6 +94,7 @@ python -m scripts.engineering_calc.review input.json
 - `connection.py` 的 capacity 必須由可追溯的規範、產品資料或專案條件明確提供；工具不內建 universal fastener capacity。
 - `beam.py` 不推論支承、splice rigidity 或 semi-rigid behavior；boundary condition 不明時，ChatGPT 應把 structural model 視為 `INCOMPLETE`。
 - local calculation result 不得直接升格成 overall structural PASS。
+- `thermal_bridge_2d.py` 的材料導熱係數、mesh 與 boundary condition 都必須由 caller／project provenance 提供；kernel 不內建材料表、不猜 indoor/outdoor surface resistance。其 `NUMERICAL_BACKEND_ONLY` 輸出與 Case 1／Case 2 regression PASS 都不得升格成完整 ISO 10211 compliance。
 
 ## 目前模組
 
@@ -106,9 +107,10 @@ python -m scripts.engineering_calc.review input.json
 - `connection.py`：需求／容量比、bearing、shear/tension 與 thread-engagement arithmetic helper。
 - `audit.py`：乘積鏈與靜力 force balance reconciliation。
 - `wind_pressure.py`：103 年修正版《建築物耐風設計規範及解說》風壓 deterministic kernel；支援 `h > 18 m` 外牆圖 3.2 Zone 4／5，以及 `h <= 18 m` 外牆圖 3.1(a) 與屋頂圖 3.1(b)～(d) Zone 1／2／3。
+- `thermal_bridge_2d.py`：二維 steady-state 熱傳 numerical kernel；接受 caller 已離散的 triangular mesh、逐 element 導熱係數、顯式 fixed-temperature nodes 與 surface-resistance exterior edges。它只回傳 node temperature 與指定 surface-resistance boundary heat flow，不建立 Ψ-value／fRsi／結露或 ISO 10211 project compliance 判定。
 - `review.py`：AI-facing JSON adapter，統一 invocation、execution status、reported comparison 與 review flags。
 
-對應 deterministic tests 位於 `tests/engineering_calc/`，並由 repository CI 執行。
+一般 deterministic tests 位於 `tests/engineering_calc/`。熱橋 numerical regression 位於 `tests/thermal_bridge/`，只由獨立 CI job 安裝 `requirements/thermal-bridge.txt` 後執行；因此 optional thermal backend 不會擴大既有 repository validation job 的 dependency failure domain。
 
 ## 多跨梁核算使用原則
 

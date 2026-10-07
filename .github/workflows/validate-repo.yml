@@ -41,3 +41,22 @@ jobs:
 
       - name: 執行 repository 驗證
         run: python scripts/validate_repo.py
+
+
+  thermal_backend:
+    name: 驗證二維熱橋數值 backend
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 設定 Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: 安裝熱傳數值 dependency
+        run: python -m pip install --disable-pip-version-check -r requirements/thermal-bridge.txt
+
+      - name: 執行二維熱橋 regression
+        run: python -m unittest discover -s tests/thermal_bridge -p "test_*.py"
