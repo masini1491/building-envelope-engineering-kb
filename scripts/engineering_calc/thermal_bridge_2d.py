@@ -133,9 +133,14 @@ def solve_steady_state_2d(
     fixed_temperature_boundaries: Sequence[FixedTemperatureBoundary] = (),
     surface_resistance_boundaries: Sequence[SurfaceResistanceBoundary] = (),
 ) -> ThermalBridge2DResult:
-    """Solve one connected conforming triangular 2D steady-state conduction model.
+    """Solve one edge-connected triangular 2D steady-state conduction model.
 
-    Parameters are caller-confirmed numerical facts:
+    Parameters are caller-confirmed numerical facts. The kernel validates
+    connectivity, element degeneracy, duplicate/orphan vertices, manifold edge
+    incidence, and explicit boundary references. Geometric conformity beyond
+    those checks (for example no overlapping elements or T-junctions) remains a
+    caller/mesh-generator responsibility:
+
     - ``points_m``: N x 2 node coordinates in metres.
     - ``triangles``: M x 3 zero-based node indices.
     - ``conductivity_w_mk``: one finite positive conductivity per triangle.
