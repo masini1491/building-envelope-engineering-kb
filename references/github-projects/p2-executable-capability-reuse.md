@@ -51,22 +51,42 @@ ISO 官方頁面確認 **ISO 10211:2017, Edition 2** 仍為 current；其 scope 
 
 COMSOL 公開 application documentation重現 ISO 10211:2017 的 2D validation cases：
 
-- Case 1：half-square homogeneous conduction，28 個 evaluation points，公開說明 acceptance difference為 0.1 °C。
-- Case 2：heterogeneous concrete／wood／insulation／aluminum cross-section，公開 geometry dimensions、conductivities、surface resistances、expected total heat flow與 evaluation-point temperatures；公開說明 temperature與heat-flow validation tolerances。
+- Case 1：half-square homogeneous conduction，28 個 evaluation points，公開 acceptance difference為 0.1 °C。
+- Case 2：heterogeneous concrete／wood／insulation／aluminum cross-section，公開 geometry dimensions、conductivities、surface resistances、expected total heat flow與 evaluation-point temperatures；公開 temperature tolerance 0.1 °C、heat-flow tolerance 0.1%。
 
-這些公開 reproduction可作 independent regression evidence，但不能因此宣稱本 repo 已取得或可重製 ISO 10211 全文。
+這些公開 reproduction可作 independent numerical-backend regression evidence，但不能因此宣稱本 repo 已取得或可重製 ISO 10211 全文，也不能把兩個 2D benchmark PASS 升格成完整 ISO 10211 project compliance。
 
 ### 可重用候選
 
-#### 有限元素 backend 候選：kinnala/scikit-fem
+#### 有限元素 backend：kinnala/scikit-fem
 
-- disposition：`ADAPT_CANDIDATE`
-- reviewed revision：`53d7555ec355477e3b88f6397e206979b689d14c`
+- disposition：`ADAPT_CANDIDATE / BENCHMARK_VERIFIED`
+- reviewed upstream head：`53d7555ec355477e3b88f6397e206979b689d14c`
+- probe package：`scikit-fem==12.0.2`
+- package tag revision：`a9c43abbc3b17c36a059132c9f571447b755920e`
 - license：BSD-3-Clause
 - runtime：Python 3.10+
 - minimal dependencies：NumPy、SciPy
-- capability：triangular／quadrilateral FEM assembly、sparse systems、boundary DOFs與post-processing primitives
-- adoption boundary：可作 numerical backend；本 repo 自己擁有 thermal-bridge input/output contract、material/boundary provenance與validation semantics。不得把 scikit-fem examples 當 ISO authority。
+- capability：triangular／quadrilateral FEM assembly、sparse systems、boundary DOFs與 post-processing primitives
+- adoption boundary：可作 numerical backend；本 repo 自己擁有 thermal-bridge input/output contract、material/boundary provenance與 validation semantics。不得把 scikit-fem examples 當 ISO authority。
+
+#### 熱傳 backend probe evidence
+
+Temporary non-merge probe：
+
+- PR：`#8`
+- branch：`chatgpt/p2-thermal-backend-probe`
+- probe commit：`082b4e16641a1ffe115aa0e4757da752bec6ff2a`
+- GitHub Actions run：`37589368465`（run 253）
+- tested environment：Ubuntu runner、Python 3.12、`numpy==2.5.3`、`scipy==1.18.1`、`scikit-fem==12.0.2`
+- repository engineering tests：44 tests PASS
+- Case 1：最大 evaluation-point temperature error = `0.0477770670 °C`，小於等於 0.1 °C
+- Case 2：最大 evaluation-point temperature error = `0.0387100955 °C`，小於等於 0.1 °C
+- Case 2：total heat flow = `9.4926417761 W/m`；相對於 9.5 W/m 的 relative error = `0.0007745499`（約 0.07745%），小於等於 0.1%
+- probe workflow conclusion：`SUCCESS`
+- PR disposition：`CLOSED / NOT MERGED`
+
+這組 evidence 足以 admission「scikit-fem 12.0.2 可作目前 2D steady-state numerical backend 候選」；它不 admission production API、永久 dependency、Ψ-value/fRsi、condensation criterion、3D solver或任何 project-specific ISO compliance claim。
 
 #### 熱橋應用參考：schoenenbach/thermal-bridge
 
@@ -75,17 +95,30 @@ COMSOL 公開 application documentation重現 ISO 10211:2017 的 2D validation c
 - observation：project宣稱已用 ISO 10211 test cases驗證，且含 declarative geometry／adaptive mesh／temperature與Ψ/fRsi outputs。
 - boundary：不直接 copy、vendor或改寫其 implementation；只作 architecture/reuse landscape evidence。
 
+## 正式 kernel 納入邊界（Production kernel admission boundary）
+
+下一個 Hot 可以開始 production kernel，但必須維持下列 boundary：
+
+- numerical backend 採 scikit-fem adapter/reuse，不自行重寫 FEM engine；
+- production kernel只接受 caller 已離散完成的 2D mesh與 project-supplied material/boundary facts，不把 CAD importer、material catalog或 geometry authoring混入 solver owner；
+- material conductivity保持 caller/project provenance；solver不得自行補 catalog value；
+- thermal boundary condition必須顯式提供；不得由場景名稱猜 indoor/outdoor surface resistance；
+- dependency應隔離於 thermal capability；缺 backend 時 fail closed，不得退回模型手算或未驗證自製 solver；
+- output只可宣稱 numerical result與實際 validation scope；Case 1／Case 2 regression PASS 不等於完整 ISO 10211 compliance；
+- benchmark regression應保留 temperature與 heat-flow兩種 evidence，避免只驗單一輸出；
+- production adapter尚未 admission前，不接 `review.py`／自然語言入口。
+
 ## 下一個 Hot gate
 
-先完成 **solver reuse + benchmark admission**，再決定是否新增 production dependency／kernel。至少要回答：
+進入 **2D thermal production kernel contract／implementation**，先固定：
 
-- dependency pinning與CI是否可接受；
-- Case 1／Case 2 是否可在本 repo 的 proposed contract 下可重現；
-- material conductivity與boundary condition如何保持 project-supplied provenance；
-- numerical-method PASS 如何與 project-specific ISO compliance 分開；
-- 若只完成2D cases，輸出必須明確標示其 validation coverage，不得宣稱完整 3D high-precision method。
+1. isolated dependency pinning與 CI placement；
+2. triangle mesh／per-element conductivity／boundary-condition input schema；
+3. temperature field／selected boundary heat-flow／backend provenance／validation-scope output；
+4. invalid mesh、non-finite／non-positive conductivity、boundary conflict、missing backend 的 fail-closed semantics；
+5. Case 1／Case 2 永久 regression如何由 generic production kernel重現，而不是把 benchmark geometry寫死進 kernel。
 
-在以上 gate 關閉前，不建立 Ψ-value compliance、condensation acceptance、DXF importer、3D solver或 UI。
+STOP boundary仍為：不建立 Ψ-value project compliance、condensation acceptance criterion、material catalog、DXF importer、3D solver、UI或自然語言 adapter。
 
 ## 來源（Sources）
 
