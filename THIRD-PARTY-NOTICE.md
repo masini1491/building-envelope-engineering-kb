@@ -26,6 +26,17 @@
 
 例如 repository 自行整理「ASTM E330 可作為 uniform static air pressure 結構性能試驗的 routing reference」這類工程說明，可屬於 repository 的原創 commentary；但 ASTM 標準原文仍是第三方作品。
 
+
+## 可選數值 backend dependency
+
+二維熱橋 numerical kernel 透過獨立 optional dependency set 使用下列第三方 Python 套件；repository 不 vendor 其原始碼：
+
+- `NumPy 2.5.3` — BSD 3-Clause-style license；copyright 依 upstream `LICENSE.txt`。
+- `SciPy 1.18.1` — BSD 3-Clause-style license；copyright 依 upstream `LICENSE.txt`。
+- `scikit-fem 12.0.2` — BSD-3-Clause；copyright 2018–26 scikit-fem developers。
+
+這些套件只作 numerical backend／scientific-computing dependency；其授權不改變本 repository 自有 code/document 的授權，也不代表 NumPy、SciPy 或 scikit-fem 對本 repository 的 endorsement。
+
 ## 商標
 
 ASTM、ISO、CNS、AAMA、FGIA 及製造商名稱等名稱與標誌，只用於識別與引用。除非相關權利人明確表示，否則不代表 sponsorship、endorsement、affiliation 或 ownership。
