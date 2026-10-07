@@ -268,6 +268,50 @@ class ThermalBridge2DTests(unittest.TestCase):
                 ],
             )
 
+    def test_rejects_duplicate_mesh_vertices(self):
+        points = [
+            (0.0, 0.0),
+            (1.0, 0.0),
+            (0.0, 1.0),
+            (0.0, 1.0),
+        ]
+        with self.assertRaises(ThermalBridgeInputError):
+            solve_steady_state_2d(
+                points_m=points,
+                triangles=[(0, 1, 2), (0, 1, 3)],
+                conductivity_w_mk=[1.0, 1.0],
+                fixed_temperature_boundaries=[
+                    FixedTemperatureBoundary("anchor", [0, 1], 0.0)
+                ],
+            )
+
+    def test_rejects_unreferenced_mesh_vertex(self):
+        with self.assertRaises(ThermalBridgeInputError):
+            solve_steady_state_2d(
+                points_m=[
+                    (0.0, 0.0),
+                    (1.0, 0.0),
+                    (0.0, 1.0),
+                    (2.0, 2.0),
+                ],
+                triangles=[(0, 1, 2)],
+                conductivity_w_mk=[1.0],
+                fixed_temperature_boundaries=[
+                    FixedTemperatureBoundary("anchor", [0, 1], 0.0)
+                ],
+            )
+
+    def test_rejects_malformed_surface_edge(self):
+        with self.assertRaises(ThermalBridgeInputError):
+            solve_steady_state_2d(
+                points_m=[(0.0, 0.0), (1.0, 0.0), (0.0, 1.0)],
+                triangles=[(0, 1, 2)],
+                conductivity_w_mk=[1.0],
+                surface_resistance_boundaries=[
+                    SurfaceResistanceBoundary("bad", [0], 20.0, 0.11)
+                ],
+            )
+
     def test_backend_unavailable_is_explicit(self):
         with patch(
             "scripts.engineering_calc.thermal_bridge_2d._load_backend",
