@@ -95,30 +95,33 @@ Temporary non-merge probe：
 - observation：project宣稱已用 ISO 10211 test cases驗證，且含 declarative geometry／adaptive mesh／temperature與Ψ/fRsi outputs。
 - boundary：不直接 copy、vendor或改寫其 implementation；只作 architecture/reuse landscape evidence。
 
-## 正式 kernel 納入邊界（Production kernel admission boundary）
+## Production kernel admission 結果
 
-下一個 Hot 可以開始 production kernel，但必須維持下列 boundary：
+Disposition：`ADMITTED / NUMERICAL_BACKEND_ONLY`
 
-- numerical backend 採 scikit-fem adapter/reuse，不自行重寫 FEM engine；
-- production kernel只接受 caller 已離散完成的 2D mesh與 project-supplied material/boundary facts，不把 CAD importer、material catalog或 geometry authoring混入 solver owner；
-- material conductivity保持 caller/project provenance；solver不得自行補 catalog value；
-- thermal boundary condition必須顯式提供；不得由場景名稱猜 indoor/outdoor surface resistance；
-- dependency應隔離於 thermal capability；缺 backend 時 fail closed，不得退回模型手算或未驗證自製 solver；
-- output只可宣稱 numerical result與實際 validation scope；Case 1／Case 2 regression PASS 不等於完整 ISO 10211 compliance；
-- benchmark regression應保留 temperature與 heat-flow兩種 evidence，避免只驗單一輸出；
-- production adapter尚未 admission前，不接 `review.py`／自然語言入口。
+2D steady-state thermal production kernel 已完成 admission：
 
-## 下一個 Hot gate
+- implementation PR：`#10`
+- implementation candidate head：`e28455022529b0195f2300df368e97d3f39fd4a9`
+- merge commit：`a771828cbdb6701d6e0c4e99ac0c36c2bab2a259`
+- exact-candidate Actions run：`37603659019`（SUCCESS）
+- merge 後 main Actions run：`37603923108`（SUCCESS）
+- optional backend pins：`numpy==2.5.3`、`scipy==1.18.1`、`scikit-fem==12.0.2`
+- production owner：`scripts/engineering_calc/thermal_bridge_2d.py`
+- permanent regression：`tests/thermal_bridge/test_thermal_bridge_2d.py`
 
-進入 **2D thermal production kernel contract／implementation**，先固定：
+Production contract 已固定為：
 
-1. isolated dependency pinning與 CI placement；
-2. triangle mesh／per-element conductivity／boundary-condition input schema；
-3. temperature field／selected boundary heat-flow／backend provenance／validation-scope output；
-4. invalid mesh、non-finite／non-positive conductivity、boundary conflict、missing backend 的 fail-closed semantics；
-5. Case 1／Case 2 永久 regression如何由 generic production kernel重現，而不是把 benchmark geometry寫死進 kernel。
+- caller 提供已離散的 2D triangular mesh、逐 element conductivity 與顯式 thermal boundary conditions；
+- output 提供 node temperature field、指定 surface-resistance boundary heat flow、實際 backend identity/version、validation scope；
+- backend unavailable、index／退化元素／edge-connectivity／manifold edge、duplicate／orphan vertices、non-finite／non-positive conductivity、boundary conflict與其他已宣告 contract violation均 fail closed；
+- 任意 caller mesh 的完整 computational-geometry conformity（例如 overlapping elements 或 T-junction）仍屬 caller／mesh-generator provenance，kernel 不宣稱已全面驗證；
+- public ISO 10211:2017 Case 1／Case 2 由 generic production kernel 永久 regression 重現；
+- `NUMERICAL_BACKEND_ONLY` 不等於 project-specific ISO 10211 compliance。
 
-STOP boundary仍為：不建立 Ψ-value project compliance、condensation acceptance criterion、material catalog、DXF importer、3D solver、UI或自然語言 adapter。
+STOP boundary 維持不變：目前不接 `review.py`／自然語言 adapter，不建立 Ψ-value／fRsi／condensation acceptance、material catalog、DXF importer、3D solver或 UI。
+
+C2 已完成後，不自動 promote 其他 Cold 項目；後續工作需重新依 current evidence、使用者選擇與 repository authority 決定。
 
 ## 來源（Sources）
 
