@@ -5,7 +5,7 @@
   "verification_status": "VERIFIED_PRIMARY",
   "verified_at": "2026-10-07",
   "authority": "Taiwan Ministry of the Interior / National Land Management Agency",
-  "scope": "Wind V2 plus bounded high-rise roof: h > 18 m Figure 3.2 Zone 1/2 suction with explicitly verified all-sides parapet > 0.9 m permitting Zone 3 as Zone 2; for roof slope > 10 degrees Figure 3.2 note 5 routes to Figure 3.1(c)/(d). General Figure 3.2 direct Zone 3 and positive roof GCp remain outside the admitted low-slope scope.",
+  "scope": "Wind V2 high-rise roof Figure 3.2 Zone 1/2 suction with official engineering example formulaized values and direct Zone 3 suction from approximate Figure 3.2 visual transcription; qualifying parapet > 0.9 m on all sides optionally allows Zone 3 as Zone 2, while slopes > 10 degrees route to Figure 3.1(c)/(d). High-rise low-slope positive external GCp remains unsupported. Partially enclosed positive internal pressure may choose q(h) or q(zh0) with verified topmost dominant opening height.",
   "sources": [
     {
       "id": "nlma-current",
