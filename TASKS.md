@@ -4,7 +4,12 @@
 
 ## 目前執行中的工作
 
-目前沒有 Hot 工作。下一階段工作需由 current evidence、使用者選擇與 repository authority 重新 promote；不得自動從 `BACKLOG.md` 啟動。
+### 非線性 FEA 求解器介面（KB-CAND-007）— EVIDENCE GATED
+
+- 使用者已明確選定此 Stage。第一階段為 **CalculiX 研究與 opt-in execution probe**，不是已驗證的玻璃／金屬板非線性分析。
+- 已建立外部 executable 的 probe 與 mock regression、benchmark sourcing／license dossier；需要 PR exact-head CI、main CI 及 canonical read-back 方可結束第一階段。
+- 仍待：完整公開 benchmark materialization、exact solver version、實際 NLGEOM run、位移／反力獨立驗證、mesh convergence、玻璃／金屬板各自的模型適用性。缺這些證據時維持 `EXECUTION_ONLY_NOT_NUMERICALLY_VALIDATED`，不可升格為完整工程 execution capability。
+- 後續 benchmark stage 需 fresh admission；不得自動下載外部二進位檔、執行未知輸入檔或宣稱設計強度 PASS。
 
 ## 使用規則
 
