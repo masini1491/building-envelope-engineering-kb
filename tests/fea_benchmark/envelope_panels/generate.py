@@ -4,8 +4,8 @@ import argparse
 from pathlib import Path
 
 CONFIG={
- "glass":dict(E=70000.0,nu=0.20,t=2.0,edge="simple",q_small=0.0001,q_large=0.06,coefficient=0.00406),
- "aluminum":dict(E=69000.0,nu=0.33,t=2.0,edge="clamped",q_small=0.0001,q_large=0.06,coefficient=0.00126)
+ "glass":dict(E=70000.0,nu=0.20,t=2.0,edge="simple",q_small=0.0001,q_large=0.6,coefficient=0.00406),
+ "aluminum":dict(E=69000.0,nu=0.33,t=2.0,edge="clamped",q_small=0.0001,q_large=0.6,coefficient=0.00126)
 }
 A=100.
 def build(material,n,load,out):
