@@ -27,7 +27,7 @@ def read(n,case):
 small=[read(n,"small") for n in (4,8,16)]
 large=[read(n,"large") for n in (4,8,16)]
 print(f"KIRCHHOFF_SMALL_PLATE_ORACLE={analytic:.8g}")
-if not abs(small[-1]-analytic)/analytic < .16:raise SystemExit("SMALL_PLATE_ANALYTIC_MISMATCH")
+if not abs(small[-1]-analytic)/analytic < .03:raise SystemExit("SMALL_PLATE_ANALYTIC_MISMATCH")
 if not abs(small[-1]-small[-2])<abs(small[-2]-small[0]):raise SystemExit("SMALL_PLATE_REFINEMENT_FAILED")
 if not abs(large[-1]-large[-2])<abs(large[-2]-large[0]):raise SystemExit("LARGE_PLATE_REFINEMENT_FAILED")
 if not large[-1]<small[-1]*(q_large/q_small)*.8:raise SystemExit("NLGEOM_MEMBRANE_STIFFENING_NOT_OBSERVED")
