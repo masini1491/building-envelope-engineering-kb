@@ -1,0 +1,22 @@
+** Source architecture: CalculiX-Examples/Streifen/sh.inp MIT
+** Copyright (c) 2017 Martin Kraska.
+*include,input=all.msh
+*include,input=fix.nam
+*include,input=rot.nam
+*include,input=fix.sur
+*boundary
+Nfix,1,6
+*material,name=steel
+*elastic
+210000,0.3
+*shell section,elset=Eall,material=steel
+1
+*step,nlgeom
+*static
+*boundary
+Nrot,5,5,1.57
+*node file
+U
+*section print,surface=Sfix,name=fix
+SOF
+*end step

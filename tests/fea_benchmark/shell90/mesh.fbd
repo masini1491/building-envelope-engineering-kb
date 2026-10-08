@@ -1,0 +1,17 @@
+# Based on public MIT CalculiX-Examples Streifen/sh.fbd at
+# 316273e9105e44ce7e3ee05059dac1bc3f256a69
+# Copyright (c) 2017 Martin Kraska. MIT license.
+pnt p0 0 0 0
+swep all new tra 0 10 0 4
+seta fix se all
+swep all rot tra 100 0 0 40
+elty all qu8r
+mesh all
+send all abq
+send all abq nam
+send fix abq spc 123456
+send rot abq spc 5 1.57
+comp fix do
+send fix abq sur
+
+quit

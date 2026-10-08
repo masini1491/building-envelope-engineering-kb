@@ -14,6 +14,46 @@
 
 已有 mock regressions 僅驗證 opt-in、安全的 argv 邊界及 process status；未在 repo CI 下載 solver 或運行非線性模型。
 
+## 第二階段實際求解 probe（2026-10-08）
+
+公開、合成的 `tests/fea_benchmark/geometric_truss.inp` 由 Ubuntu 24.04 官方套件 `calculix-ccx 2.21-1` 解算；`*STEP,NLGEOM` 在 GitHub Actions 實際運行。固定桿長 100 mm、E=210000 N/mm²、A=1 mm²、自由端施加 30 mm 橫向位移。獨立 Green–Lagrange 解析參考（x/y 平面）為：
+
+- `epsilon = (1/2)*(30/100)^2 = 0.045`
+- `RF_x=EA*epsilon = 9450 N`；
+- `RF_y=RF_x*(30/100)=2835 N`；
+- 末端 `U_y=30 mm`；固定端平面內反力需平衡。
+
+實際 solver `.dat` 最終增量的 x/y 末端與支點反力、位移通過上述解析交叉檢核。Workflow `非線性 FEA 實際執行探針` 成功的候選 run `37717072426`、tested SHA `692a25e231ff3b7f28f0514956cdf468f8631af8`；屬於受限的 **`ANALYTIC_2D_REACTION_CHECK_PASS`**。
+
+**重要限制：** 實際 `.dat` 也出現非零 out-of-plane (`RF_z`) 輸出，該分量未取得獨立物理／元素 formulation 解釋與 validation，**不得**將 x/y 局部解析比對當成全自由度平衡或模型全面正確。真實 90° 殼板案例需 CGX 產生包括 mesh、node sets 的全部 include；尚未 materialize 或跑 shell/plate solver benchmark，尚無 mesh convergence。Glass/metal panel execution remains `NOT_ADMITTED`。當次 workflow 實際執行不由本 Repo `review.py` 或 `calculix_probe.py` 呼叫，不得混稱兩者已整合。
+
+## 公開 90° 非線性殼板實際執行證據
+
+從 MIT 授權上游 `CalculiX-Examples/Streifen` 整理 `shell90/mesh.fbd`、
+`shell90/shell90.inp`，以 Ubuntu 24.04 的 `calculix-cgx
+2.21+dfsg-1build1` 在 `xvfb-run` 下重建 `all.msh`、`fix.nam`、
+`rot.nam`、`fix.sur`，再由 `calculix-ccx 2.21-1` 解算 `*STEP, NLGEOM`。
+CI 首次執行因 CGX 缺少終止指令超時，加入 `quit` 後經 Actions
+`37717381484` 真正生成相依檔案並完成 CCX shell 求解，
+`.sta` 記錄最終增量 `STEP TIME=1.0`，產生 `.frd`。
+輸出證據由 workflow `calculix-nlgeom-probe` Actions artifact 保存。
+
+當前程式同時建立 `check_shell90.py` 的 fail-closed 最終增量檢查，與
+Green–Lagrange truss 分開執行；沒有將 shell 的 `frd`／`sta` 當作
+獨立 stress／reaction／deflection 參考答案。**狀態：
+`SHELL_NLGEOM_EXECUTED_REFERENCE_UNVERIFIED`，不是
+`SHELL_BENCHMARK_ADMITTED`**。兩個模組的驗證 scope 不能互相外推：
+
+- Truss：完整實際 CCX 運算＋解析 x/y 位移與反力容差檢核，
+  `ANALYTIC_2D_REACTION_CHECK_PASS`；z 向反力未 admission。
+- Shell：公開旋轉位移案例有實際求解流程／輸出與增量完成證據；
+  **沒有**針對殼板的獨立數值答案、反力平衡驗證或網格敏感度。
+
+剩餘主要缺口：可重現的 shell displacement/reaction independent oracle、
+不同網格細化的 convergence，以及對真正玻璃／金屬板材料、支承、面外
+壓力與設計 acceptance 的分別驗證。不得將上述 smoke 解讀為
+`ASTM/ADM` 相關結構設計合規。
+
 ## 真正 benchmark admission 的最低缺口
 
 1. Pin exact CalculiX / CGX version、binary provenance、運作平台及 licensing boundary。

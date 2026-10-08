@@ -1,0 +1,61 @@
+name: 非線性 FEA 實際執行探針
+
+on:
+  pull_request:
+    paths:
+      - 'tests/fea_benchmark/**'
+      - '.github/workflows/calculix-benchmark.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  calculix_probe:
+    name: CalculiX NLGEOM 實際基準
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - name: 安裝官方套件
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends calculix-ccx calculix-cgx xvfb xauth
+          command -v ccx
+          ccx -v || true
+      - name: 實際解非線性 truss benchmark
+        working-directory: tests/fea_benchmark
+        run: |
+          timeout 90s ccx -i geometric_truss
+          python check_truss.py
+      - name: 以 CGX 重建公開非線性殼板模型
+        working-directory: tests/fea_benchmark/shell90
+        run: |
+          timeout 60s xvfb-run -a cgx -b mesh.fbd
+          test -s all.msh
+          test -s fix.nam
+          test -s rot.nam
+          test -s fix.sur
+          grep -qi 'S8' all.msh
+      - name: 真實執行 90 度 NLGEOM 殼板
+        working-directory: tests/fea_benchmark/shell90
+        run: |
+          timeout 90s ccx -i shell90
+          test -s shell90.sta
+          test -s shell90.frd
+          tail -n 35 shell90.sta
+          python check_shell90.py
+      - name: 保存可查證數值輸出
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: calculix-nlgeom-probe
+          path: |
+            tests/fea_benchmark/*.dat
+            tests/fea_benchmark/*.sta
+            tests/fea_benchmark/*.cvg
+            tests/fea_benchmark/*.frd
+            tests/fea_benchmark/shell90/*.dat
+            tests/fea_benchmark/shell90/*.sta
+            tests/fea_benchmark/shell90/*.frd
+          if-no-files-found: warn

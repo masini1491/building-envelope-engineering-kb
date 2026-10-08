@@ -37,6 +37,38 @@
 
 這些套件只作 numerical backend／scientific-computing dependency；其授權不改變本 repository 自有 code/document 的授權，也不代表 NumPy、SciPy 或 scikit-fem 對本 repository 的 endorsement。
 
+## 非線性 FEA 公開範例的權利與隔離
+
+`tests/fea_benchmark/shell90/mesh.fbd` 和 `shell90.inp` 衍生自
+`calculix/CalculiX-Examples` 的 `Streifen/sh.fbd` 與 `Streifen/sh.inp`
+（commit `316273e9105e44ce7e3ee05059dac1bc3f256a69`）。
+
+Copyright (c) 2017 Martin Kraska
+
+MIT License
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+
+另，CI 以 Ubuntu apt 安裝的 CalculiX `ccx`／`cgx` 軟體仍各受其 upstream
+授權約束，沒有複製或附帶分發這些求解器二進位檔，也不因此將其 GPL
+授權誤當成 MIT。
+
 ## 商標
 
 ASTM、ISO、CNS、AAMA、FGIA 及製造商名稱等名稱與標誌，只用於識別與引用。除非相關權利人明確表示，否則不代表 sponsorship、endorsement、affiliation 或 ownership。
