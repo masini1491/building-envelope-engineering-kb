@@ -45,6 +45,17 @@ jobs:
           test -s shell90.frd
           tail -n 35 shell90.sta
           python check_shell90.py
+      - name: 三層網格非線性殼板收斂與獨立圓弧比較
+        working-directory: tests/fea_benchmark/shell90
+        run: |
+          set -euo pipefail
+          for count in 20 40 80; do
+            mkdir -p "mesh_${count}"
+            sed "s/swep all rot tra 100 0 0 40/swep all rot tra 100 0 0 ${count}/" mesh.fbd > "mesh_${count}/mesh.fbd"
+            cp shell90.inp "mesh_${count}/shell90.inp"
+            (cd "mesh_${count}" && timeout 60s xvfb-run -a cgx -b mesh.fbd && timeout 90s ccx -i shell90)
+          done
+          python check_mesh_convergence.py
       - name: 保存可查證數值輸出
         if: always()
         uses: actions/upload-artifact@v4
@@ -58,4 +69,7 @@ jobs:
             tests/fea_benchmark/shell90/*.dat
             tests/fea_benchmark/shell90/*.sta
             tests/fea_benchmark/shell90/*.frd
+            tests/fea_benchmark/shell90/mesh_*/*.dat
+            tests/fea_benchmark/shell90/mesh_*/*.sta
+            tests/fea_benchmark/shell90/mesh_*/*.frd
           if-no-files-found: warn
