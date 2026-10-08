@@ -222,6 +222,14 @@ CalculiX 官方 `*NODE PRINT` 的 `RF` 包含支承反力與施加在所列節�
 
 小荷載的比較量為 `corrected_support_z = sum(EDGE RFz) - sum(EDGE equivalent applied Pz)`，和總合力 `qA0=1 N` 比對；若相對殘差或水平寄生反力大於 `1e-4` 則測試失敗。既有 `check_reactions.py` 仍保留原始診斷。此檢核只針對小位移下的合成線彈性板；大荷載 `NLGEOM` 的 follower pressure 不使用未變形面積替代實際外力，不宣稱 full nonlinear equilibrium、材料容量或 ASTM/ADM acceptance。實際 PR #28 exact-head `dacb6869ae0e936ee2261cd2b5667be86c4a28bc` 的 CalculiX CI `37756874281` 與 Repo CI `37756874261` 均 SUCCESS；合併至 `main@6ff1047efa344dcaf0216a02fbdb09fecff75494` 後 Repo CI `37757010107` SUCCESS，已完成 canonical read-back。六組小荷載經修正後支承反力分別為玻璃 −0.999999240／−0.999999211／−0.999999294 N，以及鋁板 −1.000000000／−0.999999947／−0.999999964 N；最大相對平衡殘差約 7.9×10⁻⁷。此為 **`S8R_SMALL_PRESSURE_BALANCE_BOUNDED_PASS`**，不是大變形全域平衡或工程容量 acceptance。
 
+## 第十階段：變形中面 follower pressure 的獨立三維診斷（不構成平衡 admission）
+
+於既有合成 `glass/aluminum` 模型之 `q=0.6 N/mm²`、4／8／16 S8R 網格，讀取實際 `NALL` 節點末增量平移位移及 `EDGE RF`。使用 S8 解析形函數導數、3×3 Gauss 積分與變形後切向量叉積，分別估算中面壓力三維合力及 `EDGE` 相容節點荷載，進而輸出修正支承合力與差額。
+
+`check_follower_pressure.py` 僅接受原有規則、軸向矩形初始網格及無 MPC 的輸入；缺漏節點、重複／非有限數值、翻轉積分點應拒絕。其物理界線明確：CalculiX 的 `S8R` 殼元素在 CCX 中會展開成三維單元，壓力作用面與 expanded shell face／厚度旋轉效應可能不同於所算中面。因此中面積分只是**獨立幾何診斷**，不可將 `corrected RF + midpoint follower resultant` 的小殘差當作真實全域平衡 PASS，也不得為數值吻合調整容差。
+
+相關一手文件：CalculiX 2.21 User's Manual 的 shell elements、`*DLOAD`、`*NODE PRINT`（https://www.dhondt.de/ccx_2.21.pdf）；套件與 workflow 版本仍依 Repo 既有 CI。Stage 10 真實結果及其數值差距必須經 exact-head CI 確認後更新；在此之前保持 `GLOBAL_BALANCE_NOT_ADMITTED`。
+
 ## 真正 benchmark admission 的最低缺口
 
 1. Pin exact CalculiX / CGX version、binary provenance、運作平台及 licensing boundary。
