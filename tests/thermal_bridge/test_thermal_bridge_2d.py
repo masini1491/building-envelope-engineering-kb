@@ -1,4 +1,5 @@
 import unittest
+from dataclasses import replace
 from unittest.mock import patch
 
 import numpy as np
@@ -311,6 +312,109 @@ class ThermalBridge2DTests(unittest.TestCase):
                     SurfaceResistanceBoundary("bad", [0], 20.0, 0.11)
                 ],
             )
+
+    def test_rejects_unvalidated_backend_versions_before_assembly(self):
+        with patch(
+            "scripts.engineering_calc.thermal_bridge_2d.metadata.version",
+            side_effect=lambda package: {
+                "numpy": "0.0.0", "scipy": "1.18.1", "scikit-fem": "12.0.2"
+            }[package],
+        ):
+            with self.assertRaises(ThermalBridgeBackendUnavailable):
+                solve_steady_state_2d(
+                    points_m=[(0.0, 0.0), (1.0, 0.0), (0.0, 1.0)],
+                    triangles=[(0, 1, 2)],
+                    conductivity_w_mk=[1.0],
+                    fixed_temperature_boundaries=[
+                        FixedTemperatureBoundary("anchor", [0], 0.0)
+                    ],
+                )
+
+    def test_mixed_dirichlet_robin_linear_solution(self):
+        # 1 m x 1 m: left T=0 C; right ambient 20 C, R=0.1;
+        # k=1 W/mK gives right surface T=20/11 and boundary inflow=20/11 W/m.
+        mesh = MeshTri.init_tensor(np.linspace(0, 1, 11), np.linspace(0, 1, 11))
+        left = [
+            int(i) for i in range(mesh.p.shape[1])
+            if np.isclose(mesh.p[0, i], 0.0)
+        ]
+        right_edges = [
+            tuple(int(n) for n in mesh.facets[:, i])
+            for i in mesh.boundary_facets()
+            if all(np.isclose(mesh.p[0, int(n)], 1.0) for n in mesh.facets[:, i])
+        ]
+        result = solve_steady_state_2d(
+            points_m=mesh.p.T.tolist(),
+            triangles=mesh.t.T.tolist(),
+            conductivity_w_mk=[1.0] * mesh.nelements,
+            fixed_temperature_boundaries=[
+                FixedTemperatureBoundary("left", left, 0.0)
+            ],
+            surface_resistance_boundaries=[
+                SurfaceResistanceBoundary("right", right_edges, 20.0, 0.1)
+            ],
+        )
+        expected_flow = 20.0 / 1.1
+        # k=1, L=1, area=1 => conduction R=1 and surface R=0.1.
+        self.assertAlmostEqual(result.boundary_heat_flow_w_per_m["right"], expected_flow, places=7)
+        for i in range(mesh.p.shape[1]):
+            self.assertAlmostEqual(
+                result.node_temperature_c[i], expected_flow * mesh.p[0, i], places=6
+            )
+
+    def test_distinct_element_conductivities_assemble_correctly(self):
+        mesh = MeshTri.init_tensor(np.array([0.0, 0.5, 1.0]), np.array([0.0, 1.0]))
+        left = [
+            int(i) for i in range(mesh.p.shape[1])
+            if np.isclose(mesh.p[0, i], 0.0)
+        ]
+        right = [
+            int(i) for i in range(mesh.p.shape[1])
+            if np.isclose(mesh.p[0, i], 1.0)
+        ]
+        conductivity = [
+            1.0 if float(mesh.p[0, tri].mean()) < 0.5 else 2.0
+            for tri in mesh.t.T
+        ]
+        result = solve_steady_state_2d(
+            points_m=mesh.p.T.tolist(),
+            triangles=mesh.t.T.tolist(),
+            conductivity_w_mk=conductivity,
+            fixed_temperature_boundaries=[
+                FixedTemperatureBoundary("left", left, 0.0),
+                FixedTemperatureBoundary("right", right, 12.0),
+            ],
+        )
+        # Series resistances: 0.5/1 + 0.5/2 = 0.75, flux=16.
+        mid = [int(i) for i in range(mesh.p.shape[1])
+               if np.isclose(mesh.p[0, i], 0.5)]
+        for i in mid:
+            self.assertAlmostEqual(result.node_temperature_c[i], 8.0, places=6)
+
+    def test_numeric_overflow_rejected_as_domain_error(self):
+        class Huge:
+            def __float__(self):
+                raise OverflowError("float overflow")
+        with self.assertRaises(ThermalBridgeInputError):
+            solve_steady_state_2d(
+                points_m=[(0, 0), (1, 0), (0, 1)],
+                triangles=[(0, 1, 2)],
+                conductivity_w_mk=[1.0],
+                fixed_temperature_boundaries=[
+                    FixedTemperatureBoundary("bad", [0], Huge())
+                ],
+            )
+
+    def test_numpy_boundary_edge_collections_are_accepted(self):
+        result = solve_steady_state_2d(
+            points_m=[(0, 0), (1, 0), (0, 1)],
+            triangles=[(0, 1, 2)],
+            conductivity_w_mk=[1.0],
+            fixed_temperature_boundaries=[
+                FixedTemperatureBoundary("anchor", np.array([0, 1]), 0.0)
+            ],
+        )
+        self.assertEqual(len(result.node_temperature_c), 3)
 
     def test_backend_unavailable_is_explicit(self):
         with patch(
