@@ -94,6 +94,28 @@ class TaiwanWindPressureTests(unittest.TestCase):
         self.assertEqual(low["zone3_negative"], low["zone2_negative"])
         self.assertIsNone(low["positive_all_zones"])
 
+    def test_zone3_direct_official_figure_endpoints_and_semilog_midpoint(self):
+        for area, expected in ((0.5, -6.67), (1.0, -6.67),
+                               (math.sqrt(50.0), (-6.67 - 4.79) / 2),
+                               (50.0, -4.79), (100.0, -4.79)):
+            with self.subTest(area=area):
+                args = dict(
+                    region="臺北市", district=None, building_category=3,
+                    terrain_category="B", kzt=1.0, enclosure="enclosed",
+                    h_m=50.0, roof_slope_deg=5.0, effective_area_m2=area,
+                    least_horizontal_dimension_m=20.0, governing_wind_source="code",
+                )
+                result = calculate_roof_design_pressure(**args)
+                self.assertAlmostEqual(
+                    result["coefficients"]["gcp"]["zone3_negative"], expected, places=8
+                )
+                self.assertFalse(result["applicability"]["parapet_zone3_as_zone2_applied"])
+                self.assertAlmostEqual(
+                    result["pressures"]["zone3"]["negative_kpa"],
+                    result["velocity_pressure"]["qh"]["q_kpa"] * (expected - 0.375),
+                )
+                self.assertNotIn("positive_kpa", result["pressures"]["zone3"])
+
     def test_high_rise_roof_requires_qualified_parapet(self):
         args = dict(
             region="臺北市", district=None, building_category=3,
@@ -101,8 +123,10 @@ class TaiwanWindPressureTests(unittest.TestCase):
             h_m=50.0, roof_slope_deg=5.0, effective_area_m2=1.0,
             least_horizontal_dimension_m=20.0, governing_wind_source="code",
         )
-        with self.assertRaises(WindPressureUnsupportedError):
-            calculate_roof_design_pressure(**args)
+        direct = calculate_roof_design_pressure(**args)
+        self.assertEqual(direct["applicability"]["status"], "SUPPORTED_SUCTION_ONLY")
+        self.assertAlmostEqual(direct["coefficients"]["gcp"]["zone3_negative"], -6.67)
+        self.assertNotIn("positive_kpa", direct["pressures"]["zone3"])
         with self.assertRaises(WindPressureInputError):
             calculate_roof_design_pressure(
                 **args, apply_parapet_zone3_as_zone2=True,
