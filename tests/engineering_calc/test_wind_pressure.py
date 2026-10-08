@@ -95,6 +95,15 @@ class TaiwanWindPressureTests(unittest.TestCase):
         self.assertFalse(low["parapet_zone3_as_zone2_applied"])
         self.assertIsNone(low["positive_all_zones"])
 
+    def test_zone3_independent_visual_midgraph_tolerance(self):
+        # Independent visual observation of NLMA Figure 3.2 (original p. 81).
+        # A=10 m2 Zone 3 curve reads approximately -5.5 GCp, with 0.3
+        # reading tolerance. This is deliberately NOT derived from end anchors.
+        # Source: https://www.nlma.gov.tw/uploads/files/31dfde31df0c1be76c1b8d92e4285d76.pdf
+        from scripts.engineering_calc.wind_pressure import figure_3_2_roof_suction_with_parapet
+        result = figure_3_2_roof_suction_with_parapet(10.0)
+        self.assertAlmostEqual(result["zone3_direct_negative"], -5.5, delta=0.3)
+
     def test_zone3_direct_official_figure_endpoints_and_semilog_midpoint(self):
         for area, expected in ((0.5, -6.67), (1.0, -6.67),
                                (math.sqrt(50.0), (-6.67 - 4.79) / 2),
@@ -497,6 +506,8 @@ class TaiwanWindPressureTests(unittest.TestCase):
         qh = selected["velocity_pressure"]["qh"]["q_kpa"]
         self.assertLess(qi_pos, qh)
         self.assertAlmostEqual(qi_neg, qh)
+        self.assertEqual(selected["applicability"]["positive_internal_pressure_status"], "PRESCRIBED_BASIS")
+        self.assertEqual(reference["applicability"]["positive_internal_pressure_status"], "CONSERVATIVE_QH_FALLBACK")
         self.assertAlmostEqual(
             selected["pressures"]["zone5"]["negative_kpa"] -
             reference["pressures"]["zone5"]["negative_kpa"],
