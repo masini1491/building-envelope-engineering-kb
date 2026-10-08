@@ -112,6 +112,11 @@ def _wind_pressure(p, inp):
         raise IncompleteInputError("inputs.surface must be wall or roof")
 
     h_m = _num(inp, "h_m")
+    basis = inp.get("positive_internal_pressure_basis", "q(h)")
+    if not isinstance(basis, str):
+        raise IncompleteInputError("inputs.positive_internal_pressure_basis must be a string")
+    opening_top = (_num(inp, "opening_top_height_m")
+                   if inp.get("opening_top_height_m") is not None else None)
     try:
         if surface == "roof":
             apply_parapet = inp.get("apply_parapet_zone3_as_zone2", False)
@@ -137,6 +142,8 @@ def _wind_pressure(p, inp):
                 effective_area_m2=_num(inp, "effective_area_m2"),
                 least_horizontal_dimension_m=_num(inp, "least_horizontal_dimension_m"),
                 governing_wind_source=values["governing_wind_source"],
+                positive_internal_pressure_basis=basis,
+                opening_top_height_m=opening_top,
                 apply_parapet_zone3_as_zone2=apply_parapet,
                 parapet_all_sides=parapet_all_sides,
                 parapet_height_m=parapet_height,
@@ -165,6 +172,8 @@ def _wind_pressure(p, inp):
                 effective_area_m2=_num(inp, "effective_area_m2"),
                 least_horizontal_dimension_m=_num(inp, "least_horizontal_dimension_m"),
                 governing_wind_source=values["governing_wind_source"],
+                positive_internal_pressure_basis=basis,
+                opening_top_height_m=opening_top,
                 roof_slope_deg=roof_slope,
                 apply_low_slope_wall_reduction=apply_reduction,
             )
