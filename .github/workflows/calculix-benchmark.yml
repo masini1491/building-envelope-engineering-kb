@@ -39,6 +39,182 @@ jobs:
             echo '## OS'
             cat /etc/os-release
           } | tee tests/fea_benchmark/provenance/calculix-package.txt
+          # Fail closed on absent provenance; do not pin a moving distro package to an assumed version.
+          grep -Eq '^calculix-ccx[[:space:]]+[0-9]' tests/fea_benchmark/provenance/calculix-package.txt
+          grep -Eq '^[0-9a-f]{64}[[:space:]]+/usr/bin/ccx      - name: 實際解非線性 truss benchmark
+        working-directory: tests/fea_benchmark
+        run: |
+          timeout 90s ccx -i geometric_truss
+          python check_truss.py
+      - name: 以 CGX 重建公開非線性殼板模型
+        working-directory: tests/fea_benchmark/shell90
+        run: |
+          timeout 60s xvfb-run -a cgx -b mesh.fbd
+          test -s all.msh
+          test -s fix.nam
+          test -s rot.nam
+          test -s fix.sur
+          test -s rot.sur
+          grep -qi 'S8' all.msh
+      - name: 真實執行 90 度 NLGEOM 殼板
+        working-directory: tests/fea_benchmark/shell90
+        run: |
+          timeout 90s ccx -i shell90
+          test -s shell90.sta
+          test -s shell90.frd
+          tail -n 35 shell90.sta
+          python check_shell90.py
+      - name: 三層網格非線性殼板收斂與獨立圓弧比較
+        working-directory: tests/fea_benchmark/shell90
+        run: |
+          set -euo pipefail
+          for count in 20 40 80; do
+            mkdir -p "mesh_${count}"
+            sed "s/swep all rot tra 100 0 0 40/swep all rot tra 100 0 0 ${count}/" mesh.fbd > "mesh_${count}/mesh.fbd"
+            cp shell90.inp "mesh_${count}/shell90.inp"
+            (cd "mesh_${count}" && timeout 60s xvfb-run -a cgx -b mesh.fbd && timeout 90s ccx -i shell90)
+          done
+          python check_mesh_convergence.py
+          python diagnose_end_reactions.py
+      - name: 面外均佈壓力薄板解析與幾何非線性檢核
+        working-directory: tests/fea_benchmark/pressure_plate
+        run: |
+          set -euo pipefail
+          for case in small large; do
+            for n in 4 8 16; do
+              python generate.py --n "${n}" --case "${case}" --output "${case}_${n}"
+              (cd "${case}_${n}" && timeout 90s ccx -i plate)
+            done
+          done
+          python check.py
+      - name: 玻璃與鋁板合成面外風壓驗證
+        working-directory: tests/fea_benchmark/envelope_panels
+        run: |
+          set -euo pipefail
+          for material in glass aluminum; do
+            for load in small large; do
+              for n in 4 8 16; do
+                python generate.py --material "$material" --load "$load" --n "$n" --output "${material}_${load}_${n}"
+                (cd "${material}_${load}_${n}" && timeout 90s ccx -i panel)
+              done
+            done
+          done
+          python check.py
+          python check_reactions.py
+          python -m unittest -v test_pressure_equilibrium.py
+          python check_pressure_equilibrium.py
+          python -m unittest -v test_follower_pressure.py
+          python check_follower_pressure.py
+      - name: 保存可查證數值輸出
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: calculix-nlgeom-probe
+          path: |
+            tests/fea_benchmark/provenance/*.txt
+            tests/fea_benchmark/*.dat
+            tests/fea_benchmark/*.sta
+            tests/fea_benchmark/*.cvg
+            tests/fea_benchmark/*.frd
+            tests/fea_benchmark/shell90/*.dat
+            tests/fea_benchmark/shell90/*.sta
+            tests/fea_benchmark/shell90/*.frd
+            tests/fea_benchmark/shell90/mesh_*/*.dat
+            tests/fea_benchmark/shell90/mesh_*/*.sta
+            tests/fea_benchmark/shell90/mesh_*/*.frd
+            tests/fea_benchmark/pressure_plate/*/*.dat
+            tests/fea_benchmark/pressure_plate/*/*.sta
+            tests/fea_benchmark/envelope_panels/*/*.dat
+            tests/fea_benchmark/envelope_panels/*/*.sta
+          if-no-files-found: warn
+ tests/fea_benchmark/provenance/calculix-package.txt
+          grep -q '^VERSION_ID="24.04"      - name: 實際解非線性 truss benchmark
+        working-directory: tests/fea_benchmark
+        run: |
+          timeout 90s ccx -i geometric_truss
+          python check_truss.py
+      - name: 以 CGX 重建公開非線性殼板模型
+        working-directory: tests/fea_benchmark/shell90
+        run: |
+          timeout 60s xvfb-run -a cgx -b mesh.fbd
+          test -s all.msh
+          test -s fix.nam
+          test -s rot.nam
+          test -s fix.sur
+          test -s rot.sur
+          grep -qi 'S8' all.msh
+      - name: 真實執行 90 度 NLGEOM 殼板
+        working-directory: tests/fea_benchmark/shell90
+        run: |
+          timeout 90s ccx -i shell90
+          test -s shell90.sta
+          test -s shell90.frd
+          tail -n 35 shell90.sta
+          python check_shell90.py
+      - name: 三層網格非線性殼板收斂與獨立圓弧比較
+        working-directory: tests/fea_benchmark/shell90
+        run: |
+          set -euo pipefail
+          for count in 20 40 80; do
+            mkdir -p "mesh_${count}"
+            sed "s/swep all rot tra 100 0 0 40/swep all rot tra 100 0 0 ${count}/" mesh.fbd > "mesh_${count}/mesh.fbd"
+            cp shell90.inp "mesh_${count}/shell90.inp"
+            (cd "mesh_${count}" && timeout 60s xvfb-run -a cgx -b mesh.fbd && timeout 90s ccx -i shell90)
+          done
+          python check_mesh_convergence.py
+          python diagnose_end_reactions.py
+      - name: 面外均佈壓力薄板解析與幾何非線性檢核
+        working-directory: tests/fea_benchmark/pressure_plate
+        run: |
+          set -euo pipefail
+          for case in small large; do
+            for n in 4 8 16; do
+              python generate.py --n "${n}" --case "${case}" --output "${case}_${n}"
+              (cd "${case}_${n}" && timeout 90s ccx -i plate)
+            done
+          done
+          python check.py
+      - name: 玻璃與鋁板合成面外風壓驗證
+        working-directory: tests/fea_benchmark/envelope_panels
+        run: |
+          set -euo pipefail
+          for material in glass aluminum; do
+            for load in small large; do
+              for n in 4 8 16; do
+                python generate.py --material "$material" --load "$load" --n "$n" --output "${material}_${load}_${n}"
+                (cd "${material}_${load}_${n}" && timeout 90s ccx -i panel)
+              done
+            done
+          done
+          python check.py
+          python check_reactions.py
+          python -m unittest -v test_pressure_equilibrium.py
+          python check_pressure_equilibrium.py
+          python -m unittest -v test_follower_pressure.py
+          python check_follower_pressure.py
+      - name: 保存可查證數值輸出
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: calculix-nlgeom-probe
+          path: |
+            tests/fea_benchmark/provenance/*.txt
+            tests/fea_benchmark/*.dat
+            tests/fea_benchmark/*.sta
+            tests/fea_benchmark/*.cvg
+            tests/fea_benchmark/*.frd
+            tests/fea_benchmark/shell90/*.dat
+            tests/fea_benchmark/shell90/*.sta
+            tests/fea_benchmark/shell90/*.frd
+            tests/fea_benchmark/shell90/mesh_*/*.dat
+            tests/fea_benchmark/shell90/mesh_*/*.sta
+            tests/fea_benchmark/shell90/mesh_*/*.frd
+            tests/fea_benchmark/pressure_plate/*/*.dat
+            tests/fea_benchmark/pressure_plate/*/*.sta
+            tests/fea_benchmark/envelope_panels/*/*.dat
+            tests/fea_benchmark/envelope_panels/*/*.sta
+          if-no-files-found: warn
+ tests/fea_benchmark/provenance/calculix-package.txt
       - name: 實際解非線性 truss benchmark
         working-directory: tests/fea_benchmark
         run: |
