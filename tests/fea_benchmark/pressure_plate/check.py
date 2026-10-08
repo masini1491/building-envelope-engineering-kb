@@ -8,7 +8,13 @@ def read(n,case):
     d=Path(f"{case}_{n}")
     dat=(d/"plate.dat").read_text(errors="replace")
     sta=(d/"plate.sta").read_text(errors="replace")
-    if not ("1.000" in sta or "1.000000" in sta): raise SystemExit("INCOMPLETE_STEP")
+    records=[]
+    for line in sta.splitlines():
+        fields=line.split()
+        if len(fields)==7 and fields[0]=="1":
+            try: records.append(float(fields[4]))
+            except ValueError: continue
+    if not records or abs(records[-1]-1.0)>1e-7: raise SystemExit("INCOMPLETE_STEP")
     pattern=r"displacements \(vx,vy,vz\) for set CENTER and time\s+([\d.E+-]+)\s+(\d+)\s+([\d.E+-]+)\s+([\d.E+-]+)\s+([\d.E+-]+)"
     hits=list(re.finditer(pattern,dat,re.I))
     if not hits: raise SystemExit("CENTER_MISSING")
