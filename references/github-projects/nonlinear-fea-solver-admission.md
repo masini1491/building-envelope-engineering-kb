@@ -214,6 +214,14 @@ pressure 可能依變形後面法線／面積分配，**不可**把
 **玻璃及金屬板的總外力／支承反力平衡未 admission**，
 更不代表玻璃破壞、鋁板屈服／屈曲或 ASTM／ADM capacity。
 
+## 第九階段：S8R 均佈壓力節點力與小荷載平衡檢核（bounded）
+
+CalculiX 官方 `*NODE PRINT` 的 `RF` 包含支承反力與施加在所列節點上的外力；因此四邊支承同時施加 `*DLOAD,P` 的 S8R 板，不能把 `EDGE RF` 直接當作純支承力。參見 CalculiX User's Manual 的 `*NODE PRINT` / `RF` 段落（https://www.dhondt.de/ccx_2.21.pdf）。這是 Stage 8 誤差的候選解釋，不以手冊描述代替實際 CI。
+
+`check_pressure_equilibrium.py` 從實際生成的合成 `panel.inp` 讀取 8 節點 S8R connectivity、幾何、`EDGE` 與 `*DLOAD`，以獨立 3×3 Gauss 積分計算相容壓力等效節點力；只接受初始平面、正向、矩形 S8R 和目前指定邊界條件，拒絕扭曲元素、MPC、轉換座標、缺失／重複 RF、非有限結果及平衡殘差。對規則 n×n 解析預期 `F_edge,load/(qA0)=(2n+1)/(3n²)`，在 n=4／8／16 分別為 0.1875／0.0885416667／0.04296875；與 Stage 8 的觀測缺口高度吻合。
+
+小荷載的比較量為 `corrected_support_z = sum(EDGE RFz) - sum(EDGE equivalent applied Pz)`，和總合力 `qA0=1 N` 比對；若相對殘差或水平寄生反力大於 `1e-4` 則測試失敗。既有 `check_reactions.py` 仍保留原始診斷。此檢核只針對小位移下的合成線彈性板；大荷載 `NLGEOM` 的 follower pressure 不使用未變形面積替代實際外力，不宣稱 full nonlinear equilibrium、材料容量或 ASTM/ADM acceptance。最終 admission 仍依 exact-head 真實 CCX CI／repository CI／main read-back 結果判定。
+
 ## 真正 benchmark admission 的最低缺口
 
 1. Pin exact CalculiX / CGX version、binary provenance、運作平台及 licensing boundary。
