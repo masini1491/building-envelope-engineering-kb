@@ -493,6 +493,8 @@ def _internal_pressures(common, *, terrain_category, kzt, opening_top_height_m,
     if positive_internal_pressure_basis not in ("q(h)", "q(zh0)"):
         raise WindPressureInputError("positive_internal_pressure_basis must be q(h) or q(zh0)")
     qh = common["qh"]
+    # For partially enclosed buildings q(zh0) is the prescribed positive
+    # internal-pressure basis; q(h) is a conservative suction assumption only.
     if common["enclosure"] != "partially_enclosed" and positive_internal_pressure_basis != "q(h)":
         raise WindPressureInputError("q(zh0) applies only to partially enclosed buildings")
     if positive_internal_pressure_basis == "q(zh0)":
