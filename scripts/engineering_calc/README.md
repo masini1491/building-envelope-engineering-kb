@@ -84,6 +84,12 @@ python -m scripts.engineering_calc.review input.json
 
 不要求把完整 JSON 原樣貼給使用者，但不得只寫「已用 helper 重算」而無法區分真正 execution、手算、模型心算或 source-code inspection。
 
+### 部分封閉式內風壓速度壓選擇
+
+規範表 2.1 註 1 的高層局部構材路由：當 `enclosure="partially_enclosed"` 時，**正值內風壓**按影響正內風壓的最高開口高度 `zh₀`，使用 `q(zh₀)`；**負值內風壓**使用 `q(h)`。選用 `positive_internal_pressure_basis="q(zh0)"` 時必須提供由工程師確認的 `opening_top_height_m`（大於 0 且不高於 `h_m`），不由程式猜測開口。
+
+相容舊輸入的 `"q(h)"` 預設僅作 **`CONSERVATIVE_QH_FALLBACK`**：對高層部分封閉式正值內風壓，以 `q(h)` 作保守吸力值，不得標為按確定開口高度計算的規範精確值；在不允許保守假設的專案應提供 `zh₀`。封閉式建築物與低層既有路由仍使用 `q(h)`。輸出 `velocity_pressure.qi_positive` 和 `qi_negative` 分別標示兩個符號的來源，負風壓不得誤用 `q(zh₀)` 以外推其他載重情境。
+
 ### 高層屋頂局部吸力（KB-CAND-008 bounded admission）
 
 `wind_pressure` 的 `surface="roof"` 已新增受限 `h > 18 m` 路由：

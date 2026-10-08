@@ -488,6 +488,38 @@ def _resolve_common(
     }
 
 
+def _internal_pressures(common, *, terrain_category, kzt, opening_top_height_m,
+                        positive_internal_pressure_basis, data):
+    if positive_internal_pressure_basis not in ("q(h)", "q(zh0)"):
+        raise WindPressureInputError("positive_internal_pressure_basis must be q(h) or q(zh0)")
+    qh = common["qh"]
+    # For partially enclosed buildings q(zh0) is the prescribed positive
+    # internal-pressure basis; q(h) is a conservative suction assumption only.
+    if common["enclosure"] != "partially_enclosed" and positive_internal_pressure_basis != "q(h)":
+        raise WindPressureInputError("q(zh0) applies only to partially enclosed buildings")
+    if positive_internal_pressure_basis == "q(zh0)":
+        if common["h_m"] <= 18.0:
+            raise WindPressureUnsupportedError("q(zh0) option is limited to the high-rise route")
+        if opening_top_height_m is None:
+            raise WindPressureInputError("opening_top_height_m required for q(zh0)")
+        try:
+            z = float(opening_top_height_m)
+        except (ValueError, TypeError, OverflowError) as exc:
+            raise WindPressureInputError("opening_top_height_m must be numeric") from exc
+        if not math.isfinite(z) or z <= 0 or z > common["h_m"]:
+            raise WindPressureInputError("opening_top_height_m must be finite, > 0 and <= h")
+        positive = velocity_pressure(
+            z, terrain_category=terrain_category, kzt=kzt,
+            importance_factor=common["importance_factor"],
+            v10_mps=common["v10_mps"], data=data,
+        )
+    else:
+        if opening_top_height_m is not None:
+            raise WindPressureInputError("opening_top_height_m requires q(zh0) selection")
+        positive = qh
+    return positive, qh
+
+
 def calculate_wall_design_pressure(
     *,
     region: str,
@@ -503,6 +535,8 @@ def calculate_wall_design_pressure(
     governing_wind_source: str,
     roof_slope_deg: float | None = None,
     apply_low_slope_wall_reduction: bool = False,
+    positive_internal_pressure_basis: str = "q(h)",
+    opening_top_height_m: float | None = None,
     data: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Calculate wall Zone 4/5 design pressures for admitted high- or low-rise route."""
@@ -530,6 +564,7 @@ def calculate_wall_design_pressure(
 
     gcpi = common["gcpi_magnitude"]
     qh = common["qh"]
+    qi_positive, qi_negative = _internal_pressures(common, terrain_category=terrain_category, kzt=kzt, opening_top_height_m=opening_top_height_m, positive_internal_pressure_basis=positive_internal_pressure_basis, data=ref)
     route: str
     qz: dict[str, float] | None
 
@@ -573,15 +608,15 @@ def calculate_wall_design_pressure(
 
     positive = (
         q_external_positive["q_kpa"] * gcp["positive_zone4_zone5"]
-        + q_internal["q_kpa"] * gcpi
+        + qi_negative["q_kpa"] * gcpi
     )
     zone4_negative = (
         q_external_negative["q_kpa"] * gcp["zone4_negative"]
-        - q_internal["q_kpa"] * gcpi
+        - qi_positive["q_kpa"] * gcpi
     )
     zone5_negative = (
         q_external_negative["q_kpa"] * gcp["zone5_negative"]
-        - q_internal["q_kpa"] * gcpi
+        - qi_positive["q_kpa"] * gcpi
     )
     raw, display = _pressure_sets(
         {
@@ -611,7 +646,7 @@ def calculate_wall_design_pressure(
             "zg_m": common["zg_m"],
             "kzt": float(kzt),
             "enclosure": common["enclosure"],
-            "gcpi_magnitude": gcpi,
+            "gcpi_magnitude": gcpi, "positive_internal_pressure_basis": positive_internal_pressure_basis, "opening_top_height_m": opening_top_height_m,
             "h_m": h,
             "z_m": float(z_m) if z_m is not None else None,
             "roof_slope_deg": float(roof_slope_deg) if roof_slope_deg is not None else None,
@@ -623,9 +658,10 @@ def calculate_wall_design_pressure(
             "status": "SUPPORTED",
             "route": route,
             "governing_wind_source": "code",
-            "partially_enclosed_internal_velocity_pressure_basis": "q(h)",
+            "partially_enclosed_internal_velocity_pressure_basis": positive_internal_pressure_basis,
+            "positive_internal_pressure_status": ("CONSERVATIVE_QH_FALLBACK" if common["enclosure"] == "partially_enclosed" and positive_internal_pressure_basis == "q(h)" else "PRESCRIBED_BASIS"),
         },
-        "velocity_pressure": {"qz": qz, "qh": qh, "qi": q_internal},
+        "velocity_pressure": {"qz": qz, "qh": qh, "qi": qi_positive, "qi_positive": qi_positive, "qi_negative": qi_negative},
         "corner_zone": {
             "a_m": corner_a_m,
             "formula": (
@@ -666,6 +702,8 @@ def calculate_roof_design_pressure(
     apply_parapet_zone3_as_zone2: bool = False,
     parapet_all_sides: bool = False,
     parapet_height_m: float | None = None,
+    positive_internal_pressure_basis: str = "q(h)",
+    opening_top_height_m: float | None = None,
     data: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Calculate admitted roof routes; Figure 3.2 low-slope suction is bounded."""
@@ -682,6 +720,7 @@ def calculate_roof_design_pressure(
         data=ref,
     )
     h = common["h_m"]
+    qi_positive, qi_negative = _internal_pressures(common, terrain_category=terrain_category, kzt=kzt, opening_top_height_m=opening_top_height_m, positive_internal_pressure_basis=positive_internal_pressure_basis, data=ref)
     area = float(effective_area_m2)
     width = float(least_horizontal_dimension_m)
     if not math.isfinite(area) or area <= 0:
@@ -730,13 +769,13 @@ def calculate_roof_design_pressure(
         display = {}
         unit_factor = float(ref["constants"]["kgf_per_m2_to_kpa"])
         for zone in ("zone1", "zone2", "zone3"):
-            negative = pressure_scale * (gcp[f"{zone}_negative"] - gcpi)
+            negative = pressure_scale * gcp[f"{zone}_negative"] - qi_positive["q_kpa"] * gcpi
             entry = {
                 "negative_kpa": negative,
                 "negative_kgf_m2": negative / unit_factor,
             }
             if not partial:
-                positive = pressure_scale * (gcp["positive_all_zones"] + gcpi)
+                positive = pressure_scale * gcp["positive_all_zones"] + qi_negative["q_kpa"] * gcpi
                 entry["positive_kpa"] = positive
                 entry["positive_kgf_m2"] = positive / unit_factor
             raw[zone] = entry
@@ -763,7 +802,7 @@ def calculate_roof_design_pressure(
                 "importance_factor": common["importance_factor"],
                 "terrain_category": str(terrain_category).strip().upper(),
                 "kzt": float(kzt), "enclosure": common["enclosure"],
-                "gcpi_magnitude": gcpi, "h_m": h, "roof_slope_deg": slope,
+                "gcpi_magnitude": gcpi, "positive_internal_pressure_basis": positive_internal_pressure_basis, "opening_top_height_m": opening_top_height_m, "h_m": h, "roof_slope_deg": slope,
                 "effective_area_m2": area, "least_horizontal_dimension_m": width,
                 "apply_parapet_zone3_as_zone2": bool(apply_parapet_zone3_as_zone2),
                 "parapet_all_sides": bool(parapet_all_sides),
@@ -779,9 +818,10 @@ def calculate_roof_design_pressure(
                     "NOT_ADMITTED" if partial else "CALCULATED"
                 ),
                 "governing_wind_source": "code",
-                "partially_enclosed_internal_velocity_pressure_basis": "q(h)",
+                "partially_enclosed_internal_velocity_pressure_basis": positive_internal_pressure_basis,
+            "positive_internal_pressure_status": ("CONSERVATIVE_QH_FALLBACK" if common["enclosure"] == "partially_enclosed" and positive_internal_pressure_basis == "q(h)" else "PRESCRIBED_BASIS"),
             },
-            "velocity_pressure": {"qh": qh, "qi": qh},
+            "velocity_pressure": {"qh": qh, "qi": qi_positive, "qi_positive": qi_positive, "qi_negative": qi_negative},
             "corner_zone": {
                 "a_m": max(0.10 * width, 0.9),
                 "formula": "max(0.10*B, 0.9 m)",
@@ -826,14 +866,14 @@ def calculate_roof_design_pressure(
 
     qh = common["qh"]
     gcpi = common["gcpi_magnitude"]
-    positive = qh["q_kpa"] * gcp["positive_all_zones"] + qh["q_kpa"] * gcpi
+    positive = qh["q_kpa"] * gcp["positive_all_zones"] + qi_negative["q_kpa"] * gcpi
 
     pressures: dict[str, dict[str, float]] = {}
     for zone in ("zone1", "zone2", "zone3"):
         negative_gcp = gcp[f"{zone}_negative"]
         pressures[zone] = {
             "positive_kpa": positive,
-            "negative_kpa": qh["q_kpa"] * negative_gcp - qh["q_kpa"] * gcpi,
+            "negative_kpa": qh["q_kpa"] * negative_gcp - qi_positive["q_kpa"] * gcpi,
         }
     raw, display = _pressure_sets(
         pressures,
