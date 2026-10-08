@@ -18,6 +18,10 @@ Nfix,1,6
 Nrot,5,5,1.57
 *node file
 U
+*node print,nset=Nfix
+RF
+*node print,nset=Nrot
+RF
 *section print,surface=Sfix,name=fix
 SOF
 *section print,surface=Srot,name=rot
