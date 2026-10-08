@@ -39,6 +39,10 @@ jobs:
             echo '## OS'
             cat /etc/os-release
           } | tee tests/fea_benchmark/provenance/calculix-package.txt
+          # Check presence and format; do not assume a distro version remains fixed.
+          grep -Eq '^calculix-ccx[[:space:]]+[0-9]' tests/fea_benchmark/provenance/calculix-package.txt
+          grep -Eq '^[0-9a-f]{64}[[:space:]]+/usr/bin/ccx$' tests/fea_benchmark/provenance/calculix-package.txt
+          grep -q '^VERSION_ID="24.04"$' tests/fea_benchmark/provenance/calculix-package.txt
       - name: 實際解非線性 truss benchmark
         working-directory: tests/fea_benchmark
         run: |

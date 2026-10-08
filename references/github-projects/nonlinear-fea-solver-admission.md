@@ -279,3 +279,10 @@ CalculiX 官方 `*NODE PRINT` 的 `RF` 包含支承反力與施加在所列節�
 - `src/dload.f`：此為 user subroutine DLOAD 範例／lubrication coupling，雖列出 `ifaceq` 的 face 1 slots `(4,3,2,1,11,10,9,12)`，**不是足以獨立證明普通均布壓力之 production load integration 路徑**；不得直接將其當作 solver ordinary pressure oracle。
 
 以上只能支持 **candidate face mapping**，不能據此宣稱已精確重建 CCX 實際 follower force。Stage 11 下一個必需的證據是 pin CalculiX 2.21 對應 source revision、普通 `*DLOAD,P` 的內部 load integration path、變形後 expanded face coordinates／rotational MPC 的取得方法。缺任一項，結果為 `SHELL_FACE_GEOMETRY_UNRESOLVED` 並保持 `GLOBAL_BALANCE_NOT_ADMITTED`。原有 Stage 10 的 0.33% 差異不可直接歸因厚度或旋轉。
+
+
+### 第十一階段套件版本實證與原始碼來源定位（尚未認證受壓面平衡）
+
+- 2026-10-08 GitHub Actions PR #34，exact-head `ca5d200871f3b36c4a733c477be761ab2552e106`、CalculiX run `37773447955` SUCCESS；其執行日誌證明 Ubuntu 24.04.5 LTS 安裝 `calculix-ccx 2.21-1`，套件 archive `calculix-ccx_2.21-1_amd64.deb` 的 apt metadata SHA-256 為 `796f7e0c518817651c4b82d3fb14e38ceebc2b8d2cd503db9e5c2fec21ae2fd3`，實際 `/usr/bin/ccx` SHA-256 為 `6adaabf5bf0382fc2bfd692b984320ed375dba777f7dc8297562f818043faa1b`。以上是 binary provenance，**不等於 source-to-binary reproducible-build proof**。
+- 版本相符的公開來源已定位為 [Debian Sources `calculix-ccx/2.21-1`](https://sources.debian.org/src/calculix-ccx/2.21-1/) 與 [Debian 2.21-1 source package](https://packages.debian.org/source/sid/calculix-ccx)（`calculix-ccx_2.21.orig.tar.bz2` 加 Debian packaging/patches）；[Ubuntu noble source package](https://packages.ubuntu.com/source/noble/calculix-ccx) 亦標示 `2.21-1`。**目前尚未逐檔讀取並校驗此 exact source package 的 `dloads.f`、`gen3dfrom2d.f`、ordinary pressure integration routine 與 patches**，不能用 upstream master 取代。
+- CI artifact `calculix-nlgeom-probe` 已包含 `tests/fea_benchmark/provenance/calculix-package.txt`。後續須在 exact source package 中交叉核對 `*DLOAD,P`→expanded solid face、quadratic surface integration 與 NLGEOM deformed coordinates；若不能證實，維持 `SHELL_FACE_GEOMETRY_UNRESOLVED`、`GLOBAL_BALANCE_NOT_ADMITTED`、`EVIDENCE GATED`。
