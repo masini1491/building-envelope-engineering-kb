@@ -269,3 +269,13 @@ CalculiX 官方 `*NODE PRINT` 的 `RF` 包含支承反力與施加在所列節�
 - 真正全域平衡 admission 另須確定完整支承反力來源、可能的 in-plane 及 moments／constraints、pressure follower resultant；需用真實 CCX exact-head CI、數值獨立 oracle、main read-back 才可考慮，仍排除 ASTM E1300／ADM capacity。
 
 **Stage 11 起始研究結果：** 目前 repository `generate.py` 只輸出 S8R `*NODE`／`*ELEMENT`、`NALL U` 與 `EDGE RF`；`check_follower_pressure.py` 的 Gauss 積分只重建變形後中面，沒有 expanded C3D20R 的面 connectivity 或壓力面座標。故在現有已 admission evidence 下，**無法直接宣稱已取得精確壓力面全域平衡**。下一步須先取得 solver-level expanded-face 的可追溯輸出或可靠原始碼／手冊映射，再實作對帳。
+
+### 第十一階段原始碼交叉核對：受壓面 1 與 P1（研究證據，尚未認證）
+
+本次定位 upstream `Dhondtguido/CalculiX@master` 下列檔案；**master 是目前讀到的 upstream source，尚未證明與 CI 安裝之 CalculiX 2.21-1 binary 完全一致**，不得冒充 exact-version authority：
+
+- `src/gen3dfrom2d.f`：展開 20-node solid 時，原始 S8R 的 corner nodes 1–4 對應 solid face 1 corners；原始 midside nodes 5–8 對應 solid face 1 midsides（expanded connectivity slots 9–12）；相對面為 solid face 2（slots 5–8、13–16）。展開表面座標涉及厚度、offset、node normal。
+- `src/dloads.f`：對 `lakon` 殼元素的一般非 EDNOR、非 I distributed load，標籤分支設定 `label(1:2)='P1'`；**需確認實際 `*DLOAD PLATE,P` 是否通過該分支**。
+- `src/dload.f`：此為 user subroutine DLOAD 範例／lubrication coupling，雖列出 `ifaceq` 的 face 1 slots `(4,3,2,1,11,10,9,12)`，**不是足以獨立證明普通均布壓力之 production load integration 路徑**；不得直接將其當作 solver ordinary pressure oracle。
+
+以上只能支持 **candidate face mapping**，不能據此宣稱已精確重建 CCX 實際 follower force。Stage 11 下一個必需的證據是 pin CalculiX 2.21 對應 source revision、普通 `*DLOAD,P` 的內部 load integration path、變形後 expanded face coordinates／rotational MPC 的取得方法。缺任一項，結果為 `SHELL_FACE_GEOMETRY_UNRESOLVED` 並保持 `GLOBAL_BALANCE_NOT_ADMITTED`。原有 Stage 10 的 0.33% 差異不可直接歸因厚度或旋轉。
