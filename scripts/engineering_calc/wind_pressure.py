@@ -397,10 +397,10 @@ def figure_3_2_roof_suction_with_parapet(
         "effective_area_m2": float(effective_area_m2),
         "zone1_negative": result["zone1_negative"],
         "zone2_negative": result["zone2_negative"],
-        "zone3_negative": result["zone2_negative"],
+        "zone3_negative": zone3_value,
         "zone3_direct_negative": zone3_value,
         "zone3_direct_provenance": zone3["value_nature"],
-        "parapet_zone3_as_zone2_applied": True,
+        "parapet_zone3_as_zone2_applied": False,
         "coefficient_provenance": fig["transcription_status"],
         "positive_all_zones": None,
     }
@@ -707,8 +707,8 @@ def calculate_roof_design_pressure(
                 if not math.isfinite(parapet_height) or parapet_height <= 0.9:
                     raise WindPressureInputError("Figure 3.2 roof parapet height must be > 0.9 m")
                 parapet_applied = True
-            else:
-                gcp["zone3_negative"] = gcp["zone3_direct_negative"]
+                gcp["zone3_negative"] = gcp["zone2_negative"]
+                gcp["parapet_zone3_as_zone2_applied"] = True
             route = ("FIGURE_3_2_HIGH_RISE_ROOF_PARAPET_SUCTION_ONLY"
                      if parapet_applied else "FIGURE_3_2_HIGH_RISE_ROOF_DIRECT_ZONE3_SUCTION_ONLY")
             partial = True
