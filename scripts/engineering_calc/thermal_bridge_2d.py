@@ -16,6 +16,7 @@ from typing import Sequence
 
 
 VALIDATION_SCOPE = "ISO_10211_2017_PUBLIC_CASE1_CASE2_BACKEND_REGRESSION"
+ADMITTED_BACKEND_VERSIONS = {"scikit-fem": "12.0.2", "numpy": "2.5.3", "scipy": "1.18.1"}
 
 
 class ThermalBridgeInputError(ValueError):
@@ -96,7 +97,7 @@ def _load_backend():
 def _finite_float(value: float, field: str) -> float:
     try:
         number = float(value)
-    except (TypeError, ValueError) as exc:
+    except (TypeError, ValueError, OverflowError) as exc:
         raise ThermalBridgeInputError(f"{field} must be numeric") from exc
     if not math.isfinite(number):
         raise ThermalBridgeInputError(f"{field} must be finite")
@@ -114,11 +115,11 @@ def _int_index(value: int, field: str) -> int:
         raise ThermalBridgeInputError(f"{field} must be an integer index")
     try:
         number = int(value)
-    except (TypeError, ValueError) as exc:
+    except (TypeError, ValueError, OverflowError) as exc:
         raise ThermalBridgeInputError(f"{field} must be an integer index") from exc
     try:
         numeric = float(value)
-    except (TypeError, ValueError):
+    except (TypeError, ValueError, OverflowError):
         numeric = float(number)
     if not math.isfinite(numeric) or numeric != number:
         raise ThermalBridgeInputError(f"{field} must be an integer index")
@@ -156,6 +157,15 @@ def solve_steady_state_2d(
     """
 
     backend = _load_backend()
+    try:
+        actual_versions = {package: metadata.version(package) for package in ADMITTED_BACKEND_VERSIONS}
+    except metadata.PackageNotFoundError as exc:
+        raise ThermalBridgeBackendUnavailable("thermal backend package metadata is unavailable") from exc
+    if actual_versions != ADMITTED_BACKEND_VERSIONS:
+        raise ThermalBridgeBackendUnavailable(
+            f"unvalidated thermal backend versions: {actual_versions!r}; "
+            f"expected {ADMITTED_BACKEND_VERSIONS!r}"
+        )
     np = backend["np"]
     Basis = backend["Basis"]
     BilinearForm = backend["BilinearForm"]
@@ -263,7 +273,7 @@ def solve_steady_state_2d(
             raise ThermalBridgeInputError("boundary names must be unique")
         boundary_names.add(boundary_name)
         temperature = _finite_float(boundary.temperature_c, "temperature_c")
-        if not boundary.node_indices:
+        if len(boundary.node_indices) == 0:
             raise ThermalBridgeInputError(
                 f"fixed boundary {boundary_name!r} must contain at least one node"
             )
@@ -295,7 +305,7 @@ def solve_steady_state_2d(
         )
         if resistance <= 0.0:
             raise ThermalBridgeInputError("surface_resistance_m2k_w must be > 0")
-        if not boundary.edge_node_pairs:
+        if len(boundary.edge_node_pairs) == 0:
             raise ThermalBridgeInputError(
                 f"surface boundary {boundary_name!r} must contain at least one edge"
             )
@@ -347,13 +357,15 @@ def solve_steady_state_2d(
     element = ElementTriP1()
     basis = Basis(mesh, element)
 
-    matrix = None
-    for value in np.unique(conductivity):
-        selected = np.flatnonzero(conductivity == value)
-        contribution = float(value) * asm(
-            laplace, Basis(mesh, element, elements=selected)
-        )
-        matrix = contribution if matrix is None else matrix + contribution
+    @BilinearForm
+    def material_laplace(u, v, w):
+        return w.conductivity * (u.grad[0] * v.grad[0] + u.grad[1] * v.grad[1])
+
+    matrix = asm(
+        material_laplace,
+        basis,
+        conductivity=conductivity[:, None] * np.ones((1, basis.X.shape[1])),
+    )
 
     @BilinearForm
     def boundary_mass(u, v, _):
@@ -410,14 +422,9 @@ def solve_steady_state_2d(
         )
         heat_flow[boundary_name] = float(flow)
 
-    try:
-        skfem_version = metadata.version("scikit-fem")
-        numpy_version = metadata.version("numpy")
-        scipy_version = metadata.version("scipy")
-    except metadata.PackageNotFoundError as exc:
-        raise ThermalBridgeBackendUnavailable(
-            "thermal backend package metadata is unavailable"
-        ) from exc
+    skfem_version = actual_versions["scikit-fem"]
+    numpy_version = actual_versions["numpy"]
+    scipy_version = actual_versions["scipy"]
 
     return ThermalBridge2DResult(
         node_temperature_c=tuple(float(value) for value in temperature),
