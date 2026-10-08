@@ -40,17 +40,6 @@ Cold item **不具 execution authority**。要開始實作前，必須依 curren
 
 ## 候選（CANDIDATE）
 
-### 高樓層屋頂 Zone 1／2／3 wind-pressure coverage（KB-CAND-008）
-
-- **Why**：current Wind V2 已支援 `h > 18 m` 外牆與 `h <= 18 m` 屋頂，但官方 Figure 3.2 同時定義 `h > 18 m` 屋頂 Zone 1／2／3。
-- **Trigger**：需要 `h > 18 m` 屋頂局部構材／外部被覆物設計風壓。
-- **Current obligation**：另行設計 Figure 3.2 roof coefficient/routing；不得順手併入其他 Stage。
-
-### 玻璃熱傳與結露 screening（KB-CAND-006）
-
-- **Why**：需要由已知 U-value／boundary conditions推導表面溫度、fRsi或 dew-point risk。
-- **Current obligation**：只使用 verified project/manufacturer inputs；不吸收未追溯產品 catalog。
-
 ### 玻璃／金屬板非線性 FEA execution adapter（KB-CAND-007）
 
 - **Why**：現有 glass／metal-panel FEA governance沒有 validated nonlinear execution route。
