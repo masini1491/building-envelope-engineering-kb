@@ -36,6 +36,7 @@ jobs:
           test -s fix.nam
           test -s rot.nam
           test -s fix.sur
+          test -s rot.sur
           grep -qi 'S8' all.msh
       - name: 真實執行 90 度 NLGEOM 殼板
         working-directory: tests/fea_benchmark/shell90
@@ -56,6 +57,7 @@ jobs:
             (cd "mesh_${count}" && timeout 60s xvfb-run -a cgx -b mesh.fbd && timeout 90s ccx -i shell90)
           done
           python check_mesh_convergence.py
+          python diagnose_end_reactions.py
       - name: 保存可查證數值輸出
         if: always()
         uses: actions/upload-artifact@v4

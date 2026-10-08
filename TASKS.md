@@ -11,7 +11,8 @@
 - 第二階段候選：以 Ubuntu 官方 apt 的 CalculiX CCX 2.21-1／CGX 2.21+dfsg-1build1 執行 **真正** NLGEOM truss 與 90° shell；truss 只完成 x/y 解析反力比對；shell 現有增量完整性與 FRD 產生證據，**尚無殼板獨立數值答案與 mesh convergence**。詳見 `references/github-projects/nonlinear-fea-solver-admission.md`。
 - 第三階段候選：公開 90° 殼板的 20／40／80 長向網格已由真實 CGX+CCX CI 成功執行，從 FRD／DAT 提取自由端位移及固定端彎矩；以獨立圓弧梁近似檢核最細網格 X／Z 位移，兩項位移及彎矩細化趨勢 PASS。證據與限制見 `references/github-projects/nonlinear-fea-solver-admission.md`；仍須 exact-head PR、merge/main CI 後才算正式完成此 bounded Stage。
 - 第四階段：加入 shell90 固定端彎矩 `EIθ/L` 獨立梁理論近似、固定端寄生力／非主軸矩的 bounded 檢查，真實 CalculiX 與既有 CI 均通過；見研究 dossier 與 PR #23。
-- **仍待**：完整施加端與固定端全自由度反力平衡、元素／網格數值精度、玻璃／金屬板的材料與支承專屬面外壓力 benchmark、工程 acceptance。梁理論近似不能代表已驗證的完整殼板結構設計能力。
+- 第五階段候選：現有 shell90 新增施加轉角端 `SROT` 截面、兩端節點 `RF` 輸出與 fail-closed 診斷腳本。真實 CalculiX CI 驗證 20／40／80 網格取得結果；兩端截面 `My` 未完全抵消，節點 RF 並非完整旋轉約束反力，**不宣稱 full global balance PASS**。詳見 `references/github-projects/nonlinear-fea-solver-admission.md`。
+- **仍待**：完整施加端與固定端全自由度反力平衡（包含旋轉拘束的可驗證輸出與座標轉換）、元素／網格數值精度、玻璃／金屬板材料及支承專屬面外壓力 benchmark、工程 acceptance。保留 `EVIDENCE GATED`。
 - 後續 benchmark stage 需 fresh admission；不得自動下載外部二進位檔、執行未知輸入檔或宣稱設計強度 PASS。
 
 ## 使用規則
