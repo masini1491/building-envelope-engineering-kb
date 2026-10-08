@@ -10,7 +10,8 @@
 - 已建立外部 executable 的 probe 與 mock regression、benchmark sourcing／license dossier；需要 PR exact-head CI、main CI 及 canonical read-back 方可結束第一階段。
 - 第二階段候選：以 Ubuntu 官方 apt 的 CalculiX CCX 2.21-1／CGX 2.21+dfsg-1build1 執行 **真正** NLGEOM truss 與 90° shell；truss 只完成 x/y 解析反力比對；shell 現有增量完整性與 FRD 產生證據，**尚無殼板獨立數值答案與 mesh convergence**。詳見 `references/github-projects/nonlinear-fea-solver-admission.md`。
 - 第三階段候選：公開 90° 殼板的 20／40／80 長向網格已由真實 CGX+CCX CI 成功執行，從 FRD／DAT 提取自由端位移及固定端彎矩；以獨立圓弧梁近似檢核最細網格 X／Z 位移，兩項位移及彎矩細化趨勢 PASS。證據與限制見 `references/github-projects/nonlinear-fea-solver-admission.md`；仍須 exact-head PR、merge/main CI 後才算正式完成此 bounded Stage。
-- 仍待：來源獨立的 shell **反力／彎矩絕對值**基準、全自由度平衡與元素精度審查，以及玻璃／金屬板材料、支承、實際面外壓力下的個別非線性 benchmark。圓弧近似與三網格趨勢不能宣稱玻璃／金屬板工程設計已 admission。
+- 第四階段：加入 shell90 固定端彎矩 `EIθ/L` 獨立梁理論近似、固定端寄生力／非主軸矩的 bounded 檢查，真實 CalculiX 與既有 CI 均通過；見研究 dossier 與 PR #23。
+- **仍待**：完整施加端與固定端全自由度反力平衡、元素／網格數值精度、玻璃／金屬板的材料與支承專屬面外壓力 benchmark、工程 acceptance。梁理論近似不能代表已驗證的完整殼板結構設計能力。
 - 後續 benchmark stage 需 fresh admission；不得自動下載外部二進位檔、執行未知輸入檔或宣稱設計強度 PASS。
 
 ## 使用規則
