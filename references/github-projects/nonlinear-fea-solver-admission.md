@@ -228,7 +228,22 @@ CalculiX 官方 `*NODE PRINT` 的 `RF` 包含支承反力與施加在所列節�
 
 `check_follower_pressure.py` 僅接受原有規則、軸向矩形初始網格及無 MPC 的輸入；缺漏節點、重複／非有限數值、翻轉積分點應拒絕。其物理界線明確：CalculiX 的 `S8R` 殼元素在 CCX 中會展開成三維單元，壓力作用面與 expanded shell face／厚度旋轉效應可能不同於所算中面。因此中面積分只是**獨立幾何診斷**，不可將 `corrected RF + midpoint follower resultant` 的小殘差當作真實全域平衡 PASS，也不得為數值吻合調整容差。
 
-相關一手文件：CalculiX 2.21 User's Manual 的 shell elements、`*DLOAD`、`*NODE PRINT`（https://www.dhondt.de/ccx_2.21.pdf）；套件與 workflow 版本仍依 Repo 既有 CI。Stage 10 真實結果及其數值差距必須經 exact-head CI 確認後更新；在此之前保持 `GLOBAL_BALANCE_NOT_ADMITTED`。
+相關一手文件：CalculiX 2.21 User's Manual 的 shell elements、`*DLOAD`、`*NODE PRINT`（https://www.dhondt.de/ccx_2.21.pdf）；套件與 workflow 版本仍依 Repo 既有 CI。
+
+最終真實 CI：首次 PR #30 candidate `456259569cc6aa32e95f9931045abc8956553d47` 的 `37758509709` 因缺少明確 `NSET=NALL`，於 `MISSING_NALL_DISPLACEMENTS` 中止，非平衡驗證失敗。修正後 exact-head `fa9b9fa4c7a6cd62f63be93dc25ff1982691b088` 的 CalculiX `37759647404` 與 Repo CI `37759647455` 均 SUCCESS；merge `8f7baadeecde993e64755a72e628bcc4f35ec545` 的 main CI `37759837478` SUCCESS，已 canonical read-back。
+
+最終高壓 `q=0.6 N/mm²`：變形中面之法向積分總 Z 力、扣除中面節點荷載後推算的支承 Z 力及其差額（單位 N）：
+
+| 合成模型 | 4 網格 | 8 網格 | 16 網格 |
+|---|---|---|---|
+| Glass 中面總 Z 力 | +5980.47755 | +5980.62611 | +5980.61979 |
+| Glass 推算支承 Z 力 | −5961.35233 | −5960.79661 | −5960.67006 |
+| Glass Z 殘差 | +19.12522 | +19.82950 | +19.94973 |
+| Aluminum 中面總 Z 力 | +6000.00000 | +6000.00000 | +6000.00000 |
+| Aluminum 推算支承 Z 力 | −5997.82984 | −5998.82605 | −5999.40968 |
+| Aluminum Z 殘差 | +2.17016 | +1.17395 | +0.59032 |
+
+相對殘差（3D norm／中面總力 norm）：Glass `0.00319794`／`0.00331562`／`0.00333573`；Aluminum `0.000361693`／`0.000195659`／`0.0000983869`。Glass 差異並未隨網格細化消失。此數值僅表示**中面近似**與 solver RF 不完全相同，尚不能歸因於單一厚度、旋轉或 pressure face mechanism。**`FOLLOWER_PRESSURE_MIDSURFACE_DIAGNOSTICS_COMPLETE`；`GLOBAL_BALANCE_NOT_ADMITTED`**。完整殼單元壓力作用面／厚度轉換及真正支承約束反力定義仍須獨立驗證。
 
 ## 真正 benchmark admission 的最低缺口
 
