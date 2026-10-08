@@ -14,7 +14,8 @@
 - 第五階段候選：現有 shell90 新增施加轉角端 `SROT` 截面、兩端節點 `RF` 輸出與 fail-closed 診斷腳本。真實 CalculiX CI 驗證 20／40／80 網格取得結果；兩端截面 `My` 未完全抵消，節點 RF 並非完整旋轉約束反力，**不宣稱 full global balance PASS**。詳見 `references/github-projects/nonlinear-fea-solver-admission.md`。
 - 第六階段候選：合成四邊簡支 100×100×1 mm 均佈受壓 `S8R` 板，4／8／16 網格以真實 CCX `NLGEOM` 驗證；小撓度與獨立 Kirchhoff 係數 `0.00406` 比較，16 分割偏差約 0.88%，較大壓力呈現幾何非線性膜內增剛，均有網格細化趨勢。僅限 bounded plate benchmark，待 exact-head CI／main CI closure。詳見 `references/github-projects/nonlinear-fea-solver-admission.md`。
 - 第七階段候選：玻璃／鋁板獨立合成面外壓力 benchmark，各有物性及四邊簡支／固定支承；4／8／16 S8R 網格、兩壓力，真實 CCX NLGEOM 已驗證，小撓度 Kirchhoff 獨立理論 5% 以內、網格趨勢及定性大變形增剛。僅為 synthetic elastic proxy，見 `references/github-projects/nonlinear-fea-solver-admission.md`；最終需 exact-head/main CI read-back。
-- **仍待**：完整雙端全自由度反力平衡、真實玻璃／鋁板材料與支承及風壓條件、各自破壞／屈服／屈曲準則、產品強度資料、幾何非線性大撓度獨立精確答案及工程 acceptance；保持 `EVIDENCE GATED`，不宣稱 ASTM E1300／ADM capacity。
+- 第八階段：以玻璃／鋁板合成 `S8R` 受壓板的 `EDGE RF` 輸出作壓力／邊界反力診斷；小壓力下 4／8／16 網格總反力相對 `qA₀` 分別不足約 18.75%／8.85%／4.30%，缺口隨網格細化減少。**物理平衡 gate 未通過**：診斷腳本保留 mismatch，CI SUCCESS 僅代表診斷可重現，不代表平衡驗證 PASS；詳見 `references/github-projects/nonlinear-fea-solver-admission.md`。
+- **仍待**：釐清 `S8R` 壓力離散／所有反力來源並對照實際 follower pressure 全域合力，完成兩種板件外力與拘束反力獨立平衡，以及真實材料、支承、風壓與失效／屈曲準則、產品資料、大撓度獨立答案和工程 acceptance；維持 `EVIDENCE GATED`，不宣稱 ASTM E1300／ADM capacity。
 - 後續 benchmark stage 需 fresh admission；不得自動下載外部二進位檔、執行未知輸入檔或宣稱設計強度 PASS。
 
 ## 使用規則
