@@ -84,6 +84,38 @@ PR #23 的第一輪真實 CalculiX candidate run `37722229764`
 它量測的是固定端 section-resultant 的寄生分量，並未對照各施加轉角
 的端部反力；殼板應力、接觸、玻璃與金屬板工程承載力均不適用。
 
+## 第五階段：兩端截面與節點反力診斷（尚非完整平衡）
+
+在現有公開 `shell90` 的 CGX `mesh.fbd` 追加 `rot.sur`，
+並對 `SFIX`／`SROT` 同時啟用 `*SECTION PRINT ... SOF`；另以
+`*NODE PRINT,NSET=Nfix/Nrot` 輸出節點 `RF`。
+對 20／40／80 分割進行實際 CCX 2.21 NLGEOM 求解，加入
+`diagnose_end_reactions.py` 擷取最終荷載時間的六維截面結果、
+兩端節點平移反力以及兩截面直接相加值；資料不完整即 fail-closed。
+候選真實 CI `37729008135` 已 SUCCESS，配對 Repo CI
+`37729008081` 已 SUCCESS。
+
+**工程發現（80 分割、最終增量，N／N·mm）：**
+
+- 固定端截面：`F=(+0.516657, ~0, −0.043495)`，
+  `M=(-0.217474, −2775.174, −2.583286)`。
+- 施加旋轉端截面：`F=(+0.000230, ~0, −0.026376)`，
+  `M=(-0.131881, +2777.080, −0.001152)`。
+- 截面主彎矩絕對值相近，但兩端截面 `My` 和尚差約
+  `+1.906 N·mm`；合力並未直接互抵。
+- 固定端 `Nfix` 節點平移反力非零；施加旋轉端 `Nrot`
+  平移反力接近零。節點 RF1～RF3 **不包含足以認證所有旋轉拘束
+  反力的完整資訊**。
+
+`SECTION PRINT` 是受表面法向／切面定義影響的截面力；
+`NODE PRINT RF` 是所列節點的受約束反力，不可直接拿兩者
+進行全自由度平衡合格判定。最終正確 disposition：
+`TWO_END_REACTION_DIAGNOSTIC_COMPLETE_NOT_GLOBAL_BALANCE_PASS`；
+**全域平衡 gate 繼續 EVIDENCE GATED**。需要可追溯的外力／位移
+拘束工作、含旋轉 DOF 的完整 nodal output formulation 與同一參考
+座標系之 wrench transformation 後，才能考慮完整 admission。
+保留目前反力差異作為 blocker，不能以近似零或放寬容差掩蓋。
+
 ## 真正 benchmark admission 的最低缺口
 
 1. Pin exact CalculiX / CGX version、binary provenance、運作平台及 licensing boundary。
