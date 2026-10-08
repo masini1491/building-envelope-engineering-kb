@@ -1,5 +1,7 @@
 import unittest
 
+from scripts.engineering_calc.review import run_review
+
 from scripts.engineering_calc.glazing_condensation import (
     CondensationInputError,
     screen_center_glass_condensation,
@@ -61,6 +63,32 @@ class GlazingCondensationTests(unittest.TestCase):
             with self.subTest(field=field, invalid=invalid):
                 with self.assertRaises(CondensationInputError):
                     screen_center_glass_condensation(**{**good, field: invalid})
+
+    def test_review_adapter_works_and_rejects_bad_humidity(self):
+        payload = {
+            "check_type": "glazing_condensation",
+            "units": {
+                "temperature": "degC",
+                "relative_humidity": "%",
+                "U": "W/(m2 K)",
+                "Rsi": "m2 K/W",
+            },
+            "inputs": {
+                "indoor_temperature_c": 20,
+                "outdoor_temperature_c": 0,
+                "indoor_relative_humidity_pct": 50,
+                "glazing_u_value_w_m2k": 2,
+                "interior_surface_resistance_m2k_w": 0.13,
+            },
+        }
+        ok = run_review(payload)
+        self.assertEqual(ok["calculation_status"], "COMPUTED")
+        self.assertEqual(ok["computed"]["compliance_status"], "SCREENING_ONLY_NOT_ISO_COMPLIANCE")
+        bad = run_review({
+            **payload,
+            "inputs": {**payload["inputs"], "indoor_relative_humidity_pct": 110},
+        })
+        self.assertEqual(bad["calculation_status"], "INCOMPLETE_INPUT")
 
     def test_scope_is_explicit(self):
         result = screen_center_glass_condensation(
