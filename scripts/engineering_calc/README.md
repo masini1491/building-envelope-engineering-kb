@@ -34,7 +34,7 @@ python -m scripts.engineering_calc.review input.json
 
 最外層固定使用 `check_type / units / inputs / reported_results / tolerance`。`units` 必填且不得猜測；`reported_results` 可省略；`tolerance` 只代表 numerical agreement，不是 engineering acceptance criterion。
 
-目前 adapter 支援：`beam`、`required_inertia`、`required_section_modulus`、`section_property_utilization`、`fastener_group`、`demand_capacity`、`projected_bearing_stress`、`shear_tension_demand`、`thread_engagement`、`audit_product`、`audit_force_balance`、`wind_pressure`。`thermal_bridge_2d.py` 在目前 Stage **尚未接入 `review.py`**；若需要直接使用，屬明確的 lower-level `ADAPTER_FALLBACK`，不得描述成已支援的 AI-facing `check_type`。
+目前 adapter 支援：`glazing_condensation`、`beam`、`required_inertia`、`required_section_modulus`、`section_property_utilization`、`fastener_group`、`demand_capacity`、`projected_bearing_stress`、`shear_tension_demand`、`thread_engagement`、`audit_product`、`audit_force_balance`、`wind_pressure`。`thermal_bridge_2d.py` 在目前 Stage **尚未接入 `review.py`**；若需要直接使用，屬明確的 lower-level `ADAPTER_FALLBACK`，不得描述成已支援的 AI-facing `check_type`。
 
 ### 輸出契約
 
@@ -83,6 +83,19 @@ python -m scripts.engineering_calc.review input.json
 - 若未走 adapter，明確標示 `ADAPTER_FALLBACK` 與原因。
 
 不要求把完整 JSON 原樣貼給使用者，但不得只寫「已用 helper 重算」而無法區分真正 execution、手算、模型心算或 source-code inspection。
+
+### 玻璃中央部位結露初篩（`glazing_condensation`）
+
+AI-facing `review.py` 支援這個獨立 deterministic screening check_type。必填 `inputs`：
+`indoor_temperature_c`、`outdoor_temperature_c`、
+`indoor_relative_humidity_pct`（0–100%，且必須 >0）、
+`glazing_u_value_w_m2k` 及 `interior_surface_resistance_m2k_w`，
+均由工程師或可追溯產品／專案證據提供；`units` 仍須顯式提供。
+
+限定採 1D 穩態 `T_si=T_i-U×R_si×(T_i-T_o)` 與 Magnus 近似露點（17.62／243.12）比較；
+`temperature_factor_frsi` 在室內外溫度相等時為 `null`。
+`NO_CONDENSATION_IN_THIS_1D_MODEL` 只表示此模型下的局部表面比較，
+**不得**解讀為整窗／間隔條／窗框無結露，亦不評估黴菌、生長條件、時間累積與 ISO 13788／ISO 10211 project compliance。
 
 ## 工具邊界
 
