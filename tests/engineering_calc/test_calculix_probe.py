@@ -23,6 +23,7 @@ class CalculixProbeTests(unittest.TestCase):
     def test_rejects_bad_input(self):
         with tempfile.TemporaryDirectory() as d:
             Path(d, "case.inp").write_text("*HEADING\n", encoding="utf-8")
+            Path(d, "-x.inp").write_text("*HEADING\n", encoding="utf-8")
             for name in ("../case", "bad name", "-x", ""):
                 with self.subTest(name=name), self.assertRaises(FEAProbeInputError):
                     probe_calculix(executable="ccx", job_name=name, workspace=d)
