@@ -116,6 +116,39 @@ PR #23 的第一輪真實 CalculiX candidate run `37722229764`
 座標系之 wrench transformation 後，才能考慮完整 admission。
 保留目前反力差異作為 blocker，不能以近似零或放寬容差掩蓋。
 
+## 第六階段：四邊簡支薄板面外均布壓力（受限）
+
+使用合成、無任何專案身分的 100 × 100 × 1 mm 均質線彈性板，
+`E=210000 N/mm²`、`ν=0.3`，以 CalculiX `S8R` 元素、
+四邊 `Uz=0`、兩個抑制平面內剛體位移的錨點、`*DLOAD P`
+以及 `*STEP,NLGEOM` 執行 4／8／16 分割網格。
+
+獨立來源：Liu & Riggs（2005），*Structural Engineering and Mechanics* 19(3),
+Table 2，均佈荷載下四邊簡支正方形 Kirchhoff 薄板中央位移：
+`w=0.00406 q a^4/D`、`D=Et³/[12(1−ν²)]`；
+<https://www.techno-press.org/download.php?journal=sem&num=3&ordernum=4&volume=19>。
+此解析公式**僅適用小撓度線彈性薄板**；不是幾何非線性解析答案，
+也不是 ASTM E1300 玻璃承載力方法。
+
+實際候選 CalculiX run `37735614743` 的結果（mm）：
+
+| 網格 | 微小壓力 q=0.0001 N/mm² | 較高壓力 q=0.5 N/mm² |
+|---|---:|---:|
+| 4 | 0.002149116 | 3.577855 |
+| 8 | 0.002133544 | 3.664268 |
+| 16 | 0.002129700 | 3.668193 |
+
+微小壓力獨立 Kirchhoff 理論為 `0.0021112 mm`，16 分割結果
+偏差約 0.88%，符合明定 3% 容差；兩負載的網格細化差異均逐步縮小。
+較高壓力下的實測中心位移遠低於小撓度線性外推的約
+`10.6485 mm`，支持此**指定模型**出現 `NLGEOM` 膜內增剛的
+定性趨勢，但**沒有**獨立的大撓度精確參考、獨立 global reaction
+equilibrium gate 或可用於玻璃／金屬板的工程 acceptance。
+
+Admission 限定為 `BOUNDED_UNIFORM_PRESSURE_PLATE_PROBE`：
+可重現 S8R 受壓板件求解＋小撓度獨立參考＋兩種荷載網格細化。
+不得由此推導玻璃耐風承載力、金屬板強度、材料破壞或 ASTM／ADM 合規。
+
 ## 真正 benchmark admission 的最低缺口
 
 1. Pin exact CalculiX / CGX version、binary provenance、運作平台及 licensing boundary。
