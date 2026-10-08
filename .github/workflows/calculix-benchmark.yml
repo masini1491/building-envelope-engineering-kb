@@ -41,7 +41,9 @@ jobs:
           } | tee tests/fea_benchmark/provenance/calculix-package.txt
           # Fail closed on absent provenance; do not pin a moving distro package to an assumed version.
           grep -Eq '^calculix-ccx[[:space:]]+[0-9]' tests/fea_benchmark/provenance/calculix-package.txt
-          grep -Eq '^[0-9a-f]{64}[[:space:]]+/usr/bin/ccx      - name: 實際解非線性 truss benchmark
+          grep -Eq '^[0-9a-f]{64}[[:space:]]+/usr/bin/ccx$' tests/fea_benchmark/provenance/calculix-package.txt
+          grep -q '^VERSION_ID="24.04"$' tests/fea_benchmark/provenance/calculix-package.txt
+      - name: 實際解非線性 truss benchmark
         working-directory: tests/fea_benchmark
         run: |
           timeout 90s ccx -i geometric_truss
