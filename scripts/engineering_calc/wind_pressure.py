@@ -616,7 +616,7 @@ def calculate_wall_design_pressure(
     )
     zone5_negative = (
         q_external_negative["q_kpa"] * gcp["zone5_negative"]
-        - q_internal["q_kpa"] * gcpi
+        - qi_positive["q_kpa"] * gcpi
     )
     raw, display = _pressure_sets(
         {
