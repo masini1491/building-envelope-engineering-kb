@@ -659,6 +659,7 @@ def calculate_wall_design_pressure(
             "route": route,
             "governing_wind_source": "code",
             "partially_enclosed_internal_velocity_pressure_basis": positive_internal_pressure_basis,
+            "positive_internal_pressure_status": ("CONSERVATIVE_QH_FALLBACK" if common["enclosure"] == "partially_enclosed" and positive_internal_pressure_basis == "q(h)" else "PRESCRIBED_BASIS"),
         },
         "velocity_pressure": {"qz": qz, "qh": qh, "qi": qi_positive, "qi_positive": qi_positive, "qi_negative": qi_negative},
         "corner_zone": {
@@ -818,6 +819,7 @@ def calculate_roof_design_pressure(
                 ),
                 "governing_wind_source": "code",
                 "partially_enclosed_internal_velocity_pressure_basis": positive_internal_pressure_basis,
+            "positive_internal_pressure_status": ("CONSERVATIVE_QH_FALLBACK" if common["enclosure"] == "partially_enclosed" and positive_internal_pressure_basis == "q(h)" else "PRESCRIBED_BASIS"),
             },
             "velocity_pressure": {"qh": qh, "qi": qi_positive, "qi_positive": qi_positive, "qi_negative": qi_negative},
             "corner_zone": {
