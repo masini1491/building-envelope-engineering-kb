@@ -66,6 +66,24 @@ Green–Lagrange truss 分開執行；沒有將 shell 的 `frd`／`sta` 當作
 - **Admission**：`BOUNDED_SHELL90_GEOMETRIC_BENCHMARK_PASS`（90° 均質彈性殼板、指定轉角案例；網格敏感度與受限位移解析 cross-check）。不代表殼板 general formulation、應力、連接、接觸、鋁板或結構玻璃的設計強度或合規。
 - 仍待：獨立殼板反力／彎矩絕對量基準、全自由度反力平衡、細化品質／元素收斂階數、面外受壓板案例、玻璃與金屬板材料／邊界條件專屬 benchmark，以及與 engineering acceptance criteria 連結。不能把本次 bounded PASS 外推到 ASTM、ADM 或帷幕設計合格。
 
+## 第四階段：純彎固定端反力矩近似基準（2026-10-08）
+
+以非線性 90° shell 20／40／80 網格固定端 `.dat` 總力矩對照**外部獨立梁理論**：
+`M=EI×θ/L`，以 `E=210000 N/mm²`、`b=10 mm`、`t=1 mm`、
+`θ=1.57 rad`、`L=100 mm`，得理論 `|My|=2747.5 N·mm`。
+
+舊的 80 網格輸出 `My=-2775.174 N·mm`，與理論差 27.674 N·mm；
+目前 automated gate 容許偏差 35 N·mm，另要求 20→40→80
+固定端 `My` 的差值縮小，以及固定端寄生三維合力與非主軸力矩
+小於相應標準化限值（5% `|My|/L`、2% `|My|`）。
+
+PR #23 的第一輪真實 CalculiX candidate run `37722229764`
+與 repository run `37722229789` 均 PASS；其適用範圍僅為
+公開 90° 均質等向彈性殼板模型與近似 Euler–Bernoulli 梁理論比對。
+`check_mesh_convergence.py` 仍不宣稱完整自由度 global balance：
+它量測的是固定端 section-resultant 的寄生分量，並未對照各施加轉角
+的端部反力；殼板應力、接觸、玻璃與金屬板工程承載力均不適用。
+
 ## 真正 benchmark admission 的最低缺口
 
 1. Pin exact CalculiX / CGX version、binary provenance、運作平台及 licensing boundary。
