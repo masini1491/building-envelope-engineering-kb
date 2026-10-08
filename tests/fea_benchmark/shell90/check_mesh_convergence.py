@@ -52,7 +52,25 @@ def extract(directory):
     if not matches: raise SystemExit("MISSING_REACTION_MOMENT")
     vals=[float(v) for v in matches[-1].group(2).split()]
     if len(vals)!=6: raise SystemExit("BAD_REACTION_MOMENT")
+    # At a pure imposed end-rotation the ideal net support force is zero.
+    # Check CGX/CCX reported support traction force stays small relative to
+    # characteristic bending force abs(M)/L; do not claim exact equilibrium.
+    force_norm=math.sqrt(sum(v*v for v in vals[:3]))
+    if force_norm > 0.05 * abs(vals[4])/LENGTH:
+        raise SystemExit("SUPPORT_PARASITIC_FORCE_TOO_LARGE")
+    if abs(vals[3]) > 0.02*abs(vals[4]) or abs(vals[5]) > 0.02*abs(vals[4]):
+        raise SystemExit("SUPPORT_PARASITIC_MOMENT_TOO_LARGE")
     return (x,z,vals[4],len(geo))
+
+# Independent Euler-Bernoulli bending idealization, per unit strip width:
+# EI = E*b*t^3/12. The 90-degree pure-bending moment is EI*theta/L.
+# This is an approximate thin-strip theory, not an exact 3D shell solution.
+E=210000.0
+WIDTH=10.0
+THICKNESS=1.0
+EXPECTED_ABS_MY=E*WIDTH*THICKNESS**3/12 * ANGLE/LENGTH
+if not math.isfinite(EXPECTED_ABS_MY):
+    raise SystemExit("INVALID_ANALYTIC_MOMENT")
 
 results=[]
 for subdivisions in (20,40,80):
@@ -61,6 +79,12 @@ for subdivisions in (20,40,80):
     print(f"MESH {subdivisions}: UX={result[0]:.6f} UZ={result[1]:.6f} MY={result[2]:.6f} nodes={result[3]}")
 coarse,medium,fine=results
 print(f"INDEPENDENT_ARC: UX={EXPECTED_X:.6f} UZ={EXPECTED_Z:.6f}")
+print(f"INDEPENDENT_EULER_BERNOULLI_MOMENT_ABS: MY={EXPECTED_ABS_MY:.6f} Nmm")
+if abs(abs(fine[2])-EXPECTED_ABS_MY)>35.0:
+    raise SystemExit("ANALYTICAL_REACTION_MOMENT_TOLERANCE_FAILED")
+if not (abs(fine[2]-medium[2]) < abs(medium[2]-coarse[2])):
+    raise SystemExit("REACTION_MOMENT_REFINEMENT_NOT_CONTRACTING")
+
 if abs(fine[0]-EXPECTED_X)>0.6 or abs(fine[1]-EXPECTED_Z)>0.7:
     raise SystemExit("ANALYTICAL_DISPLACEMENT_TOLERANCE_FAILED")
 if not (abs(fine[0]-medium[0])<abs(medium[0]-coarse[0]) and
