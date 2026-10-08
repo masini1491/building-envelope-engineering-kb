@@ -5,7 +5,7 @@
   "verification_status": "VERIFIED_PRIMARY",
   "verified_at": "2026-10-07",
   "authority": "Taiwan Ministry of the Interior / National Land Management Agency",
-  "scope": "V2 supports enclosed or partially enclosed wall components/cladding for h > 18 m under Figure 3.2, plus h <= 18 m walls and gable/hip roofs through 45 degrees under Figure 3.1.",
+  "scope": "Wind V2 plus bounded high-rise roof: h > 18 m Figure 3.2 Zone 1/2 suction with explicitly verified all-sides parapet > 0.9 m permitting Zone 3 as Zone 2; for roof slope > 10 degrees Figure 3.2 note 5 routes to Figure 3.1(c)/(d). General Figure 3.2 direct Zone 3 and positive roof GCp remain outside the admitted low-slope scope.",
   "sources": [
     {
       "id": "nlma-current",
