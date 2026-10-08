@@ -91,7 +91,8 @@ class TaiwanWindPressureTests(unittest.TestCase):
         self.assertAlmostEqual(high["zone1_negative"], -1.87)
         self.assertAlmostEqual(high["zone2_negative"], -3.33)
         self.assertAlmostEqual(middle["zone1_negative"], (-2.92 - 1.87) / 2)
-        self.assertEqual(low["zone3_negative"], low["zone2_negative"])
+        self.assertAlmostEqual(low["zone3_negative"], -6.67)
+        self.assertFalse(low["parapet_zone3_as_zone2_applied"])
         self.assertIsNone(low["positive_all_zones"])
 
     def test_zone3_direct_official_figure_endpoints_and_semilog_midpoint(self):
@@ -147,6 +148,7 @@ class TaiwanWindPressureTests(unittest.TestCase):
             result["pressures"]["zone3"]["negative_kpa"],
             result["pressures"]["zone2"]["negative_kpa"]
         )
+        self.assertTrue(result["coefficients"]["gcp"]["parapet_zone3_as_zone2_applied"])
         self.assertNotIn("positive_kpa", result["pressures"]["zone1"])
         self.assertAlmostEqual(result["corner_zone"]["a_m"], 2.0)
 
