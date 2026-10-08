@@ -112,6 +112,12 @@ AI-facing `review.py` 支援這個獨立 deterministic screening check_type。�
 `NO_CONDENSATION_IN_THIS_1D_MODEL` 只表示此模型下的局部表面比較，
 **不得**解讀為整窗／間隔條／窗框無結露，亦不評估黴菌、生長條件、時間累積與 ISO 13788／ISO 10211 project compliance。
 
+### 非線性 FEA 外部執行 probe（KB-CAND-007）
+
+`calculix_probe.py` 為本 Stage opt-in 外部 CalculiX process wrapper；不是 `review.py` check_type，也不自行產生求解器模型或解析求解結果。只有 caller 已審查本機輸入 deck、所有 include、工作目錄與 solver executable 時才可設 `execute=True`。預設不執行，且即使 process exit code 為 0 亦回報 `PROCESS_EXIT_ZERO_UNVERIFIED`，**不等於 NLGEOM 收斂／工程設計驗證**。沒有 sandbox；不得執行不可信輸入。
+
+選型與缺口見 [非線性 FEA 求解器研究](../../references/github-projects/nonlinear-fea-solver-admission.md)。本 repo 不打包 GPL-2.0 solver，benchmark 與實際 solver 執行仍待獨立驗證。
+
 ## 工具邊界
 
 - calculator 確認 arithmetic correctness，不等於確認 engineering correctness。
