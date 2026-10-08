@@ -258,3 +258,14 @@ CalculiX 官方 `*NODE PRINT` 的 `RF` 包含支承反力與施加在所列節�
 - CalculiX GPL-2.0：https://github.com/Dhondtguido/CalculiX/blob/master/LICENSE
 - 公開 90° 彎曲案例：https://github.com/calculix/CalculiX-Examples/tree/316273e9105e44ce7e3ee05059dac1bc3f256a69/Streifen
 - 本 Repo 既有 FEA owners：`knowledge/cladding/structural-analysis/plate-fea-modeling.md`、`knowledge/structural-glass/structural-glass-fea-modeling.md`；數值結果須遵守現有 FEA governance。
+
+## 第十一階段研究：展開殼單元作用面與反力來源（EVIDENCE GATED）
+
+**目前僅研究路線，不構成 admission。** Stage 10 在大壓力玻璃板中面 follower pressure 積分與 `EDGE RF` 校正之差約 0.32–0.33%，且網格細化不消失；鋁板約 0.0362% 降至 0.00984%。此差異不能直接歸因於特定厚度、曲率或求解器錯誤。
+
+- 先以官方 CalculiX 2.21 的 shell expansion、`*DLOAD` 壓力面、`*NODE PRINT RF` 語義及輸出格式為一手研究範圍；必須證實 S8R→expanded-solid 的面與符號對應，不可由中面推測實際壓力面。
+- 先設計不變更 production kernel 的 **A/B diagnostic**：同一 4／8／16 網格，分別收集 small/large load 的殼中面位移、可驗證的 shell face／expanded element evidence，以及 RF／外力分量；需有獨立幾何積分 oracle 和完整輸出覆蓋／非有限數／重複節點 negative guards。
+- 對厚度偏移與 rotations 的幾何 reconstruction，若沒有可驗證的 expanded-node 位置、元素面 connectivity、載荷方向與反力定義，應回報 `SHELL_FACE_GEOMETRY_UNRESOLVED`；**不得**把 `C3D20R` 面荷載與中面 Gauss 積分視為相同，亦不得調整 tolerance 強行 PASS。
+- 真正全域平衡 admission 另須確定完整支承反力來源、可能的 in-plane 及 moments／constraints、pressure follower resultant；需用真實 CCX exact-head CI、數值獨立 oracle、main read-back 才可考慮，仍排除 ASTM E1300／ADM capacity。
+
+**Stage 11 起始研究結果：** 目前 repository `generate.py` 只輸出 S8R `*NODE`／`*ELEMENT`、`NALL U` 與 `EDGE RF`；`check_follower_pressure.py` 的 Gauss 積分只重建變形後中面，沒有 expanded C3D20R 的面 connectivity 或壓力面座標。故在現有已 admission evidence 下，**無法直接宣稱已取得精確壓力面全域平衡**。下一步須先取得 solver-level expanded-face 的可追溯輸出或可靠原始碼／手冊映射，再實作對帳。
