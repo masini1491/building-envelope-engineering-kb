@@ -31,7 +31,7 @@ def probe_calculix(
     The input deck and its includes must already have been produced and reviewed
     by the caller. This API neither builds FEA models nor parses results.
     """
-    if not isinstance(job_name, str) or not job_name or not all(
+    if not isinstance(job_name, str) or not job_name or not job_name[0].isascii() or not job_name[0].isalnum() or not all(
         c.isascii() and (c.isalnum() or c in "_-") for c in job_name
     ) or len(job_name) > 64:
         raise FEAProbeInputError("job_name must be a short ASCII identifier")
