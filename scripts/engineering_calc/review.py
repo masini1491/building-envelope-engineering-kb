@@ -15,6 +15,7 @@ from .fastener_group import elastic_in_plane_group
 from .section_required import required_inertia, required_section_modulus, utilization
 from .connection import demand_capacity, projected_bearing_stress, shear_tension_demand, thread_engagement_ratio
 from .audit import audit_product, audit_force_balance
+from .glazing_condensation import CondensationInputError, screen_center_glass_condensation
 from .wind_pressure import (
     WindPressureInputError,
     WindPressureUnsupportedError,
@@ -184,6 +185,36 @@ def _wind_pressure(p, inp):
         flat[f"{zone}.negative_kpa"] = pressures["negative_kpa"]
     return _final(p, "wind_pressure", computed, flat)
 
+def _glazing_condensation(p, inp):
+    for field in (
+        "indoor_temperature_c", "outdoor_temperature_c",
+        "indoor_relative_humidity_pct", "glazing_u_value_w_m2k",
+        "interior_surface_resistance_m2k_w",
+    ):
+        if isinstance(inp.get(field), bool):
+            raise IncompleteInputError(f"inputs.{field} must be numeric, not boolean")
+    try:
+        result = screen_center_glass_condensation(
+            indoor_temperature_c=_num(inp, "indoor_temperature_c"),
+            outdoor_temperature_c=_num(inp, "outdoor_temperature_c"),
+            indoor_relative_humidity_pct=_num(inp, "indoor_relative_humidity_pct"),
+            glazing_u_value_w_m2k=_num(inp, "glazing_u_value_w_m2k"),
+            interior_surface_resistance_m2k_w=_num(
+                inp, "interior_surface_resistance_m2k_w"
+            ),
+        )
+    except CondensationInputError as exc:
+        raise IncompleteInputError(str(exc)) from exc
+    computed = asdict(result)
+    flat = {
+        "interior_surface_temperature_c": result.interior_surface_temperature_c,
+        "indoor_dew_point_c": result.indoor_dew_point_c,
+    }
+    if result.temperature_factor_frsi is not None:
+        flat["temperature_factor_frsi"] = result.temperature_factor_frsi
+    return _final(p, "glazing_condensation", computed, flat)
+
+
 def _simple(p,inp,check):
     if check=="required_inertia": computed={"required_inertia":required_inertia(_num(inp,"i_trial"),_num(inp,"delta_trial"),_num(inp,"delta_allow"))}
     elif check=="required_section_modulus": computed={"required_section_modulus":required_section_modulus(_num(inp,"moment_max"),_num(inp,"allowable_stress"))}
@@ -210,6 +241,7 @@ def run_review(payload):
         if not isinstance(check,str) or not check: raise IncompleteInputError("check_type must be a non-empty string")
         if check=="beam": return _beam(p,inp)
         if check=="wind_pressure": return _wind_pressure(p,inp)
+        if check=="glazing_condensation": return _glazing_condensation(p,inp)
         return _simple(p,inp,check)
     except UnsupportedModelError as e: status="UNSUPPORTED_MODEL"; flag=f"UNSUPPORTED_MODEL:{e}"
     except (IncompleteInputError,TypeError,ValueError) as e: status="INCOMPLETE_INPUT"; flag=f"INCOMPLETE_INPUT:{e}"
