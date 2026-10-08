@@ -36,6 +36,7 @@ jobs:
           test -s fix.nam
           test -s rot.nam
           test -s fix.sur
+          test -s rot.sur
           grep -qi 'S8' all.msh
       - name: 真實執行 90 度 NLGEOM 殼板
         working-directory: tests/fea_benchmark/shell90
