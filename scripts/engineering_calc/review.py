@@ -181,8 +181,10 @@ def _wind_pressure(p, inp):
     if qz is not None:
         flat["qz_kpa"] = qz["q_kpa"]
     for zone, pressures in computed["pressures"].items():
-        flat[f"{zone}.positive_kpa"] = pressures["positive_kpa"]
-        flat[f"{zone}.negative_kpa"] = pressures["negative_kpa"]
+        if "positive_kpa" in pressures:
+            flat[f"{zone}.positive_kpa"] = pressures["positive_kpa"]
+        if "negative_kpa" in pressures:
+            flat[f"{zone}.negative_kpa"] = pressures["negative_kpa"]
     return _final(p, "wind_pressure", computed, flat)
 
 def _glazing_condensation(p, inp):
