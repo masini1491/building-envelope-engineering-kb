@@ -482,6 +482,75 @@ class TaiwanWindPressureTests(unittest.TestCase):
             result["velocity_pressure"]["qh"]["q_kpa"],
         )
 
+    def test_partially_enclosed_positive_internal_qzh0_branch(self):
+        base = dict(region="基隆市", district=None, building_category=5,
+                    terrain_category="B", kzt=1.0, enclosure="partially_enclosed",
+                    h_m=50.0, z_m=40.0, effective_area_m2=10.0,
+                    least_horizontal_dimension_m=20.0, governing_wind_source="code")
+        reference = calculate_wall_design_pressure(**base)
+        selected = calculate_wall_design_pressure(
+            **base, positive_internal_pressure_basis="q(zh0)",
+            opening_top_height_m=10.0
+        )
+        qi_pos = selected["velocity_pressure"]["qi_positive"]["q_kpa"]
+        qi_neg = selected["velocity_pressure"]["qi_negative"]["q_kpa"]
+        qh = selected["velocity_pressure"]["qh"]["q_kpa"]
+        self.assertLess(qi_pos, qh)
+        self.assertAlmostEqual(qi_neg, qh)
+        self.assertAlmostEqual(
+            selected["pressures"]["zone5"]["negative_kpa"] -
+            reference["pressures"]["zone5"]["negative_kpa"],
+            (qh - qi_pos) * 1.146
+        )
+        self.assertAlmostEqual(
+            selected["pressures"]["zone4"]["positive_kpa"],
+            reference["pressures"]["zone4"]["positive_kpa"]
+        )
+        for kwargs in (
+            {"positive_internal_pressure_basis": "q(zh0)"},
+            {"positive_internal_pressure_basis": "q(zh0)", "opening_top_height_m": 51},
+            {"opening_top_height_m": 10},
+            {"positive_internal_pressure_basis": "unknown"},
+        ):
+            with self.subTest(kwargs=kwargs):
+                with self.assertRaises(WindPressureInputError):
+                    calculate_wall_design_pressure(**base, **kwargs)
+
+    def test_partially_enclosed_roof_qzh0_changes_only_suction(self):
+        base = dict(region="臺北市", district=None, building_category=3,
+                    terrain_category="B", kzt=1.0, enclosure="partially_enclosed",
+                    h_m=50.0, roof_slope_deg=20.0, effective_area_m2=1.0,
+                    least_horizontal_dimension_m=20.0, governing_wind_source="code")
+        standard = calculate_roof_design_pressure(**base)
+        selected = calculate_roof_design_pressure(
+            **base, positive_internal_pressure_basis="q(zh0)",
+            opening_top_height_m=10.0
+        )
+        self.assertAlmostEqual(
+            selected["pressures"]["zone1"]["positive_kpa"],
+            standard["pressures"]["zone1"]["positive_kpa"],
+        )
+        self.assertGreater(
+            selected["pressures"]["zone1"]["negative_kpa"],
+            standard["pressures"]["zone1"]["negative_kpa"],
+        )
+
+    def test_review_adapter_partially_enclosed_opening_height(self):
+        inp = dict(surface="roof", region="臺北市", building_category=3,
+                   terrain_category="B", kzt=1.0, enclosure="partially_enclosed",
+                   h_m=50.0, roof_slope_deg=5.0, effective_area_m2=1.0,
+                   least_horizontal_dimension_m=20.0, governing_wind_source="code",
+                   positive_internal_pressure_basis="q(zh0)", opening_top_height_m=10.0)
+        payload = {"check_type": "wind_pressure", "units":{"pressure":"kPa"},
+                   "inputs":inp}
+        output = run_review(payload)
+        self.assertEqual(output["calculation_status"], "COMPUTED")
+        self.assertEqual(
+            output["computed"]["applicability"]["partially_enclosed_internal_velocity_pressure_basis"], "q(zh0)"
+        )
+        bad = run_review({**payload, "inputs":{**inp,"opening_top_height_m":51}})
+        self.assertEqual(bad["calculation_status"], "INCOMPLETE_INPUT")
+
     def test_review_adapter_routes_high_and_low_rise(self):
         high = run_review(
             {
