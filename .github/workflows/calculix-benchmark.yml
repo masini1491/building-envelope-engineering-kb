@@ -57,6 +57,7 @@ jobs:
             (cd "mesh_${count}" && timeout 60s xvfb-run -a cgx -b mesh.fbd && timeout 90s ccx -i shell90)
           done
           python check_mesh_convergence.py
+          python diagnose_end_reactions.py
       - name: 保存可查證數值輸出
         if: always()
         uses: actions/upload-artifact@v4
