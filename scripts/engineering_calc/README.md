@@ -84,6 +84,15 @@ python -m scripts.engineering_calc.review input.json
 
 不要求把完整 JSON 原樣貼給使用者，但不得只寫「已用 helper 重算」而無法區分真正 execution、手算、模型心算或 source-code inspection。
 
+### 高層屋頂局部吸力（KB-CAND-008 bounded admission）
+
+`wind_pressure` 的 `surface="roof"` 已新增受限 `h > 18 m` 路由：
+
+- `roof_slope_deg <= 10`：只納入內政部建築研究所示範例依規範圖 3.2 數值化的 Zone 1／2 **負風壓**；必須明確提供 `apply_parapet_zone3_as_zone2=true`、`parapet_all_sides=true`、`parapet_height_m > 0.9`，才能依圖 3.2 註 2 將 Zone 3 作 Zone 2。未確認此條件即 `UNSUPPORTED_MODEL`，不得臆測 Zone 3。
+- `10 < roof_slope_deg <= 45`：依圖 3.2 註 5 轉用圖 3.1(c)／(d)；不啟用圖 3.2 女兒牆折減。
+- 上述第一條為 `SUPPORTED_SUCTION_ONLY`：`pressures` 只有 `negative_kpa`、`negative_kgf_m2`；本 Stage 沒有屋頂正風壓曲線，不得從外牆的正壓係數推算。若核算輸入要求 `zoneN.positive_kpa`，adapter 將標成 `UNSUPPORTED_REPORTED_KEY`。
+- 圖 3.2 Zone 1／2 係數來源為政府研究示範例的公式化結果，不能宣稱已將整張標準圖 3.2 或非女兒牆屋頂 Zone 3 完整 machine-encode。
+
 ### 玻璃中央部位結露初篩（`glazing_condensation`）
 
 AI-facing `review.py` 支援這個獨立 deterministic screening check_type。必填 `inputs`：

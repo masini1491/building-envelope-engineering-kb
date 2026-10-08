@@ -5,6 +5,9 @@ Admitted scope:
 - h <= 18 m wall components/cladding under Figure 3.1(a),
 - h <= 18 m gable/hip-roof components/cladding through 45 degrees
   under Figure 3.1(b)-(d),
+- h > 18 m roof suction using government research Figure 3.2 Zone 1/2
+  and explicit eligible parapet Zone 3 as Zone 2, or steep-roof Figure 3.1(c)-(d)
+  via Figure 3.2 note 5; non-parapet direct Zone 3 not admitted,
 - enclosed or partially enclosed buildings,
 - code-governed wind only.
 
@@ -357,6 +360,40 @@ def figure_3_1_roof_gcp(
     }
 
 
+def figure_3_2_roof_suction_with_parapet(
+    effective_area_m2: float,
+    *,
+    data: Mapping[str, Any] | None = None,
+) -> dict[str, Any]:
+    """Admitted research-formulized Figure 3.2 negative GCp for zones 1/2.
+
+    Zone 3 is treated as Zone 2 only when the caller separately confirms
+    qualifying all-sides parapets and slope <= 10 degrees. Not a general
+    Figure 3.2 roof coefficient reader.
+    """
+    ref = data or load_reference_data()
+    fig = ref["figure_3_2_roof_with_parapet"]
+    controls = fig["base_taiwan_gcp_control_values"]
+    result, method = _interpolate_family(
+        effective_area_m2,
+        low_area_m2=float(fig["low_area_m2"]),
+        high_area_m2=float(fig["high_area_m2"]),
+        conversion_factor=1.0,
+        controls=controls,
+    )
+    return {
+        "figure": "3.2",
+        "selection_method": method,
+        "effective_area_m2": float(effective_area_m2),
+        "zone1_negative": result["zone1_negative"],
+        "zone2_negative": result["zone2_negative"],
+        "zone3_negative": result["zone2_negative"],
+        "parapet_zone3_as_zone2_applied": True,
+        "coefficient_provenance": fig["transcription_status"],
+        "positive_all_zones": None,
+    }
+
+
 def _round_half_up(value: float, digits: int) -> float:
     quantum = Decimal(1).scaleb(-digits)
     return float(Decimal(str(value)).quantize(quantum, rounding=ROUND_HALF_UP))
@@ -619,7 +656,7 @@ def calculate_roof_design_pressure(
     parapet_height_m: float | None = None,
     data: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
-    """Calculate h <= 18 m roof Zone 1/2/3 design pressures under Figure 3.1."""
+    """Calculate admitted roof routes; Figure 3.2 low-slope suction is bounded."""
     ref = data or load_reference_data()
     common = _resolve_common(
         region=region,
@@ -633,10 +670,6 @@ def calculate_roof_design_pressure(
         data=ref,
     )
     h = common["h_m"]
-    if h > 18.0:
-        raise WindPressureUnsupportedError(
-            "roof V2 supports Figure 3.1 h <= 18 m only"
-        )
     area = float(effective_area_m2)
     width = float(least_horizontal_dimension_m)
     if not math.isfinite(area) or area <= 0:
@@ -645,6 +678,111 @@ def calculate_roof_design_pressure(
         raise WindPressureInputError(
             "least_horizontal_dimension_m must be finite and > 0"
         )
+
+    if h > 18.0:
+        slope = float(roof_slope_deg)
+        if not math.isfinite(slope) or slope < 0.0:
+            raise WindPressureInputError("roof_slope_deg must be finite and >= 0")
+        if slope <= 10.0:
+            if not apply_parapet_zone3_as_zone2 or not parapet_all_sides:
+                raise WindPressureUnsupportedError(
+                    "h > 18 m Figure 3.2 roof requires source-verified Zone 3 coefficients "
+                    "unless qualifying parapet Zone 3 relief is explicitly requested"
+                )
+            if parapet_height_m is None:
+                raise WindPressureInputError("parapet_height_m is required")
+            parapet_height = float(parapet_height_m)
+            if not math.isfinite(parapet_height) or parapet_height <= 0.9:
+                raise WindPressureInputError(
+                    "Figure 3.2 roof parapet height must be > 0.9 m"
+                )
+            gcp = figure_3_2_roof_suction_with_parapet(area, data=ref)
+            route = "FIGURE_3_2_HIGH_RISE_ROOF_PARAPET_SUCTION_ONLY"
+            partial = True
+            parapet_applied = True
+        else:
+            if apply_parapet_zone3_as_zone2:
+                raise WindPressureUnsupportedError(
+                    "Figure 3.2 roof parapet relief requires slope <= 10 degrees"
+                )
+            gcp = figure_3_1_roof_gcp(area, slope, data=ref)
+            if gcp["slope_branch"] == "le_7":
+                raise WindPressureUnsupportedError("invalid high-rise steep roof branch")
+            route = "FIGURE_3_1_C_D_BY_FIGURE_3_2_NOTE_5"
+            partial = False
+            parapet_applied = False
+        qh = common["qh"]
+        gcpi = common["gcpi_magnitude"]
+        pressure_scale = qh["q_kpa"]
+        raw = {}
+        display = {}
+        unit_factor = float(ref["constants"]["kgf_per_m2_to_kpa"])
+        for zone in ("zone1", "zone2", "zone3"):
+            negative = pressure_scale * (gcp[f"{zone}_negative"] - gcpi)
+            entry = {
+                "negative_kpa": negative,
+                "negative_kgf_m2": negative / unit_factor,
+            }
+            if not partial:
+                positive = pressure_scale * (gcp["positive_all_zones"] + gcpi)
+                entry["positive_kpa"] = positive
+                entry["positive_kgf_m2"] = positive / unit_factor
+            raw[zone] = entry
+            display[zone] = {
+                k: _round_half_up(v, 2 if k.endswith("_kpa") else 1)
+                for k, v in entry.items()
+            }
+        return {
+            "reference": {
+                "dataset_id": ref["dataset_id"],
+                "verification_status": ref["verification_status"],
+                "verified_at": ref["verified_at"],
+                "code_basis": "建築物耐風設計規範及解說 103 年修正版",
+                "figure": gcp["figure"],
+                "coefficient_scope": (
+                    "GOVERNMENT_RESEARCH_FORMULIZED_SUCTION_ONLY"
+                    if partial else "FIGURE_3_2_NOTE_5_REFERENCES_FIGURE_3_1"
+                ),
+            },
+            "resolved_inputs": {
+                "surface": "roof", "region": _normalize_admin_name(region),
+                "district": _normalize_admin_name(district) if district else None,
+                "v10_mps": common["v10_mps"], "building_category": str(building_category),
+                "importance_factor": common["importance_factor"],
+                "terrain_category": str(terrain_category).strip().upper(),
+                "kzt": float(kzt), "enclosure": common["enclosure"],
+                "gcpi_magnitude": gcpi, "h_m": h, "roof_slope_deg": slope,
+                "effective_area_m2": area, "least_horizontal_dimension_m": width,
+                "apply_parapet_zone3_as_zone2": bool(apply_parapet_zone3_as_zone2),
+                "parapet_all_sides": bool(parapet_all_sides),
+                "parapet_height_m": (
+                    float(parapet_height_m) if parapet_height_m is not None else None
+                ),
+            },
+            "applicability": {
+                "status": "SUPPORTED_SUCTION_ONLY" if partial else "SUPPORTED",
+                "route": route,
+                "parapet_zone3_as_zone2_applied": parapet_applied,
+                "positive_roof_pressure_status": (
+                    "NOT_ADMITTED" if partial else "CALCULATED"
+                ),
+                "governing_wind_source": "code",
+                "partially_enclosed_internal_velocity_pressure_basis": "q(h)",
+            },
+            "velocity_pressure": {"qh": qh, "qi": qh},
+            "corner_zone": {
+                "a_m": max(0.10 * width, 0.9),
+                "formula": "max(0.10*B, 0.9 m)",
+            },
+            "coefficients": {"gcp": gcp, "gcpi_positive": gcpi, "gcpi_negative": -gcpi},
+            "pressures": raw, "display_pressures": display,
+            "rounding": {
+                "method": "ROUND_HALF_UP",
+                "pressure_kpa_digits": 2,
+                "pressure_kgf_m2_digits": 1,
+                "rule": "raw values remain authoritative; display rounding applied last",
+            },
+        }
 
     gcp = figure_3_1_roof_gcp(area, roof_slope_deg, data=ref)
     parapet_applied = False

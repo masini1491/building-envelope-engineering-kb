@@ -5,7 +5,7 @@
   "verification_status": "VERIFIED_PRIMARY",
   "verified_at": "2026-10-07",
   "authority": "Taiwan Ministry of the Interior / National Land Management Agency",
-  "scope": "V2 supports enclosed or partially enclosed wall components/cladding for h > 18 m under Figure 3.2, plus h <= 18 m walls and gable/hip roofs through 45 degrees under Figure 3.1.",
+  "scope": "Wind V2 plus bounded high-rise roof: h > 18 m Figure 3.2 Zone 1/2 suction with explicitly verified all-sides parapet > 0.9 m permitting Zone 3 as Zone 2; for roof slope > 10 degrees Figure 3.2 note 5 routes to Figure 3.1(c)/(d). General Figure 3.2 direct Zone 3 and positive roof GCp remain outside the admitted low-slope scope.",
   "sources": [
     {
       "id": "nlma-current",
@@ -97,6 +97,33 @@
       "source": "Table 2.17",
       "v1_supported": false
     }
+  },
+  "figure_3_2_roof_with_parapet": {
+    "applicability": "h > 18 m, roof slope 0..10 degrees, explicitly confirmed parapet all sides higher than 0.9 m; Zone 3 may be treated as Zone 2; negative/suction only",
+    "figure": "3.2",
+    "low_area_m2": 1,
+    "high_area_m2": 50,
+    "source_note": "Government ABRI 建築物耐風設計規範示範例研擬與解說, section 2.6, physical page 34 / PDF page 77, formulaized Figure 3.2 zone 1/2 negative GCp curves (already Taiwan GCp, no ×2.083 again). For other high-rise roof slope/geometry, use governing Figure 3.2 notes.",
+    "source_url": "https://ws.moi.gov.tw/Download.ashx?n=Y29tcGxldGUucGRm&u=LzAwMS9VcGxvYWQvT2xkRmlsZV9BYnJpX0dvdi9yZXNlYXJjaC8xMDMwLzE0NDc5Mjk5MTExLnBkZg%3D%3D",
+    "transcription_status": "GOVERNMENT_RESEARCH_FORMULIZED_GCP_NOT_COMPLETE_FIGURE_3_2_REPRODUCTION",
+    "base_taiwan_gcp_control_values": {
+      "zone1_negative": {
+        "low": -2.92,
+        "high": -1.87
+      },
+      "zone2_negative": {
+        "low": -4.79,
+        "high": -3.33
+      }
+    },
+    "parapet_zone3_relief": {
+      "minimum_height_m_exclusive": 0.9,
+      "all_sides_required": true,
+      "maximum_slope_deg": 10,
+      "effect": "zone3_negative_equals_zone2_negative_only_when_explicitly_requested"
+    },
+    "positive_roof_gcp": "NOT_REPRODUCED_IN_THIS_BOUNDED_STAGE",
+    "no_parapet_zone3_gcp": "NOT_REPRODUCED_IN_THIS_BOUNDED_STAGE"
   },
   "figure_3_2_wall": {
     "applicability": "h > 18 m, enclosed or partially enclosed buildings, wall components and cladding",
