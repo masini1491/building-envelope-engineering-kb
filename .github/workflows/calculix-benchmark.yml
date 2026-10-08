@@ -44,6 +44,7 @@ jobs:
           test -s shell90.sta
           test -s shell90.frd
           tail -n 35 shell90.sta
+          python check_shell90.py
       - name: 保存可查證數值輸出
         if: always()
         uses: actions/upload-artifact@v4
