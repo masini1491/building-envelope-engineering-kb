@@ -381,14 +381,26 @@ def figure_3_2_roof_suction_with_parapet(
         conversion_factor=1.0,
         controls=controls,
     )
+    zone3 = ref["figure_3_2_roof_with_parapet"]["no_parapet_zone3_gcp"]
+    zone3_value, zone3_method = _semilog_interpolate(
+        effective_area_m2,
+        low_area_m2=float(zone3["low_area_m2"]),
+        high_area_m2=float(zone3["high_area_m2"]),
+        low_value=float(zone3["zone3_negative"]["low"]),
+        high_value=float(zone3["zone3_negative"]["high"]),
+    )
+    if zone3_method != method:
+        raise WindPressureInputError("roof Zone 3 area interpolation mismatch")
     return {
         "figure": "3.2",
         "selection_method": method,
         "effective_area_m2": float(effective_area_m2),
         "zone1_negative": result["zone1_negative"],
         "zone2_negative": result["zone2_negative"],
-        "zone3_negative": result["zone2_negative"],
-        "parapet_zone3_as_zone2_applied": True,
+        "zone3_negative": zone3_value,
+        "zone3_direct_negative": zone3_value,
+        "zone3_direct_provenance": zone3["value_nature"],
+        "parapet_zone3_as_zone2_applied": False,
         "coefficient_provenance": fig["transcription_status"],
         "positive_all_zones": None,
     }
@@ -684,22 +696,22 @@ def calculate_roof_design_pressure(
         if not math.isfinite(slope) or slope < 0.0:
             raise WindPressureInputError("roof_slope_deg must be finite and >= 0")
         if slope <= 10.0:
-            if not apply_parapet_zone3_as_zone2 or not parapet_all_sides:
-                raise WindPressureUnsupportedError(
-                    "h > 18 m Figure 3.2 roof requires source-verified Zone 3 coefficients "
-                    "unless qualifying parapet Zone 3 relief is explicitly requested"
-                )
-            if parapet_height_m is None:
-                raise WindPressureInputError("parapet_height_m is required")
-            parapet_height = float(parapet_height_m)
-            if not math.isfinite(parapet_height) or parapet_height <= 0.9:
-                raise WindPressureInputError(
-                    "Figure 3.2 roof parapet height must be > 0.9 m"
-                )
             gcp = figure_3_2_roof_suction_with_parapet(area, data=ref)
-            route = "FIGURE_3_2_HIGH_RISE_ROOF_PARAPET_SUCTION_ONLY"
+            parapet_applied = False
+            if apply_parapet_zone3_as_zone2:
+                if not parapet_all_sides:
+                    raise WindPressureInputError("parapet_all_sides must be true")
+                if parapet_height_m is None:
+                    raise WindPressureInputError("parapet_height_m is required")
+                parapet_height = float(parapet_height_m)
+                if not math.isfinite(parapet_height) or parapet_height <= 0.9:
+                    raise WindPressureInputError("Figure 3.2 roof parapet height must be > 0.9 m")
+                parapet_applied = True
+                gcp["zone3_negative"] = gcp["zone2_negative"]
+                gcp["parapet_zone3_as_zone2_applied"] = True
+            route = ("FIGURE_3_2_HIGH_RISE_ROOF_PARAPET_SUCTION_ONLY"
+                     if parapet_applied else "FIGURE_3_2_HIGH_RISE_ROOF_DIRECT_ZONE3_SUCTION_ONLY")
             partial = True
-            parapet_applied = True
         else:
             if apply_parapet_zone3_as_zone2:
                 raise WindPressureUnsupportedError(
