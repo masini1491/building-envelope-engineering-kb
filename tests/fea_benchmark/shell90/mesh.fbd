@@ -13,3 +13,5 @@ send fix abq spc 123456
 send rot abq spc 5 1.57
 comp fix do
 send fix abq sur
+
+quit
