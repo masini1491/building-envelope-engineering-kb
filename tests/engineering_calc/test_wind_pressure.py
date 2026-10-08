@@ -1,4 +1,5 @@
 import unittest
+import math
 
 from scripts.engineering_calc.review import run_review
 from scripts.engineering_calc.wind_pressure import (
@@ -84,7 +85,7 @@ class TaiwanWindPressureTests(unittest.TestCase):
     def test_high_rise_roof_parapet_suction_coefficients(self):
         low = figure_3_2_roof_suction_with_parapet(1.0)
         high = figure_3_2_roof_suction_with_parapet(50.0)
-        middle = figure_3_2_roof_suction_with_parapet(10 ** ((0 + __import__("math").log10(50)) / 2))
+        middle = figure_3_2_roof_suction_with_parapet(math.sqrt(50.0))
         self.assertAlmostEqual(low["zone1_negative"], -2.92)
         self.assertAlmostEqual(low["zone2_negative"], -4.79)
         self.assertAlmostEqual(high["zone1_negative"], -1.87)
