@@ -70,7 +70,7 @@ python -m scripts.engineering_calc.review input.json
 - 低樓層屋頂：`zone1.* / zone2.* / zone3.*`
 - 共通：`qh_kpa / corner_a_m`；`h > 18 m` 外牆另有 `qz_kpa`
 
-超出 admitted applicability（例如開放式、風洞 governing、`h > 18 m` 屋頂或 `roof_slope_deg > 45`）時回 `UNSUPPORTED_MODEL`；必要 project facts／行政區資料不足時回 `INCOMPLETE_INPUT`。這些 execution status 不代表整體耐風設計 PASS／FAIL。
+超出 admitted applicability（例如開放式、風洞 governing、未支援的高層屋頂正壓或 `roof_slope_deg > 45`）時回 `UNSUPPORTED_MODEL`；必要 project facts／行政區資料不足時回 `INCOMPLETE_INPUT`。這些 execution status 不代表整體耐風設計 PASS／FAIL。
 
 ### 回答中的執行證據
 
@@ -88,10 +88,10 @@ python -m scripts.engineering_calc.review input.json
 
 `wind_pressure` 的 `surface="roof"` 已新增受限 `h > 18 m` 路由：
 
-- `roof_slope_deg <= 10`：只納入內政部建築研究所示範例依規範圖 3.2 數值化的 Zone 1／2 **負風壓**；必須明確提供 `apply_parapet_zone3_as_zone2=true`、`parapet_all_sides=true`、`parapet_height_m > 0.9`，才能依圖 3.2 註 2 將 Zone 3 作 Zone 2。未確認此條件即 `UNSUPPORTED_MODEL`，不得臆測 Zone 3。
+- `roof_slope_deg <= 10`：採內政部建築研究所示範例公式化的 Zone 1／2 負風壓；Zone 3 的無女兒牆曲線由國土署圖 3.2 **近似圖面轉錄**（面積平台 1／50 m²：−6.67／−4.79，半對數內插），不是官方公布的精確係數表。若明確提供 `apply_parapet_zone3_as_zone2=true`、`parapet_all_sides=true`、`parapet_height_m > 0.9`，則依圖 3.2 註 2 將 Zone 3 作 Zone 2；未啟用則使用 Zone 3 直接吸力。
 - `10 < roof_slope_deg <= 45`：依圖 3.2 註 5 轉用圖 3.1(c)／(d)；不啟用圖 3.2 女兒牆折減。
 - 上述第一條為 `SUPPORTED_SUCTION_ONLY`：`pressures` 只有 `negative_kpa`、`negative_kgf_m2`；本 Stage 沒有屋頂正風壓曲線，不得從外牆的正壓係數推算。若核算輸入要求 `zoneN.positive_kpa`，adapter 將標成 `UNSUPPORTED_REPORTED_KEY`。
-- 圖 3.2 Zone 1／2 係數來源為政府研究示範例的公式化結果，不能宣稱已將整張標準圖 3.2 或非女兒牆屋頂 Zone 3 完整 machine-encode。
+- Zone 1／2 來源為政府研究示範例的公式化結果，Zone 3 為國土署原圖的近似端點轉錄。**不得**將本次轉錄描述為出版者數值表或包含完整屋頂正風壓的全面合規判定。
 
 ### 玻璃中央部位結露初篩（`glazing_condensation`）
 
