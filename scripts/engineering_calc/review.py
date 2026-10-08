@@ -186,6 +186,13 @@ def _wind_pressure(p, inp):
     return _final(p, "wind_pressure", computed, flat)
 
 def _glazing_condensation(p, inp):
+    for field in (
+        "indoor_temperature_c", "outdoor_temperature_c",
+        "indoor_relative_humidity_pct", "glazing_u_value_w_m2k",
+        "interior_surface_resistance_m2k_w",
+    ):
+        if isinstance(inp.get(field), bool):
+            raise IncompleteInputError(f"inputs.{field} must be numeric, not boolean")
     try:
         result = screen_center_glass_condensation(
             indoor_temperature_c=_num(inp, "indoor_temperature_c"),
