@@ -69,6 +69,19 @@ jobs:
             done
           done
           python check.py
+      - name: 玻璃與鋁板合成面外風壓驗證
+        working-directory: tests/fea_benchmark/envelope_panels
+        run: |
+          set -euo pipefail
+          for material in glass aluminum; do
+            for load in small large; do
+              for n in 4 8 16; do
+                python generate.py --material "$material" --load "$load" --n "$n" --output "${material}_${load}_${n}"
+                (cd "${material}_${load}_${n}" && timeout 90s ccx -i panel)
+              done
+            done
+          done
+          python check.py
       - name: 保存可查證數值輸出
         if: always()
         uses: actions/upload-artifact@v4
@@ -87,4 +100,6 @@ jobs:
             tests/fea_benchmark/shell90/mesh_*/*.frd
             tests/fea_benchmark/pressure_plate/*/*.dat
             tests/fea_benchmark/pressure_plate/*/*.sta
+            tests/fea_benchmark/envelope_panels/*/*.dat
+            tests/fea_benchmark/envelope_panels/*/*.sta
           if-no-files-found: warn
