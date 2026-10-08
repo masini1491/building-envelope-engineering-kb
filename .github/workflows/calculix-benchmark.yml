@@ -82,6 +82,7 @@ jobs:
             done
           done
           python check.py
+          python check_reactions.py
       - name: 保存可查證數值輸出
         if: always()
         uses: actions/upload-artifact@v4
