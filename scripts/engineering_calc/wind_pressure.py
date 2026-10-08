@@ -5,6 +5,9 @@ Admitted scope:
 - h <= 18 m wall components/cladding under Figure 3.1(a),
 - h <= 18 m gable/hip-roof components/cladding through 45 degrees
   under Figure 3.1(b)-(d),
+- h > 18 m roof suction using government research Figure 3.2 Zone 1/2
+  and explicit eligible parapet Zone 3 as Zone 2, or steep-roof Figure 3.1(c)-(d)
+  via Figure 3.2 note 5; non-parapet direct Zone 3 not admitted,
 - enclosed or partially enclosed buildings,
 - code-governed wind only.
 
@@ -653,7 +656,7 @@ def calculate_roof_design_pressure(
     parapet_height_m: float | None = None,
     data: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
-    """Calculate h <= 18 m roof Zone 1/2/3 design pressures under Figure 3.1."""
+    """Calculate admitted roof routes; Figure 3.2 low-slope suction is bounded."""
     ref = data or load_reference_data()
     common = _resolve_common(
         region=region,
