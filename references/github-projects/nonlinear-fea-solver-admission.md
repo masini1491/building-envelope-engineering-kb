@@ -270,7 +270,7 @@ CalculiX 官方 `*NODE PRINT` 的 `RF` 包含支承反力與施加在所列節�
 
 **Stage 11 起始研究結果：** 目前 repository `generate.py` 只輸出 S8R `*NODE`／`*ELEMENT`、`NALL U` 與 `EDGE RF`；`check_follower_pressure.py` 的 Gauss 積分只重建變形後中面，沒有 expanded C3D20R 的面 connectivity 或壓力面座標。故在現有已 admission evidence 下，**無法直接宣稱已取得精確壓力面全域平衡**。下一步須先取得 solver-level expanded-face 的可追溯輸出或可靠原始碼／手冊映射，再實作對帳。
 
-### Stage 11 原始碼交叉核對：face 1 / P1（研究證據，未 admission）
+### 第十一階段原始碼交叉核對：受壓面 1 與 P1（研究證據，尚未認證）
 
 本次定位 upstream `Dhondtguido/CalculiX@master` 下列檔案；**master 是目前讀到的 upstream source，尚未證明與 CI 安裝之 CalculiX 2.21-1 binary 完全一致**，不得冒充 exact-version authority：
 
