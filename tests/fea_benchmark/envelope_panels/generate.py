@@ -28,6 +28,8 @@ def build(material,n,load,out):
     lines+=["*MATERIAL,NAME=ISOTROPIC","*ELASTIC",f"{c['E']},{c['nu']}","*SHELL SECTION,ELSET=PLATE,MATERIAL=ISOTROPIC",str(c["t"])]
     edge=[v for (i,j),v in nodes.items() if i in (0,2*n) or j in (0,2*n)]
     lines+=["*NSET,NSET=EDGE"]+[",".join(map(str,edge[k:k+12])) for k in range(0,len(edge),12)]
+    all_nodes=list(nodes.values())
+    lines+=["*NSET,NSET=NALL"]+[",".join(map(str,all_nodes[k:k+12])) for k in range(0,len(all_nodes),12)]
     lines+=["*NSET,NSET=CENTER",str(nodes[(n,n)]),"*BOUNDARY"]
     if c["edge"]=="clamped":lines+=["EDGE,1,6,0."]
     else:
