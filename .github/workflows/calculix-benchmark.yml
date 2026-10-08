@@ -23,6 +23,22 @@ jobs:
           sudo apt-get install -y --no-install-recommends calculix-ccx calculix-cgx xvfb xauth
           command -v ccx
           ccx -v || true
+      - name: 記錄 CalculiX 安裝版本與可追溯資訊
+        run: |
+          set -euo pipefail
+          mkdir -p tests/fea_benchmark/provenance
+          {
+            echo '## Installed package'
+            dpkg-query -W calculix-ccx
+            echo '## Package source and candidate metadata'
+            apt-cache show calculix-ccx | grep -E '^(Package|Version|Source|Filename|SHA256):' | head -n 25
+            echo '## Executable'
+            command -v ccx
+            readlink -f "$(command -v ccx)"
+            sha256sum "$(readlink -f "$(command -v ccx)")"
+            echo '## OS'
+            cat /etc/os-release
+          } | tee tests/fea_benchmark/provenance/calculix-package.txt
       - name: 實際解非線性 truss benchmark
         working-directory: tests/fea_benchmark
         run: |
@@ -93,6 +109,7 @@ jobs:
         with:
           name: calculix-nlgeom-probe
           path: |
+            tests/fea_benchmark/provenance/*.txt
             tests/fea_benchmark/*.dat
             tests/fea_benchmark/*.sta
             tests/fea_benchmark/*.cvg
