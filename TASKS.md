@@ -4,17 +4,15 @@
 
 ## 目前執行中的工作
 
-### 高樓層屋頂局部風壓（KB-CAND-008）— ACTIVE
+### 高樓層屋頂局部風壓（KB-CAND-008）— PARTIAL / SOURCE-GATED
 
-- Authority：使用者於 2026-10-08 明確選定此 Cold candidate；按圖 3.2 原始官方圖表與 Wind V2 接續，不延伸其他 wind features。
-- 先核對 >18 m 屋頂圖 3.2 Zone 1/2/3 的負風壓、坡度 >10° 轉圖 3.1(c)/(d)、女兒牆條件與圖表 machine transcription；無原始正風壓曲線時不得偽造 roof positive GCp。
-- Implementation：限定的 deterministic coefficients + route、separate suction-only boundary where relevant、風壓 test regression、adapter status 正確表示 unsupported/partial；受權驗證與 remote read-back後 closure。
+- 使用者已於 2026-10-08 授權本項；bounded implementation PR #14 已 merge 至 main `373c2e8030921ecf556def39f14ccddd8e93c6cf`，其 exact-main CI `37712301407` 兩個 jobs SUCCESS。
+- 已納入：h > 18 m、坡度 ≤10°、屋頂四周女兒牆高度嚴格 >0.9 m 且明確啟用 Zone 3→Zone 2 時，依內政部建築研究所示範例 formulaized Figure 3.2 Zone 1/2 負壓係數計算 suction-only；坡度 >10°～45° 依 Figure 3.2 註 5 路由 Figure 3.1(c)/(d)。
+- **仍未完成**：無合格女兒牆時 Figure 3.2 Zone 3 原始曲線的可靠 machine transcription、獨立端點／中間值 cross-check；此類輸入目前必須 `UNSUPPORTED_MODEL`。Figure 3.2 low-slope 的屋頂正壓也不會猜測。
+- 下一步只有在原始官方曲線或可合法追溯的授權表格可精確核對時，才能繼續 general coverage；不得以外牆係數、另一法規圖表或臆測曲線補齊。
+- 如無新的 source evidence，此項保持 `SOURCE-GATED`，不宣稱 full feature admission，也不自動放寬工程適用範圍。
 
-### 玻璃表面溫度與結露初篩（KB-CAND-006）— QUEUED
-
-- Authority：同次使用者選定，依序待 KB-CAND-008 current stage完成再進 Hot implementation。
-- 只對已確認 U-value／surface resistance／環境温濕度或有 provenance 的局部表面溫度作 bounded surface condensation screening；不得以單一 U-value 推估 spacer／frame minimum temperature，也不宣稱完整 ISO 13788/10211 compliance。
-- Implementation：獨立 deterministic thermal/dew-point/fRsi kernel、provenance／applicability 及 invalid-input fail-closed、focused test、CI、read-back；不引入材料 catalog。
+已完成的玻璃表面溫度／結露初篩（KB-CAND-006）不再占用 Hot：production PR #13 merge `e6652f5516713f56e6e84209fc62e79c5738ef46`，exact-main CI `37711950722` SUCCESS。交付 `glazing_condensation.py`、`review.py` adapter、deterministic regression及 1D 中央玻璃 scope；非整窗、邊框、間隔條及 ISO 完整合規評估。
 
 ## 使用規則
 
