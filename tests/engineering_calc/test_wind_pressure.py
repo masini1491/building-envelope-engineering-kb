@@ -9,6 +9,7 @@ from scripts.engineering_calc.wind_pressure import (
     figure_3_1_roof_gcp,
     figure_3_1_wall_gcp,
     figure_3_2_wall_gcp,
+    figure_3_2_roof_suction_with_parapet,
     low_rise_corner_width,
     resolve_basic_wind_speed,
     resolve_importance_factor,
@@ -79,6 +80,85 @@ class TaiwanWindPressureTests(unittest.TestCase):
         self.assertEqual(at_two["height_for_k_m"], 5.0)
         self.assertAlmostEqual(at_two["k"], at_five["k"])
         self.assertAlmostEqual(at_two["q_kpa"], at_five["q_kpa"])
+
+    def test_high_rise_roof_parapet_suction_coefficients(self):
+        low = figure_3_2_roof_suction_with_parapet(1.0)
+        high = figure_3_2_roof_suction_with_parapet(50.0)
+        middle = figure_3_2_roof_suction_with_parapet(10 ** ((0 + __import__("math").log10(50)) / 2))
+        self.assertAlmostEqual(low["zone1_negative"], -2.92)
+        self.assertAlmostEqual(low["zone2_negative"], -4.79)
+        self.assertAlmostEqual(high["zone1_negative"], -1.87)
+        self.assertAlmostEqual(high["zone2_negative"], -3.33)
+        self.assertAlmostEqual(middle["zone1_negative"], (-2.92 - 1.87) / 2)
+        self.assertEqual(low["zone3_negative"], low["zone2_negative"])
+        self.assertIsNone(low["positive_all_zones"])
+
+    def test_high_rise_roof_requires_qualified_parapet(self):
+        args = dict(
+            region="臺北市", district=None, building_category=3,
+            terrain_category="B", kzt=1.0, enclosure="enclosed",
+            h_m=50.0, roof_slope_deg=5.0, effective_area_m2=1.0,
+            least_horizontal_dimension_m=20.0, governing_wind_source="code",
+        )
+        with self.assertRaises(WindPressureUnsupportedError):
+            calculate_roof_design_pressure(**args)
+        with self.assertRaises(WindPressureInputError):
+            calculate_roof_design_pressure(
+                **args, apply_parapet_zone3_as_zone2=True,
+                parapet_all_sides=True, parapet_height_m=0.9
+            )
+        result = calculate_roof_design_pressure(
+            **args, apply_parapet_zone3_as_zone2=True,
+            parapet_all_sides=True, parapet_height_m=1.2
+        )
+        self.assertEqual(
+            result["applicability"]["status"], "SUPPORTED_SUCTION_ONLY"
+        )
+        qh = result["velocity_pressure"]["qh"]["q_kpa"]
+        self.assertAlmostEqual(
+            result["pressures"]["zone1"]["negative_kpa"], qh * (-2.92 - 0.375)
+        )
+        self.assertEqual(
+            result["pressures"]["zone3"]["negative_kpa"],
+            result["pressures"]["zone2"]["negative_kpa"]
+        )
+        self.assertNotIn("positive_kpa", result["pressures"]["zone1"])
+        self.assertAlmostEqual(result["corner_zone"]["a_m"], 2.0)
+
+    def test_high_rise_roof_steep_slope_routes_figure_3_1(self):
+        result = calculate_roof_design_pressure(
+            region="臺北市", district=None, building_category=3,
+            terrain_category="B", kzt=1.0, enclosure="enclosed",
+            h_m=50.0, roof_slope_deg=20.0, effective_area_m2=1.0,
+            least_horizontal_dimension_m=20.0, governing_wind_source="code",
+        )
+        self.assertEqual(result["applicability"]["route"],
+                         "FIGURE_3_1_C_D_BY_FIGURE_3_2_NOTE_5")
+        self.assertEqual(result["reference"]["figure"], "3.1(c)")
+        self.assertIn("positive_kpa", result["pressures"]["zone3"])
+
+    def test_high_rise_roof_adapter_does_not_invent_positive_suction_values(self):
+        payload = dict(
+            check_type="wind_pressure",
+            units={"pressure":"kPa", "length":"m", "area":"m2"},
+            inputs={
+                "surface":"roof", "region":"臺北市", "building_category":3,
+                "terrain_category":"B", "kzt":1.0,
+                "enclosure":"enclosed", "h_m":50.0, "roof_slope_deg":5.0,
+                "effective_area_m2":1.0,
+                "least_horizontal_dimension_m":20.0,
+                "governing_wind_source":"code",
+                "apply_parapet_zone3_as_zone2":True,
+                "parapet_all_sides":True,
+                "parapet_height_m":1.2,
+            },
+            reported_results={"zone1.positive_kpa":1.0},
+        )
+        response = run_review(payload)
+        self.assertEqual(response["calculation_status"], "COMPUTED")
+        self.assertEqual(response["comparison_status"], "INCOMPLETE")
+        self.assertIn("UNSUPPORTED_REPORTED_KEY:zone1.positive_kpa",
+                      response["review_flags"])
 
     def test_figure_3_2_regression_unchanged(self):
         low = figure_3_2_wall_gcp(1.0)
