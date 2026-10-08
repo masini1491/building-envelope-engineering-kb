@@ -175,6 +175,45 @@ Admission 限定為 `BOUNDED_UNIFORM_PRESSURE_PLATE_PROBE`：
 其他結構規範合規。仍待真實支承、風壓分佈／反力平衡、
 材料非線性、破壞與荷載組合、材料產品證據及精確驗收門檻。
 
+## 第八階段：玻璃／鋁板均佈壓力與支承節點反力診斷（未通過全域平衡 admission）
+
+`tests/fea_benchmark/envelope_panels/check_reactions.py` 於既有兩種材料、
+兩種壓力、4／8／16 分割 S8R 模型讀取最後增量的 `EDGE` 節點
+`RF1/RF2/RF3` 總和；並輸出 `NALL` 節點位移，保留未來追蹤
+受壓板件變形幾何所需的輸出。此 Stage 僅比較／診斷，**不提供平衡 PASS**。
+
+小壓力 `q=0.0001 N/mm²`，初始面積 `100×100 mm²`，
+獨立總外力參照 `|qA₀|=1.000000 N`，實際 CCX 2.21
+節點邊界反力 Z 合計（N）：
+
+| 代理材料 | 4 分割 | 8 分割 | 16 分割 |
+|---|---:|---:|---:|
+| 玻璃代理 | −0.81249924 | −0.911457544 | −0.957030544 |
+| 鋁板代理 | −0.81250000 | −0.911458280 | −0.957031214 |
+
+故小荷載下反力缺口依網格約為
+**18.750%／8.854%／4.297%**，兩個不同支承／材料模型
+有近乎一致的網格相關偏差。候選 CI 最初正確在 3% 門檻
+**失敗**（run `37744144365`）。後續將檢查器改為
+fail-closed 缺少輸出／非有限值，但對已確認的物理數值不一致
+輸出明確的 `UNRESOLVED_SMALL_LOAD_FORCE_GAP` 與
+`GLOBAL_BALANCE_NOT_ADMITTED`，不以放寬容差或假定反力總和
+正確而將 benchmark 標示為 PASS。真實診斷 CI `37744330901`
+已完成；其 SUCCESS 只表示診斷成功執行，不是物理平衡成功。
+
+較大壓力 `q=0.6 N/mm²`：初始 `qA₀=6000 N`，
+16 分割玻璃 `ΣRFz≈−5704.082 N`、鋁板
+`ΣRFz≈−5741.547 N`；但幾何非線性 follower
+pressure 可能依變形後面法線／面積分配，**不可**把
+`qA₀` 當作最終外力的精確基準，故只做診斷。
+
+主要 unresolved prerequisite：確認 CalculiX `S8R` 壓力的
+完整離散節點外力、內部節點與 constraint/MPC 實際反力語意；
+必要時以獨立幾何積分計算 follower pressure 的全域合力，
+並保留對照的元素／版本／網格精度證據。釐清之前
+**玻璃及金屬板的總外力／支承反力平衡未 admission**，
+更不代表玻璃破壞、鋁板屈服／屈曲或 ASTM／ADM capacity。
+
 ## 真正 benchmark admission 的最低缺口
 
 1. Pin exact CalculiX / CGX version、binary provenance、運作平台及 licensing boundary。
