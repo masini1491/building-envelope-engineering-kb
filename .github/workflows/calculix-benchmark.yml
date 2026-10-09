@@ -106,6 +106,7 @@ jobs:
           python -m unittest -v test_pressure_equilibrium.py
           python check_pressure_equilibrium.py
           python -m unittest -v test_follower_pressure.py
+          python -m unittest -v test_expanded_face.py
           python check_follower_pressure.py
       - name: 保存可查證數值輸出
         if: always()

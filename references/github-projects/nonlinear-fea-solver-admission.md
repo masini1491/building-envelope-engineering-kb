@@ -286,3 +286,27 @@ CalculiX 官方 `*NODE PRINT` 的 `RF` 包含支承反力與施加在所列節�
 - 2026-10-08 GitHub Actions PR #34，exact-head `ca5d200871f3b36c4a733c477be761ab2552e106`、CalculiX run `37773447955` SUCCESS；其執行日誌證明 Ubuntu 24.04.5 LTS 安裝 `calculix-ccx 2.21-1`，套件 archive `calculix-ccx_2.21-1_amd64.deb` 的 apt metadata SHA-256 為 `796f7e0c518817651c4b82d3fb14e38ceebc2b8d2cd503db9e5c2fec21ae2fd3`，實際 `/usr/bin/ccx` SHA-256 為 `6adaabf5bf0382fc2bfd692b984320ed375dba777f7dc8297562f818043faa1b`。以上是 binary provenance，**不等於 source-to-binary reproducible-build proof**。
 - 版本相符的公開來源已定位為 [Debian Sources `calculix-ccx/2.21-1`](https://sources.debian.org/src/calculix-ccx/2.21-1/) 與 [Debian 2.21-1 source package](https://packages.debian.org/source/sid/calculix-ccx)（`calculix-ccx_2.21.orig.tar.bz2` 加 Debian packaging/patches）；[Ubuntu noble source package](https://packages.ubuntu.com/source/noble/calculix-ccx) 亦標示 `2.21-1`。**目前尚未逐檔讀取並校驗此 exact source package 的 `dloads.f`、`gen3dfrom2d.f`、ordinary pressure integration routine 與 patches**，不能用 upstream master 取代。
 - CI artifact `calculix-nlgeom-probe` 已包含 `tests/fea_benchmark/provenance/calculix-package.txt`。後續須在 exact source package 中交叉核對 `*DLOAD,P`→expanded solid face、quadratic surface integration 與 NLGEOM deformed coordinates；若不能證實，維持 `SHELL_FACE_GEOMETRY_UNRESOLVED`、`GLOBAL_BALANCE_NOT_ADMITTED`、`EVIDENCE GATED`。
+
+## 第十二階段：CalculiX 2.21 原始碼與展開面積分診斷（EVIDENCE GATED）
+
+研究日期：2026-10-09。依維護者提供的原始碼檔案，實際核對 `2.21-1` source package；以 `.dsc` 列示的 SHA-256 驗證兩份 archive：
+
+- `calculix-ccx_2.21.orig.tar.bz2`：`51d229aee320cf685216d360f7c04f9a57af0148fbe840483a964c86c315da82`（1,794,485 bytes）。
+- `calculix-ccx_2.21-1.debian.tar.xz`：`6c2a934b66491c9e916cbf6328167d417f7e985b380e200facf92c3e953d255f`（20,872 bytes）。
+
+已檢查 Debian 四個 patches 之修改檔案路徑（Makefile／其他拼字修正／CalculiX.h），未直接修改這次核對的 `dloads.f`、`loadadd.f`、`rhs.f`、`e_c3d_rhs.f`、`shape8q.f`、`gen3dfrom2d.f`、`gauss.f`。未驗證 `.dsc` PGP signature，也尚未重建出與 CI `/usr/bin/ccx` 相同雜湊的 executable，**不能稱為 reproducible binary identity**。
+
+### 已確認的原始碼路徑
+
+- `src/dloads.f`（約 369–386、491–508 行）：一般 S8R 殼壓力 `*DLOAD, PLATE,P,q` 的標籤，非 `EDNOR` 分支轉成 `P1`；`src/loadadd.f` 儲存 face-load 資料。不能外推成所有 load 類型。
+- `src/gen3dfrom2d.f`（約 106–111、145–184 行）：S8R 展開所用的 thickness、normal、offset 形成三維節點；上下面不是原 S8R 中面。原本 `NALL U` 不足以獨立重建 rotation/MPC 調整後全部 expanded node。
+- `src/rhs.f`（約 156–161 行）在 distributed forces 路徑呼叫 `e_c3d_rhs`；`src/e_c3d_rhs.f`（約 59–64、397–405 行）之 `P1` C3D20 face slot 順序為 `(4,3,2,1,11,10,9,12)`。
+- `src/e_c3d_rhs.f`（約 426–439、476–505、536–549 行）依變形狀態使用 `co + vold` 的面座標、`gauss2d2` 四點及 `shape8q` Jacobian，在節點 force accumulator 使用 `-N_i × q × J_vector × weight`；`src/shape8q.f`（約 61–114 行）確認二次形狀函數及有向面 Jacobian。源碼路徑由版本相符 archive 核對，不再以 moving upstream `master` 代替。
+
+### 本階段獨立幾何診斷之認證界線
+
+`tests/fea_benchmark/envelope_panels/check_expanded_face.py` 只接受明確提供的 **20 個 C3D20 expanded node 最終三維座標**及正壓力，獨立運算 P1 面的 2×2 Gauss 等效節點力與總合力；`test_expanded_face.py` 使用合成平面、傾斜面解析參考及 failure-path guards 進行 sanity check。不得把輸入自動視為真正 CCX expanded solid data；此測試也沒有從 8-node 中面 `U` 推定 expanded node `U`。
+
+本階段最多可稱 `EXACT_SOURCE_FACE_PATH_RECONCILED` 與 `EXPANDED_FACE_SYNTHETIC_ORACLE_PASS`（僅限 source route 與合成解析幾何）。**未取得實際 CCX expanded-face 當前座標、完整 MPC/rotation 轉換與全部 reaction 定義**；Stage 10 玻璃約 0.33% 殘差仍無確定歸因；保持 `SHELL_FACE_GEOMETRY_UNRESOLVED`、`GLOBAL_BALANCE_NOT_ADMITTED`、`EVIDENCE GATED`，不宣稱 E1300／ADM 工程 capacity。
+
+來源：[Debian CalculiX 2.21-1 source package](https://sources.debian.org/src/calculix-ccx/2.21-1/)；本 Repo 不複製或重新授權 GPL-2.0 原始碼。
