@@ -319,3 +319,20 @@ CalculiX 官方 `*NODE PRINT` 的 `RF` 包含支承反力與施加在所列節�
 - `check_expanded_frd.py` 解析 ASCII FRD 的參考節點座標、C3D20 拓撲與最後一步位移；還原 CCX 內部元素 slot，嚴格要求所有展開面相關節點都有參考座標及位移，且最後 time=1.0；否則拒絕。輸出由真實 CCX 形成的 P1 受壓合力供研究，不得當作平衡 PASS。
 - `test_expanded_frd.py` 使用 synthetic FRD fixture 驗證排列、固定欄寬、缺少展開位移、元素種類錯誤、非最終時間、重複／非有限座標及缺檔路徑。fixture PASS 不能代替真實 CCX FRD coverage。
 - **Gate**：若 CI 證明 `OUTPUT=3D` 仍未產生完整 expanded-node `U`，必須保持 `EXPANDED_FACE_COVERAGE_UNRESOLVED`，不可自動從中面 U、rotations 或推測的 MPC 補齊。即使真實 FRD 合力已取得，仍缺完整支承反力及壓力作用節點反力定義；保持 `GLOBAL_BALANCE_NOT_ADMITTED`、`EVIDENCE GATED`，不宣稱 ASTM E1300／ADM capacity。
+
+### 第十三階段實測結果與第十四階段差異診斷（2026-10-10）
+
+PR #37 的 exact-head 真實 CalculiX CI `38005598716` 與 Repo CI `38005598674` 均 SUCCESS，合併 main `76b66958af96da48115fc85172ec4fe18831469c`，main CI `38005697877` SUCCESS。FRD 的 20-node C3D20 拓撲、參考座標、最終 3D U 均由真正 CCX 輸出取得；不是合成座標推估。六個高壓案例（q=0.6 N/mm²）實際 P1 三維合力如下：
+
+| 合成材料 | 網格 | 原始 S8R 節點數 | FRD 節點數 | P1 受壓面 Z 合力（N） |
+| --- | ---: | ---: | ---: | ---: |
+| glass | 4 | 65 | 155 | +5960.505913 |
+| glass | 8 | 225 | 531 | +5960.653713 |
+| glass | 16 | 833 | 1955 | +5960.641960 |
+| aluminum | 4 | 65 | 155 | +6000.000000 |
+| aluminum | 8 | 225 | 531 | +6000.000000 |
+| aluminum | 16 | 833 | 1955 | +6000.000000 |
+
+這些值來自實際 FRD 的 P1 面積分；僅為獨立外力幾何診斷，尚非反力平衡。Stage 10 中面積分的 glass Z 合力約 +5980.48／+5980.63／+5980.62 N，和實際 P1 面約差 20 N，足以證明先前中面近似**不能當作**真正受壓面；不能把差異單獨歸因於 thickness、rotation 或 offset。
+
+第十四階段增加 `compare_pressure_surfaces.py`，並以兩項定向測試驗證：同時列出 P1 − 中面外力差及 P1 +「先前用中面節點外力修正」的 EDGE inferred support 差。後者是 **mixed discretization diagnostic**，不具完整平衡物理意義；絕不把其殘差較小當作 `GLOBAL_BALANCE_PASS`。仍須查明 CCX 原始 `RF` 如何包含外力、約束及 MPC 反力，並獨立核對完整邊界力後，才可能討論全域平衡 admission。狀態維持 `EVIDENCE GATED`。
