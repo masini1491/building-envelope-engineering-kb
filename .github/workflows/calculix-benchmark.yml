@@ -107,6 +107,8 @@ jobs:
           python check_pressure_equilibrium.py
           python -m unittest -v test_follower_pressure.py
           python -m unittest -v test_expanded_face.py
+          python -m unittest -v test_expanded_frd.py
+          python check_expanded_frd.py
           python check_follower_pressure.py
       - name: 保存可查證數值輸出
         if: always()
@@ -128,5 +130,6 @@ jobs:
             tests/fea_benchmark/pressure_plate/*/*.dat
             tests/fea_benchmark/pressure_plate/*/*.sta
             tests/fea_benchmark/envelope_panels/*/*.dat
+            tests/fea_benchmark/envelope_panels/*/*.frd
             tests/fea_benchmark/envelope_panels/*/*.sta
           if-no-files-found: warn
