@@ -310,3 +310,12 @@ CalculiX 官方 `*NODE PRINT` 的 `RF` 包含支承反力與施加在所列節�
 本階段最多可稱 `EXACT_SOURCE_FACE_PATH_RECONCILED` 與 `EXPANDED_FACE_SYNTHETIC_ORACLE_PASS`（僅限 source route 與合成解析幾何）。**未取得實際 CCX expanded-face 當前座標、完整 MPC/rotation 轉換與全部 reaction 定義**；Stage 10 玻璃約 0.33% 殘差仍無確定歸因；保持 `SHELL_FACE_GEOMETRY_UNRESOLVED`、`GLOBAL_BALANCE_NOT_ADMITTED`、`EVIDENCE GATED`，不宣稱 E1300／ADM 工程 capacity。
 
 來源：[Debian CalculiX 2.21-1 source package](https://sources.debian.org/src/calculix-ccx/2.21-1/)；本 Repo 不複製或重新授權 GPL-2.0 原始碼。
+
+## 第十三階段：實際 FRD 展開節點證據與 P1 幾何合力（待 CI 實測）
+
+研究日期：2026-10-10。使用 SHA-256 已核對的 CalculiX 2.21 原始碼，進一步確認 `src/frd.c`（座標／C3D20 拓撲）、`src/frdvector.c`（節點位移）及 `src/noelfiles.f`（`*NODE FILE,OUTPUT=3D`）可形成 **候選** 的三維展開節點取證路徑；`src/frd.c` 會重新排列 C3D20 的 20 節點順序，不能直接將 FRD 連接表當作 CCX 內部 slot。
+
+- 合成板件 deck 明確要求 `*NODE FILE,OUTPUT=3D` 的 `U`，保留既有 `NALL U` 與 `EDGE RF` 診斷；CI 保存 `.frd`。
+- `check_expanded_frd.py` 解析 ASCII FRD 的參考節點座標、C3D20 拓撲與最後一步位移；還原 CCX 內部元素 slot，嚴格要求所有展開面相關節點都有參考座標及位移，且最後 time=1.0；否則拒絕。輸出由真實 CCX 形成的 P1 受壓合力供研究，不得當作平衡 PASS。
+- `test_expanded_frd.py` 使用 synthetic FRD fixture 驗證排列、固定欄寬、缺少展開位移、元素種類錯誤、非最終時間、重複／非有限座標及缺檔路徑。fixture PASS 不能代替真實 CCX FRD coverage。
+- **Gate**：若 CI 證明 `OUTPUT=3D` 仍未產生完整 expanded-node `U`，必須保持 `EXPANDED_FACE_COVERAGE_UNRESOLVED`，不可自動從中面 U、rotations 或推測的 MPC 補齊。即使真實 FRD 合力已取得，仍缺完整支承反力及壓力作用節點反力定義；保持 `GLOBAL_BALANCE_NOT_ADMITTED`、`EVIDENCE GATED`，不宣稱 ASTM E1300／ADM capacity。

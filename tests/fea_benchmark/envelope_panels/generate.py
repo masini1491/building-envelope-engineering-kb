@@ -34,7 +34,7 @@ def build(material,n,load,out):
     if c["edge"]=="clamped":lines+=["EDGE,1,6,0."]
     else:
         lines+=["EDGE,3,3,0.",f"{nodes[(0,0)]},1,2,0.",f"{nodes[(2*n,0)]},2,2,0."]
-    lines+=["*STEP,NLGEOM","*STATIC","0.05,1.,0.00001,0.1","*DLOAD",f"PLATE,P,{c['q_'+load]}","*NODE PRINT,NSET=CENTER","U","*NODE PRINT,NSET=EDGE","RF","*NODE PRINT,NSET=NALL","U","*END STEP"]
+    lines+=["*STEP,NLGEOM","*STATIC","0.05,1.,0.00001,0.1","*DLOAD",f"PLATE,P,{c['q_'+load]}","*NODE FILE,OUTPUT=3D","U","*NODE PRINT,NSET=CENTER","U","*NODE PRINT,NSET=EDGE","RF","*NODE PRINT,NSET=NALL","U","*END STEP"]
     (out/"panel.inp").write_text("\n".join(lines)+"\n",encoding="utf-8")
 if __name__=="__main__":
     parser=argparse.ArgumentParser()
