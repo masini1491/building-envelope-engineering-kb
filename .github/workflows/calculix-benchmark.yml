@@ -109,6 +109,8 @@ jobs:
           python -m unittest -v test_expanded_face.py
           python -m unittest -v test_expanded_frd.py
           python check_expanded_frd.py
+          python -m unittest -v test_compare_pressure_surfaces.py
+          python compare_pressure_surfaces.py
           python check_follower_pressure.py
       - name: 保存可查證數值輸出
         if: always()
