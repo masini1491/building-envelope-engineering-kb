@@ -367,3 +367,11 @@ Stage 15 新增的 `NALL RF` 不是「獨立支承反力」，其完整節點 Z 
 2026-10-10：建立 `check_output_selection_ab.py`，以同一份 synthetic large-pressure glass／aluminum S8R deck 進行六組配對真實 CCX 求解。A 組要求 `*NODE PRINT,NSET=NALL; U,RF`；B 組僅移除 `NALL RF` 輸出要求，保留 `U`。其餘網格、荷載、材料、拘束、`NLGEOM` 和 `EDGE RF` 完全一致。獨立比對兩組原始 deck 的唯一差異、最後增量的 NALL U 和 EDGE RF，並保留完整 CI 日誌。合成負向測試驗證 deck 不相等及標記缺失時拒絕。
 
 **目的**：驗證先前「NALL RF 可能改變 EDGE RF」的推測是否可由可重複的真正求解器 A/B 實驗否定；單次同檔交叉核對不等於跨設定實驗。即使 A/B 完全一致，仍只能 admission `OUTPUT_SELECTION_INVARIANCE_ONLY`，不能以其推論完整支承反力或 `GLOBAL_BALANCE_PASS`。完整大變形平衡仍 `EVIDENCE GATED`。
+
+## 第十八階段：C3D20 展開節點力與 S8R 殼節點 RF 投影驗證（候選）
+
+研究日期：2026-10-10。沿已校驗的 CalculiX 2.21 原始碼 `results.c`、`resultsforc.c`、`printout.f`、`printoutnode.f`、`frd.c` 與 `map3dto1d2d.f` 查證，`RF` 是 internal nodal force 的投影，而不是只含拘束自由度的支承反力。針對一般 quadratic S8R 殼元素，`map3dto1d2d.f` 使用 `node8` 分層節點對照：角點取三個厚度方向節點，邊中點取兩個厚度方向節點；力模式（`iforce=1`）各展開節點只計入一次，再依同一原殼節點相鄰元素 incidence 做平均。
+
+本階段新增 `check_rf_3d_projection.py`：以真正的 `*NODE FILE,OUTPUT=3D` `U,RF` 產出的 FRD `FORC` 資料和 C3D20 connectivity，依原始碼對照重建 3D→S8R nodal-force projection，和 `*NODE PRINT,NSET=NALL` 的 `RF` 逐原始節點比對，含資料完整性與共用節點唯一歸屬守門。以 `test_rf_3d_projection.py` 驗證合成正向與缺漏、重複、不合幾何排列等負向案例。
+
+**驗證門**：FRD 必須明確包含最後 time=1.0 的完整 expanded `FORC`；若 `OUTPUT=3D` 使 `RF` 缺漏或 solver 不支援，拒絕並維持未認證。即使映射數值相符，這是與 CCX 原始碼、相同求解器內部力資料的交叉驗證，不是獨立 global reaction balance。不得因 `NALL RF` 全域和接近零便聲稱 follower pressure 已與支承反力平衡；維持 `GLOBAL_BALANCE_NOT_ADMITTED` 與 `EVIDENCE GATED`。
