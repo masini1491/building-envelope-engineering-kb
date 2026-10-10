@@ -336,3 +336,11 @@ PR #37 的 exact-head 真實 CalculiX CI `38005598716` 與 Repo CI `38005598674`
 這些值來自實際 FRD 的 P1 面積分；僅為獨立外力幾何診斷，尚非反力平衡。Stage 10 中面積分的 glass Z 合力約 +5980.48／+5980.63／+5980.62 N，和實際 P1 面約差 20 N，足以證明先前中面近似**不能當作**真正受壓面；不能把差異單獨歸因於 thickness、rotation 或 offset。
 
 第十四階段增加 `compare_pressure_surfaces.py`，並以兩項定向測試驗證：同時列出 P1 − 中面外力差及 P1 +「先前用中面節點外力修正」的 EDGE inferred support 差。後者是 **mixed discretization diagnostic**，不具完整平衡物理意義；絕不把其殘差較小當作 `GLOBAL_BALANCE_PASS`。仍須查明 CCX 原始 `RF` 如何包含外力、約束及 MPC 反力，並獨立核對完整邊界力後，才可能討論全域平衡 admission。狀態維持 `EVIDENCE GATED`。
+
+## 第十五階段：RF 源碼投影與 NALL／EDGE 證據交叉核對（候選）
+
+研究日期：2026-10-10；由維護者提供並以 `.dsc` SHA-256 校驗的 CalculiX 2.21 source archive 實際檢查：
+
+- `src/results.c` 的 `resultsmechmt` 聚合 `fn`（節點 internal force），再呼叫 `resultsforc`；`src/resultsforc.c` 對 MPC dependent/independent terms 做係數與 `fmpc` 的轉換，不是直接輸出支承外力；`src/printout.f` 的 `RF` 分支可能先呼叫 `map3dto1d2d` 將展開實體力映回原殼節點，`src/printoutnode.f` 輸出的是 `fn(j,node)`，而非只含拘束反力的向量。
+- `*NODE PRINT,NSET=NALL` 現要求 `U,RF`，保留 `EDGE RF`；`audit_rf_projection.py` 僅檢查同一個 CCX `.dat` 的原殼 NALL/EDGE RF 在共同節點的投影一致性、完整性與節點力和，**不是**獨立平衡式。四項 synthetic parser tests 為負向守門；真實 CI 執行後才可標記 real-CCX coverage。
+- 源碼含 MPC 與 shell mapping，直接從 `RF` 當作支承反力是不成立的。仍須對完整 `fext`（含 pressure、constraint/MPC redistribution）與映回 `fn` 的語意建立對應，不能以 `NALL RF` 求和替代外力／支承力平衡。保持 `GLOBAL_BALANCE_NOT_ADMITTED`／`EVIDENCE GATED`。
