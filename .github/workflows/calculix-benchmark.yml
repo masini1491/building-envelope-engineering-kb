@@ -113,6 +113,18 @@ jobs:
           python compare_pressure_surfaces.py
           python -m unittest -v test_audit_rf_projection.py
           python audit_rf_projection.py
+          # Paired runs differ only by NALL RF print selection; do not reuse old output.
+          for material in glass aluminum; do
+            for n in 4 8 16; do
+              source="${material}_large_${n}"
+              paired="${material}_large_${n}_no_nall_rf"
+              mkdir -p "$paired"
+              sed '/^\*NODE PRINT,NSET=NALL$/{n;s/^U,RF$/U/;}' "$source/panel.inp" > "$paired/panel.inp"
+              (cd "$paired" && timeout 90s ccx -i panel)
+            done
+          done
+          python -m unittest -v test_output_selection_ab.py
+          python check_output_selection_ab.py
           python check_follower_pressure.py
       - name: 保存可查證數值輸出
         if: always()
