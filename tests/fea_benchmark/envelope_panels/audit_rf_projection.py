@@ -20,6 +20,8 @@ def rf_block(source: str, set_name: str, expected: set[int]):
         raise ValueError(f"MISSING_FINAL_{set_name}_RF")
     result = {}
     for line in matches[-1].group(2).splitlines():
+        if not line.strip():
+            continue
         values = line.split()
         if len(values) != 4:
             raise ValueError("MALFORMED_RF_ROW")
