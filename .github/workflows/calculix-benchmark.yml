@@ -125,6 +125,8 @@ jobs:
           done
           python -m unittest -v test_output_selection_ab.py
           python check_output_selection_ab.py
+          python -m unittest -v test_rf_3d_projection.py
+          python check_rf_3d_projection.py
           python check_follower_pressure.py
       - name: 保存可查證數值輸出
         if: always()
