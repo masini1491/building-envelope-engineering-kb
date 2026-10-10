@@ -361,3 +361,9 @@ PR #37 的 exact-head 真實 CalculiX CI `38005598716` 與 Repo CI `38005598674`
 Stage 15 新增的 `NALL RF` 不是「獨立支承反力」，其完整節點 Z 向加總約為 +0.00050／−0.00044／−0.000228 N（glass 4／8／16）及 +0.00040／−0.00007／−0.000467 N（aluminum 4／8／16），主要表示投影後內部節點力互相抵消；不能用這個接近零的結果宣稱 external load + boundary reaction 的全域平衡。現有 `EDGE RF` 和 `NALL RF` 共用 CCX internal-force projection path，故兩者的一致性僅為**同來源交叉核對**，不是獨立數值 oracle。
 
 **下一個證據缺口**：需要釐清 `resultsforc`、`map3dto1d2d` 及 `RF` 寫檔之前如何處理 external follower pressure、MPC dependent-node load redistribution 與拘束自由度的真正 reaction。不得直接將 `NALL RF` 或 `EDGE RF` 的全域求和視為反力平衡證明。狀態繼續 `GLOBAL_BALANCE_NOT_ADMITTED`／`EVIDENCE GATED`。
+
+## 第十七階段：NALL RF 輸出選擇的隔離 A/B 實驗（候選）
+
+2026-10-10：建立 `check_output_selection_ab.py`，以同一份 synthetic large-pressure glass／aluminum S8R deck 進行六組配對真實 CCX 求解。A 組要求 `*NODE PRINT,NSET=NALL; U,RF`；B 組僅移除 `NALL RF` 輸出要求，保留 `U`。其餘網格、荷載、材料、拘束、`NLGEOM` 和 `EDGE RF` 完全一致。獨立比對兩組原始 deck 的唯一差異、最後增量的 NALL U 和 EDGE RF，並保留完整 CI 日誌。合成負向測試驗證 deck 不相等及標記缺失時拒絕。
+
+**目的**：驗證先前「NALL RF 可能改變 EDGE RF」的推測是否可由可重複的真正求解器 A/B 實驗否定；單次同檔交叉核對不等於跨設定實驗。即使 A/B 完全一致，仍只能 admission `OUTPUT_SELECTION_INVARIANCE_ONLY`，不能以其推論完整支承反力或 `GLOBAL_BALANCE_PASS`。完整大變形平衡仍 `EVIDENCE GATED`。
