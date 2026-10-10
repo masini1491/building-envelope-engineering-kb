@@ -344,3 +344,20 @@ PR #37 的 exact-head 真實 CalculiX CI `38005598716` 與 Repo CI `38005598674`
 - `src/results.c` 的 `resultsmechmt` 聚合 `fn`（節點 internal force），再呼叫 `resultsforc`；`src/resultsforc.c` 對 MPC dependent/independent terms 做係數與 `fmpc` 的轉換，不是直接輸出支承外力；`src/printout.f` 的 `RF` 分支可能先呼叫 `map3dto1d2d` 將展開實體力映回原殼節點，`src/printoutnode.f` 輸出的是 `fn(j,node)`，而非只含拘束反力的向量。
 - `*NODE PRINT,NSET=NALL` 現要求 `U,RF`，保留 `EDGE RF`；`audit_rf_projection.py` 僅檢查同一個 CCX `.dat` 的原殼 NALL/EDGE RF 在共同節點的投影一致性、完整性與節點力和，**不是**獨立平衡式。四項 synthetic parser tests 為負向守門；真實 CI 執行後才可標記 real-CCX coverage。
 - 源碼含 MPC 與 shell mapping，直接從 `RF` 當作支承反力是不成立的。仍須對完整 `fext`（含 pressure、constraint/MPC redistribution）與映回 `fn` 的語意建立對應，不能以 `NALL RF` 求和替代外力／支承力平衡。保持 `GLOBAL_BALANCE_NOT_ADMITTED`／`EVIDENCE GATED`。
+
+## 第十六階段：RF 觀察更正與投影範圍限定（2026-10-10）
+
+第十五階段 PR #39 的修正後 exact-head CalculiX CI `38021387071` 與 Repository CI `38021387075` 均 SUCCESS；merge `1ce79f26f305da861546a22568955ae8cc25185b`，合併後 main CI `38021467115` SUCCESS。前一輪曾提出「加入 NALL RF 使 EDGE RF 改變」的推測，**已由同一批 CI 日誌交叉核對否定，撤回該推測**。
+
+| 模型 | 網格 | Stage 10/14 EDGE RF Z (N) | Stage 15 EDGE RF Z (N) | 判讀 |
+| --- | ---: | ---: | ---: | --- |
+| glass | 4 | −4841.926 | −4841.926 | 一致 |
+| glass | 8 | −5432.08052 | −5432.08052 | 一致 |
+| glass | 16 | −5704.08197 | −5704.08197 | 一致 |
+| aluminum | 4 | −4872.7044 | −4872.7044 | 一致 |
+| aluminum | 8 | −5467.47016 | −5467.47016 | 一致 |
+| aluminum | 16 | −5741.547032 | −5741.547032 | 一致 |
+
+Stage 15 新增的 `NALL RF` 不是「獨立支承反力」，其完整節點 Z 向加總約為 +0.00050／−0.00044／−0.000228 N（glass 4／8／16）及 +0.00040／−0.00007／−0.000467 N（aluminum 4／8／16），主要表示投影後內部節點力互相抵消；不能用這個接近零的結果宣稱 external load + boundary reaction 的全域平衡。現有 `EDGE RF` 和 `NALL RF` 共用 CCX internal-force projection path，故兩者的一致性僅為**同來源交叉核對**，不是獨立數值 oracle。
+
+**下一個證據缺口**：需要釐清 `resultsforc`、`map3dto1d2d` 及 `RF` 寫檔之前如何處理 external follower pressure、MPC dependent-node load redistribution 與拘束自由度的真正 reaction。不得直接將 `NALL RF` 或 `EDGE RF` 的全域求和視為反力平衡證明。狀態繼續 `GLOBAL_BALANCE_NOT_ADMITTED`／`EVIDENCE GATED`。
