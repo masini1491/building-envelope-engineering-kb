@@ -75,7 +75,7 @@ def read_final_expanded_rf(path: Path, expected: set[int]) -> dict[int, tuple[fl
 
 
 def project_expanded_rf(original_elements, expanded_elements, forces):
-    """Reproduce map3dto1d2d force mode: once per 3D node, mean per 2D incidence.
+    """Reproduce map3dto1d2d force mode: each 3D force is summed only once.
 
     Restriction: each expanded node must belong to exactly one original
     S8R shell node group. This fails closed for unaccounted variants.
@@ -101,7 +101,9 @@ def project_expanded_rf(original_elements, expanded_elements, forces):
     for expanded_nid, orig in associations.items():
         for i in range(3):
             projected[orig][i] += forces[expanded_nid][i]
-    return {node: tuple(v / incidence[node] for v in vec) for node, vec in projected.items()}, incidence
+    # iforce=1 resets inum(node2d)=-1; unlike field interpolation,
+    # repeated-element incidence is NOT an averaging divisor.
+    return {node: tuple(vec) for node, vec in projected.items()}, incidence
 
 
 def reconcile(deck: Path, frd: Path, dat: Path):

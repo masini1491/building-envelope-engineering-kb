@@ -44,7 +44,8 @@ class RFProjectionTests(unittest.TestCase):
         forces = {i: (1.0, 0.0, 0.0) for i in set(first) | set(second)}
         mapped, incidence = project_expanded_rf([tuple(a), tuple(b)], {1:first, 2:tuple(second)}, forces)
         self.assertEqual(incidence[a[1]], 2)
-        self.assertEqual(mapped[a[1]][0], 3.0 / 2.0)
+        self.assertEqual(mapped[a[1]][0], 3.0)
+        self.assertEqual(sum(x[0] for x in mapped.values()), len(forces))
 
     def test_reject_partial_and_ambiguous_connectivity(self):
         original = [tuple(range(1,9))]
