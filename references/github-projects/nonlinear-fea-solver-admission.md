@@ -381,3 +381,13 @@ Stage 15 新增的 `NALL RF` 不是「獨立支承反力」，其完整節點 Z 
 第一版 PR #42 exact-head `bbe1d0b542bb5dcfa9ed8cfa4efd84c4d64117d6` 的 Repo CI `38049657499` SUCCESS、CalculiX CI `38049657595` **FAIL**。失敗點為真正 CCX 3D FRD `FORC` 映回 `NALL RF` 的最大節點分量相對差 0.37689231，並非測試的非線性收斂失敗；五項 synthetic unit tests 均 PASS。下載該 run 的 `calculix-nlgeom-probe` artifact（ID `11669230685`）後，以 glass 4 網格真實 FRD／DAT 重現。
 
 **根因**：原候選誤把 `map3dto1d2d.f` 的場量平均套用至 `iforce=1` 力路徑；CalculiX 在力路徑以 `inum(node2d)=-1` 標記，避免 shared expanded node 重複累計，最後力值**不除以**相鄰元素 incidence。誤除使 shared node 的 RF 約變成原值 1/2 或 1/4。修正後，以相同真實 glass 4 原始 artifact 重新對帳，三維節點力加總接近零，映射後節點力與原 `.dat` 的差距主要為文字輸出捨入精度。本修正須通過新的 exact-head CI 才能正式 admission；不修改求解器或放寬 0.0002 的 serialization tolerance。持續 `GLOBAL_BALANCE_NOT_ADMITTED`。
+
+## 第十九階段：受限合成板件的三向平移力平衡重建（候選，2026-10-10）
+
+**前提／來源**：以 CalculiX 2.21-1 原始碼 `e_c3d_rhs.f` 壓力 P1 路徑、`map3dto1d2d.f` (`iforce=1`)、`resultsforc.c`／`printoutnode.f`，以及 Stage 18 實際 CCX `.frd`/`.dat` 成功算例為證據。針對 repo generator 的合成 S8R 板件，原始印出的 `NALL RF` 是**內部節點力**，不能直接當作支承反力。此候選腳本只重建可觀測的 Cartesian translational residual：用真實 CCX expanded C3D20 節點最終座標，獨立計算 follower `P1` 的等效展開節點外力，再沿已驗證 node8 對照映回 S8R 原節點。於已知明確約束的平移自由度，採 `R_constrained = internal_RF − reconstructed_P1_pressure`；於其餘平移自由度要求 `internal_RF − reconstructed_P1_pressure ≈ 0`。不是 CCX 原生獨立輸出的支承反力。
+
+- **模型 scope**：僅 `generate.py` 產生的 `glass`（四邊 U3 簡支，2 個定位點補 U1／U2）與 `aluminum`（邊界 U1–U6 固定）的六組高荷載（q=0.6 N/mm²；4/8/16 網格）、線彈性 isotropic S8R、`NLGEOM`。只審核 1/2/3 **平移分量**；不代表 U4–U6 旋轉、彎矩、shell director、MPC/constraint multiplier、接觸或其他負載機制之平衡。
+- `check_reconstructed_pressure_balance.py` 要求恰當的材料與零位移 `*BOUNDARY` 契約，不接受不明約束組合；強制完整真實 FRD 20-node 座標／U、真實 `NALL RF`，並先通過 Stage 18 FRD→`.dat` 內力投影交叉檢核。重建 P1 nodal load 不允許與全部外力合力不符。
+- 真實 Stage 18 artifact `11669230685` 的本機初步證據（**不同於正式 exact-head CI**）：6/6 合成模型的三向合力 + 重建支承合力，相對歐氏範數殘差皆小於 1.52×10⁻⁷；未約束平移自由度最大差除以壓力總合力皆小於 1.2×10⁻⁸。偏差包括 DAT／FRD 可見文字輸出精度，容差暫採 `GLOBAL_REL_TOL=5e-7`、`FREE_REL_TOL=1e-7`，均須由 CI 實跑驗證而非僅依此宣稱 admission。
+- 六項定向單元測試含解析平面 P1 分配、known-simple support layout、missing FRD node、非法約束、自由度及約束反力刻意擾動、不一致或非有限力值等 fail-closed paths。**必須同時通過 PR exact-head Repo CI 與實際 CalculiX CI，再能 admission 此限定驗證**。
+- 此外，仍不等同能從 CalculiX 直接獨立量得拘束反力，更非一般殼板 global six-component force/moment balance 或玻璃／鋁板承載力、ASTM E1300／ADM 規範檢核。保持 **`GENERAL_GLOBAL_BALANCE_NOT_ADMITTED`、`EVIDENCE GATED`**。

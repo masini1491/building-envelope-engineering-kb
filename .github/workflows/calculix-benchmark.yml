@@ -127,6 +127,8 @@ jobs:
           python check_output_selection_ab.py
           python -m unittest -v test_rf_3d_projection.py
           python check_rf_3d_projection.py
+          python -m unittest -v test_reconstructed_pressure_balance.py
+          python check_reconstructed_pressure_balance.py
           python check_follower_pressure.py
       - name: 保存可查證數值輸出
         if: always()
