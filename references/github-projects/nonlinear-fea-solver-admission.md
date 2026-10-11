@@ -446,3 +446,10 @@ Stage 15 新增的 `NALL RF` 不是「獨立支承反力」，其完整節點 Z 
 - test_rotation_spc_ab.py 驗證唯一 deck 差異與缺失、重複拘束 fail-closed。計算缺漏或 FRD／DAT 不完整即拒絕。
 - Stage 22 exact-source 靜態 mean-rotation／drilling path 為研究背景；結果不提供獨立 rotational reaction、MPC multiplier 或 general six-component global balance。
 - 完成須 PR exact-head Repo CI＋真正 CalculiX CI、main CI 與 canonical read-back。無論 A/B 差異如何，整體 EVIDENCE GATED、GENERAL_GLOBAL_BALANCE_NOT_ADMITTED。
+
+## 第二十四階段：三維展開節點力矩與殼節點投影遺失力偶（候選，2026-10-11）
+
+- 利用 Stage 18 已驗證的 node8 C3D20→S8R 力投影歸屬，將每個展開節點位置寫為 original S8R current position 加上 expanded-relative arm，分解 Σ(x_expanded×F) 為 Σ(x_shell×F_projected)＋Σ((x_expanded−x_shell)×F_expanded)。這是同一組內力／外力的幾何恆等式，不是獨立旋轉 reaction。
+- 對 Stage 20 真實 CCX expanded FRD internal FORCE 與 Stage 19 獨立積分的 P1 nodal load 分開執行 moment partition；要求節點完整、單一原始殼節點歸屬、Stage 18/19 先驗 gate 及 algebraic force/moment partition closure。
+- 新增 check_expanded_moment_partition.py 和 test_expanded_moment_partition.py；合成測試含隱藏的純力偶、arm + local couple 重組、缺少 shell／expanded position、非有限力值。真實 A/B 需由 exact-head CalculiX CI 完成。
+- 此處的 relative geometric couple 不能冒充 CCX 自主輸出的 U4–U6 旋轉反力或 constraint MPC multiplier，不能將恆等式 PASS 提升為六分量全域平衡。狀態保持 GENERAL_GLOBAL_BALANCE_NOT_ADMITTED、EVIDENCE GATED。
