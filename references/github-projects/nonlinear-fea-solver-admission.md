@@ -463,3 +463,12 @@ Stage 15 新增的 `NALL RF` 不是「獨立支承反力」，其完整節點 Z 
 - **驗證**：兩組 solver 從相同原始碼與 build flags 開始，只讓 instrumentation differ；相同合成 aluminum S8R P1 高荷載 deck 比對 `NALL U/RF`、expanded FRD U/RF 與拓撲，要求文字精度下逐項相同並保留有限 trace；任何 source hash、追蹤資料、mesh／output 缺漏、位移或 force mismatch 一律 fail closed。
 - **執行邊界**：CI runner 下載 source 時先校驗 SHA-256，隔離編譯原版／插樁版，使用官方依賴；不得發佈或上傳修改 GPL solver binary。CI 若因依賴、compiler、來源下載或 instrumentation 自身失敗，仍以實際原因記錄，絕不把失敗視為工程缺陷或放寬數值檢核。
 - **Admission 不擴張**：這是 source-internal MPC redistribution observability，並非獨立 `U4/U5/U6` reaction couples、constraint multiplier completeness、任意 shell global six-component moment balance 或 ASTM E1300／ADM strength check。維持 `GENERAL_GLOBAL_BALANCE_NOT_ADMITTED`、`EVIDENCE GATED`。
+
+## 第二十六階段：MEANROT 係數／節點 term 有界可觀測診斷（candidate，2026-10-11）
+
+Stage 25 已驗證原版與 opt-in 插樁版於合成鋁板 4／8 網格具相同文字精度輸出。此候選僅在相同、SHA 固定之 2.21 原始碼的隔離再編譯中加入第二個 opt-in `CCX_MPC_TERMS_FILE`；不改動核心計算。
+
+- 記錄 `resultsforc.c` 的每次呼叫 ID、`MEANROT` 的 MPC ID、term 序號、solver 內部 node ID、DOF、係數及 `fmpc`。對 term chain 過長、資料缺漏、非有限值、不一致呼叫順序 fail-closed。
+- 保留 Stage 25 pristine／instrumented 的相同 deck 及 U/RF/FRD 數值對照，追加第二個 opt-in 版與 pristine 比對。只有真正執行 CI 才能宣稱 exact-head real solver validation。
+- 內部 node ID 與 FRD ID 的數值吻合不是物理身分證明；不可僅憑兩者 ID 相同就將 term 力矩歸到 shell director、rotational reaction、MPC multiplier 或支承反力。新的 `term_node_ids_in_expanded_FRD` 僅是 coverage diagnostic。
+- 只把研究用診斷腳本和受限證據說明保存於公開 KB；不公開 GPL 原始碼或 binary。完整六維力矩平衡仍 `GENERAL_GLOBAL_BALANCE_NOT_ADMITTED`、`EVIDENCE GATED`。
