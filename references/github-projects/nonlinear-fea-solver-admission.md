@@ -391,3 +391,15 @@ Stage 15 新增的 `NALL RF` 不是「獨立支承反力」，其完整節點 Z 
 - 真實 Stage 18 artifact `11669230685` 的本機初步證據（**不同於正式 exact-head CI**）：6/6 合成模型的三向合力 + 重建支承合力，相對歐氏範數殘差皆小於 1.52×10⁻⁷；未約束平移自由度最大差除以壓力總合力皆小於 1.2×10⁻⁸。偏差包括 DAT／FRD 可見文字輸出精度，容差暫採 `GLOBAL_REL_TOL=5e-7`、`FREE_REL_TOL=1e-7`，均須由 CI 實跑驗證而非僅依此宣稱 admission。
 - 六項定向單元測試含解析平面 P1 分配、known-simple support layout、missing FRD node、非法約束、自由度及約束反力刻意擾動、不一致或非有限力值等 fail-closed paths。**必須同時通過 PR exact-head Repo CI 與實際 CalculiX CI，再能 admission 此限定驗證**。
 - 此外，仍不等同能從 CalculiX 直接獨立量得拘束反力，更非一般殼板 global six-component force/moment balance 或玻璃／鋁板承載力、ASTM E1300／ADM 規範檢核。保持 **`GENERAL_GLOBAL_BALANCE_NOT_ADMITTED`、`EVIDENCE GATED`**。
+
+
+## 第二十階段：展開節點幾何力矩資訊保真診斷（candidate，2026-10-11）
+
+**Stage scope**：只觀察已驗證合成 S8R 模型的 CalculiX 2.21 `OUTPUT=3D` FRD expanded-node 資料，在同一個 Cartesian 原點（0,0,0 mm）計算壓力等效節點力與展開節點內力的 `Σ(r×F)`。先要求 Stage 19 的平移重建與 Stage 18 的投影對照全部通過。這是 **geometric-moment observation**，不是完整六自由度平衡，亦不是獨立支承反力／反力矩測量。
+
+- 新增 `check_expanded_moment_diagnostic.py` 與 `test_expanded_moment_diagnostic.py`，利用 Stage 13/18/19 現有 parser／P1 積分，對實際 FRD 全部展開節點之最終座標、內力與重建壓力節點力計算 `ΣF` 及 `Σ(r×F)`；不以中面原節點替代作用位置。
+- 五項 synthetic tests 中，兩個厚度方向展開節點具相反切向力的純力偶，合力為 0、力矩不為 0，證明原殼節點三向力投影會遺失力矩資訊；另涵蓋解析力矩、座標原點變化、資料缺漏及非法／非有限值。這些 synthetic tests 不等於實際 CCX admission。
+- `unpartitioned_geometric_residual_Nmm` 是 **未分類內力與外力幾何力矩之差**，不能視為支承反力矩、MPC multiplier 或全域平衡殘差。即使它接近零，也不能給出 full six-component PASS。輸出固定標示 `six_component_balance=NOT_ADMITTED`，並將 rotational reactions、rotational MPC multipliers、independent support reactions 標示 `UNOBSERVED`。
+- 這一版未提供 `U4/U5/U6`、`RM`、`MPC` 的可靠可觀測契約，且未重新完成 CalculiX 2.21 exact-source 的 constraint-related routines 對照。完整三維力矩、director、offset、constraint-couple 與 MPC 力重新分配仍屬 evidence gap；不得把 `Σ(r×F)` 本身當成完整 `ΣM=0`。
+- **Admission gate**：須有 Stage 20 PR exact-head Repository CI 與真實 CalculiX CI、merged main CI 及 canonical read-back，才可認證上述受限診斷在真實合成案例上可重現。最終 engineering capacity／六維 global balance 仍為 `GENERAL_GLOBAL_BALANCE_NOT_ADMITTED`、`EVIDENCE GATED`，不得聲稱 ASTM E1300／ADM 容量。
+
