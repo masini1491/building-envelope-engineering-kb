@@ -144,6 +144,14 @@ jobs:
           python check_rotation_spc_ab.py
           python -m unittest -v test_expanded_moment_partition.py
           python check_expanded_moment_partition.py
+          python -m unittest -v test_run_synthetic_panel.py
+          for material in glass aluminum; do
+            for n in 4 8 16; do
+              folder="adapter_smoke_${material}_${n}"
+              mkdir -p "$folder"
+              python run_synthetic_panel.py --material "$material" --mesh "$n" --workspace "$folder" --ccx "$(command -v ccx)" --execute
+            done
+          done
           python check_follower_pressure.py
       - name: 保存可查證數值輸出
         if: always()

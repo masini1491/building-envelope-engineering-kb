@@ -564,3 +564,11 @@ Stage 31 main CI `38119404136` SUCCESS；以上合併 commit 與執行紀錄皆�
 **目前能證明的最高範圍**：對這些固定合成模型，MEANROT helper roles 與 cascade entry/exit 的 MPC chain 縮減，可在 exact-source 隔離 GPL 診斷版實際觀測。尚無獨立旋轉拘束反力矩、完整 nonlinear MPC term identity lineage、含 node 力偶的實際六分量 global equilibrium acceptance。下一個可驗證工程問題需重新建立 per-term source identity 穿越 MPC transformation 的契約，並在所有原始／展開／輔助節點的真實作用位置取得獨立數據；目前不宜直接新增工程容量或 six-component PASS gate。
 
 **維持** `EVIDENCE GATED`、`GENERAL_GLOBAL_BALANCE_NOT_ADMITTED`。此 dossier 為唯一研究證據 owner；外部 GPL 2.21 原始碼及 binary 不納入 public repository。
+
+
+## 第三十三階段：固定合成板件之受限 execution adapter（候選，2026-10-11）
+
+- **目標**：不把 Stage 1–32 的 MPC 研究誤視為通用工程求解器完成。新增可一次呼叫之 `run_synthetic_panel.py`，只接受 Repo canonical `generate.py` 產生的 glass／aluminum、n=4／8／16、large-load 固定合成 S8R P1 NLGEOM 算例；禁止未知 deck、任意 `*INCLUDE`、非預期材料與專案輸入。
+- **執行關卡**：預設 opt-out；只有 `--execute`、可信外部 CCX executable、既有且空白的操作員控制資料夾成立才產生 fixture／執行，無 sandbox。回傳僅為 `SYNTHETIC_BENCHMARK_EVIDENCE_PASS` 或拒絕，不是正式 engineering PASS。
+- **數值證據**：要求求解器 process zero exit、完整 .sta 最後步驟 time=1、.dat／.frd、Stage 19 三向平移力平衡、Stage 24 力矩幾何分解均通過；缺少資料、非有限值、超過固定輸出大小、超時、數值不一致都拒絕。CI 應跑 mock／fail-closed test 及真實獨立 `glass n=4` smoke（不偷用原本已執行的結果）。
+- **工程邊界**：這不是任意幾何模型 execution adapter；不提供獨立旋轉反力矩、六分量 global equilibrium、材料非線性、接觸／屈曲／缺陷或 ASTM E1300／ADM capacity。保持 `EVIDENCE GATED`、`GENERAL_GLOBAL_BALANCE_NOT_ADMITTED`。
