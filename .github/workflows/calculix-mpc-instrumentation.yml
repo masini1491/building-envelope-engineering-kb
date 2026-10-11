@@ -45,6 +45,10 @@ jobs:
           rm resultsforc.o ccx_2.21.a ccx_2.21
           make -j2 ccx_2.21 CFLAGS='-Wall -O2 -I/usr/include/spooles -DARCH="Linux" -DSPOOLES -DARPACK -DMATRIXSTORAGE -DUSE_MT=1' FFLAGS='-O2 -fallow-argument-mismatch' LIBS='-lspooles -lpthread -larpack -llapack -lblas -lm -lc'
           cp ccx_2.21 "$RUNNER_TEMP/ccx-terms"
+          python "$GITHUB_WORKSPACE/tests/fea_benchmark/solver_instrumentation/ccx_mpc_role_probe.py" "$src/usermpc.f"
+          rm usermpc.o ccx_2.21.a ccx_2.21
+          make -j2 ccx_2.21 CFLAGS='-Wall -O2 -I/usr/include/spooles -DARCH="Linux" -DSPOOLES -DARPACK -DMATRIXSTORAGE -DUSE_MT=1' FFLAGS='-O2 -fallow-argument-mismatch' LIBS='-lspooles -lpthread -larpack -llapack -lblas -lm -lc'
+          cp ccx_2.21 "$RUNNER_TEMP/ccx-roles"
           sha256sum "$RUNNER_TEMP/ccx-pristine" "$RUNNER_TEMP/ccx-instrumented"
       - name: Re-run identical synthetic benchmark decks
         run: |
@@ -67,5 +71,11 @@ jobs:
               (cd "$terms" && CCX_MPC_AUDIT_FILE="$terms/trace.csv" CCX_MPC_TERMS_FILE="$terms/terms.csv" timeout 120s "$RUNNER_TEMP/ccx-terms" -i panel)
               python tests/fea_benchmark/solver_instrumentation/ccx_mpc_probe.py compare "$base" "$terms" "$terms/trace.csv"
               python tests/fea_benchmark/solver_instrumentation/ccx_mpc_terms.py check "$terms/trace.csv" "$terms/terms.csv" "$terms/panel.frd"
+              roles="$root/${material}_${n}_roles"
+              mkdir -p "$roles"
+              cp "$base/panel.inp" "$roles/panel.inp"
+              (cd "$roles" && CCX_MPC_AUDIT_FILE="$roles/trace.csv" CCX_MPC_TERMS_FILE="$roles/terms.csv" CCX_MPC_ROLES_FILE="$roles/roles.csv" timeout 120s "$RUNNER_TEMP/ccx-roles" -i panel)
+              python tests/fea_benchmark/solver_instrumentation/ccx_mpc_probe.py compare "$base" "$roles" "$roles/trace.csv"
+              python tests/fea_benchmark/solver_instrumentation/check_mpc_roles.py "$roles/roles.csv" "$roles/terms.csv"
             done
           done

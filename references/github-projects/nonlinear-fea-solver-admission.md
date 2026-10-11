@@ -484,3 +484,11 @@ Stage 25 已驗證原版與 opt-in 插樁版於合成鋁板 4／8 網格具相�
 - Stage 26 的 exact-head 真實隔離 CCX CI `38114272472`：鋁板 4／8 網格的最後一次呼叫各有 64／128 個 MEANROT MPC、256／512 個 term；其中 192／384 個 term node ID 不在現有 FRD 節點集合。此處的集合差異僅為數值 ID coverage，不證明節點身分，更不是力矩平衡誤差。
 - **下一道 admission gate**：要追查各 `usermpc` term 的確切 role，須有 exact 2.21 source-verified term role mapping（包含特殊 node 0、旋轉值及 inhomogeneous terms）和實際儲存座標的獨立 trace；不得把 node ID coincidence 當作 position、也不得為求得 `r×F` 替未知 internal nodes 合成座標。應先完成 source-role discriminator 與反例測試，再考慮 instrumented moment reconstruction。
 - 保持 `EVIDENCE GATED`、`GENERAL_GLOBAL_BALANCE_NOT_ADMITTED`；沒有獨立旋轉支承反力／MPC 力偶認證，也沒有正式工程容量計算。
+
+
+## 第二十八階段：`usermpc.f` MEANROT 角色級隔離診斷（候選，2026-10-11）
+
+- **原始碼錨點**：官方來源封存檔 SHA-256 `51d229aee320cf685216d360f7c04f9a57af0148fbe840483a964c86c315da82`；`src/usermpc.f` SHA-256 `97d49518ea8306d0ba9b88c0861c4bfb45487d45836f765d01b9d624548e2fe5`。只在 source hash 和結構錨點符合時，由 CI 隔離複本插樁；不提交第三方 GPL source 或 binary。
+- **最小資料契約**：在 `usermpc` 完成 MEANROT 建構且已確立 dependent DOF 後，opt-in `CCX_MPC_ROLES_FILE` 記錄 MPC ID、每個 term 的 node/DOF、角色：regular candidate、axis/angle helper、inhomogeneous helper、以及 `noderef/idirref`。嚴格與 Stage 26 `resultsforc` 最後一次呼叫的 `nodempc` 順序及 node/DOF 對帳；資料缺失、重複、順序變化或缺少 helper 皆 fail closed。
+- **工程責任邊界**：這是 **source-internal term role identity**；其中 regular candidate 並非自動得到已驗證的 FRD 三維位置，angle/inhomogeneous helper 也不等同實體受力點。只有通過 exact-head source build、原版與插樁版同 deck 的 NALL/FRD 結果一致、完整 trace mapping 與負向測試，才可宣稱受限角色對帳可重現。不得把 coefficient×fmpc 直接視為獨立支承反力矩。
+- Stage 28 與後續仍維持 `EVIDENCE GATED`、`GENERAL_GLOBAL_BALANCE_NOT_ADMITTED`，不包含玻璃／鋁板正式工程承載力計算。
