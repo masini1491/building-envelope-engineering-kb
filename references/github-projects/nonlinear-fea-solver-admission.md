@@ -496,3 +496,12 @@ Stage 25 已驗證原版與 opt-in 插樁版於合成鋁板 4／8 網格具相�
 ### 第二十八階段：第一輪 root cause（受限診斷修正）
 
 CI `38118121617` 的 real `usermpc` trace 顯示原始鋁板 4 網格可有 `ROLE_END,7,8,261,261,1,1`，同一個 internal node `261` 的 DOF 1 是 angle/axis helper、DOF 2 是非齊次 helper。原插樁僅比對 node ID，後一判斷覆蓋前一判斷，導致 `HELPER_ROLE_MULTIPLICITY` 被正確拒絕。現改以 (node ID, DOF) 辨識，並新增同節點不同 DOF 的回歸測試。此修正不放寬物理契約，無論 CI 成功與否均不宣稱獨立旋轉支承力矩。
+
+
+### 第二十八階段：第二輪 exact-source reconciliation（時間點差異）
+
+Exact-head CI 在完成 node/DOF 角色修正後，已通過原版／插樁版求解數值對照及 Stage 26 term trace，但 `TERM_NODE_DOF_IDENTITY_MISMATCH` 明確指出 **`usermpc` 建立時的 MPC chain 不能被視為最後 `resultsforc` trace 的同一快照**。已觀察建立記錄含 8 個 term 的 MPC；Stage 26 最後一次求解器 trace 的鋁板 4 網格則是 64 MPC、256 term（平均每 MPC 4 term）。兩者不具可直接推論的 term 序列恆等性。
+
+本階段正式改為 **creation-role observation + cross-snapshot difference diagnostic**；保留所有記錄格式、完整性、helper multiplicity、node/DOF 與非有限值等 fail-closed 檢查，但跨快照僅回報 numeric MPC ID overlap 與 exact term sequence coincident count；固定輸出 `creation_to_final_mapping=NOT_ESTABLISHED`。數值 coincident 不代表 term lineage、旋轉 reactions 或物理座標已認證。
+
+後續如要追蹤轉換，需另行對 `gen3dmpc`、`cascade`、`decascade` 及 nonlinear MPC updates 加入必要的版本相符來源／身分對帳，不得以 tolerance、索引相同或憑空插入節點位置補足。

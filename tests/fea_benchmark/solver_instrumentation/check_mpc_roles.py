@@ -47,16 +47,23 @@ def compare(role_path,term_path):
     terms=defaultdict(list)
     for mid,slot,node,dof,coeff,mult in parse_terms(term_path)["last_call_terms"]:
         terms[mid].append((node,dof))
-    if set(roles)!=set(terms):raise ValueError("CREATION_FINAL_COVERAGE_MISMATCH")
+    if not roles or not terms:
+        raise ValueError("NO_MEANROT_OBSERVATIONS")
     counts=[0,0,0]
-    for mid,items in roles.items():
-        if [(x[0],x[1]) for x in items]!=terms[mid]:
-            raise ValueError("TERM_NODE_DOF_IDENTITY_MISMATCH")
+    for items in roles.values():
         for node,dof,role in items:counts[role]+=1
-    return {"meanrot_mpcs":len(roles),"regular_terms":counts[0],
-            "angle_axis_terms":counts[1],"inhomogeneous_terms":counts[2],
-            "role_mapping":"COMPLETE_FOR_TESTED_SYNTHETIC_CASE",
-            "support_reaction_moment":"UNOBSERVED","six_component_balance":"NOT_ADMITTED"}
+    common=set(roles)&set(terms)
+    equal=sum(1 for mid in common if [(n,d) for n,d,_ in roles[mid]]==terms[mid])
+    return {"creation_meanrot_mpcs":len(roles),"final_meanrot_mpcs":len(terms),
+            "creation_regular_terms":counts[0],
+            "creation_angle_axis_terms":counts[1],
+            "creation_inhomogeneous_terms":counts[2],
+            "common_numeric_mpc_ids":len(common),
+            "matching_term_sequences_within_common_ids":equal,
+            "creation_to_final_mapping":"NOT_ESTABLISHED",
+            "term_role_labels_apply_to":"USRMPC_CREATION_SNAPSHOT_ONLY",
+            "support_reaction_moment":"UNOBSERVED",
+            "six_component_balance":"NOT_ADMITTED"}
 
 if __name__=="__main__":
     p=argparse.ArgumentParser()

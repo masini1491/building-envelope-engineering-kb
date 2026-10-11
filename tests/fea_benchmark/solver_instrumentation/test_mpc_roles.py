@@ -18,15 +18,15 @@ class RoleTests(unittest.TestCase):
             a=Path(d)/"roles";b=Path(d)/"terms"
             a.write_text(self.valid);b.write_text(self.terms)
             result=compare(a,b)
-            self.assertEqual((result["regular_terms"],result["angle_axis_terms"],result["inhomogeneous_terms"]),(1,1,1))
+            self.assertEqual((result["creation_regular_terms"],result["creation_angle_axis_terms"],result["creation_inhomogeneous_terms"]),(1,1,1))
     def test_same_helper_node_distinct_dofs(self):
         with tempfile.TemporaryDirectory() as d:
             a=Path(d)/"roles";b=Path(d)/"terms"
             a.write_text(self.valid.replace("21,2,2","20,2,2").replace("3,3,20,21,4,1","3,3,20,20,4,1"))
             b.write_text(self.terms.replace("21,2,1,4","20,2,1,4"))
             result=compare(a,b)
-            self.assertEqual(result["angle_axis_terms"],1)
-            self.assertEqual(result["inhomogeneous_terms"],1)
+            self.assertEqual(result["creation_angle_axis_terms"],1)
+            self.assertEqual(result["creation_inhomogeneous_terms"],1)
     def test_missing_end(self):
         with tempfile.TemporaryDirectory() as d:
             a=Path(d)/"roles";a.write_text(self.valid.split("ROLE_END")[0])
@@ -39,7 +39,9 @@ class RoleTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as d:
             a=Path(d)/"roles";b=Path(d)/"terms"
             a.write_text(self.valid);b.write_text(self.terms.replace("3,1,10,1","3,1,11,1"))
-            with self.assertRaisesRegex(ValueError,"TERM_NODE_DOF_IDENTITY"):compare(a,b)
+            got=compare(a,b)
+            self.assertEqual(got["matching_term_sequences_within_common_ids"],0)
+            self.assertEqual(got["creation_to_final_mapping"],"NOT_ESTABLISHED")
     def test_unknown_source(self):
         with self.assertRaisesRegex(ValueError,"UNRECOGNIZED"):patch("unknown source")
 
