@@ -145,6 +145,9 @@ python tests/fea_benchmark/envelope_panels/run_aluminum_research.py --input alum
 
 成功時 `execution_status=ALUMINUM_PARAMETRIC_RESEARCH_EVIDENCE_PASS` 僅指這個受限模型的 numeric checks 成立，非 admissible ADM capacity，也不是任意板件／支承／材料／屈曲、接觸或全六分量平衡驗收。Stage 38 的不同參數實測與細節可查 canonical dossier。
 
+Stage 40–44 已另以實際 CalculiX CI 對低荷載合成鋁板完成受限驗證：4／8／16 網格與一項 Kirchhoff／Rayleigh–Ritz 位移近似、最終原始 S8R 節點 U／平移支承合力重建摘要、expanded C3D20 節點外插／平均 S／E 六分量，以及同模型兩倍均布面壓的逐節點 U／S／E 比例檢查和法向 Hooke 定律應力／應變交叉比對。成功結果在 `research_observations` 中提供 node ID、單位與未認證標記；此處**最大值只在現有輸出節點內比較**，不代表積分點／整板場極值，不提供獨立轉動反力、剪切本構驗證、ADM 容量或真實構件 engineering PASS。真實 CCX 仍須可信外部程式與 `--execute`。完整來源、數值研究門檻與限制只以 canonical dossier 為準。
+
+
 ## 工具邊界
 
 - calculator 確認 arithmetic correctness，不等於確認 engineering correctness。
