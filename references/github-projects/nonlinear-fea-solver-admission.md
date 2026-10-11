@@ -641,3 +641,10 @@ Stage 37 已完成與舊合成固定案例相同之參數下的真實 CCX smoke�
 僅針對同一組 100×100×3 mm、E=69000 MPa、ν=0.33、n=16、四邊固定 S8R 模型，分別以 0.0001／0.0002 N/mm² 面壓執行**兩次真實、獨立** CCX。基於小撓度等向線彈性近似，固定模型對均布壓力之 U、S、E 場一階成比例，是不同於 parser 自身的物理縮放檢核；在所有已解析原始殼節點 U 及 expanded-node 六分量 S／E 上逐分量比較，不只比峰值。確認相同模型 geometry/topology、參數輸入及 DAT／FRD／deck SHA provenance，非有限／缺節點／缺張量／場振幅太小均 fail closed。研究門檻設 4% 最大分量相對於該場最大幅值的 scaled residual，並要求面外位移低於板厚 5%；這些容差**只是合成數值研究的 screening**，不是材料允許誤差、一般精度保證或設計規範。
 
 壓力成比例屬數值一致性檢查，不等於逐點真實應力／應變解析值、積分點峰值或獨立本構應力真值已建立；工程狀態保持 `EVIDENCE GATED`／`GENERAL_GLOBAL_BALANCE_NOT_ADMITTED`。完成需 PR exact-head Repo／real CCX CI 與合併後 main CI／read-back。
+
+
+## 第四十四階段：低荷載法向應力／應變本構交叉驗證（候選，2026-10-11）
+
+延續 Stage 43 受限的同一 100×100×3 mm、E=69000 MPa、ν=0.33、16 網格低荷載 synthetic 資料，採用獨立線彈性等向材料 compliance 關係 εᵢ=(σᵢ−ν(σⱼ+σₖ))/E，在 CCX 真實 FRD expanded-node 的**全部法向三分量**檢查，並以 E×應變殘差（MPa）相對於最大觀測法向應力作 bounded max-error screening。研究門檻暫設 3%；缺資料、非有限值、節點覆蓋不相等、訊號太小都 fail closed。此檢查僅可驗證材料本構關係與 solver 輸出彼此相容，不代表幾何應力場絕對數值正確；shear convention 尚未獨立解決，故**不檢查剪應力/剪應變**。
+
+Stage 43 已通過 PR #68 真實 independent pressure scaling 與 main CI；Stage 44 必須另取得 PR exact-head 真實 CCX、Repository CI、合併後 main CI 與 canonical read-back。僅限定線彈性低荷載 synthetic；保持 `EVIDENCE GATED`、`GENERAL_GLOBAL_BALANCE_NOT_ADMITTED`，不主張任何工程強度 admission。
