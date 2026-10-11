@@ -412,3 +412,29 @@ Stage 15 新增的 `NALL RF` 不是「獨立支承反力」，其完整節點 Z 
 - 新增 `check_required_couple.py` 與 `test_required_couple.py`（六項 synthetic tests），涵蓋平移力矩、剩餘力偶需求、原點變化、平移平衡先驗守門、缺失節點／錯誤自由度與非有限值。Real CCX 只能確認已支援合成 fixture 的計算可重現，不能認證 MPC/rotation。
 - CalculiX 2.21-1 的 `gen3dboun.f`／`gen3dmpc.f`／`gen3dforc.f` 源碼逐行對帳及旋轉反力輸出契約尚缺證據；不得以 upstream moving branch 或異版本使用手冊代替 exact-version 原始碼。對 rotational reactions、MPC couple 和 independent support reaction 仍輸出 `UNOBSERVED`。
 - Admission 需 PR exact-head Repository CI／真實 CalculiX CI、main CI 與 canonical read-back。即使數值合力矩很小，`GENERAL_GLOBAL_BALANCE_NOT_ADMITTED`、`EVIDENCE GATED` 仍然成立，且不涉及玻璃／鋁板正式容量設計。
+
+
+## 第二十二階段：CalculiX 2.21 殼旋轉 SPC／MPC 原始碼路徑取證（2026-10-11）
+
+**原始碼身分與權利邊界**：使用維護者提供的 Debian source package `calculix-ccx 2.21-1`，與 `.dsc` SHA-256 重新對帳：`calculix-ccx_2.21.orig.tar.bz2` 為 `51d229aee320cf685216d360f7c04f9a57af0148fbe840483a964c86c315da82`（1,794,485 bytes），Debian `calculix-ccx_2.21-1.debian.tar.xz` 為 `6c2a934b66491c9e916cbf6328167d417f7e985b380e200facf92c3e953d255f`（20,872 bytes）。檢查四個 Debian patches 的修改路徑：未改動下述 `gen3dboun.f`、`gen3dmpc.f`、`gen3dforc.f`、`resultsforc.c`、`printout.f` 或 `printoutnode.f`。此身分只證明**版本相符之封包原始碼**；未驗證 `.dsc` PGP signature，亦未重建比對 Ubuntu 安裝 binary SHA，不能冒充 source-to-binary reproducibility。僅記錄位置和最小語意摘要，不複製 GPL-2.0 原始碼至本 Repo。
+
+### 來源對帳／適用範圍
+
+| exact 2.21 source | 觀察路徑／行號 | 此次能支持的 claim |
+| --- | --- | --- |
+| `src/gen3dboun.f` | 63–72；76–128 | 擴展殼／梁 SPC 前會處理 shell 旋轉值；已存在 knot 的旋轉 DOF `idir > 3` 可導到 `rig(node)` 對應旋轉節點之 1–3 平移型 SPC，不能直接視為原始 S8R 節點的獨立旋轉 reaction |
+| `src/gen3dboun.f` | 568–584；617–643 | 一般非非線性動力情形的原始旋轉 SPC 進入 mean-rotation MPC 路徑；對殼法向 drilling 軸的旋轉（`abs(dot) > 0.999`）可被忽略，因此 `EDGE,1,6` 文字不能自動解讀成六個可量測反力分量 |
+| `src/gen3dboun.f` | 657–742 | 殼內平面轉軸的旋轉值以 `MEANROTBS` mean-rotation MPC 及新增 SPC angle term 轉換；需原始 MPC 係數與相應約束力，不能直接從 `NALL RF` 取得完整轉矩 |
+| `src/gen3dboun.f` | 144–212 | 非線性動力條件下存在另外的 knot generation 分支；不可套用靜態驗證的 mean-rotation 結論到所有分析模式 |
+| `src/gen3dmpc.f` | 41–67、116–215 | 既有 MPC 所引用殼旋轉自由度／依賴展開節點的轉換具有不同路徑；在某些 knot 情況轉成 `rig(node)` 的 1–3 DOF，不代表能從 FRD `FORC` 反推出完整 multiplier |
+| `src/gen3dforc.f` | 131–149；571–705 | 指定原始殼節點轉矩時，也可能轉向 knot／mean rotation MPC；此與 `*DLOAD,P` 不同，本 Repo 尚無對應受控載荷實測 |
+| `src/resultsforc.c` | 34–59；75–134 | `fmpc` 與 dependent/independent term 做 MPC 內力再分配，且對 `ndir>3` 有跳過路徑；投影後 `RF` 並非所有約束 multiplier 的獨立列印值 |
+| `src/printout.f`／`src/printoutnode.f` | 85–93、132–137／95–111 | 原殼 `RF` 經 `map3dto1d2d(iforce=1)`，輸出標頭仍為三分量 `forces (fx,fy,fz)`，不提供可直接認證的 `RM4–RM6` 反力矩觀測欄 |
+
+以上是**原始碼語意研究**；不表示任意受限 shell model 皆可獨立產生全域力矩平衡，亦不證明 `fmpc`、所有 boundary reaction 或 director offset 的物理歸屬已可從目前 DAT／FRD 讀出。
+
+### 下一個 bounded empirical gate
+
+同一平面、等向性、合成 `S8R`、`NLGEOM`、`*DLOAD,P` 的鋁板 fixture，以原始 `EDGE,1,6,0.` 與只移除法向旋轉 `EDGE,1,5,0.` 作配對 **真實 CCX A/B 求解**。其他 deck 字元須完全相同，比較最終原節點 `NALL U`、`NALL RF` 與 expanded-node FRD 觀測，任何模型／輸出缺漏 fail-closed。若 A/B 相同，只能認證本限定 fixture 中 U6 的 output-selection／constraint invariance，**不能**宣稱所有殼的 drilling rotation 一律不起作用、所有 MPC 已釐清或六分量平衡 PASS。無法執行則保留此 empirical gap。
+
+**工程狀態不變**：`EVIDENCE GATED`、`GENERAL_GLOBAL_BALANCE_NOT_ADMITTED`；不做 E1300／ADM 正式容量計算。
