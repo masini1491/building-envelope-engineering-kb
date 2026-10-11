@@ -11,6 +11,7 @@ from aluminum_research_input import load
 from check_reconstructed_pressure_balance import reconcile
 from check_expanded_moment_partition import observe_case
 from aluminum_result_summary import summarize
+from aluminum_tensor_observation import summarize_tensors
 
 def run(*,input_json:Path,workspace:Path,executable:str,execute:bool=False)->dict:
     config=load(input_json)
@@ -39,7 +40,13 @@ def run(*,input_json:Path,workspace:Path,executable:str,execute:bool=False)->dic
         partition=observe_case(inp,frd,dat,"aluminum")
     except (ValueError,OSError) as exc:
         raise SyntheticPanelEvidenceError("RESEARCH_AUDIT_REJECTED:"+type(exc).__name__) from exc
-    summary=summarize(deck=inp,dat=dat,inputs=config,translational_balance=balance)
+    try:
+        summary=summarize(deck=inp,dat=dat,inputs=config,translational_balance=balance)
+        tensors=summarize_tensors(frd)
+    except (ValueError,OSError) as exc:
+        raise SyntheticPanelEvidenceError("TENSOR_OR_SUMMARY_AUDIT_REJECTED:"+type(exc).__name__) from exc
+    summary["stress"]=tensors["stress"]
+    summary["strain"]=tensors["strain"]
     return {"execution_status":"ALUMINUM_PARAMETRIC_RESEARCH_EVIDENCE_PASS",
             "model_scope":"RECTANGULAR_FOUR_EDGE_CLAMPED_LINEAR_ELASTIC_S8R_NLGEOM_P1",
             "inputs":config,"translational_balance":balance,

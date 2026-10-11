@@ -627,3 +627,10 @@ Stage 37 已完成與舊合成固定案例相同之參數下的真實 CCX smoke�
 在既有 `ALUMINUM_PARAMETRIC_RESEARCH_EVIDENCE_PASS` 之後，新增 `research_observations`，僅整理 original S8R NALL 節點最後增量的三向平移位移（mm）、中心節點位移、節點最大合位移、節點最大面外位移及節點 ID。最大值僅限**原始殼節點**，不是殼元素連續場或 expanded solid 的全域極值。資料來源為既有 CCX DAT final NALL U；不另外虛構應力或應變。另沿用 Stage 19 通過之 follower-pressure/internals 推導的三向平移支承合力（N）及 residual，明示屬**重建**而非獨立測量；輸出與已有稽核結果對帳。
 
 對輸入、deck 幾何／網格／材料／面壓及 NALL 節點 coverage 做 fail-closed 比對。`stress`、`strain`、`rotational_support_reaction` 固定為 `NOT_OBSERVED`；`aluminum_design_manual_capacity=NOT_COMPUTED`、`engineering_acceptance=NOT_ADMITTED`。既有 SHA-256 provenance 和 opt-in runtime 邊界不變。完成需 PR exact-head Repo CI、實際 CalculiX CI、merge 後 main CI 與 canonical read-back；本摘要沒有提升通用六分量平衡或工程 capacity admission。
+
+
+## 第四十二階段：鋁板 expanded-node 應力與應變觀測（候選，2026-10-11）
+
+僅在受限 `run_aluminum_research.py` 參數模型增加 CalculiX `*EL FILE,OUTPUT=3D` 的 `S,E`；固定合成 benchmark deck 不變。新增 FRD `STRESS` 與 `TOSTRAIN` 六分量解析，要求 final time 1.0、明確六分量標頭／次序、無缺漏／重複／非有限值、與既有 C3D20 expanded 節點座標及位移完全一致的節點覆蓋。於 Stage 41 `research_observations` 下附加各 tensor 最大絕對分量、對應擴展節點 ID、來源與單位。
+
+**數值意義**：這是 CalculiX 3D 展開元素產生的節點外插／平均觀測值，不是未經平均的 Gauss point 值、殼中面表面極值或任何屈服／失效準則。未提供獨立應力／應變數值 oracle，故 `independent_numerical_oracle=NOT_ESTABLISHED`，`integration_point_extreme=NOT_OBSERVED`，不計算 von Mises 合格性或 ADM capacity。必須 PR exact-head Repository 與真實 CCX CI PASS、merge 後 main CI、canonical read-back 才可聲稱本受限觀測 adapter 完成。保持 `EVIDENCE GATED`、`GENERAL_GLOBAL_BALANCE_NOT_ADMITTED`。
