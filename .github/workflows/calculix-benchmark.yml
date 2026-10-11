@@ -149,6 +149,16 @@ jobs:
           python -m unittest -v test_aluminum_research.py
           python -m unittest -v test_aluminum_result_summary.py
           python -m unittest -v test_aluminum_tensor_observation.py
+          python -m unittest -v test_aluminum_elastic_scaling.py
+          # Stage 43: true independent pressure-scaled S8R runs, same geometry/material.
+          for level in baseline doubled; do
+            if [ "$level" = baseline ]; then pressure=0.0001; else pressure=0.0002; fi
+            fixture="$RUNNER_TEMP/scaling_$level"
+            mkdir -p "$fixture/run"
+            python -c 'import json,sys; from check_aluminum_ritz import expected_input; c=expected_input("thicker_square",16); c["pressure_n_mm2"]=float(sys.argv[1]); print(json.dumps(c))' "$pressure" > "$fixture/input.json"
+            python run_aluminum_research.py --input "$fixture/input.json" --workspace "$fixture/run" --ccx "$(command -v ccx)" --execute > "$fixture/output.json"
+          done
+          python check_aluminum_elastic_scaling.py "$RUNNER_TEMP/scaling_baseline" "$RUNNER_TEMP/scaling_doubled"
           python -m unittest -v test_aluminum_ritz.py
           for case in thicker_square rectangular_higher_pressure; do
             fixture="$RUNNER_TEMP/ritz_${case}"

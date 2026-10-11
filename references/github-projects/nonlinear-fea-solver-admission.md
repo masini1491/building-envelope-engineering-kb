@@ -634,3 +634,10 @@ Stage 37 已完成與舊合成固定案例相同之參數下的真實 CCX smoke�
 僅在受限 `run_aluminum_research.py` 參數模型增加 CalculiX `*EL FILE,OUTPUT=3D` 的 `S,E`；固定合成 benchmark deck 不變。新增 FRD `STRESS` 與 `TOSTRAIN` 六分量解析，要求 final time 1.0、明確六分量標頭／次序、無缺漏／重複／非有限值、與既有 C3D20 expanded 節點座標及位移完全一致的節點覆蓋。於 Stage 41 `research_observations` 下附加各 tensor 最大絕對分量、對應擴展節點 ID、來源與單位。
 
 **數值意義**：這是 CalculiX 3D 展開元素產生的節點外插／平均觀測值，不是未經平均的 Gauss point 值、殼中面表面極值或任何屈服／失效準則。未提供獨立應力／應變數值 oracle，故 `independent_numerical_oracle=NOT_ESTABLISHED`，`integration_point_extreme=NOT_OBSERVED`，不計算 von Mises 合格性或 ADM capacity。必須 PR exact-head Repository 與真實 CCX CI PASS、merge 後 main CI、canonical read-back 才可聲稱本受限觀測 adapter 完成。保持 `EVIDENCE GATED`、`GENERAL_GLOBAL_BALANCE_NOT_ADMITTED`。
+
+
+## 第四十三階段：鋁板低壓下張量之獨立壓力縮放檢核（候選，2026-10-11）
+
+僅針對同一組 100×100×3 mm、E=69000 MPa、ν=0.33、n=16、四邊固定 S8R 模型，分別以 0.0001／0.0002 N/mm² 面壓執行**兩次真實、獨立** CCX。基於小撓度等向線彈性近似，固定模型對均布壓力之 U、S、E 場一階成比例，是不同於 parser 自身的物理縮放檢核；在所有已解析原始殼節點 U 及 expanded-node 六分量 S／E 上逐分量比較，不只比峰值。確認相同模型 geometry/topology、參數輸入及 DAT／FRD／deck SHA provenance，非有限／缺節點／缺張量／場振幅太小均 fail closed。研究門檻設 4% 最大分量相對於該場最大幅值的 scaled residual，並要求面外位移低於板厚 5%；這些容差**只是合成數值研究的 screening**，不是材料允許誤差、一般精度保證或設計規範。
+
+壓力成比例屬數值一致性檢查，不等於逐點真實應力／應變解析值、積分點峰值或獨立本構應力真值已建立；工程狀態保持 `EVIDENCE GATED`／`GENERAL_GLOBAL_BALANCE_NOT_ADMITTED`。完成需 PR exact-head Repo／real CCX CI 與合併後 main CI／read-back。
