@@ -453,3 +453,13 @@ Stage 15 新增的 `NALL RF` 不是「獨立支承反力」，其完整節點 Z 
 - 對 Stage 20 真實 CCX expanded FRD internal FORCE 與 Stage 19 獨立積分的 P1 nodal load 分開執行 moment partition；要求節點完整、單一原始殼節點歸屬、Stage 18/19 先驗 gate 及 algebraic force/moment partition closure。
 - 新增 check_expanded_moment_partition.py 和 test_expanded_moment_partition.py；合成測試含隱藏的純力偶、arm + local couple 重組、缺少 shell／expanded position、非有限力值。真實 A/B 需由 exact-head CalculiX CI 完成。
 - 此處的 relative geometric couple 不能冒充 CCX 自主輸出的 U4–U6 旋轉反力或 constraint MPC multiplier，不能將恆等式 PASS 提升為六分量全域平衡。狀態保持 GENERAL_GLOBAL_BALANCE_NOT_ADMITTED、EVIDENCE GATED。
+
+
+## 第二十五階段：隔離重編譯之 MPC instrumentation（候選，2026-10-11）
+
+- **使用者授權**：可在隔離研究環境對已驗證版本 CalculiX 2.21 原始碼最小插樁及重編譯，並與未修改原始碼構建之 CCX 比對。維持 GPL-2.0 授權邊界，不將 GPL solver 原始碼或 executable 複製／納入本 MIT/CC BY 知識庫。
+- **受控輸入**：Debian upstream `calculix-ccx_2.21.orig.tar.bz2` SHA-256 `51d229aee320cf685216d360f7c04f9a57af0148fbe840483a964c86c315da82`；`src/resultsforc.c` SHA-256 `d1de9498ac715a7f08da0b7beba3c92c7c2f1030c85c37122d2708f2f480cad0`。只有 exact hash 與唯一插樁錨點皆成立才可建立 instrumented 變體。
+- **測量責任**：於 `resultsforc.c` 已完成數值更新後，以 opt-in `CCX_MPC_AUDIT_FILE` 輸出每次 `calcul_fn==1` 下 MPC 個數、`MEANROT` 類型數量、`abs(fmpc)` 最大值；不改 force redistribution 邏輯。不輸出所有 MPC mapping、原始殼節點對應或約束作用位置，亦不能由此求得旋轉支承反力矩。
+- **驗證**：兩組 solver 從相同原始碼與 build flags 開始，只讓 instrumentation differ；相同合成 glass／aluminum S8R P1 高荷載 deck 比對 `NALL U/RF`、expanded FRD U/RF 與拓撲，要求文字精度下逐項相同並保留有限 trace；任何 source hash、追蹤資料、mesh／output 缺漏、位移或 force mismatch 一律 fail closed。
+- **執行邊界**：CI runner 下載 source 時先校驗 SHA-256，隔離編譯原版／插樁版，使用官方依賴；不得發佈或上傳修改 GPL solver binary。CI 若因依賴、compiler、來源下載或 instrumentation 自身失敗，仍以實際原因記錄，絕不把失敗視為工程缺陷或放寬數值檢核。
+- **Admission 不擴張**：這是 source-internal MPC redistribution observability，並非獨立 `U4/U5/U6` reaction couples、constraint multiplier completeness、任意 shell global six-component moment balance 或 ASTM E1300／ADM strength check。維持 `GENERAL_GLOBAL_BALANCE_NOT_ADMITTED`、`EVIDENCE GATED`。
