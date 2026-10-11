@@ -23,17 +23,19 @@ class Tests(unittest.TestCase):
     def test_zero_exit_does_not_pass_without_outputs(self):
         with tempfile.TemporaryDirectory() as d:
             fake = Path(d)/"fake_ccx"; fake.write_bytes(b"synthetic test executable")
+            workspace=Path(d)/"run"; workspace.mkdir()
             with patch("run_synthetic_panel.probe_calculix",return_value=FEAProbeResult(
                     "PROCESS_EXIT_ZERO_UNVERIFIED",0,"","")):
                 with self.assertRaisesRegex(SyntheticPanelEvidenceError,"REQUIRED_OUTPUT"):
-                    run_synthetic_panel(material="glass",mesh=4,workspace=d,executable=str(fake),execute=True)
+                    run_synthetic_panel(material="glass",mesh=4,workspace=workspace,executable=str(fake),execute=True)
     def test_nonzero_and_timeout_fail_closed(self):
         for status in ("PROCESS_NONZERO","TIMEOUT","EXECUTION_ERROR"):
             with tempfile.TemporaryDirectory() as d:
                 fake = Path(d)/"fake_ccx"; fake.write_bytes(b"synthetic test executable")
-            with patch("run_synthetic_panel.probe_calculix",return_value=FEAProbeResult(status,None,"","")):
+                workspace=Path(d)/"run"; workspace.mkdir()
+                with patch("run_synthetic_panel.probe_calculix",return_value=FEAProbeResult(status,None,"","")):
                     with self.assertRaisesRegex(SyntheticPanelEvidenceError,"SOLVER_DID_NOT_EXIT_ZERO"):
-                        run_synthetic_panel(material="glass",mesh=4,workspace=d,executable=str(fake),execute=True)
+                        run_synthetic_panel(material="glass",mesh=4,workspace=workspace,executable=str(fake),execute=True)
     def test_partial_step_not_complete(self):
         with tempfile.TemporaryDirectory() as d:
             p=Path(d)/"panel.sta";p.write_text("1 1 1 1 0.5 1 1\n")
@@ -51,12 +53,13 @@ class Tests(unittest.TestCase):
     def test_solver_mutation_detected_with_real_status(self):
         with tempfile.TemporaryDirectory() as d:
             fake=Path(d)/"fake_ccx"; fake.write_bytes(b"solver")
+            workspace=Path(d)/"run"; workspace.mkdir()
             def mutated(**kwargs):
                 fake.write_bytes(b"changed solver")
                 return FEAProbeResult("PROCESS_EXIT_ZERO_UNVERIFIED",0,"","")
             with patch("run_synthetic_panel.probe_calculix",side_effect=mutated):
                 with self.assertRaises(SyntheticPanelEvidenceError):
-                    run_synthetic_panel(material="glass",mesh=4,workspace=d,executable=str(fake),execute=True)
+                    run_synthetic_panel(material="glass",mesh=4,workspace=workspace,executable=str(fake),execute=True)
     def test_symlink_workspace_rejected(self):
         with tempfile.TemporaryDirectory() as d:
             base=Path(d);real=base/"real";real.mkdir()
