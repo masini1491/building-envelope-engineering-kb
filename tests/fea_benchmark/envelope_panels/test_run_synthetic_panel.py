@@ -3,8 +3,7 @@ import tempfile
 import unittest
 from pathlib import Path
 from unittest.mock import patch
-from scripts.engineering_calc.calculix_probe import FEAProbeResult
-from run_synthetic_panel import run_synthetic_panel,SyntheticPanelEvidenceError,_completed_step
+from run_synthetic_panel import run_synthetic_panel,SyntheticPanelEvidenceError,_completed_step, FEAProbeResult
 
 class Tests(unittest.TestCase):
     def test_opt_in_required_before_any_mutation(self):
