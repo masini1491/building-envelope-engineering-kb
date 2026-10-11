@@ -36,9 +36,10 @@ BODY="""      if(audit_emit.eq.1) then
                   audit_node=nodempc(1,audit_index)
                   audit_dof=nodempc(2,audit_index)
                   audit_role=0
-                  if(audit_node.eq.nodevector) audit_role=1
-                  if(audit_node.eq.audit_inhom_node)
-     &               audit_role=2
+                  if(audit_node.eq.nodevector.and.audit_dof.eq.1)
+     &               audit_role=1
+                  if(audit_node.eq.audit_inhom_node.and.
+     &               audit_dof.eq.2) audit_role=2
                   write(audit_unit,'(A,6(I0,A),I0)')
      &                 'ROLE_TERM,',nmpc,',',audit_slot,',',
      &                 audit_node,',',audit_dof,',',audit_role,',',

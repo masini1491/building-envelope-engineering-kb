@@ -76,8 +76,6 @@ jobs:
               cp "$base/panel.inp" "$roles/panel.inp"
               (cd "$roles" && CCX_MPC_AUDIT_FILE="$roles/trace.csv" CCX_MPC_TERMS_FILE="$roles/terms.csv" CCX_MPC_ROLES_FILE="$roles/roles.csv" timeout 120s "$RUNNER_TEMP/ccx-roles" -i panel)
               python tests/fea_benchmark/solver_instrumentation/ccx_mpc_probe.py compare "$base" "$roles" "$roles/trace.csv"
-              echo "Bounded role trace sample (first MPC):"
-              sed -n "1,12p" "$roles/roles.csv"
               python tests/fea_benchmark/solver_instrumentation/check_mpc_roles.py "$roles/roles.csv" "$roles/terms.csv"
             done
           done

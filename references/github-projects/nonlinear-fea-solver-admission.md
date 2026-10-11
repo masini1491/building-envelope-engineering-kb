@@ -492,3 +492,7 @@ Stage 25 已驗證原版與 opt-in 插樁版於合成鋁板 4／8 網格具相�
 - **最小資料契約**：在 `usermpc` 完成 MEANROT 建構且已確立 dependent DOF 後，opt-in `CCX_MPC_ROLES_FILE` 記錄 MPC ID、每個 term 的 node/DOF、角色：regular candidate、axis/angle helper、inhomogeneous helper、以及 `noderef/idirref`。嚴格與 Stage 26 `resultsforc` 最後一次呼叫的 `nodempc` 順序及 node/DOF 對帳；資料缺失、重複、順序變化或缺少 helper 皆 fail closed。
 - **工程責任邊界**：這是 **source-internal term role identity**；其中 regular candidate 並非自動得到已驗證的 FRD 三維位置，angle/inhomogeneous helper 也不等同實體受力點。只有通過 exact-head source build、原版與插樁版同 deck 的 NALL/FRD 結果一致、完整 trace mapping 與負向測試，才可宣稱受限角色對帳可重現。不得把 coefficient×fmpc 直接視為獨立支承反力矩。
 - Stage 28 與後續仍維持 `EVIDENCE GATED`、`GENERAL_GLOBAL_BALANCE_NOT_ADMITTED`，不包含玻璃／鋁板正式工程承載力計算。
+
+### 第二十八階段：第一輪 root cause（受限診斷修正）
+
+CI `38118121617` 的 real `usermpc` trace 顯示原始鋁板 4 網格可有 `ROLE_END,7,8,261,261,1,1`，同一個 internal node `261` 的 DOF 1 是 angle/axis helper、DOF 2 是非齊次 helper。原插樁僅比對 node ID，後一判斷覆蓋前一判斷，導致 `HELPER_ROLE_MULTIPLICITY` 被正確拒絕。現改以 (node ID, DOF) 辨識，並新增同節點不同 DOF 的回歸測試。此修正不放寬物理契約，無論 CI 成功與否均不宣稱獨立旋轉支承力矩。
