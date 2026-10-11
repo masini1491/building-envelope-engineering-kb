@@ -146,6 +146,12 @@ jobs:
           python check_expanded_moment_partition.py
           python -m unittest -v test_run_synthetic_panel.py
           python -m unittest -v test_synthetic_replay.py
+          python -m unittest -v test_aluminum_research.py
+          mkdir -p "$RUNNER_TEMP/aluminum_research_run"
+          cat > "$RUNNER_TEMP/aluminum_research_input.json" <<'EOF'
+          {"width_mm":100.0,"height_mm":100.0,"thickness_mm":2.0,"youngs_modulus_mpa":69000.0,"poisson_ratio":0.33,"pressure_n_mm2":0.6,"mesh":4,"support":"four_edges_clamped","units":"N-mm-MPa","material_provenance":"explicit bounded synthetic test values"}
+          EOF
+          python run_aluminum_research.py --input "$RUNNER_TEMP/aluminum_research_input.json" --workspace "$RUNNER_TEMP/aluminum_research_run" --ccx "$(command -v ccx)" --execute
           for material in glass aluminum; do
             for n in 4 8 16; do
               folder="adapter_smoke_${material}_${n}"
