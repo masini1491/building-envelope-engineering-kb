@@ -649,9 +649,9 @@ Stage 37 已完成與舊合成固定案例相同之參數下的真實 CCX smoke�
 
 Stage 43 已通過 PR #68 真實 independent pressure scaling 與 main CI；Stage 44 必須另取得 PR exact-head 真實 CCX、Repository CI、合併後 main CI 與 canonical read-back。僅限定線彈性低荷載 synthetic；保持 `EVIDENCE GATED`、`GENERAL_GLOBAL_BALANCE_NOT_ADMITTED`，不主張任何工程強度 admission。
 
-## 第四十六階段：3003-H14／3004-H12 帷幕鋁板研究材料來源（2026-10-11）
+## 第四十六階段：3003-H14／3004-H12／3004-O 帷幕鋁板研究材料來源（2026-10-11）
 
-優先研究 alloy–temper 為 **3003-H14 與 3004-H12**。此為研究選題優先順序，**不是**宣稱全體台灣或全球帷幕牆的使用率，也不等於專案產品保證。舊 5754-H42／5005A-H14 案例僅作比較。
+優先研究 alloy–temper 為 **3003-H14、3004-H12 與 3004-O**。此為研究選題優先順序，**不是**宣稱全體台灣或全球帷幕牆的使用率，也不等於專案產品保證。舊 5754-H42／5005A-H14 案例僅作比較。
 
 ### 供應商公開機械性質（研究線索；非設計強度）
 
@@ -659,12 +659,16 @@ Stage 43 已通過 PR #68 真實 independent pressure scaling 與 main CI；Stag
 | --- | --- | --- | --- | --- |
 | 3003-H14 | 1.21 mm 以上至 6.30 mm | 140–180 | 最低 115 | BlueScope Distribution，3003 sheet 資料 |
 | 3004-H12 | 大於 0.20 mm 至 6.00 mm | 190–240 | 最低 155 | Southwest Aluminum，3004 sheet 資料 |
+| 3004-O（供應商與 H111 合併列示） | 大於 0.20 mm 至 12.50 mm（表中另列較厚範圍） | 155–200 | 最低 60 | Southwest Aluminum 與 tk accelis（原 thyssenkrupp Materials Processing Europe）的 EN AW-3004 供應商資料 |
 
 - [BlueScope Distribution — Aluminium 3003 Data Sheet](https://www.bluescopedistribution.com.au/products/aluminium/aluminium-3003-data-sheet/)：3003-H14 之板厚、Rm、0.2% yield、成形與表面處理資訊。
 - [Southwest Aluminum — 3004 Aluminum Sheet](https://www.southwest-aluminum.com/aluminum-plate/3004-aluminum-sheet.html)：3004-H12 之板厚、Rm、0.2% yield、厚度分區延伸率；該供應商提及幕牆板應用。
+- [tk accelis Processing Europe — EN AW-3004 / Al Mn1Mg1](https://www.thyssenkrupp-materials-processing-europe.com/en/aluminum/alloy-group-3000-or-en-aw-3003-or-en-aw-3004-or-en-aw-3005a-or-en-aw-3103-a-or-en-aw-3105a/en-aw-3004-or-al-mn1mg1)：公開供應商表將 O 與 H111 同列；除 Rm／Rp0.2 外，列示依板厚而變的伸長率與建議彎曲半徑。**不得將兩種實際 temper 或加工狀態無條件視為完全相同。**
 - [ASTM 官方 B209/B209M-21a](https://store.astm.org/b0209_b0209m-21a.html)：**標準範圍與版本路由**，不是可自由複製的標準全文或免費材料／設計公式。
 
-兩份表格的供應商、地域及來源層級不同，未獨立確認相同法規／標準、試驗方向、材料批次或製造與加工後狀態；不可逕以最低 Rp0.2 比較判定**任一實際鋁板的設計強度或耐久性**。必須核對供應商產品規格、mill certificate、板厚、冷作成形後 temper、軋延方向與適用設計依據。**供應商的 Rp0.2 不是 ADM allowable strength、局部挫屈、扣件或板件極限承載力。**
+這些表格的供應商、地域及來源層級不同，未獨立確認相同法規／標準、試驗方向、材料批次或製造與加工後狀態；不可逕以最低 Rp0.2 比較判定**任一實際鋁板的設計強度或耐久性**。必須核對供應商產品規格、mill certificate、板厚、冷作成形後 temper、軋延方向與適用設計依據。**供應商的 Rp0.2 不是 ADM allowable strength、局部挫屈、扣件或板件極限承載力。**
+
+3004-O 為 annealed／退火狀態，通常供較大成形變形用途；相對於 3004-H12，兩者的屈服強度、延性及成形後材料狀態必須分開確認，不能把冷作／退火前後性能視為不變；此處僅根據已列的供應商產品資訊，不建立塑性曲線或加工折減。
 
 現有參數化 FEA 的 E／ν／厚度／壓力與材料來源均維持**明確輸入**。合金牌號不可自行推出 E、ν、塑性曲線、降伏或 capacity。Stage 42–44 FRD 的 S／E 張量是 expanded-node 外插／平均觀測，Hooke／壓力比例一致性不代表真實材料強度驗證，故本階段**不改動 solver、計算器或輸入契約**。
 
