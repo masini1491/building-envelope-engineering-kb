@@ -127,6 +127,24 @@ python tests/fea_benchmark/envelope_panels/run_synthetic_panel.py --material gla
 
 該入口只接受 `glass`／`aluminum` 與 4／8／16 網格，固定為 Repo 產生的 synthetic S8R NLGEOM P1 高荷載模型，**不接受外部 input deck**；預設不帶 `--execute` 就不執行。成功時要求 CCX process、最後增量、DAT／FRD、三向平移平衡及幾何力矩分解均可驗證；另於執行前後確認 deck／solver SHA-256 未改變，並在成功回覆附上主要 artifact 的 SHA-256 追溯資訊，回傳 `SYNTHETIC_BENCHMARK_EVIDENCE_PASS`，同時維持 `engineering_acceptance=NOT_ADMITTED` 和 `six_component_global_balance=NOT_ADMITTED`。無 sandbox，不能執行不可信外部 solver。這不是 `review.py` check_type、正式玻璃／鋁板強度設計功能或一般 nonlinear FEA adapter。
 
+
+### 鋁板參數研究介面（Stage 37–38）
+
+已支援另一個**僅限研究模型**之入口 `tests/fea_benchmark/envelope_panels/run_aluminum_research.py`：明確提供 JSON 檔案、空白的既有工作目錄和可信本機 CCX，且加上 `--execute` 才會運行。輸入需包含 `width_mm / height_mm / thickness_mm / youngs_modulus_mpa / poisson_ratio / pressure_n_mm2 / mesh / support / units / material_provenance`。目前僅接受 `support="four_edges_clamped"`、`units="N-mm-MPa"`、`mesh=4/8/16` 及程式所定研究限制，所有材料與面壓值由呼叫者提供。
+
+範例（僅為合成研究，不能當成實際建材參數）：
+
+```json
+{"width_mm":120.0,"height_mm":80.0,"thickness_mm":2.5,"youngs_modulus_mpa":70000.0,"poisson_ratio":0.32,"pressure_n_mm2":0.3,"mesh":8,"support":"four_edges_clamped","units":"N-mm-MPa","material_provenance":"explicit synthetic values for research"}
+```
+
+```bash
+mkdir -p /tmp/kb-aluminum-research
+python tests/fea_benchmark/envelope_panels/run_aluminum_research.py --input aluminum.json --workspace /tmp/kb-aluminum-research --ccx /usr/bin/ccx --execute
+```
+
+成功時 `execution_status=ALUMINUM_PARAMETRIC_RESEARCH_EVIDENCE_PASS` 僅指這個受限模型的 numeric checks 成立，非 admissible ADM capacity，也不是任意板件／支承／材料／屈曲、接觸或全六分量平衡驗收。Stage 38 的不同參數實測與細節可查 canonical dossier。
+
 ## 工具邊界
 
 - calculator 確認 arithmetic correctness，不等於確認 engineering correctness。
