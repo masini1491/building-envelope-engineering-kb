@@ -526,3 +526,13 @@ Stage 28 的 PR #52 真實隔離 CCX exact-head run `38118486882` 觀測：鋁�
 下一個真正必要的研究為記錄 `cascade` 入口／出口及 nonlinear MPC update 的 bounded term identity digest／term count，核對誰改變 `nodempc` 及 `coefmpc`，但不得在沒有來源級連續性之前，用 MPA ID overlap 假定同一 term lineage。此 dossier 只建立候選 owner path；尚未授權任意求解器內部力矩重建，也未取得獨立旋轉拘束反力矩。
 
 **工程狀態維持** `EVIDENCE GATED`、`GENERAL_GLOBAL_BALANCE_NOT_ADMITTED`；不做玻璃／鋁板 capacity acceptance。
+
+
+## 第三十階段：`cascade.c` 入口／出口 MEANROT chain 診斷（candidate，2026-10-11）
+
+延續 Stage 28–29 已確立的 source-role 與 transformed-term snapshots 差異，使用完全相同之 CalculiX 2.21 upstream SHA `51d229aee320cf685216d360f7c04f9a57af0148fbe840483a964c86c315da82`，並對 `cascade.c` exact SHA `430911d6f9f91078c0efb826ba103656a504e46ec0d3ce74356b91b4333336c4` 進行 **隔離、opt-in、instrumentation only** 的診斷版重編譯。
+
+- 在 `cascade` entry／exit 以 `CCX_CASCADE_AUDIT_FILE` 記錄 ordered call ID、MEANROT constraint count、總 term count、最大 term chain 長度；只讀取 entry／exit 的 `ipompc/nodempc/labmpc`，不改 core solver 的 MPC 約束、係數或方程。
+- 記錄檔 parser 嚴格要求 call pair 完整、序號有序、範圍受限、至少真實觀測一次 MEANROT。輸出兩端 aggregate count 是否改變；**aggregate change 不足以推定所有 8→4 term 的個別因果／term lineage**，結果固定 `specific_8_to_4_causality=NOT_ESTABLISHED`。
+- 沿用 Stage 25–28 的隔離未修改版／診斷版求解比較，要求相同合成鋁板 4／8 網格的 `NALL U/RF`、expanded FRD U/RF 維持現有 text-numeric 比對契約；任何資料缺漏、差異、非有限值或 source SHA 不符 fail closed。
+- 不把任何 GPL source／binary 提交到 KB。只有 PR exact-head 真實 CalculiX CI、Repository CI、合併後 main CI 與 canonical read-back 成立，才能稱此限定 cascade 診斷可重現；不代表獨立轉動拘束反力、一般六分量平衡或設計承載力 admission。保持 `EVIDENCE GATED`、`GENERAL_GLOBAL_BALANCE_NOT_ADMITTED`。
