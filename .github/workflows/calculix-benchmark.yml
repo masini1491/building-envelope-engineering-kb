@@ -133,6 +133,15 @@ jobs:
           python check_expanded_moment_diagnostic.py
           python -m unittest -v test_required_couple.py
           python check_required_couple.py
+          python -m unittest -v test_rotation_spc_ab.py
+          for n in 4 8 16; do
+            base="aluminum_large_${n}"
+            paired="aluminum_large_${n}_no_drilling"
+            mkdir -p "$paired"
+            sed "s/^EDGE,1,6,0\.$/EDGE,1,5,0./" "$base/panel.inp" > "$paired/panel.inp"
+            (cd "$paired" && timeout 90s ccx -i panel)
+          done
+          python check_rotation_spc_ab.py
           python check_follower_pressure.py
       - name: 保存可查證數值輸出
         if: always()

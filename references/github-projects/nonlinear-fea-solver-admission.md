@@ -438,3 +438,11 @@ Stage 15 新增的 `NALL RF` 不是「獨立支承反力」，其完整節點 Z 
 同一平面、等向性、合成 `S8R`、`NLGEOM`、`*DLOAD,P` 的鋁板 fixture，以原始 `EDGE,1,6,0.` 與只移除法向旋轉 `EDGE,1,5,0.` 作配對 **真實 CCX A/B 求解**。其他 deck 字元須完全相同，比較最終原節點 `NALL U`、`NALL RF` 與 expanded-node FRD 觀測，任何模型／輸出缺漏 fail-closed。若 A/B 相同，只能認證本限定 fixture 中 U6 的 output-selection／constraint invariance，**不能**宣稱所有殼的 drilling rotation 一律不起作用、所有 MPC 已釐清或六分量平衡 PASS。無法執行則保留此 empirical gap。
 
 **工程狀態不變**：`EVIDENCE GATED`、`GENERAL_GLOBAL_BALANCE_NOT_ADMITTED`；不做 E1300／ADM 正式容量計算。
+
+## 第二十三階段：合成鋁板 U6 旋轉 SPC A/B 求解（候選，2026-10-11）
+以相同線彈性、平面 S8R 合成鋁板 NLGEOM、P1 pressure 以及 4／8／16 網格，只改變 EDGE 原始節點拘束 DOF 範圍 1–6 改為 1–5。其他參數及輸出須相同。
+
+- 真實 CCX paired 求解後，使用 check_rotation_spc_ab.py 檢查完整 NALL U、NALL RF、expanded FRD U 以及元素拓撲，回報最大位移和內力差異，observed_exact_text_invariance 只代表文字精度下完全一致，不等於一般工程不變性。
+- test_rotation_spc_ab.py 驗證唯一 deck 差異與缺失、重複拘束 fail-closed。計算缺漏或 FRD／DAT 不完整即拒絕。
+- Stage 22 exact-source 靜態 mean-rotation／drilling path 為研究背景；結果不提供獨立 rotational reaction、MPC multiplier 或 general six-component global balance。
+- 完成須 PR exact-head Repo CI＋真正 CalculiX CI、main CI 與 canonical read-back。無論 A/B 差異如何，整體 EVIDENCE GATED、GENERAL_GLOBAL_BALANCE_NOT_ADMITTED。
