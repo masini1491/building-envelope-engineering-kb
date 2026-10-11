@@ -673,3 +673,32 @@ Stage 43 已通過 PR #68 真實 independent pressure scaling 與 main CI；Stag
 現有參數化 FEA 的 E／ν／厚度／壓力與材料來源均維持**明確輸入**。合金牌號不可自行推出 E、ν、塑性曲線、降伏或 capacity。Stage 42–44 FRD 的 S／E 張量是 expanded-node 外插／平均觀測，Hooke／壓力比例一致性不代表真實材料強度驗證，故本階段**不改動 solver、計算器或輸入契約**。
 
 下一個 admission trigger：製造商或可靠產品的原始性能與批次資料、合法可使用的標準設計條款、材料／板件失效模型、獨立數值或實驗驗證。欠缺時維持 `MATERIAL_CAPACITY_NOT_ADMITTED`、`EVIDENCE GATED`、`GENERAL_GLOBAL_BALANCE_NOT_ADMITTED`。
+
+## 第四十七階段：三種鋁板材料非線性證據適用性與資料需求（研究，2026-10-11）
+
+此階段延續 Stage 46 的 **3003-H14、3004-H12、3004-O** 材料優先序，研究哪些公開來源能支持日後建立 *實測* 非線性材料模型。**不是啟用 CalculiX `*PLASTIC`、設計強度或新 FEA admission。** 只使用公開原始論文著錄及摘要／供應商已有公開型錄；不轉錄受版權保護全文、圖像或曲線數據。
+
+### 匹配性／獨立 evidence family
+
+| 目標質別 | 此次實際核對的 evidence | 已能支持 | 尚不能支持 |
+| --- | --- | --- | --- |
+| 3003-H14 | Zampaloni 等（2003），*Experimental and numerical study of stamp hydroforming of sheet metals*，International Journal of Mechanical Sciences，DOI 10.1016/j.ijmecsci.2003.11.006（原始出版社頁） | 確有相同 alloy–temper 的液壓成形實驗與各向同性／各向異性模型比較 | 將液壓成形的接觸／支承、加工狀態或其參數直接挪用為本 KB 四邊固定均布壓力板、批次指定材料或普遍失效準則 |
+| 3004-H12 | Stage 46 Southwest Aluminum 3004 sheet 公開供應商強度／板厚表 | alloy–temper 名稱與供應商所列抗拉／Rp0.2 類別之研究線索 | 完整單軸 true-stress–equivalent-plastic-strain hardening table、各向異性或加工後可靠屬性；**在本次有限查證來源內未找到直接相同質別的可用原始完整曲線** |
+| 3004-O | Katsuta 等（1985），*Forming limit curves of 3003 and 3004 alloy sheets*，DOI 10.2464/jilm.35.696；Kaneko 等（1985），*Effects of tempering on the formability of 3003 and 3004 aluminum sheets*，DOI 10.2464/jilm.35.12（均為原始學術期刊）；Stage 46 tk accelis O/H111 型錄 | 確有 3004-O 的實驗成形極限／成形性研究與退火質別供應商資訊 | 將 forming limit curve（FLC/FLD）誤作材料 hardening curve；將 O/H111 合併型錄視為**完全同一**加工狀態；直接推定彎折後、任意厚度或任何構件的失效容量 |
+
+**兩篇 1985 年論文是不同研究問題的同刊來源，不能因材料牌號相同便視為兩份已交叉驗證的相同 stress–strain 數值。** 1985 年 FLC 研究另外涵蓋 3003-O、3003-H24、3004-H24，**H24 不得替換 H12**。Zampaloni 等研究的加工設備、支承與接觸條件也不同於目前的 synthetic S8R clamped P1 板件。
+
+原始頁面（保留永久 DOI，不下載／複製受限論文全文）：
+
+- [Zampaloni et al. 2003，原始出版社](https://doi.org/10.1016/j.ijmecsci.2003.11.006)。
+- [Katsuta et al. 1985，J-STAGE](https://doi.org/10.2464/jilm.35.696)。
+- [Kaneko et al. 1985，J-STAGE](https://doi.org/10.2464/jilm.35.12)。
+- [tk accelis 3004 供應商頁面](https://www.thyssenkrupp-materials-processing-europe.com/en/aluminum/alloy-group-3000-or-en-aw-3003-or-en-aw-3004-or-en-aw-3005a-or-en-aw-3103-a-or-en-aw-3105a/en-aw-3004-or-al-mn1mg1)。
+
+### 後續材料本構 admission gate
+
+真正增加 `*PLASTIC` 前，需逐一確認：① 具來源授權的材料試驗資料，匹配 alloy、temper、板厚、供應商／batch 與製造後狀態；② 拉伸方向（0°／45°／90°）及是否需處理 rolling anisotropy；③ 溫度、應變率與原始工程應力–應變曲線；④ 由實測資料嚴格判定均勻延伸區與頸縮前的轉換範圍，不能由屈服／抗拉兩點猜整條曲線；⑤ 若選用 CCX 等向硬化，需有相容、單調且具物理量定義的 von Mises true stress–equivalent plastic strain 表及首屈服零塑性應變，並先用獨立單元素本構實驗／numerical reference 核對；⑥ 成形後狀態、板件與支承／連接／局部挫屈、完整 engineering design basis 再分別 admission。
+
+目前可讀到的 CalculiX 2.18 `*PLASTIC` 文件描述輸入格式，但它**只能作舊版方法路由**；真正針對 CalculiX 2.21 實作必須從已核對版本的 source/manual 與真實 CCX regression 再驗證。不能把任何 peer-reviewed FLC、供應商最小 Rp0.2、單獨材料 E／ν，或跨質別 hardening coefficients，當成可直接產生真實 deck 的材料模型。
+
+**目前結果：** 已找到相關學術材料研究線索，但三種目標 alloy–temper 都維持 `MATERIAL_PLASTICITY_NOT_ADMITTED` 與 `MATERIAL_CAPACITY_NOT_ADMITTED`；已存在的線彈性 S8R synthetic 模型及其 Stage 40–44 數值檢查不受本文件變更影響。整體仍為 `EVIDENCE GATED`、`GENERAL_GLOBAL_BALANCE_NOT_ADMITTED`。
