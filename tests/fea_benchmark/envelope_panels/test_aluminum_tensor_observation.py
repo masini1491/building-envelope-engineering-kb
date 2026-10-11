@@ -7,7 +7,7 @@ from aluminum_tensor_observation import read_final_tensors,_read_tensor_line
 def row(node,values):
     return " -1"+f"{node:10d}"+"".join(f"{v:12.5E}" for v in values)
 def dataset(name,labels,values,node=1,at=1.):
-    return (" 100CL  "+f"{at:12.5E}"+"\n"+f" -4  {name} 6 1\n"
+    return (" 100CL      "+f"{at:12.5E}"+"\n"+f" -4  {name} 6 1\n"
             +"".join(f" -5  {x}\n" for x in labels)
             +row(node,values)+"\n -3\n")
 class Tests(unittest.TestCase):
