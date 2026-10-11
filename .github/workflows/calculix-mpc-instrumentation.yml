@@ -26,7 +26,7 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p "$RUNNER_TEMP/ccx-source"
-          curl --fail --location --retry 2 --max-time 120 'https://deb.debian.org/debian/pool/main/c/calculix-ccx/calculix-ccx_2.21.orig.tar.bz2' -o "$RUNNER_TEMP/ccx-source/source.tar.bz2"
+          curl --fail --location --retry 2 --max-time 120 'https://archive.ubuntu.com/ubuntu/pool/universe/c/calculix-ccx/calculix-ccx_2.21.orig.tar.bz2' -o "$RUNNER_TEMP/ccx-source/source.tar.bz2"
           echo "51d229aee320cf685216d360f7c04f9a57af0148fbe840483a964c86c315da82  $RUNNER_TEMP/ccx-source/source.tar.bz2" | sha256sum -c -
           tar -xjf "$RUNNER_TEMP/ccx-source/source.tar.bz2" -C "$RUNNER_TEMP/ccx-source"
           test "$(sha256sum "$RUNNER_TEMP/ccx-source/CalculiX/ccx_2.21/src/resultsforc.c" | cut -d' ' -f1)" = 'd1de9498ac715a7f08da0b7beba3c92c7c2f1030c85c37122d2708f2f480cad0'
