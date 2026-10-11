@@ -472,3 +472,15 @@ Stage 25 已驗證原版與 opt-in 插樁版於合成鋁板 4／8 網格具相�
 - 保留 Stage 25 pristine／instrumented 的相同 deck 及 U/RF/FRD 數值對照，追加第二個 opt-in 版與 pristine 比對。只有真正執行 CI 才能宣稱 exact-head real solver validation。
 - 內部 node ID 與 FRD ID 的數值吻合不是物理身分證明；不可僅憑兩者 ID 相同就將 term 力矩歸到 shell director、rotational reaction、MPC multiplier 或支承反力。新的 `term_node_ids_in_expanded_FRD` 僅是 coverage diagnostic。
 - 只把研究用診斷腳本和受限證據說明保存於公開 KB；不公開 GPL 原始碼或 binary。完整六維力矩平衡仍 `GENERAL_GLOBAL_BALANCE_NOT_ADMITTED`、`EVIDENCE GATED`。
+
+
+## 第二十七階段：MEANROT term 節點身分與旋轉輸出限制（來源研究，2026-10-11）
+
+**Source identity**：沿用已核對 SHA-256 的 CalculiX 2.21 上游原始碼，逐行檢視 `src/gen3dboun.f`、`src/resultsforc.c`。此段為來源路徑對帳與後續測試約束，不是新的真實 solver runtime outcome。
+
+- `gen3dboun.f:568–583`：在指定殼旋轉 SPC、且非對應非線性動力分支時，先進入 mean-rotation MPC 建構。對殼法向 drilling 旋轉，`633–643` 以方向內積判斷是否忽略。
+- `gen3dboun.f:687–727`：`MEANROTBS` 建立過程呼叫 `usermpc`，以 `knor(indexk+j)` 取得殼展開節點、以 `nodeact=nk+1` 傳入旋轉值項，最後以 `nodeact=0` 傳入非齊次項。此處表明 **MPC term 的角色不全等於可於 FRD 取得目前變形座標的實體 C3D20 節點**；但 `nk+1`、`nodeact=0` 的輸入是過程參數，**不能**僅靠此推論 Stage 26 所有 unmatched term 的確切角色。
+- `resultsforc.c:34–59, 75–134`：利用 `ipompc/nodempc/coefmpc/fmpc` 重分配節點力，並對 `MEANROT` 具有排除非結構 term 的特殊分支。Stage 26 的任一 term 不能被直接解讀成已套用於物理殼支承的獨立力。
+- Stage 26 的 exact-head 真實隔離 CCX CI `38114272472`：鋁板 4／8 網格的最後一次呼叫各有 64／128 個 MEANROT MPC、256／512 個 term；其中 192／384 個 term node ID 不在現有 FRD 節點集合。此處的集合差異僅為數值 ID coverage，不證明節點身分，更不是力矩平衡誤差。
+- **下一道 admission gate**：要追查各 `usermpc` term 的確切 role，須有 exact 2.21 source-verified term role mapping（包含特殊 node 0、旋轉值及 inhomogeneous terms）和實際儲存座標的獨立 trace；不得把 node ID coincidence 當作 position、也不得為求得 `r×F` 替未知 internal nodes 合成座標。應先完成 source-role discriminator 與反例測試，再考慮 instrumented moment reconstruction。
+- 保持 `EVIDENCE GATED`、`GENERAL_GLOBAL_BALANCE_NOT_ADMITTED`；沒有獨立旋轉支承反力／MPC 力偶認證，也沒有正式工程容量計算。
