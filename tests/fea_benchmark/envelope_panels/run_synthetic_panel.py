@@ -16,7 +16,7 @@ _REPO_ROOT = Path(__file__).resolve().parents[3]
 if str(_REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(_REPO_ROOT))
 
-from scripts.engineering_calc.calculix_probe import probe_calculix
+from scripts.engineering_calc.calculix_probe import probe_calculix, FEAProbeResult
 from generate import build
 from check_reconstructed_pressure_balance import reconcile
 from check_expanded_moment_partition import observe_case
