@@ -8,10 +8,18 @@ CONFIG={
  "aluminum":dict(E=69000.0,nu=0.33,t=2.0,edge="clamped",q_small=0.0001,q_large=0.6,coefficient=0.00126)
 }
 A=100.
-def build(material,n,load,out):
+def build(material,n,load,out,*,research=None):
     if material not in CONFIG or n not in (4,8,16) or load not in ("small","large"):
         raise ValueError("invalid fixture")
-    c=CONFIG[material];out.mkdir(parents=True,exist_ok=True);nodes={}
+    if research is not None and material != "aluminum":
+        raise ValueError("PARAMETRIC_RESEARCH_ALUMINUM_ONLY")
+    c=CONFIG[material].copy()
+    width=height=A
+    if research is not None:
+        width=research["width_mm"];height=research["height_mm"]
+        c.update(E=research["youngs_modulus_mpa"],nu=research["poisson_ratio"],
+                 t=research["thickness_mm"],q_large=research["pressure_n_mm2"])
+    out.mkdir(parents=True,exist_ok=True);nodes={}
     def node(i,j):
         p=(i,j)
         if p not in nodes:nodes[p]=len(nodes)+1
@@ -21,8 +29,9 @@ def build(material,n,load,out):
         for i in range(n):
             positions=[(2*i,2*j),(2*i+2,2*j),(2*i+2,2*j+2),(2*i,2*j+2),(2*i+1,2*j),(2*i+2,2*j+1),(2*i+1,2*j+2),(2*i,2*j+1)]
             elems.append([node(*p) for p in positions])
-    lines=["*HEADING",f"synthetic {material} {c['edge']} plate, n={n}, {load}","*NODE"]
-    lines.extend(f"{v},{A*i/(2*n):.7f},{A*j/(2*n):.7f},0." for (i,j),v in nodes.items())
+    lines=["*HEADING",f"synthetic {material} {c['edge']} plate, n={n}, {load}" +
+           (", parametric research" if research is not None else ""),"*NODE"]
+    lines.extend(f"{v},{width*i/(2*n):.7f},{height*j/(2*n):.7f},0." for (i,j),v in nodes.items())
     lines+=["*ELEMENT,TYPE=S8R,ELSET=PLATE"]
     lines.extend(f"{i},"+",".join(str(x) for x in elem) for i,elem in enumerate(elems,1))
     lines+=["*MATERIAL,NAME=ISOTROPIC","*ELASTIC",f"{c['E']},{c['nu']}","*SHELL SECTION,ELSET=PLATE,MATERIAL=ISOTROPIC",str(c["t"])]

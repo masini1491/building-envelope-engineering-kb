@@ -592,3 +592,15 @@ Stage 33 六組真實合成 CCX adapter smoke 在 PR #57 成功、合併後 main
 - 重播比較工具 `check_synthetic_replay.py` 必須拒絕非 `SYNTHETIC_BENCHMARK_EVIDENCE_PASS`、缺少 artifact provenance、不合法 SHA、非有限 JSON、擴張 engineering admission、不同 solver/deck 及數值 mismatch。DAT／FRD／STA **byte SHA 不要求相同**（可包含與作業環境相關文字），不能拿哈希不相同作為物理結果不同的證明。
 - 這是同一 CI runner／solver 版本上「跨兩個工作目錄的 deterministic repeatability」；不宣稱跨作業系統、compiler、CPU、硬體或一般模型求解一致，也不提供獨立旋轉反力／完整 MPC lineage。
 - 完成需 PR exact-head 六組真實 CCX、兩組獨立 replay、Repository CI、合併後 main CI 與 remote read-back；保持 `EVIDENCE GATED`、`GENERAL_GLOBAL_BALANCE_NOT_ADMITTED`。
+
+
+## 第三十七階段：可輸入鋁板參數之受限非線性研究模型（候選，2026-10-11）
+
+使用者已選擇鋁板為下一個模型；此階段從 Stage 36 固定 synthetic adapter 衍生出 **explicit research-input only** 的 S8R 矩形四邊固定板介面，**不是**正式鋁板工程設計器。
+
+- 新的 `aluminum_research_input.py` 僅接受固定鍵名的 JSON，單位 `N-mm-MPa`，矩形寬／高、厚度、由呼叫者提供之彈性模數、Poisson ratio、均布正向 P1 pressure、4／8／16 mesh、`four_edges_clamped` 支承，以及非空 material provenance label；拒絕額外欄位、重複欄位、非有限值、超出 bounded numerical research envelope 的輸入。
+- 不將 JSON 直接傳給 CCX；只透過既有 `generate.py` 產生受限模型。新入口 `run_aluminum_research.py` 預設不執行；只在 caller 明確 opt-in、空白 working directory、可信外部 CCX 下呼叫原有 process wrapper。須取得 final-step `.sta`、NALL U/RF、expanded FRD、Stage 19 bounded translations 與 Stage 24 geometric partition，並記錄 deck／solver／DAT／FRD／STA SHA-256。
+- 限定參數範圍是 **testing envelope，不是建築法規、ADM 或物理合理性認證**。即使 `ALUMINUM_PARAMETRIC_RESEARCH_EVIDENCE_PASS`，也僅表示該算例通過受限 numerical checks。沒有材料牌號／temper／焊接熱影響、失效準則、屈曲、連接或獨立旋轉拘束反力矩。
+- 最低驗證為 JSON 負向測試、與既有固定參數一致的 real CCX smoke、PR exact-head CI、main CI 與 canonical remote read-back。**不開放任意外部 deck 或宣稱 ADM member capacity**。
+
+工程狀態維持 `EVIDENCE GATED`、`GENERAL_GLOBAL_BALANCE_NOT_ADMITTED`。
