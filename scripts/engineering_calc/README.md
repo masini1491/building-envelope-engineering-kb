@@ -116,7 +116,16 @@ AI-facing `review.py` 支援這個獨立 deterministic screening check_type。�
 
 `calculix_probe.py` 為本 Stage opt-in 外部 CalculiX process wrapper；不是 `review.py` check_type，也不自行產生求解器模型或解析求解結果。只有 caller 已審查本機輸入 deck、所有 include、工作目錄與 solver executable 時才可設 `execute=True`。預設不執行，且即使 process exit code 為 0 亦回報 `PROCESS_EXIT_ZERO_UNVERIFIED`，**不等於 NLGEOM 收斂／工程設計驗證**。沒有 sandbox；不得執行不可信輸入。
 
-選型與缺口見 [非線性 FEA 求解器研究](../../references/github-projects/nonlinear-fea-solver-admission.md)。本 repo 不打包 GPL-2.0 solver，benchmark 與實際 solver 執行仍待獨立驗證。
+選型與完整的受限驗證 evidence 見 [非線性 FEA 求解器研究](../../references/github-projects/nonlinear-fea-solver-admission.md)。本 repo 不打包 GPL-2.0 solver。
+
+Stage 33 另提供**合成 benchmark 專用**的受限執行入口 `tests/fea_benchmark/envelope_panels/run_synthetic_panel.py`。於 repo 根目錄、確認本機 `ccx` 是可信已安裝版本後，可先建空白工作目錄，再明確 opt-in 執行：
+
+```bash
+mkdir -p /tmp/kb-ccx-synthetic-glass4
+python tests/fea_benchmark/envelope_panels/run_synthetic_panel.py --material glass --mesh 4 --workspace /tmp/kb-ccx-synthetic-glass4 --ccx /usr/bin/ccx --execute
+```
+
+該入口只接受 `glass`／`aluminum` 與 4／8／16 網格，固定為 Repo 產生的 synthetic S8R NLGEOM P1 高荷載模型，**不接受外部 input deck**；預設不帶 `--execute` 就不執行。成功時要求 CCX process、最後增量、DAT／FRD、三向平移平衡及幾何力矩分解均可驗證，回傳 `SYNTHETIC_BENCHMARK_EVIDENCE_PASS`，同時維持 `engineering_acceptance=NOT_ADMITTED` 和 `six_component_global_balance=NOT_ADMITTED`。無 sandbox，不能執行不可信外部 solver。這不是 `review.py` check_type、正式玻璃／鋁板強度設計功能或一般 nonlinear FEA adapter。
 
 ## 工具邊界
 
