@@ -49,6 +49,10 @@ jobs:
           rm usermpc.o ccx_2.21.a ccx_2.21
           make -j2 ccx_2.21 CFLAGS='-Wall -O2 -I/usr/include/spooles -DARCH="Linux" -DSPOOLES -DARPACK -DMATRIXSTORAGE -DUSE_MT=1' FFLAGS='-O2 -fallow-argument-mismatch' LIBS='-lspooles -lpthread -larpack -llapack -lblas -lm -lc'
           cp ccx_2.21 "$RUNNER_TEMP/ccx-roles"
+          python "$GITHUB_WORKSPACE/tests/fea_benchmark/solver_instrumentation/ccx_cascade_probe.py" "$src/cascade.c"
+          rm cascade.o ccx_2.21.a ccx_2.21
+          make -j2 ccx_2.21 CFLAGS='-Wall -O2 -I/usr/include/spooles -DARCH="Linux" -DSPOOLES -DARPACK -DMATRIXSTORAGE -DUSE_MT=1' FFLAGS='-O2 -fallow-argument-mismatch' LIBS='-lspooles -lpthread -larpack -llapack -lblas -lm -lc'
+          cp ccx_2.21 "$RUNNER_TEMP/ccx-cascade"
           sha256sum "$RUNNER_TEMP/ccx-pristine" "$RUNNER_TEMP/ccx-instrumented"
       - name: Re-run identical synthetic benchmark decks
         run: |
@@ -77,5 +81,11 @@ jobs:
               (cd "$roles" && CCX_MPC_AUDIT_FILE="$roles/trace.csv" CCX_MPC_TERMS_FILE="$roles/terms.csv" CCX_MPC_ROLES_FILE="$roles/roles.csv" timeout 120s "$RUNNER_TEMP/ccx-roles" -i panel)
               python tests/fea_benchmark/solver_instrumentation/ccx_mpc_probe.py compare "$base" "$roles" "$roles/trace.csv"
               python tests/fea_benchmark/solver_instrumentation/check_mpc_roles.py "$roles/roles.csv" "$roles/terms.csv"
+              cascade="$root/${material}_${n}_cascade"
+              mkdir -p "$cascade"
+              cp "$base/panel.inp" "$cascade/panel.inp"
+              (cd "$cascade" && CCX_MPC_AUDIT_FILE="$cascade/trace.csv" CCX_MPC_TERMS_FILE="$cascade/terms.csv" CCX_MPC_ROLES_FILE="$cascade/roles.csv" CCX_CASCADE_AUDIT_FILE="$cascade/cascade.csv" timeout 120s "$RUNNER_TEMP/ccx-cascade" -i panel)
+              python tests/fea_benchmark/solver_instrumentation/ccx_mpc_probe.py compare "$base" "$cascade" "$cascade/trace.csv"
+              python tests/fea_benchmark/solver_instrumentation/check_cascade_trace.py "$cascade/cascade.csv"
             done
           done
