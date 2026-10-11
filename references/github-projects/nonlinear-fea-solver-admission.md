@@ -505,3 +505,24 @@ Exact-head CI 在完成 node/DOF 角色修正後，已通過原版／插樁版�
 本階段正式改為 **creation-role observation + cross-snapshot difference diagnostic**；保留所有記錄格式、完整性、helper multiplicity、node/DOF 與非有限值等 fail-closed 檢查，但跨快照僅回報 numeric MPC ID overlap 與 exact term sequence coincident count；固定輸出 `creation_to_final_mapping=NOT_ESTABLISHED`。數值 coincident 不代表 term lineage、旋轉 reactions 或物理座標已認證。
 
 後續如要追蹤轉換，需另行對 `gen3dmpc`、`cascade`、`decascade` 及 nonlinear MPC updates 加入必要的版本相符來源／身分對帳，不得以 tolerance、索引相同或憑空插入節點位置補足。
+
+
+## 第二十九階段：MEANROT MPC 建構／轉換／力輸出責任路徑（來源研究，2026-10-11）
+
+本次使用已驗證 `calculix-ccx_2.21.orig.tar.bz2` SHA-256 `51d229aee320cf685216d360f7c04f9a57af0148fbe840483a964c86c315da82` 的**同一份 exact 2.21 原始碼**，而非 upstream moving branch：
+
+| 責任 owner | SHA-256 與最低充分來源證據 | 可成立的限定結論 |
+| --- | --- | --- |
+| `src/usermpc.f` | `97d49518ea8306d0ba9b88c0861c4bfb45487d45836f765d01b9d624548e2fe5`；93–126、290–302、483–500 | 建立 mean-rotation auxiliary angle/inhomogeneous terms、計算係數並選定 dependent term；建立時 term identity 不是永久穩定輸出契約 |
+| `src/gen3dmpc.f` | `78367fa0950302861e2916d28b3c5ad88fb2b84f8da45f779be4a709ba3255c2`；42–109 | 對原始殼旋轉相關 MPC 進行展開／knot 路徑轉換；此處不是已驗證的最終力反應輸出 |
+| `src/cascade.c` | `430911d6f9f91078c0efb826ba103656a504e46ec0d3ce74356b91b4333336c4`；34–57、97–135 | source 明確宣告 decascade／dependent DOF 處理及 user/nonlinear MPC 分類；它是值得進一步測量的中間態 owner，但單靠 source 不能斷定全部 8→4 term 縮減由它造成 |
+| `src/results.c` | `d4adfb2b68fdd83d5dc46b9306a712d8dc05aacd326deb2f91cc3d94b22e6d7b`；401–414 | 呼叫 `resultsforc` 時存在 ordinary MPC arrays 和 mortar-transform arrays 的分支；Stage 28 合成非 mortar fixture 未驗證任意 contact/mortar 分支 |
+| `src/resultsforc.c` | `d1de9498ac715a7f08da0b7beba3c92c7c2f1030c85c37122d2708f2f480cad0`；34–59、75–134 | 此處的 `nodempc/coefmpc/fmpc` 是進入內力重分配當下的 arrays，不可默認等同 `usermpc` 建立當下的原始 term chain |
+
+### 階段性數值證據與下一道守門
+
+Stage 28 的 PR #52 真實隔離 CCX exact-head run `38118486882` 觀測：鋁板 4 網格在建立快照中有 64 個 MEANROT、384 個 regular terms、64 個 angle terms、64 個 inhomogeneous terms；8 網格則分別為 128／768／128／128。建立與最後一次 `resultsforc` 的 numeric MPC ID 集合可重合，但兩組網格的完整 term-sequence match 都為 **0**；這是**跨階段身分未閉合的證據**，不是物理平衡失敗。
+
+下一個真正必要的研究為記錄 `cascade` 入口／出口及 nonlinear MPC update 的 bounded term identity digest／term count，核對誰改變 `nodempc` 及 `coefmpc`，但不得在沒有來源級連續性之前，用 MPA ID overlap 假定同一 term lineage。此 dossier 只建立候選 owner path；尚未授權任意求解器內部力矩重建，也未取得獨立旋轉拘束反力矩。
+
+**工程狀態維持** `EVIDENCE GATED`、`GENERAL_GLOBAL_BALANCE_NOT_ADMITTED`；不做玻璃／鋁板 capacity acceptance。
