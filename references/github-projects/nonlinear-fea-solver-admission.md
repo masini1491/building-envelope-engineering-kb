@@ -582,3 +582,13 @@ Stage 33 六組真實合成 CCX adapter smoke 在 PR #57 成功、合併後 main
 - 只有 bounded numeric checks 全部成立時才在 `artifact_provenance` 輸出 deck、solver、DAT、FRD、STA 之 SHA-256。輸出檔 identity 為此一 run 觀測到的 file bytes，不等同跨 runtime 或 compiler 版本的通用數值等價，也不保證 solver executable 沒有執行外部副作用；操作員仍須信任本機工具。
 - 新增遺失／超大檔案 SHA 拒絕及運行期間 solver bytes 改變等負向測試。不得將測試建立之 fake solver 當真正 runtime evidence；本階段完成門仍為 PR exact-head 真實 CCX 6-case smoke、Repo CI、合併後 main CI 與 canonical read-back。
 - 維持 `EVIDENCE GATED`、`GENERAL_GLOBAL_BALANCE_NOT_ADMITTED`。輸入／求解器雜湊是追溯而非旋轉反力矩、工程失效準則、ASTM E1300 或 ADM 容量的 admission。
+
+
+## 第三十六階段：跨獨立工作目錄的合成求解重播契約（候選，2026-10-11）
+
+延續 Stage 33–35 固定六組 synthetic S8R NLGEOM P1 adapter，以及已驗證之 deck／solver／DAT／FRD／STA SHA-256 evidence，本階段只新增「同一受限模型在不同**空白工作目錄**執行兩次」的可觀測重播對照。
+
+- 單次 CI 執行固定六組 glass／aluminum × n=4／8／16，保留每組獨立 JSON result於 runner ephemeral 目錄，而非寫回 execution workspace；對 glass n=4、aluminum n=4 再以**新空白工作目錄**重新執行實際 CCX，要求同一 deck SHA、同一 solver binary SHA、相同模型語意、受限三向平移與幾何力矩數值結果完全一致。
+- 重播比較工具 `check_synthetic_replay.py` 必須拒絕非 `SYNTHETIC_BENCHMARK_EVIDENCE_PASS`、缺少 artifact provenance、不合法 SHA、非有限 JSON、擴張 engineering admission、不同 solver/deck 及數值 mismatch。DAT／FRD／STA **byte SHA 不要求相同**（可包含與作業環境相關文字），不能拿哈希不相同作為物理結果不同的證明。
+- 這是同一 CI runner／solver 版本上「跨兩個工作目錄的 deterministic repeatability」；不宣稱跨作業系統、compiler、CPU、硬體或一般模型求解一致，也不提供獨立旋轉反力／完整 MPC lineage。
+- 完成需 PR exact-head 六組真實 CCX、兩組獨立 replay、Repository CI、合併後 main CI 與 remote read-back；保持 `EVIDENCE GATED`、`GENERAL_GLOBAL_BALANCE_NOT_ADMITTED`。
