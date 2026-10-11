@@ -611,3 +611,12 @@ Stage 33 六組真實合成 CCX adapter smoke 在 PR #57 成功、合併後 main
 Stage 37 已完成與舊合成固定案例相同之參數下的真實 CCX smoke。此階段新增 **120×80×2.5 mm、E=70000 MPa、Poisson ratio=0.32、P1 pressure=0.3 N/mm²、8 分割、四邊固定** 的明確合成反例，要求新的 `run_aluminum_research.py` 真實執行 `ALUMINUM_PARAMETRIC_RESEARCH_EVIDENCE_PASS`。另外從產出的 deck 獨立解析原始節點外接矩形、元素數目與壓力，與 JSON 確認一致；此前的 100×100×2 mm 單組對照保留。
 
 這仍是 bounded elastic S8R numerical method research，非正式鋁板尺寸設計、非 ADM 強度容量，也不保證任意 parameter combinations 的求解或物理驗收。必須實際 CI PASS 才能將本階段標為受限通過。工程狀態維持 `EVIDENCE GATED` 與 `GENERAL_GLOBAL_BALANCE_NOT_ADMITTED`。
+
+
+## 第四十階段：鋁板小撓度獨立 Ritz 近似與三層網格研究（候選，2026-10-11）
+
+兩組完全合成低荷載矩形鋁板：100×100×3 mm、E=69000 MPa、ν=0.33、p=0.0001 N/mm²；120×80×2.5 mm、E=70000 MPa、ν=0.32、p=0.0002 N/mm²。兩組均為四邊固定、線彈性、S8R NLGEOM P1，分別採 4／8／16 網格、六次 opt-in 真實 CalculiX 2.21 求解。
+
+獨立研究比較使用 Kirchhoff 小撓度板之**一項 Rayleigh–Ritz 近似**：w=W(1−ξ²)²(1−η²)²，ξ=2x/a、η=2y/b；由 D=Et³/[12(1−ν²)]、彎曲能量與外力位能，利用解析多項式積分取得 W。此為近似方法而非精確解析真值。比對需輸入、deck 幾何、材料、網格、面壓、來源 SHA 與真實執行一致，16 網格與 Ritz 差異不大於 20%，並具 |w16−w8| < |w8−w4| 的改善及 max|w| < 0.05t。20% 與 5% 僅為 bounded research-screening threshold，並非工程允許誤差、精確網格收斂或 ADM 設計依據。
+
+只有 PR exact-head 真實 CCX 六案例、Repository CI、合併後 main CI、remote read-back 均成功才能稱此研究階段通過。維持 `EVIDENCE GATED`、`GENERAL_GLOBAL_BALANCE_NOT_ADMITTED`，不建立正式鋁板 strength/capacity、轉動反力或任意支承 admission。
