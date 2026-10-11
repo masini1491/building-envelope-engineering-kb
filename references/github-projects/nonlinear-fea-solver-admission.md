@@ -604,3 +604,10 @@ Stage 33 六組真實合成 CCX adapter smoke 在 PR #57 成功、合併後 main
 - 最低驗證為 JSON 負向測試、與既有固定參數一致的 real CCX smoke、PR exact-head CI、main CI 與 canonical remote read-back。**不開放任意外部 deck 或宣稱 ADM member capacity**。
 
 工程狀態維持 `EVIDENCE GATED`、`GENERAL_GLOBAL_BALANCE_NOT_ADMITTED`。
+
+
+## 第三十八階段：不同鋁板參數之真實求解驗證（候選，2026-10-11）
+
+Stage 37 已完成與舊合成固定案例相同之參數下的真實 CCX smoke。此階段新增 **120×80×2.5 mm、E=70000 MPa、Poisson ratio=0.32、P1 pressure=0.3 N/mm²、8 分割、四邊固定** 的明確合成反例，要求新的 `run_aluminum_research.py` 真實執行 `ALUMINUM_PARAMETRIC_RESEARCH_EVIDENCE_PASS`。另外從產出的 deck 獨立解析原始節點外接矩形、元素數目與壓力，與 JSON 確認一致；此前的 100×100×2 mm 單組對照保留。
+
+這仍是 bounded elastic S8R numerical method research，非正式鋁板尺寸設計、非 ADM 強度容量，也不保證任意 parameter combinations 的求解或物理驗收。必須實際 CI PASS 才能將本階段標為受限通過。工程狀態維持 `EVIDENCE GATED` 與 `GENERAL_GLOBAL_BALANCE_NOT_ADMITTED`。

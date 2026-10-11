@@ -152,6 +152,12 @@ jobs:
           {"width_mm":100.0,"height_mm":100.0,"thickness_mm":2.0,"youngs_modulus_mpa":69000.0,"poisson_ratio":0.33,"pressure_n_mm2":0.6,"mesh":4,"support":"four_edges_clamped","units":"N-mm-MPa","material_provenance":"explicit bounded synthetic test values"}
           EOF
           python run_aluminum_research.py --input "$RUNNER_TEMP/aluminum_research_input.json" --workspace "$RUNNER_TEMP/aluminum_research_run" --ccx "$(command -v ccx)" --execute
+          mkdir -p "$RUNNER_TEMP/aluminum_variant_run"
+          cat > "$RUNNER_TEMP/aluminum_variant_input.json" <<'EOF'
+          {"width_mm":120.0,"height_mm":80.0,"thickness_mm":2.5,"youngs_modulus_mpa":70000.0,"poisson_ratio":0.32,"pressure_n_mm2":0.3,"mesh":8,"support":"four_edges_clamped","units":"N-mm-MPa","material_provenance":"explicit alternative synthetic research values"}
+          EOF
+          python run_aluminum_research.py --input "$RUNNER_TEMP/aluminum_variant_input.json" --workspace "$RUNNER_TEMP/aluminum_variant_run" --ccx "$(command -v ccx)" --execute > "$RUNNER_TEMP/aluminum_variant_result.json"
+          python -c 'import json,sys; from pathlib import Path; from check_pressure_equilibrium import parse_deck; from aluminum_research_input import load; model=load(Path(sys.argv[1])); nodes,elements,edge,q=parse_deck(Path(sys.argv[2])); result=json.loads(Path(sys.argv[3]).read_text()); assert result["execution_status"]=="ALUMINUM_PARAMETRIC_RESEARCH_EVIDENCE_PASS"; assert result["engineering_acceptance"]=="NOT_ADMITTED"; assert len(elements)==model["mesh"]**2; assert abs(q-model["pressure_n_mm2"])<1e-12; assert abs(max(p[0] for p in nodes.values())-model["width_mm"])<1e-6; assert abs(max(p[1] for p in nodes.values())-model["height_mm"])<1e-6; print("ALUMINUM_VARIANT_INPUT_GEOMETRY_AND_PRESSURE_PASS")' "$RUNNER_TEMP/aluminum_variant_input.json" "$RUNNER_TEMP/aluminum_variant_run/panel.inp" "$RUNNER_TEMP/aluminum_variant_result.json"
           for material in glass aluminum; do
             for n in 4 8 16; do
               folder="adapter_smoke_${material}_${n}"
