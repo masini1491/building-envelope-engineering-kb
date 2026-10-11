@@ -125,7 +125,7 @@ mkdir -p /tmp/kb-ccx-synthetic-glass4
 python tests/fea_benchmark/envelope_panels/run_synthetic_panel.py --material glass --mesh 4 --workspace /tmp/kb-ccx-synthetic-glass4 --ccx /usr/bin/ccx --execute
 ```
 
-該入口只接受 `glass`／`aluminum` 與 4／8／16 網格，固定為 Repo 產生的 synthetic S8R NLGEOM P1 高荷載模型，**不接受外部 input deck**；預設不帶 `--execute` 就不執行。成功時要求 CCX process、最後增量、DAT／FRD、三向平移平衡及幾何力矩分解均可驗證，回傳 `SYNTHETIC_BENCHMARK_EVIDENCE_PASS`，同時維持 `engineering_acceptance=NOT_ADMITTED` 和 `six_component_global_balance=NOT_ADMITTED`。無 sandbox，不能執行不可信外部 solver。這不是 `review.py` check_type、正式玻璃／鋁板強度設計功能或一般 nonlinear FEA adapter。
+該入口只接受 `glass`／`aluminum` 與 4／8／16 網格，固定為 Repo 產生的 synthetic S8R NLGEOM P1 高荷載模型，**不接受外部 input deck**；預設不帶 `--execute` 就不執行。成功時要求 CCX process、最後增量、DAT／FRD、三向平移平衡及幾何力矩分解均可驗證；另於執行前後確認 deck／solver SHA-256 未改變，並在成功回覆附上主要 artifact 的 SHA-256 追溯資訊，回傳 `SYNTHETIC_BENCHMARK_EVIDENCE_PASS`，同時維持 `engineering_acceptance=NOT_ADMITTED` 和 `six_component_global_balance=NOT_ADMITTED`。無 sandbox，不能執行不可信外部 solver。這不是 `review.py` check_type、正式玻璃／鋁板強度設計功能或一般 nonlinear FEA adapter。
 
 ## 工具邊界
 

@@ -6,6 +6,7 @@ user geometry, engineering capacity, MPC reaction or global six-DOF acceptance.
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import math
 from pathlib import Path
@@ -24,6 +25,22 @@ from check_expanded_moment_partition import observe_case
 
 class SyntheticPanelEvidenceError(ValueError):
     """A solver run did not establish the required bounded evidence."""
+
+def _digest_file(path: Path, max_bytes: int) -> str:
+    """Observe one bounded regular file's SHA-256; not a design approval."""
+    try:
+        target = path.resolve(strict=True)
+        size = target.stat().st_size
+    except OSError as exc:
+        raise SyntheticPanelEvidenceError("PROVENANCE_FILE_MISSING_OR_UNBOUNDED") from exc
+    if not target.is_file() or not 0 < size <= max_bytes:
+        raise SyntheticPanelEvidenceError("PROVENANCE_FILE_MISSING_OR_UNBOUNDED")
+    sha = hashlib.sha256()
+    with target.open("rb") as stream:
+        for block in iter(lambda: stream.read(1024 * 1024), b""):
+            sha.update(block)
+    return sha.hexdigest()
+
 
 
 def _completed_step(path: Path) -> None:
@@ -74,11 +91,15 @@ def run_synthetic_panel(*, material: str, mesh: int, workspace: str | Path,
     # generate.py is the canonical synthetic deck owner; do not accept external
     # *INCLUDE, geometry, loads or arbitrary user-authored input files here.
     build(material, mesh, "large", directory)
+    deck_identity = _digest_file(directory / "panel.inp", 5_000_000)
+    solver_identity = _digest_file(Path(executable), 250_000_000)
     outcome = probe_calculix(executable=executable, job_name="panel",
                              workspace=directory, timeout_seconds=timeout_seconds,
                              execute=True)
     if outcome.execution_status != "PROCESS_EXIT_ZERO_UNVERIFIED":
         raise SyntheticPanelEvidenceError("SOLVER_DID_NOT_EXIT_ZERO:" + outcome.execution_status)
+    if _digest_file(directory / "panel.inp", 5_000_000) != deck_identity or _digest_file(Path(executable), 250_000_000) != solver_identity:
+        raise SyntheticPanelEvidenceError("INPUT_OR_SOLVER_CHANGED_DURING_RUN")
     for suffix, maximum in ((".inp", 5_000_000), (".dat", 10_000_000),
                             (".frd", 64_000_000), (".sta", 2_000_000)):
         path = directory / ("panel" + suffix)
@@ -95,6 +116,11 @@ def run_synthetic_panel(*, material: str, mesh: int, workspace: str | Path,
     output = {
         "execution_status": "SYNTHETIC_BENCHMARK_EVIDENCE_PASS",
         "process_exit_code": outcome.exit_code,
+        "artifact_provenance": {"input_deck_sha256": deck_identity,
+                                "solver_executable_sha256": solver_identity,
+                                "final_dat_sha256": _digest_file(directory / "panel.dat", 10_000_000),
+                                "final_frd_sha256": _digest_file(directory / "panel.frd", 64_000_000),
+                                "final_sta_sha256": _digest_file(directory / "panel.sta", 2_000_000)},
         "model_scope": "FIXED_SYNTHETIC_S8R_NLGEOM_P1",
         "material_proxy": material, "mesh": mesh,
         "translational_balance": translation,

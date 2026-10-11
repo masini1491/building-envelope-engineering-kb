@@ -3,7 +3,7 @@ import tempfile
 import unittest
 from pathlib import Path
 from unittest.mock import patch
-from run_synthetic_panel import run_synthetic_panel,SyntheticPanelEvidenceError,_completed_step, FEAProbeResult
+from run_synthetic_panel import run_synthetic_panel,SyntheticPanelEvidenceError,_completed_step, FEAProbeResult, _digest_file
 
 class Tests(unittest.TestCase):
     def test_opt_in_required_before_any_mutation(self):
@@ -22,21 +22,41 @@ class Tests(unittest.TestCase):
                 run_synthetic_panel(material="glass",mesh=4,workspace=d,executable="x",execute=True)
     def test_zero_exit_does_not_pass_without_outputs(self):
         with tempfile.TemporaryDirectory() as d:
+            fake = Path(d)/"fake_ccx"; fake.write_bytes(b"synthetic test executable")
             with patch("run_synthetic_panel.probe_calculix",return_value=FEAProbeResult(
                     "PROCESS_EXIT_ZERO_UNVERIFIED",0,"","")):
                 with self.assertRaisesRegex(SyntheticPanelEvidenceError,"REQUIRED_OUTPUT"):
-                    run_synthetic_panel(material="glass",mesh=4,workspace=d,executable="unused",execute=True)
+                    run_synthetic_panel(material="glass",mesh=4,workspace=d,executable=str(fake),execute=True)
     def test_nonzero_and_timeout_fail_closed(self):
         for status in ("PROCESS_NONZERO","TIMEOUT","EXECUTION_ERROR"):
             with tempfile.TemporaryDirectory() as d:
-                with patch("run_synthetic_panel.probe_calculix",return_value=FEAProbeResult(status,None,"","")):
+                fake = Path(d)/"fake_ccx"; fake.write_bytes(b"synthetic test executable")
+            with patch("run_synthetic_panel.probe_calculix",return_value=FEAProbeResult(status,None,"","")):
                     with self.assertRaisesRegex(SyntheticPanelEvidenceError,"SOLVER_DID_NOT_EXIT_ZERO"):
-                        run_synthetic_panel(material="glass",mesh=4,workspace=d,executable="unused",execute=True)
+                        run_synthetic_panel(material="glass",mesh=4,workspace=d,executable=str(fake),execute=True)
     def test_partial_step_not_complete(self):
         with tempfile.TemporaryDirectory() as d:
             p=Path(d)/"panel.sta";p.write_text("1 1 1 1 0.5 1 1\n")
             with self.assertRaisesRegex(SyntheticPanelEvidenceError,"NONLINEAR_STEP_NOT_COMPLETE"):
                 _completed_step(p)
+    def test_hash_requires_nonempty_bounded_file(self):
+        with tempfile.TemporaryDirectory() as d:
+            p = Path(d)/"a"
+            with self.assertRaisesRegex(SyntheticPanelEvidenceError,"PROVENANCE_FILE"):
+                _digest_file(p,50)
+            p.write_bytes(b"abc")
+            self.assertEqual(len(_digest_file(p,50)),64)
+            with self.assertRaisesRegex(SyntheticPanelEvidenceError,"PROVENANCE_FILE"):
+                _digest_file(p,2)
+    def test_solver_mutation_detected_with_real_status(self):
+        with tempfile.TemporaryDirectory() as d:
+            fake=Path(d)/"fake_ccx"; fake.write_bytes(b"solver")
+            def mutated(**kwargs):
+                fake.write_bytes(b"changed solver")
+                return FEAProbeResult("PROCESS_EXIT_ZERO_UNVERIFIED",0,"","")
+            with patch("run_synthetic_panel.probe_calculix",side_effect=mutated):
+                with self.assertRaises(SyntheticPanelEvidenceError):
+                    run_synthetic_panel(material="glass",mesh=4,workspace=d,executable=str(fake),execute=True)
     def test_symlink_workspace_rejected(self):
         with tempfile.TemporaryDirectory() as d:
             base=Path(d);real=base/"real";real.mkdir()
