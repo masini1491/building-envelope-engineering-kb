@@ -572,3 +572,13 @@ Stage 31 main CI `38119404136` SUCCESS；以上合併 commit 與執行紀錄皆�
 - **執行關卡**：預設 opt-out；只有 `--execute`、可信外部 CCX executable、既有且空白的操作員控制資料夾成立才產生 fixture／執行，無 sandbox。回傳僅為 `SYNTHETIC_BENCHMARK_EVIDENCE_PASS` 或拒絕，不是正式 engineering PASS。
 - **數值證據**：要求求解器 process zero exit、完整 .sta 最後步驟 time=1、.dat／.frd、Stage 19 三向平移力平衡、Stage 24 力矩幾何分解均通過；缺少資料、非有限值、超過固定輸出大小、超時、數值不一致都拒絕。CI 應跑 mock／fail-closed test 及真實獨立 `glass n=4` smoke（不偷用原本已執行的結果）。
 - **工程邊界**：這不是任意幾何模型 execution adapter；不提供獨立旋轉反力矩、六分量 global equilibrium、材料非線性、接觸／屈曲／缺陷或 ASTM E1300／ADM capacity。保持 `EVIDENCE GATED`、`GENERAL_GLOBAL_BALANCE_NOT_ADMITTED`。
+
+
+## 第三十五階段：受限 execution adapter 輸入／求解器／輸出身分鏈（候選，2026-10-11）
+
+Stage 33 六組真實合成 CCX adapter smoke 在 PR #57 成功、合併後 main CI 亦成功。此階段限定原六組合成模型，補上 **SHA-256 provenance**，不新增任意 input deck 入口或任何 engineering approval。
+
+- 在 solver 執行前檢查非空、bounded deck 與可信操作員提供的本機外部 CCX executable，取得 SHA-256；執行後先確認 deck 及 executable 內容 SHA 未改變，再接續既有 output completeness、final `*.sta`、Stage 19／24 審核。
+- 只有 bounded numeric checks 全部成立時才在 `artifact_provenance` 輸出 deck、solver、DAT、FRD、STA 之 SHA-256。輸出檔 identity 為此一 run 觀測到的 file bytes，不等同跨 runtime 或 compiler 版本的通用數值等價，也不保證 solver executable 沒有執行外部副作用；操作員仍須信任本機工具。
+- 新增遺失／超大檔案 SHA 拒絕及運行期間 solver bytes 改變等負向測試。不得將測試建立之 fake solver 當真正 runtime evidence；本階段完成門仍為 PR exact-head 真實 CCX 6-case smoke、Repo CI、合併後 main CI 與 canonical read-back。
+- 維持 `EVIDENCE GATED`、`GENERAL_GLOBAL_BALANCE_NOT_ADMITTED`。輸入／求解器雜湊是追溯而非旋轉反力矩、工程失效準則、ASTM E1300 或 ADM 容量的 admission。
