@@ -43,7 +43,11 @@ def build(material,n,load,out,*,research=None):
     if c["edge"]=="clamped":lines+=["EDGE,1,6,0."]
     else:
         lines+=["EDGE,3,3,0.",f"{nodes[(0,0)]},1,2,0.",f"{nodes[(2*n,0)]},2,2,0."]
-    lines+=["*STEP,NLGEOM","*STATIC","0.05,1.,0.00001,0.1","*DLOAD",f"PLATE,P,{c['q_'+load]}","*NODE FILE,OUTPUT=3D","U,RF","*NODE PRINT,NSET=CENTER","U","*NODE PRINT,NSET=EDGE","RF","*NODE PRINT,NSET=NALL","U,RF","*END STEP"]
+    lines+=["*STEP,NLGEOM","*STATIC","0.05,1.,0.00001,0.1","*DLOAD",f"PLATE,P,{c['q_'+load]}","*NODE FILE,OUTPUT=3D","U,RF"]
+    # Tensor fields are opt-in for research only. Keep all fixed benchmarks unchanged.
+    if research is not None:
+        lines += ["*EL FILE,OUTPUT=3D", "S,E"]
+    lines += ["*NODE PRINT,NSET=CENTER","U","*NODE PRINT,NSET=EDGE","RF","*NODE PRINT,NSET=NALL","U,RF","*END STEP"]
     (out/"panel.inp").write_text("\n".join(lines)+"\n",encoding="utf-8")
 if __name__=="__main__":
     parser=argparse.ArgumentParser()
