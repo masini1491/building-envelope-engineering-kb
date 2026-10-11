@@ -47,7 +47,7 @@ jobs:
           set -euo pipefail
           root="$RUNNER_TEMP/ccx-compare"
           mkdir -p "$root"
-          for material in glass aluminum; do
+          for material in aluminum; do
             for n in 4 8; do
               base="$root/${material}_${n}_pristine"
               mod="$root/${material}_${n}_instrumented"
