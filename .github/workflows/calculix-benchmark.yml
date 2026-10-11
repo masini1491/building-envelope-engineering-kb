@@ -147,6 +147,17 @@ jobs:
           python -m unittest -v test_run_synthetic_panel.py
           python -m unittest -v test_synthetic_replay.py
           python -m unittest -v test_aluminum_research.py
+          python -m unittest -v test_aluminum_ritz.py
+          for case in thicker_square rectangular_higher_pressure; do
+            fixture="$RUNNER_TEMP/ritz_${case}"
+            mkdir -p "$fixture"
+            for n in 4 8 16; do
+              python -c 'import json,sys; from check_aluminum_ritz import expected_input; print(json.dumps(expected_input(sys.argv[1],int(sys.argv[2]))))' "$case" "$n" > "$fixture/input_${n}.json"
+              mkdir -p "$fixture/mesh_${n}"
+              python run_aluminum_research.py --input "$fixture/input_${n}.json" --workspace "$fixture/mesh_${n}" --ccx "$(command -v ccx)" --execute > "$fixture/output_${n}.json"
+            done
+            python check_aluminum_ritz.py "$fixture" "$case"
+          done
           mkdir -p "$RUNNER_TEMP/aluminum_research_run"
           cat > "$RUNNER_TEMP/aluminum_research_input.json" <<'EOF'
           {"width_mm":100.0,"height_mm":100.0,"thickness_mm":2.0,"youngs_modulus_mpa":69000.0,"poisson_ratio":0.33,"pressure_n_mm2":0.6,"mesh":4,"support":"four_edges_clamped","units":"N-mm-MPa","material_provenance":"explicit bounded synthetic test values"}
