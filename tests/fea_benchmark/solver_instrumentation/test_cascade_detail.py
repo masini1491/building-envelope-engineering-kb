@@ -20,7 +20,7 @@ class DetailTests(unittest.TestCase):
     def test_missing_exit_mpc_fails(self):
         with tempfile.TemporaryDirectory() as d:
             a,b=self.sample(d,self.detail.replace("CASCADE_DETAIL_V1,1,OUT,2,4\n",""))
-            with self.assertRaisesRegex(ValueError,"UNMATCHED_MPC_IDS"):examine(a,b)
+            with self.assertRaisesRegex(ValueError,"CASCADE_DETAIL_AGGREGATE_MISMATCH"):examine(a,b)
     def test_duplicate_mpc_fails(self):
         with tempfile.TemporaryDirectory() as d:
             a,b=self.sample(d,self.detail+"CASCADE_DETAIL_V1,1,OUT,1,4\n")
