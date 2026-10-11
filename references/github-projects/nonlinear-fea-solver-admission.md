@@ -546,3 +546,21 @@ Stage 30 真實隔離 CCX CI `38118925389` 已觀測鋁板 4／8 網格皆為 25
 - 新增的資料檢查會拒絕重複 numeric ID、缺失 entry/exit、非法 chain 長度及與 aggregate 不一致的資料。輸出明確統計 8→4 的**單次 cascade caller-local numeric MPC ID transition** 數量，不能由此推定 `usermpc` creation 至最終 `resultsforc` 的完整 across-call / cross-stage identity。
 - 同一合成鋁板 4／8 網格維持未修改 CCX 與診斷版之 NALL U/RF、expanded FRD U/RF strict text-numeric 一致性。即使觀測到 8→4，仍為 source-internal transformation observation，非 rotational support reaction 或 six-component balance。
 - Admission 門：PR exact-head 三組 CI、main CI、remote changed-file read-back。整體維持 `EVIDENCE GATED`、`GENERAL_GLOBAL_BALANCE_NOT_ADMITTED`。
+
+
+## 第三十二階段：Stage 28–31 真實證據 reconciliation 與後續 admission boundary（2026-10-11）
+
+本階段只收斂當前已通過 exact-head／main CI 的**受限合成板件研究成果**，不執行新的 solver modification 或宣稱正式工程採用。
+
+| Stage | PR／exact-head CI | 合併後 main SHA | 受限結論 |
+| --- | --- | --- | --- |
+| 28 | #52；隔離 CCX `38118486882`、Repository／FEA CI SUCCESS | `c71d8967bae61c6d5eb752c7d59a782f61fbf195` | 建立快照鋁板 n=4 為 64 MEANROT、384 regular＋64 angle＋64 inhomogeneous terms；n=8 為 128、768＋128＋128。轉換後的完整 term 序列 match 為 0：`creation_to_final_mapping=NOT_ESTABLISHED` |
+| 29 | #53；Repo CI `38118720549` SUCCESS | `fd7991a838ba0431479bd4a4d2de67e8ea8367fc` | 精確來源責任路徑為 `usermpc` → `gen3dmpc`／`cascade`／其他處理 → `resultsforc`；仍未完整辨識每條 term lineage |
+| 30 | #54；隔離 CCX `38118925389`、Repository／FEA CI SUCCESS | `41808f2092337540f55b1ec055a9e65e0c57cb84` | 兩個 synthetic 鋁板網格均為 25 次 cascade call，24 次的 MEANROT aggregate term 數量改變，MPC count 不變 |
+| 31 | #55；隔離 CCX `38119261430`、Repository／FEA CI SUCCESS | `7e4901ff28d5591cb85f4b2b0fc2b9bcbcda5be2` | n=4 累計 1536 次、n=8 累計 3072 次 **per-call, per-numeric-MPC-ID** 8→4 term-count transitions；不是獨立 MPC 個數，也不代表跨 stage identity |
+ 
+Stage 31 main CI `38119404136` SUCCESS；以上合併 commit 與執行紀錄皆按已驗證 remote evidence 記錄。原版與最小插樁版於相同合成板件的 NALL U/RF 及 expanded FRD U/RF 維持現有 text-numeric 精度下完全一致，不能擴張為一般 shell engineering acceptance。
+
+**目前能證明的最高範圍**：對這些固定合成模型，MEANROT helper roles 與 cascade entry/exit 的 MPC chain 縮減，可在 exact-source 隔離 GPL 診斷版實際觀測。尚無獨立旋轉拘束反力矩、完整 nonlinear MPC term identity lineage、含 node 力偶的實際六分量 global equilibrium acceptance。下一個可驗證工程問題需重新建立 per-term source identity 穿越 MPC transformation 的契約，並在所有原始／展開／輔助節點的真實作用位置取得獨立數據；目前不宜直接新增工程容量或 six-component PASS gate。
+
+**維持** `EVIDENCE GATED`、`GENERAL_GLOBAL_BALANCE_NOT_ADMITTED`。此 dossier 為唯一研究證據 owner；外部 GPL 2.21 原始碼及 binary 不納入 public repository。
