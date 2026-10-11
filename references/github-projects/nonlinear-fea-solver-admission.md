@@ -403,3 +403,12 @@ Stage 15 新增的 `NALL RF` 不是「獨立支承反力」，其完整節點 Z 
 - 這一版未提供 `U4/U5/U6`、`RM`、`MPC` 的可靠可觀測契約，且未重新完成 CalculiX 2.21 exact-source 的 constraint-related routines 對照。完整三維力矩、director、offset、constraint-couple 與 MPC 力重新分配仍屬 evidence gap；不得把 `Σ(r×F)` 本身當成完整 `ΣM=0`。
 - **Admission gate**：須有 Stage 20 PR exact-head Repository CI 與真實 CalculiX CI、merged main CI 及 canonical read-back，才可認證上述受限診斷在真實合成案例上可重現。最終 engineering capacity／六維 global balance 仍為 `GENERAL_GLOBAL_BALANCE_NOT_ADMITTED`、`EVIDENCE GATED`，不得聲稱 ASTM E1300／ADM 容量。
 
+
+
+## 第二十一階段：平移支承幾何力矩及未觀測力偶需求（候選，2026-10-11）
+
+- **限定 scope**：只使用 Stage 19/20 六組合成 S8R／NLGEOM 板件已驗證的原始節點平移限制和真實展開 FRD／DAT。先執行 Stage 20/19 gates；無法通過不得產生力矩診斷。
+- Stage 20 的 expanded P1 力矩與 Stage 19 重建平移支承力分別取自真正受壓面及原始 S8R 節點變形位置；兩者必須採共同 Cartesian 原點。計算 `required_unobserved_couple_if_equilibrium = −(M_P1 + M_reconstructed_translation_support)`，**只是維持靜態平衡所需要的條件式殘餘力偶，不是獨立輸出、實測或驗證之旋轉支承反力矩**。
+- 新增 `check_required_couple.py` 與 `test_required_couple.py`（六項 synthetic tests），涵蓋平移力矩、剩餘力偶需求、原點變化、平移平衡先驗守門、缺失節點／錯誤自由度與非有限值。Real CCX 只能確認已支援合成 fixture 的計算可重現，不能認證 MPC/rotation。
+- CalculiX 2.21-1 的 `gen3dboun.f`／`gen3dmpc.f`／`gen3dforc.f` 源碼逐行對帳及旋轉反力輸出契約尚缺證據；不得以 upstream moving branch 或異版本使用手冊代替 exact-version 原始碼。對 rotational reactions、MPC couple 和 independent support reaction 仍輸出 `UNOBSERVED`。
+- Admission 需 PR exact-head Repository CI／真實 CalculiX CI、main CI 與 canonical read-back。即使數值合力矩很小，`GENERAL_GLOBAL_BALANCE_NOT_ADMITTED`、`EVIDENCE GATED` 仍然成立，且不涉及玻璃／鋁板正式容量設計。
