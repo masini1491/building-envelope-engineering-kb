@@ -19,11 +19,16 @@ static void kb_cascade_trace(const char *phase,ITG *ipompc,ITG *nodempc,
     static unsigned long call_id=0;
     unsigned long sequence;
     ITG i,count=0,term_total=0,max_terms=0;
-    FILE *file;
+    FILE *file,*detail_file=NULL;
+    const char *detail_path=getenv("CCX_CASCADE_DETAIL_FILE");
     if(path==NULL || path[0]=='\0') return;
     if(strcmp(phase,"IN")==0) call_id++;
     sequence=call_id;
     if(nmpc<0 || nmpc>1000000) exit(74);
+    if(detail_path!=NULL && detail_path[0]!='\0'){
+        detail_file=fopen(detail_path,"a");
+        if(detail_file==NULL)exit(69);
+    }
     for(i=0;i<nmpc;i++){
         ITG index,local_count=0;
         if(strncmp(&labmpc[20*i],"MEANROT",7)!=0)continue;
@@ -36,6 +41,10 @@ static void kb_cascade_trace(const char *phase,ITG *ipompc,ITG *nodempc,
             index=nodempc[3*index-1];
         }
         term_total+=local_count;
+        if(detail_file!=NULL){
+            fprintf(detail_file,"CASCADE_DETAIL_V1,%lu,%s,%lld,%lld\n",
+                    sequence,phase,(long long)(i+1),(long long)local_count);
+        }
         if(local_count>max_terms)max_terms=local_count;
     }
     file=fopen(path,"a");
@@ -44,6 +53,7 @@ static void kb_cascade_trace(const char *phase,ITG *ipompc,ITG *nodempc,
             sequence,phase,(long long)count,
             (long long)term_total,(long long)max_terms);
     if(fclose(file)!=0)exit(70);
+    if(detail_file!=NULL && fclose(detail_file)!=0)exit(68);
 }
 '''
 

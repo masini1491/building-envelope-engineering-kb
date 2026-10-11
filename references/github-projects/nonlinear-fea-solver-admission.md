@@ -536,3 +536,13 @@ Stage 28 的 PR #52 真實隔離 CCX exact-head run `38118486882` 觀測：鋁�
 - 記錄檔 parser 嚴格要求 call pair 完整、序號有序、範圍受限、至少真實觀測一次 MEANROT。輸出兩端 aggregate count 是否改變；**aggregate change 不足以推定所有 8→4 term 的個別因果／term lineage**，結果固定 `specific_8_to_4_causality=NOT_ESTABLISHED`。
 - 沿用 Stage 25–28 的隔離未修改版／診斷版求解比較，要求相同合成鋁板 4／8 網格的 `NALL U/RF`、expanded FRD U/RF 維持現有 text-numeric 比對契約；任何資料缺漏、差異、非有限值或 source SHA 不符 fail closed。
 - 不把任何 GPL source／binary 提交到 KB。只有 PR exact-head 真實 CalculiX CI、Repository CI、合併後 main CI 與 canonical read-back 成立，才能稱此限定 cascade 診斷可重現；不代表獨立轉動拘束反力、一般六分量平衡或設計承載力 admission。保持 `EVIDENCE GATED`、`GENERAL_GLOBAL_BALANCE_NOT_ADMITTED`。
+
+
+## 第三十一階段：`cascade` 單一 MPC chain 前後變化（候選，2026-10-11）
+
+Stage 30 真實隔離 CCX CI `38118925389` 已觀測鋁板 4／8 網格皆為 25 次 cascade 呼叫，24 次 aggregate MEANROT term 數在入口與出口不同，沒有 MEANROT MPC 個數的變化。Stage 31 針對**每次呼叫每個 numeric MPC ID**新增 bounded `CASCADE_DETAIL_V1` observation，記錄 entry/exit 的 term chain 長度，並要求每筆均與 Stage 30 aggregate count／total／maximum 精確對帳。
+
+- 仍從 verified upstream SHA-256 `51d229aee320cf685216d360f7c04f9a57af0148fbe840483a964c86c315da82` 重新建立隔離編譯；只擴充 GitHub CI working directory 中的 `cascade.c` 診斷 patch，絕不將 GPL source/binary 寫入公開 KB。
+- 新增的資料檢查會拒絕重複 numeric ID、缺失 entry/exit、非法 chain 長度及與 aggregate 不一致的資料。輸出明確統計 8→4 的**單次 cascade caller-local numeric MPC ID transition** 數量，不能由此推定 `usermpc` creation 至最終 `resultsforc` 的完整 across-call / cross-stage identity。
+- 同一合成鋁板 4／8 網格維持未修改 CCX 與診斷版之 NALL U/RF、expanded FRD U/RF strict text-numeric 一致性。即使觀測到 8→4，仍為 source-internal transformation observation，非 rotational support reaction 或 six-component balance。
+- Admission 門：PR exact-head 三組 CI、main CI、remote changed-file read-back。整體維持 `EVIDENCE GATED`、`GENERAL_GLOBAL_BALANCE_NOT_ADMITTED`。

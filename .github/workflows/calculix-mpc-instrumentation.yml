@@ -84,8 +84,9 @@ jobs:
               cascade="$root/${material}_${n}_cascade"
               mkdir -p "$cascade"
               cp "$base/panel.inp" "$cascade/panel.inp"
-              (cd "$cascade" && CCX_MPC_AUDIT_FILE="$cascade/trace.csv" CCX_MPC_TERMS_FILE="$cascade/terms.csv" CCX_MPC_ROLES_FILE="$cascade/roles.csv" CCX_CASCADE_AUDIT_FILE="$cascade/cascade.csv" timeout 120s "$RUNNER_TEMP/ccx-cascade" -i panel)
+              (cd "$cascade" && CCX_MPC_AUDIT_FILE="$cascade/trace.csv" CCX_MPC_TERMS_FILE="$cascade/terms.csv" CCX_MPC_ROLES_FILE="$cascade/roles.csv" CCX_CASCADE_AUDIT_FILE="$cascade/cascade.csv" CCX_CASCADE_DETAIL_FILE="$cascade/cascade-detail.csv" timeout 120s "$RUNNER_TEMP/ccx-cascade" -i panel)
               python tests/fea_benchmark/solver_instrumentation/ccx_mpc_probe.py compare "$base" "$cascade" "$cascade/trace.csv"
               python tests/fea_benchmark/solver_instrumentation/check_cascade_trace.py "$cascade/cascade.csv"
+              python tests/fea_benchmark/solver_instrumentation/check_cascade_detail.py "$cascade/cascade.csv" "$cascade/cascade-detail.csv"
             done
           done
