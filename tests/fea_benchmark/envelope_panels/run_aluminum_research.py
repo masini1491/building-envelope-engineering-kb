@@ -10,6 +10,7 @@ from generate import build
 from aluminum_research_input import load
 from check_reconstructed_pressure_balance import reconcile
 from check_expanded_moment_partition import observe_case
+from aluminum_result_summary import summarize
 
 def run(*,input_json:Path,workspace:Path,executable:str,execute:bool=False)->dict:
     config=load(input_json)
@@ -38,9 +39,11 @@ def run(*,input_json:Path,workspace:Path,executable:str,execute:bool=False)->dic
         partition=observe_case(inp,frd,dat,"aluminum")
     except (ValueError,OSError) as exc:
         raise SyntheticPanelEvidenceError("RESEARCH_AUDIT_REJECTED:"+type(exc).__name__) from exc
+    summary=summarize(deck=inp,dat=dat,inputs=config,translational_balance=balance)
     return {"execution_status":"ALUMINUM_PARAMETRIC_RESEARCH_EVIDENCE_PASS",
             "model_scope":"RECTANGULAR_FOUR_EDGE_CLAMPED_LINEAR_ELASTIC_S8R_NLGEOM_P1",
             "inputs":config,"translational_balance":balance,
+            "research_observations":summary,
             "expanded_moment_partition":partition,
             "artifact_provenance":{"input_sha256":before,"solver_sha256":solver,
                "dat_sha256":_digest_file(dat,10_000_000),

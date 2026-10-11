@@ -620,3 +620,10 @@ Stage 37 已完成與舊合成固定案例相同之參數下的真實 CCX smoke�
 獨立研究比較使用 Kirchhoff 小撓度板之**一項 Rayleigh–Ritz 近似**：w=W(1−ξ²)²(1−η²)²，ξ=2x/a、η=2y/b；由 D=Et³/[12(1−ν²)]、彎曲能量與外力位能，利用解析多項式積分取得 W。此為近似方法而非精確解析真值。比對需輸入、deck 幾何、材料、網格、面壓、來源 SHA 與真實執行一致，16 網格與 Ritz 差異不大於 20%，並具 |w16−w8| < |w8−w4| 的改善及 max|w| < 0.05t。20% 與 5% 僅為 bounded research-screening threshold，並非工程允許誤差、精確網格收斂或 ADM 設計依據。
 
 只有 PR exact-head 真實 CCX 六案例、Repository CI、合併後 main CI、remote read-back 均成功才能稱此研究階段通過。維持 `EVIDENCE GATED`、`GENERAL_GLOBAL_BALANCE_NOT_ADMITTED`，不建立正式鋁板 strength/capacity、轉動反力或任意支承 admission。
+
+
+## 第四十一階段：鋁板求解結果受限研究摘要（候選，2026-10-11）
+
+在既有 `ALUMINUM_PARAMETRIC_RESEARCH_EVIDENCE_PASS` 之後，新增 `research_observations`，僅整理 original S8R NALL 節點最後增量的三向平移位移（mm）、中心節點位移、節點最大合位移、節點最大面外位移及節點 ID。最大值僅限**原始殼節點**，不是殼元素連續場或 expanded solid 的全域極值。資料來源為既有 CCX DAT final NALL U；不另外虛構應力或應變。另沿用 Stage 19 通過之 follower-pressure/internals 推導的三向平移支承合力（N）及 residual，明示屬**重建**而非獨立測量；輸出與已有稽核結果對帳。
+
+對輸入、deck 幾何／網格／材料／面壓及 NALL 節點 coverage 做 fail-closed 比對。`stress`、`strain`、`rotational_support_reaction` 固定為 `NOT_OBSERVED`；`aluminum_design_manual_capacity=NOT_COMPUTED`、`engineering_acceptance=NOT_ADMITTED`。既有 SHA-256 provenance 和 opt-in runtime 邊界不變。完成需 PR exact-head Repo CI、實際 CalculiX CI、merge 後 main CI 與 canonical read-back；本摘要沒有提升通用六分量平衡或工程 capacity admission。
