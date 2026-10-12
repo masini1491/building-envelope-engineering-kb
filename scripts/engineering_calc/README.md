@@ -257,3 +257,10 @@ python prepare_aluminum_material_input.py --selection selection.json --output re
 `tests/fea_benchmark/envelope_panels/check_u_fold_cantilever.py` 建立固定 synthetic U 型薄壁截面殼元素：長 300 mm、主面寬 40 mm、兩側垂直折邊高 20 mm、板厚 1.5 mm；合成彈性材料 E=69000 MPa、ν=0.33。三段殼共用折角節點、S8R 二次殼元素，沿長度設 8／16 網格；根部六向自由度固定，自由端沿 U 截面以二次線元素一致分配總 1 N 面外集中合力。這是**懸臂梁式 U 型試體**，並非整片受均布風壓的實際帷幕牆折板。
 
 獨立近似以薄壁中面長度積分求中性軸 z=5 mm、Iy=5000 mm⁴，Euler–Bernoulli 懸臂梁理論自由端撓度 `FL³/(3EI)=0.0260869565 mm`（**非精確殼場真值**）。於真實 CalculiX CI 比較荷載功共軛的自由端加權平均位移、根部三向平移反力其中的 z 分量與兩層網格差異；絕對撓度相對梁近似 25%、網格間差 15% 為本合成案例的初步研究篩選門檻，而非通用工程容許差。須確認 exact-head 真實 CCX CI 通過才能宣稱有限元研究對照 PASS。尚未 admission 完整六分量平衡、截面局部翹曲極值、實際折彎圓角與成形材料改變、扣件、接觸、風壓板件、局部挫屈或任何 ADM 承載力；全部維持 `NOT_ADMITTED`。
+
+
+### 合成 U 型折邊主板均布面壓（Stage 58）
+
+`tests/fea_benchmark/envelope_panels/check_u_fold_web_pressure.py` 僅從 Stage 57 固定 synthetic S8R U 型懸臂殼導出載入方式不同的受限 deck：主面寬 40 mm、長 300 mm、折邊高 20 mm、t=1.5 mm，E=69000 MPa、ν=0.33；主面 WEB element set 接收 `*DLOAD,P,0.0001 N/mm²`，**兩側折邊不直接施加壓力**；根部固定，網格 8／16，材料與節點拓樸不變。獨立 Euler–Bernoulli 理論：中面截面 Iy=5000 mm⁴、名義主面荷載 1.2 N、固定根部彎矩需求 180 N·mm、自由端撓度近似 0.0117391304 mm。這些是小撓度梁近似及初始幾何名義荷載，不是 exact S8R shell 解或任意非線性 follower pressure 合力。
+
+CI 僅採用有可追溯 provenance 的實際 CalculiX 2.21 解，針對 WEB 自由端節點以 Simpson 權重取得 z 向位移，與獨立梁理論交叉比對；要求 16 網格相對差 ≤25%、8→16 變化／理論值 ≤15% 及小撓度範圍成立。使用 `*NODE PRINT ROOT RF` 的原始 RF z 只作有界方向／量級診斷，因 constrained edge 也受到 `*DLOAD`，**不得把原始 RF 升格為獨立純支承力或全域六分量平衡**。本案例只研究合成 U 殼、固定端與均布面壓，不處理四邊支承折板、實際扣件／接觸、折角圓弧與材料成形、局部挫屈、應力場極值或 ADM 構件容量；持續 `EVIDENCE GATED`／`NOT_ADMITTED`。研究篩選門檻不代表工程容許值。
