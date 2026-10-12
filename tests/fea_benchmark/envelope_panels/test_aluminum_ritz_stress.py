@@ -48,12 +48,11 @@ class Tests(unittest.TestCase):
             compare(cfg,xyz,{1:tuple(1.6*v for v in s[1]),2:s[2]},w)
         with self.assertRaisesRegex(ValueError,"DEFLECTION"):
             compare(cfg,xyz,s,1.25*w)
+        sx=reference(cfg)["center_surface_bending_stress_mpa"]["SXX"]
+        top=list(s[1]);bottom=list(s[2])
+        top[0]+=sx*.4;bottom[0]+=sx*.4
         with self.assertRaisesRegex(ValueError,"MEMBRANE"):
-            sx=reference(cfg)["center_surface_bending_stress_mpa"]["SXX"]
-            top=list(s[1]);bottom=list(s[2])
-            top[0]+=sx*.4;bottom[0]+=sx*.4
-            with self.assertRaisesRegex(ValueError,"MEMBRANE"):
-                compare(cfg,xyz,{1:tuple(top),2:tuple(bottom)},w)
+            compare(cfg,xyz,{1:tuple(top),2:tuple(bottom)},w)
 
     def test_reject_invalid_math_inputs(self):
         cfg=self.config()
