@@ -114,6 +114,13 @@ jobs:
             (cd "$folder" && timeout 90s ccx -i panel)
           done
           python check_simple_supported_aluminum.py .
+          # Stage 57: synthetic connected U-fold shell, end-line load, true CCX.
+          python -m unittest -v test_u_fold_cantilever.py
+          for n in 8 16; do
+            python check_u_fold_cantilever.py --generate "u_fold_${n}" "$n"
+            (cd "u_fold_${n}" && timeout 90s ccx -i panel)
+          done
+          python check_u_fold_cantilever.py .
           python -m unittest -v test_follower_pressure.py
           python -m unittest -v test_expanded_face.py
           python -m unittest -v test_expanded_frd.py

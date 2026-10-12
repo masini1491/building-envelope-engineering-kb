@@ -250,3 +250,10 @@ python prepare_aluminum_material_input.py --selection selection.json --output re
 ### 理想簡支與四邊固定鋁板邊界研究（Stage 56）
 
 `tests/fea_benchmark/envelope_panels/check_simple_supported_aluminum.py` 僅從現有 synthetic aluminum low-load S8R deck 產生固定幾何／材料的理想簡支邊界對照（全周限制面外平移，兩個角點最小面內 rigid-body 約束；保留旋轉自由），不新增任意 user-deck／專案支承輸入或 `run_aluminum_research.py` 的支承選項。使用 100×100×2 mm、synthetic E=69000 MPa、ν=0.33、q=0.0001 N/mm²、n=4／8／16。CI 會真實以 CCX 對各 n 的簡支與既有四邊固定算例求解，透過獨立 Kirchhoff–Navier 奇數雙正弦級數（41／61 項截斷互比）取得理想簡支中心撓度參考，要求簡支撓度大於固定、簡支跨網格變化縮小、n=16 相對 Navier 誤差不超過僅供研究篩選的 12%。同時驗證合成模型身分、材料、拓樸、兩組邊界與受限平移平衡，並提供 SHA-256 來源。這種簡支是假設性理想支承，不代表真實帷幕牆的折邊、扣件、框架接觸、實際支承旋轉勁度、離散錨固或局部挫屈，也不提供 ADM 容量與一般六分量全域平衡驗證；結果仍為 `NOT_ADMITTED`。
+
+
+### 合成 U 型折邊薄壁懸臂梁殼模型（Stage 57）
+
+`tests/fea_benchmark/envelope_panels/check_u_fold_cantilever.py` 建立固定 synthetic U 型薄壁截面殼元素：長 300 mm、主面寬 40 mm、兩側垂直折邊高 20 mm、板厚 1.5 mm；合成彈性材料 E=69000 MPa、ν=0.33。三段殼共用折角節點、S8R 二次殼元素，沿長度設 8／16 網格；根部六向自由度固定，自由端沿 U 截面以二次線元素一致分配總 1 N 面外集中合力。這是**懸臂梁式 U 型試體**，並非整片受均布風壓的實際帷幕牆折板。
+
+獨立近似以薄壁中面長度積分求中性軸 z=5 mm、Iy=5000 mm⁴，Euler–Bernoulli 懸臂梁理論自由端撓度 `FL³/(3EI)=0.0260869565 mm`（**非精確殼場真值**）。於真實 CalculiX CI 比較荷載功共軛的自由端加權平均位移、根部三向平移反力其中的 z 分量與兩層網格差異；絕對撓度相對梁近似 25%、網格間差 15% 為本合成案例的初步研究篩選門檻，而非通用工程容許差。須確認 exact-head 真實 CCX CI 通過才能宣稱有限元研究對照 PASS。尚未 admission 完整六分量平衡、截面局部翹曲極值、實際折彎圓角與成形材料改變、扣件、接觸、風壓板件、局部挫屈或任何 ADM 承載力；全部維持 `NOT_ADMITTED`。
