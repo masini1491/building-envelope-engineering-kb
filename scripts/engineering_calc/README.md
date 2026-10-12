@@ -214,3 +214,7 @@ python prepare_aluminum_material_input.py --selection selection.json --output re
 ```
 
 產出的 `research_input.json` 才能依前述受限 opt-in 方式交給 `run_aluminum_research.py`。原始 JSON 的 source label 會明示 `USER_DECLARED_UNVERIFIED`。不要把來源標籤當作已驗證材料性質，或把 `ALUMINUM_PARAMETRIC_RESEARCH_EVIDENCE_PASS` 當成正式工程 strength/capacity PASS。
+
+可選用 `--evidence evidence.json` 啟用**使用者宣告 metadata 的一致性檢查**。此時 selection JSON 必須額外包含 `product_id`，evidence JSON 必須精確包含 `manufacturer / alloy_temper / product_id / product_form / material_condition / source_visibility / evidence_claim / thickness_range_mm / elastic_properties`；目前只接受 `product_form="sheet"`、`material_condition="AS_SUPPLIED"`、`evidence_claim="USER_DECLARED_NOT_VERIFIED"`，以及 `source_visibility="PUBLIC"` 或 `"PRIVATE"`。數值 `thickness_range_mm` 的單位是 mm；`elastic_properties` 需提供 `youngs_modulus_mpa` 與 `poisson_ratio`，與 selection 的明確輸入完全相同。省略 `--evidence` 時保留 PR #76 的舊模式；若另有產品識別但未提供 evidence 會拒絕，不會靜默忽略。驗證成功的輸出仍**只有既有十欄 research JSON**，不包含 `product_id`、私人來源內容或廠商強度。
+ 
+重要：`DECLARED_METADATA_CONSISTENCY_ONLY` **僅證明兩個使用者提供的 JSON 在程式支援的欄位上相符**，不代表官方資料真偽、材料保證值、真實產品合格、允許輸入未核對的應力–應變曲線或 ADM capacity。客戶版及非公開原始證據保留在 Repo 外，禁止上傳；實驗／熱加工後等狀態不在本前處理器的 `AS_SUPPLIED` 支援範圍。

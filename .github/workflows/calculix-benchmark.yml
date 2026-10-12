@@ -148,6 +148,7 @@ jobs:
           python -m unittest -v test_synthetic_replay.py
           python -m unittest -v test_aluminum_research.py
           python -m unittest -v test_prepare_aluminum_material_input.py
+          python -m unittest -v test_aluminum_material_evidence.py
           python -m unittest -v test_aluminum_result_summary.py
           python -m unittest -v test_aluminum_tensor_observation.py
           python -m unittest -v test_aluminum_elastic_scaling.py
