@@ -787,3 +787,13 @@ Stage 43 已通過 PR #68 真實 independent pressure scaling 與 main CI；Stag
 **CI**：PR exact-head `358af71f7413de3af6b3dac1ebf9d763776e76bb` 的 Repository CI `38232753445` 與真實 CalculiX CI `38232753461` 均 SUCCESS，包含新增案例驗證標記 `U_FOLD_WEB_PRESSURE_BEAM_SCREENING_PASS`；合併後 exact-main Repository CI `38233094823` SUCCESS，合併後 canonical source 與工作狀態已 read-back。研究門檻（相對梁理論 25%、8／16 差 15%）僅屬受限 synthetic screening，**不是實際工程容許誤差**。
 
 **邊界**：這是 U 型折邊**懸臂梁式殼**的主面均布面壓，不是四邊支承整片折邊鋁板的風壓容量。未 admission 完整 follower pressure 全域反力、獨立旋轉反力矩、局部板殼應力峰值、折角圓弧、成形後材料、接觸／扣件、加勁肋／局部挫屈或 ADM 設計容量。維持 `EVIDENCE GATED`、`MATERIAL_CAPACITY_NOT_ADMITTED`、`GENERAL_GLOBAL_BALANCE_NOT_ADMITTED`。
+
+## 第五十九階段：合成中心連續加勁肋之 S8R 板件（2026-10-12）
+
+**Stage 59／PR #96**（merge SHA `caec3e16447cc34f03112b244f8d7890ee077460`）依使用者明確授權，在合成 100×100×2 mm 四邊固定矩形鋁板中線增加 S8R 共用節點之理想連續直立加勁肋，高度 0／4／8 mm，厚度 2 mm；E=69000 MPa、ν=0.33、主面 `WEB,P,0.0001 N/mm²`，只在 WEB 上加壓，肋不直接加壓。8／16 網格共六組真實 CalculiX 研究算例，輸入與 STA／DAT／FRD SHA-256 隨 CI 證據輸出，公開版本完全 synthetic。
+
+**獨立近似與實測**：四邊固定薄板 Kirchhoff 一項 Ritz 基準中心撓度 `0.0002574911071 mm`；採相同簡化位移形狀之板彎曲能＋中心梁彎曲能，依 `I_rib=T h³/3` 得加肋研究近似，作定性勁度順序判讀，**不是完整板肋相容／翹曲應力場精確解**。真實 CCX 中心撓度：8 網格 h=0／4／8 mm 為 `0.0002296706／0.0001741728／0.0001035602 mm`；16 網格分別為 `0.0002382199／0.0001840568／0.0001079533 mm`。兩種網格均觀測肋高增加、中心撓度下降；未加肋 16 網格與單項 Ritz 參考差約 7.48%，各肋高 8／16 網格差小於受限 15% 檢查門檻。**本研究沒有建立真正獨立的加肋板精確場值 oracle，也不提供一般 mesh convergence order。**
+
+**驗證來源**：PR exact-head `dc1cb0952810be8bc7dcd020fdae3219f80609c0` 之 Repository CI `38252655579` 與真實 CalculiX CI `38252655598` 均 SUCCESS，包含 `CENTER_RIB_LOAD_TRANSFER_SCREEN_PASS`；merge-main 版本為 `caec3e16447cc34f03112b244f8d7890ee077460`。Merged-main workflow 與 canonical remote read-back 應另以完成狀態查核，不以 PR CI 取代。
+
+**Engineering admission 邊界**：板／肋共用中面殼節點是理想剛性連續連接，不代表現場焊接、螺絲、膠或接觸；未 admission 實際折彎／成形材料、初始缺陷、局部挫屈、全場積分點應力極值、獨立旋轉支承反力／反力矩、完整六分量平衡、真實鋁板強度或 ADM 構件容量。狀態持續 `EVIDENCE GATED`、`MATERIAL_CAPACITY_NOT_ADMITTED`、`GENERAL_GLOBAL_BALANCE_NOT_ADMITTED`。
