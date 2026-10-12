@@ -224,3 +224,7 @@ python prepare_aluminum_material_input.py --selection selection.json --output re
 中鋁正式提供的產品技術資料可以作為工程估算與材料參數的**製造商聲明依據**，不必把「未做第三方逐項複驗」視為一律無法引用。不過必須由使用者明確選擇 `property_evidence_status="MANUFACTURER_DECLARATION_ACCEPTED_BY_USER"`，並在獨立的 `--evidence` metadata 內填入同名的 `evidence_claim`，經產品識別、牌號質別、供貨狀態、厚度範圍及 E／ν 一致性檢查，才能取得 `USER_ACCEPTED_MANUFACTURER_METADATA_CONSISTENCY_ONLY`。未明確選擇時維持 `USER_DECLARED_UNVERIFIED`；不同狀態互相衝突時拒絕，不自動升級。
 
 此狀態的語意是**使用者接受製造商文件作為來源、且兩份宣告資料一致**，不是文件真偽的獨立鑑定、批次 MTC 試驗或任何強度／容量保證。材料性能仍須符合特定供貨產品、牌號／temper、厚度、加工與熱處理狀態以及適用設計規範。客戶版 PDF 及其非公開數值不進入公開 Repository。轉出的原始十欄 FEA 研究 input contract 不變、所有 E／ν／幾何及面壓仍須明確提供，`MATERIAL_PLASTICITY_NOT_ADMITTED` 與 `MATERIAL_CAPACITY_NOT_ADMITTED` 不變。
+
+### 三種質別之合成材料標籤隔離回歸（Stage 48）
+
+真實 CalculiX CI 會用 **完全相同且明確輸入的合成 E、ν、板厚、尺寸、面壓**，分別宣告 `3003-H14`、`3004-H12`、`3004-O`，生成三份獨立研究輸入並求解。必須確認原始 deck SHA-256 相同、solver SHA-256 相同、各筆 `material_provenance` 含正確牌號，及研究觀測 payload 完全一致；任何差異都拒絕，且單元測試涵蓋錯誤來源、輸入漂移、結果篡改與材料容量狀態升級。此測試只證明**牌號標籤沒有偷偷改變數值模型**；**不能據此宣稱三種真實鋁板材料等效**。此回歸仍為 linear-elastic research-only，`MATERIAL_PLASTICITY_NOT_ADMITTED`、`MATERIAL_CAPACITY_NOT_ADMITTED` 不變。

@@ -149,6 +149,18 @@ jobs:
           python -m unittest -v test_aluminum_research.py
           python -m unittest -v test_prepare_aluminum_material_input.py
           python -m unittest -v test_aluminum_material_evidence.py
+          python -m unittest -v test_aluminum_grade_replay.py
+          # Stage 48: all three grades have identical explicit synthetic
+          # properties; grade labels alone must not change solver physics.
+          for grade in 3003-H14 3004-H12 3004-O; do
+            root="$RUNNER_TEMP/grade_replay"
+            mkdir -p "$root"
+            python -c 'import json,sys; from test_aluminum_grade_replay import choice; print(json.dumps(choice(sys.argv[1])))' "$grade" > "$root/selection_$grade.json"
+            python prepare_aluminum_material_input.py --selection "$root/selection_$grade.json" --output "$root/input_$grade.json"
+            mkdir -p "$root/run_$grade"
+            python run_aluminum_research.py --input "$root/input_$grade.json" --workspace "$root/run_$grade" --ccx "$(command -v ccx)" --execute > "$root/result_$grade.json"
+          done
+          python check_aluminum_grade_replay.py "$RUNNER_TEMP/grade_replay"
           python -m unittest -v test_aluminum_result_summary.py
           python -m unittest -v test_aluminum_tensor_observation.py
           python -m unittest -v test_aluminum_elastic_scaling.py
