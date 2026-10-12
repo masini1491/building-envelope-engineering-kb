@@ -244,4 +244,4 @@ python prepare_aluminum_material_input.py --selection selection.json --output re
 
 ### 鋁板中心彎曲應力跨長寬比與網格受限研究（Stage 55）
 
-現有 Stage 40 的兩組 synthetic 四邊固定板（100×100×3 mm 與 120×80×2.5 mm），各有 4／8／16 網格且由真實 CalculiX 2.21 執行。新增 `tests/fea_benchmark/envelope_panels/check_aluminum_ritz_mesh_stress.py` **重用相同六組實際求解產物**，逐組檢查 config、report status、deck／DAT／FRD SHA-256 provenance、expanded C3D20 FRD 節點覆蓋與對應 Stage 54 三項式 Ritz 中心位移／彎曲 SXX、SYY 近似；同時計算每種形狀、每個方向從 4→8→16 的中心彎曲應力變化是否縮小（非精確收斂速率、無解析極限外推）。粗網格及窄板之三項式 Ritz 近似差異可能與 FE 離散誤差重疊；所有門檻僅適用這兩組合成低荷載幾何，不是對真實材料或一般板件的精度保證。輸出持續 `NOT_ADMITTED`，不觀測 Gauss-point 應力峰值、屈曲／缺陷／連接／旋轉反力矩，也不計算 ADM 容量。
+現有 Stage 40 的兩組 synthetic 四邊固定板（100×100×3 mm 與 120×80×2.5 mm），各有 4／8／16 網格且由真實 CalculiX 2.21 執行。新增 `tests/fea_benchmark/envelope_panels/check_aluminum_ritz_mesh_stress.py` **重用相同六組實際求解產物**，逐組檢查 config、report status、deck／DAT／FRD SHA-256 provenance、expanded C3D20 FRD 節點覆蓋；**只在 16 網格使用 Stage 54 的中心撓度／彎曲 SXX、SYY 近似門檻**，4／8 網格僅擷取實際中心表面應力觀測，不宣稱通過細網格門檻；同時計算每種形狀、每個方向從 4→8→16 的中心彎曲應力變化是否縮小（非精確收斂速率、無解析極限外推）。粗網格及窄板之三項式 Ritz 近似差異可能與 FE 離散誤差重疊；所有門檻僅適用這兩組合成低荷載幾何，不是對真實材料或一般板件的精度保證。輸出持續 `NOT_ADMITTED`，不觀測 Gauss-point 應力峰值、屈曲／缺陷／連接／旋轉反力矩，也不計算 ADM 容量。

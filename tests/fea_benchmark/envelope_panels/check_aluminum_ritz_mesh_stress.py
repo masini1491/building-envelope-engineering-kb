@@ -69,10 +69,39 @@ def _load_mesh(root: Path, case: str, n: int) -> dict:
     field = read_final_tensors(run/"panel.frd", set(coords))["STRESS"]
     if obs["stress"].get("expanded_nodes_covered") != len(coords):
         raise ValueError("MESH_STRESS_NODE_COUNT_INCONSISTENT")
-    result = compare(config, coords, field, center_z(run/"panel.dat"))
-    if result["reference_is_exact_3d_field"] is not False:
-        raise ValueError("MESH_STRESS_SCOPE_ESCALATION")
-    return result
+    center = center_z(run/"panel.dat")
+    # Stage 54 screening tolerances were admitted only at n=16. Coarse
+    # meshes supply observations, not a false fine-mesh PASS.
+    if n == 16:
+        result = compare(config, coords, field, center)
+        if result["reference_is_exact_3d_field"] is not False:
+            raise ValueError("MESH_STRESS_SCOPE_ESCALATION")
+        return result
+    a,b,t = config["width_mm"],config["height_mm"],config["thickness_mm"]
+    tolerance=max(1e-5,1e-6*max(a,b,t))
+    surfaces={"+":[], "-":[]}
+    for node,xyz in coords.items():
+        if (type(node) is not int or node<=0 or len(xyz)!=3
+                or len(field[node])!=6
+                or any(type(v) not in (int,float) or not math.isfinite(v)
+                       for v in (*xyz,*field[node]))):
+            raise ValueError("COARSE_CENTER_STRESS_INVALID")
+        x,y,z=xyz
+        if abs(x-a/2)<=tolerance and abs(y-b/2)<=tolerance and abs(abs(z)-t/2)<=tolerance:
+            surfaces["+" if z>0 else "-"].append(field[node])
+    if any(not 1<=len(surfaces[side])<=16 for side in ("+","-")):
+        raise ValueError("COARSE_CENTER_SURFACE_COVERAGE_MISSING")
+    stress={}
+    for component,index in (("SXX",0),("SYY",1)):
+        means=[sum(v[index] for v in surfaces[side])/len(surfaces[side]) for side in ("+","-")]
+        stress[component]={"observed_bending_mpa":abs((means[0]-means[1])/2),
+                           "observed_membrane_mpa":abs((means[0]+means[1])/2)}
+        if stress[component]["observed_bending_mpa"]<=0:
+            raise ValueError("COARSE_CENTER_STRESS_SIGNAL_MISSING")
+    return {"center_bending_stress":stress,
+            "center_deflection_observed_mm":center,
+            "fine_mesh_ritz_screening":"NOT_APPLICABLE_TO_COARSE_MESH",
+            "engineering_acceptance":"NOT_ADMITTED"}
 
 
 def check_case(root: Path, case: str) -> dict:
