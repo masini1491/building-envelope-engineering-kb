@@ -777,3 +777,13 @@ Stage 43 已通過 PR #68 真實 independent pressure scaling 與 main CI；Stag
 **驗證**：早期候選發現折邊座標索引、根部與自由端節點數及截面元素計數不一致，先修正後重新觸發 exact-head CI；最終 head `fa88d69d354758e065da67ad56907245708e3083` 的 Repository CI `38228085522`、真實 CalculiX CI `38228085537` 均 SUCCESS，merged-main Repository CI `38228840117` SUCCESS，canonical source 已在合併 SHA read-back。保留失敗歷程作修正 provenance，不把先前候選 PASS 當作最後 head 的執行證據。
 
 **適用性與拒絕外推**：本階段僅以指定 U 型懸臂受限案例驗證幾何、荷載配分、端部位移及根部平移反力。梁理論僅近似殼響應，模型沒有折彎圓角、成形硬化／殘餘應力、真實加勁肋或離散扣件、風壓載入、接觸／局部挫屈／初始缺陷、獨立旋轉反力矩、完整六分量全域平衡或 ADM 工程容量。所有 acceptance 維持 `EVIDENCE GATED`、`MATERIAL_CAPACITY_NOT_ADMITTED`、`GENERAL_GLOBAL_BALANCE_NOT_ADMITTED`；研究門檻不能當正式設計允許誤差。下一步若研究實際加勁／折板受風壓情形，須先取得符合物理條件的獨立載荷與場值基準，另行 admission。
+
+## 第五十八階段：U 型折邊主板均布面壓（2026-10-12）
+
+**Stage 58／PR #94**（merge SHA `ed397f0b091eca2dfef9ed500e5feb25ac4553bc`）依使用者當次授權，沿用 Stage 57 合成 U 型折邊懸臂 S8R 殼（長 300 mm、主面 40 mm、兩側折邊 20 mm、厚度 1.5 mm、E=69000 MPa、ν=0.33），僅對主面 WEB set 加 `*DLOAD,P,0.0001 N/mm²`，兩側折邊不直接加壓，根部六自由度固定；8／16 長向網格真實 CCX 求解並保留 deck／DAT／STA／FRD SHA-256 provenance。
+
+**獨立理論基準與實測**：薄壁截面 `Iy=5000 mm⁴`，依 Euler–Bernoulli 均布線載懸臂近似，主面投影壓力總合力 `1.2 N`、根部彎矩需求 `180 N·mm`，理論端部撓度 `q B L⁴/(8 E Iy)=0.0117391304348 mm`。真實 CalculiX 8／16 網格主面自由端 Simpson 權重位移分別 `0.0119553254167 mm`／`0.0119599727083 mm`，細網格相對梁近似差 `1.88125%`，兩網格變化／理論量值 `0.039588%`。原始 ROOT RFz：`-1.175000514 N`、`-1.187500322 N`，只是受載邊界的原始節點輸出方向／量級診斷，**不可等同於扣除施加荷載後的純支承反力**。
+
+**CI**：PR exact-head `358af71f7413de3af6b3dac1ebf9d763776e76bb` 的 Repository CI `38232753445` 與真實 CalculiX CI `38232753461` 均 SUCCESS，包含新增案例驗證標記 `U_FOLD_WEB_PRESSURE_BEAM_SCREENING_PASS`；合併後 exact-main Repository CI `38233094823` SUCCESS，合併後 canonical source 與工作狀態已 read-back。研究門檻（相對梁理論 25%、8／16 差 15%）僅屬受限 synthetic screening，**不是實際工程容許誤差**。
+
+**邊界**：這是 U 型折邊**懸臂梁式殼**的主面均布面壓，不是四邊支承整片折邊鋁板的風壓容量。未 admission 完整 follower pressure 全域反力、獨立旋轉反力矩、局部板殼應力峰值、折角圓弧、成形後材料、接觸／扣件、加勁肋／局部挫屈或 ADM 設計容量。維持 `EVIDENCE GATED`、`MATERIAL_CAPACITY_NOT_ADMITTED`、`GENERAL_GLOBAL_BALANCE_NOT_ADMITTED`。
