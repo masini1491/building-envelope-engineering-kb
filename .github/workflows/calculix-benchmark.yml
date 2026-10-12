@@ -150,6 +150,15 @@ jobs:
           python -m unittest -v test_prepare_aluminum_material_input.py
           python -m unittest -v test_aluminum_material_evidence.py
           python -m unittest -v test_aluminum_grade_replay.py
+          python -m unittest -v test_synthetic_plastic_cube.py
+          # Stage 49: deliberately synthetic one-element material-law oracle
+          for case in elastic plastic; do
+            fixture="$RUNNER_TEMP/synthetic_constitutive_$case"
+            mkdir -p "$fixture"
+            python synthetic_plastic_cube.py --case "$case" --directory "$fixture"
+            (cd "$fixture" && timeout 60s ccx -i cube)
+            python synthetic_plastic_cube.py --case "$case" --directory "$fixture" --check
+          done
           # Stage 48: all three grades have identical explicit synthetic
           # properties; grade labels alone must not change solver physics.
           for grade in 3003-H14 3004-H12 3004-O; do
