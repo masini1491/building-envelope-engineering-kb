@@ -32,9 +32,9 @@ def beam_reference() -> dict:
 def _outline(j: int) -> tuple[float, float]:
     if j <= 8:
         return (-B / 2, FLANGE * (1 - j / 8))
-    if j <= 24:
-        return (-B / 2 + B * (j - 8) / 16, 0.0)
-    return (B / 2, FLANGE * (j - 24) / 8)
+    if j <= 40:
+        return (-B / 2 + B * (j - 8) / 32, 0.0)
+    return (B / 2, FLANGE * (j - 40) / 8)
 
 
 def build(n: int) -> tuple[str, dict[int, float], set[int], set[int]]:

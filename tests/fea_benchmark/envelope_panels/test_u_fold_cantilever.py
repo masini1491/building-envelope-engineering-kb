@@ -3,7 +3,7 @@ import math
 import tempfile
 import unittest
 from pathlib import Path
-from check_u_fold_cantilever import build,beam_reference,generate,assess,_dat_vectors,L,FORCE
+from check_u_fold_cantilever import build,beam_reference,generate,assess,_dat_vectors,_outline,L,B,FLANGE,FORCE
 
 class TestUFold(unittest.TestCase):
     def test_reference_section_and_tip(self):
@@ -13,6 +13,13 @@ class TestUFold(unittest.TestCase):
         self.assertAlmostEqual(r["cantilever_tip_deflection_mm"],
                                0.02608695652173913,places=11)
         self.assertEqual(r["root_bending_moment_demand_n_mm"],FORCE*L)
+
+    def test_u_profile_corner_geometry(self):
+        self.assertEqual(_outline(0),(-B/2,FLANGE))
+        self.assertEqual(_outline(8),(-B/2,0.0))
+        self.assertEqual(_outline(24),(0.0,0.0))
+        self.assertEqual(_outline(40),(B/2,0.0))
+        self.assertEqual(_outline(48),(B/2,FLANGE))
 
     def test_exact_mesh_and_load_closure(self):
         for n in (8,16):
