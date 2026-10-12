@@ -735,3 +735,11 @@ Stage 43 已通過 PR #68 真實 independent pressure scaling 與 main CI；Stag
 **研究範圍嚴格限制**：這些 E、ν、σ_y、H、位移與單元素尺寸均是合成測試，不是 3003-H14／3004-H12／3004-O 的製造商資料、合格材料卡、軋延各向異性或真實構件支承；FRD 為節點外插／平均觀測，不是獨立積分點量測。Stage 49–50 僅說明 CCX 本構演算法在選定 *單元素＋指定載入路徑* 下與獨立基準吻合，仍維持 `MATERIAL_PLASTICITY_NOT_ADMITTED`、`MATERIAL_CAPACITY_NOT_ADMITTED`、`GENERAL_GLOBAL_BALANCE_NOT_ADMITTED`。
 
 後續若要提升真實材料與構件 admission，必須有中鋁適用產品、厚度、加工後狀態及合法可使用的完整拉伸本構曲線，並依新支承、幾何、塑性演化及失效模型分別驗證；不能用本次合成雙線性參數替代產品實測資料。
+
+## 第五十二階段：私人中鋁硬化表結構預檢及已驗證邊界（2026-10-12）
+
+**Stage 52／PR #83**（合併 commit `0000e450a1fe573532c99a524fc537ff12463899`）新增 `tests/fea_benchmark/envelope_panels/validate_private_hardening.py`，供操作者在公開 Repository 之外，以明確 opt-in 的本機私有 JSON 對 `3003-H14`、`3004-H12`、`3004-O` 的 true von Mises stress–equivalent plastic strain **點列結構**執行唯讀預檢；相關介面與限制由 `scripts/engineering_calc/README.md` 說明。程式檢查固定欄位、製造商宣告、單位、材料／供貨狀態、有限值、塑性應變順序與應力非遞減；僅回傳結構狀態、點數與 `NOT_ADMITTED` 界線，不輸出私人試驗值、產品代號或產生 `*PLASTIC` 求解輸入。
+
+**完成證據**：PR exact-head `51968f552a3b9c4253916b96ae22f6d879e2dbfe` 的 Repository CI `38197370523` 與 CalculiX workflow `38197370568` 均 SUCCESS；merged-main `0000e450a1fe573532c99a524fc537ff12463899` 的 Repository CI `38197549052` SUCCESS；已以該 SHA 的 GitHub canonical source read-back 核對 validator、合成測試與 README 範圍。此 evidence **只支持 Stage 52 的結構 validator／既有 synthetic CI scope**，不代表已輸入真實中鋁完整硬化曲線，亦非本批次試驗、真實鋁板塑性路徑或板件容量之驗證。
+
+先前整理的私有廠商規格／試驗摘要並不等同完整的 `points=[[true_stress_mpa, equivalent_plastic_strain], …]` 資料；取得真正符合 alloy、temper、產品板厚、拉伸方向、批次、製造／加工狀態及來源權利的完整原始曲線後，仍須獨立檢查單軸轉換與 CCX 2.21 本構行為，才可另行考慮下階段 admission。現階段維持 `MATERIAL_PLASTICITY_NOT_ADMITTED`、`MATERIAL_CAPACITY_NOT_ADMITTED`、`GENERAL_GLOBAL_BALANCE_NOT_ADMITTED` 與 `EVIDENCE GATED`。
