@@ -185,6 +185,8 @@ jobs:
           python check_aluminum_elastic_scaling.py "$RUNNER_TEMP/scaling_baseline" "$RUNNER_TEMP/scaling_doubled"
           python -m unittest -v test_aluminum_normal_hooke.py
           python check_aluminum_normal_hooke.py "$RUNNER_TEMP/scaling_baseline"
+          python -m unittest -v test_aluminum_ritz_stress.py
+          python check_aluminum_ritz_stress.py "$RUNNER_TEMP/scaling_baseline"
           python -m unittest -v test_aluminum_ritz.py
           for case in thicker_square rectangular_higher_pressure; do
             fixture="$RUNNER_TEMP/ritz_${case}"

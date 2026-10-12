@@ -236,3 +236,7 @@ python prepare_aluminum_material_input.py --selection selection.json --output re
 預檢器只核對資料形狀、數值有限且正值、首列塑性應變為零、後續塑性應變嚴格遞增、應力非遞減、指定硬上限與 exact keys；**不**以降伏／抗拉／伸長率插值或合成完整應力–應變曲線，**不**驗證製造商文件真偽、拉伸方向／頸縮前有效區間、材料批次或工程設計適用性。接受此 JSON 不表示 CalculiX 材料卡或正式工程 capacity 已 admission，狀態一律 `NOT_ADMITTED`。
 
 執行：`python validate_private_hardening.py /私有路徑/硬化試驗資料.json`。結果只列驗證狀態及點數，不輸出原始資料、產品代號或應力／應變值。不產生任何 `*PLASTIC` deck、無檔案寫入／上傳步驟。**客戶版 PDF、試驗資料 JSON 與實際產品資訊不得提交至公開 Repo**；CI 只執行明確合成且不對應中鋁實際試驗值的 unit fixtures。
+
+### 四邊固定鋁板之獨立低荷載彎曲場近似（研究）
+
+`tests/fea_benchmark/envelope_panels/check_aluminum_ritz_stress.py` 對既有 Stage 43 的低荷載合成鋁板，以三項對稱、滿足四邊固定幾何條件的 Kirchhoff–Rayleigh–Ritz 多項式、解析多項式積分和獨立 3×3 線性方程，建立**中心撓度與中心薄板上下表面彎曲應力**近似。它再比對真實 CalculiX 2.21 原始 S8R 中心 U 及 expanded C3D20 節點 FRD 外插／平均的中心上下表面 SXX／SYY，並檢查非彎曲（membrane）殘量、完整表面節點覆蓋與有限值。只使用公開 synthetic E／ν／厚度／面壓，無真實中鋁材料卡。**Ritz 多項式截斷與 CCX expanded-node 外插／平均都有各自誤差**；研究差異篩選門檻（撓度 12%、彎曲應力 30%、非彎曲殘量 18%）不是獨立精確真值、通用求解器誤差上限或容許應力。此觀測不能外推為積分點尖峰、折板／加勁肋／扣件、挫屈、塑性或 ADM 工程設計驗收，維持 `EVIDENCE GATED`／`GENERAL_GLOBAL_BALANCE_NOT_ADMITTED`。CI 必須在相同 PR exact-head 實際執行合成 CCX case 後才能稱受限研究篩選通過。
