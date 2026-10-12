@@ -83,7 +83,7 @@ def make_fixture(folder:Path,n:int)->None:
     old_heading=f"synthetic aluminum clamped plate, n={n}, small"
     if txt.count(old_heading)!=1 or txt.count("EDGE,1,6,0.")!=1:
         raise ValueError("SIMPLE_FIXTURE_SOURCE_DRIFT")
-    boundary=f"EDGE,3,3,0.\\n{left},1,2,0.\\n{right},2,2,0."
+    boundary=f"EDGE,3,3,0.\n{left},1,2,0.\n{right},2,2,0."
     # This is a fixture transformation, never an arbitrary user input deck.
     txt=txt.replace(old_heading,f"synthetic aluminum simple plate, n={n}, small")
     txt=txt.replace("EDGE,1,6,0.",boundary)
