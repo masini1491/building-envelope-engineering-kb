@@ -187,6 +187,7 @@ jobs:
           python check_aluminum_normal_hooke.py "$RUNNER_TEMP/scaling_baseline"
           python -m unittest -v test_aluminum_ritz_stress.py
           python check_aluminum_ritz_stress.py "$RUNNER_TEMP/scaling_baseline"
+          python -m unittest -v test_aluminum_ritz_mesh_stress.py
           python -m unittest -v test_aluminum_ritz.py
           for case in thicker_square rectangular_higher_pressure; do
             fixture="$RUNNER_TEMP/ritz_${case}"
@@ -197,6 +198,7 @@ jobs:
               python run_aluminum_research.py --input "$fixture/input_${n}.json" --workspace "$fixture/mesh_${n}" --ccx "$(command -v ccx)" --execute > "$fixture/output_${n}.json"
             done
             python check_aluminum_ritz.py "$fixture" "$case"
+            python check_aluminum_ritz_mesh_stress.py "$fixture" "$case"
           done
           mkdir -p "$RUNNER_TEMP/aluminum_research_run"
           cat > "$RUNNER_TEMP/aluminum_research_input.json" <<'EOF'

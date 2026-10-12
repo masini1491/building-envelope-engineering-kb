@@ -240,3 +240,8 @@ python prepare_aluminum_material_input.py --selection selection.json --output re
 ### 四邊固定鋁板之獨立低荷載彎曲場近似（研究）
 
 `tests/fea_benchmark/envelope_panels/check_aluminum_ritz_stress.py` 對既有 Stage 43 的低荷載合成鋁板，以三項對稱、滿足四邊固定幾何條件的 Kirchhoff–Rayleigh–Ritz 多項式、解析多項式積分和獨立 3×3 線性方程，建立**中心撓度與中心薄板上下表面彎曲應力**近似。它再比對真實 CalculiX 2.21 原始 S8R 中心 U 及 expanded C3D20 節點 FRD 外插／平均的中心上下表面 SXX／SYY，並檢查非彎曲（membrane）殘量、完整表面節點覆蓋與有限值。只使用公開 synthetic E／ν／厚度／面壓，無真實中鋁材料卡。**Ritz 多項式截斷與 CCX expanded-node 外插／平均都有各自誤差**；研究差異篩選門檻（撓度 12%、彎曲應力 30%、非彎曲殘量 18%）不是獨立精確真值、通用求解器誤差上限或容許應力。此觀測不能外推為積分點尖峰、折板／加勁肋／扣件、挫屈、塑性或 ADM 工程設計驗收，維持 `EVIDENCE GATED`／`GENERAL_GLOBAL_BALANCE_NOT_ADMITTED`。CI 必須在相同 PR exact-head 實際執行合成 CCX case 後才能稱受限研究篩選通過。
+
+
+### 鋁板中心彎曲應力跨長寬比與網格受限研究（Stage 55）
+
+現有 Stage 40 的兩組 synthetic 四邊固定板（100×100×3 mm 與 120×80×2.5 mm），各有 4／8／16 網格且由真實 CalculiX 2.21 執行。新增 `tests/fea_benchmark/envelope_panels/check_aluminum_ritz_mesh_stress.py` **重用相同六組實際求解產物**，逐組檢查 config、report status、deck／DAT／FRD SHA-256 provenance、expanded C3D20 FRD 節點覆蓋與對應 Stage 54 三項式 Ritz 中心位移／彎曲 SXX、SYY 近似；同時計算每種形狀、每個方向從 4→8→16 的中心彎曲應力變化是否縮小（非精確收斂速率、無解析極限外推）。粗網格及窄板之三項式 Ritz 近似差異可能與 FE 離散誤差重疊；所有門檻僅適用這兩組合成低荷載幾何，不是對真實材料或一般板件的精度保證。輸出持續 `NOT_ADMITTED`，不觀測 Gauss-point 應力峰值、屈曲／缺陷／連接／旋轉反力矩，也不計算 ADM 容量。
