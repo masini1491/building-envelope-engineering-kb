@@ -743,3 +743,11 @@ Stage 43 已通過 PR #68 真實 independent pressure scaling 與 main CI；Stag
 **完成證據**：PR exact-head `51968f552a3b9c4253916b96ae22f6d879e2dbfe` 的 Repository CI `38197370523` 與 CalculiX workflow `38197370568` 均 SUCCESS；merged-main `0000e450a1fe573532c99a524fc537ff12463899` 的 Repository CI `38197549052` SUCCESS；已以該 SHA 的 GitHub canonical source read-back 核對 validator、合成測試與 README 範圍。此 evidence **只支持 Stage 52 的結構 validator／既有 synthetic CI scope**，不代表已輸入真實中鋁完整硬化曲線，亦非本批次試驗、真實鋁板塑性路徑或板件容量之驗證。
 
 先前整理的私有廠商規格／試驗摘要並不等同完整的 `points=[[true_stress_mpa, equivalent_plastic_strain], …]` 資料；取得真正符合 alloy、temper、產品板厚、拉伸方向、批次、製造／加工狀態及來源權利的完整原始曲線後，仍須獨立檢查單軸轉換與 CCX 2.21 本構行為，才可另行考慮下階段 admission。現階段維持 `MATERIAL_PLASTICITY_NOT_ADMITTED`、`MATERIAL_CAPACITY_NOT_ADMITTED`、`GENERAL_GLOBAL_BALANCE_NOT_ADMITTED` 與 `EVIDENCE GATED`。
+
+## 第五十四階段：獨立三項式 Ritz 彎曲場篩選（2026-10-12）
+
+**Stage 54／PR #86**（merge SHA `39e81065f3971b02c34632deedc66faae21685f1`）對現有 synthetic 低荷載、四邊固定矩形、線彈性 S8R NLGEOM P1 鋁板新增獨立三項式 Kirchhoff–Rayleigh–Ritz 多項式近似：以解析多項式積分及 3×3 線性方程取得中心撓度和中心上下表面彎曲 SXX／SYY，與真實 CCX 2.21 expanded C3D20 FRD 的外插／平均應力和原始 S8R 中心位移比較。並核對中心上下表面觀測覆蓋、非彎曲（membrane）殘量及數值有限性。使用的 synthetic 低荷載 square case 不代表中鋁 3003-H14／3004-H12／3004-O 真實材料性質。
+
+**真實驗證 evidence**：初次 PR head `9854ae348b014d8efe303ab4447dfba076ce6279` 的 Repository CI SUCCESS，但 CCX workflow `38208642361` FAIL，原因是新增單元測試在 membrane 反例中錯誤巢狀使用兩層 `assertRaisesRegex`，內層吞掉預期例外，使外層錯誤判定沒有例外；沒有改動物理模型或容差。修正後 exact PR head `5ada81f7c9e1558ad0c1f5a168a9abfe5a223da4` 的 Repository CI `38208877299` 與真實 CalculiX CI `38208877300` 均 SUCCESS，合併後 main Repository CI `38209073600` SUCCESS；GitHub canonical merged-main source／test／workflow read-back 已確認。
+
+**限制與不可外推**：三項式 Ritz 與 CCX 的 expanded-node stress 均有各自方法誤差；目前篩選門檻撓度 12%、彎曲應力 30%、非彎曲殘量 18% 只是這組 synthetic fixture 的 bounded research thresholds，不是通用精度聲明、精確應力解、法規允許誤差或 ADM 容量值。沒有觀測 Gauss-point 極值、真實折板／加勁肋／支承／扣件／局部挫屈或獨立旋轉反力矩；持續維持 `EVIDENCE GATED`、`MATERIAL_CAPACITY_NOT_ADMITTED`、`GENERAL_GLOBAL_BALANCE_NOT_ADMITTED`。下一步如要提高獨立性，需獨立解析或試驗基準、不同板形與 mesh variation／shell formulation 的適用性評估，不能用本次單組 PASS 宣稱可直接設計鋁板。
