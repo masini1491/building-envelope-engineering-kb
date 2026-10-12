@@ -41,7 +41,9 @@ def assess(clamped,simple):
     if any(simple[n]<=clamped[n] for n in MESHES):
         raise ValueError("SUPPORT_RESPONSE_NOT_DISTINCT")
     if not (simple[4]<simple[8]<simple[16]):
-        raise ValueError("SIMPLE_MESH_NONMONOTONIC")
+        raise ValueError("SIMPLE_MESH_NONMONOTONIC:"+json.dumps({
+            "simple_mm":simple,"clamped_mm":clamped,"navier_mm":analytic,
+            "n16_relative_difference":abs(simple[16]-analytic)/analytic},sort_keys=True))
     coarse=abs(simple[8]-simple[4]);fine=abs(simple[16]-simple[8])
     if not 0<fine<coarse:
         raise ValueError("SIMPLE_MESH_CHANGE_NOT_CONTRACTING")
