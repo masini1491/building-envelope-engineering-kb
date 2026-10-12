@@ -287,3 +287,10 @@ CI 僅採用有可追溯 provenance 的實際 CalculiX 2.21 解，針對 WEB 自
 `tests/fea_benchmark/envelope_panels/check_rib_end_spring.py` 復用 Stage 60 同一模型的無額外支承 8／16 網格、同一面壓、材料和四邊固定板面，額外只對 16 個高於板面的肋端節點加入 `SPRING1` DOF 3（Z 向接地彈簧），每個節點分別採合成常數 1000 或 10000 N/mm。每網格另做兩組真實 CCX，無彈簧比較組從**同一次 CI** Stage 60 的輸入／DAT／STA／FRD 重新核對後取用；材料與折板幾何不變。此處不模擬真實角碼、螺絲、焊接、扣件、節點接觸或轉動勁度，亦不把彈簧剛度反推為廠商性能。
 
 使用 WEB 表面 S8R 形狀函數面積積分之 U3 荷載功共軛平均位移代理，比較同一網格的無彈簧／低剛度／高剛度是否逐步降低；並驗證兩網格相對差不超過受限 15% research screening。**同一死荷載的線彈性正半定彈簧勁度**具有能量單調性，但由於此模型採 NLGEOM follower pressure，僅以小變形近似作定性檢查，**不可宣稱是一般非線性定理**。彈簧總力一律標示為 `k × u` 的衍生數值，並非 CCX 獨立量到的連接力／純支承反力；不進行六分量全域平衡或旋轉反力矩 admission。保持 `EVIDENCE GATED`、`MATERIAL_CAPACITY_NOT_ADMITTED`、`GENERAL_GLOBAL_BALANCE_NOT_ADMITTED`。
+
+
+### 合成中心加勁肋端部彈簧平移方向對照（Stage 62）
+
+`tests/fea_benchmark/envelope_panels/check_rib_end_direction.py` 只使用 Stage 61 已測試的相同 100×100×2 mm 四邊固定 S8R 主面、中線高 8 mm 肋與 `P=0.0001 N/mm²`，在 16 個肋端高於板面的節點配置每節點 `10000 N/mm` 之 `SPRING1`，針對 global DOF1 (X) 與 DOF2 (Y) 新增 n=8／16 四組真實 CalculiX 合成研究；無彈簧基準從**相同 CI workflow** Stage 60 精確回讀，DOF3 (Z) 從 Stage 61 精確回讀，不重複執行已有案例。試驗唯一變因是彈簧平移作用方向，**未增加 DOF4–6 或旋轉彈簧，也未模擬連接件方向實測與現場扣件**。
+
+以同一主面 S8R 形狀函數的名義荷載功共軛 U3 平均位移代理比較 X／Y／Z，驗證有限、完整輸出與 mesh 相對差 ≤15%。同一線彈性受限系統增加正半定勁度時荷載功不應上升，但 NLGEOM follower pressure 僅把這原理作小荷載 screening：本研究允許與無彈簧**近似相同**，且僅以高於自由 baseline 0.5% 觸發拒絕，**不強制非荷載同向彈簧產生顯著變化，不宣稱任意非線性單調性定理**。彈簧力、能量僅由輸出位移與 `k u` 衍生，不是獨立反力或扭轉力矩；正交方向殼耦合結果須依 real CCX 看待，沒有預設各方向大小排序。研究持續 `EVIDENCE GATED`、`MATERIAL_CAPACITY_NOT_ADMITTED`、`GENERAL_GLOBAL_BALANCE_NOT_ADMITTED`，未 admission 工程構件、連接或 ADM 容量。

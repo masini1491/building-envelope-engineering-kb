@@ -158,6 +158,17 @@ jobs:
             done
           done
           python check_rib_end_spring.py .
+          # Stage 62: translation-only SPRING1 directional counterfactuals (DOF1/2);
+          # reuse same-commit Stage 60 free and Stage 61 DOF3 results.
+          python -m unittest -v test_rib_end_direction.py
+          for n in 8 16; do
+            for dof in 1 2; do
+              label="rib_direction_dof${dof}_n${n}"
+              python check_rib_end_direction.py --generate "$label" "$n" "$dof"
+              (cd "$label" && timeout 90s ccx -i panel)
+            done
+          done
+          python check_rib_end_direction.py .
           python -m unittest -v test_follower_pressure.py
           python -m unittest -v test_expanded_face.py
           python -m unittest -v test_expanded_frd.py
