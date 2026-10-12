@@ -280,3 +280,10 @@ CI 僅採用有可追溯 provenance 的實際 CalculiX 2.21 解，針對 WEB 自
 採用板面 WEB 節點的 S8R 平面形狀函數（四角各 -1/12、四邊中點各 +1/3）積分整片原始主面 U3，作為名義固定方向均布荷載的**功共軛平均位移代理（work-conjugate proxy）**；線彈性理論上，同一外力在更受限位移子空間之下的 compliance 不得上升。因本算例用 `NLGEOM` follower pressure，只能在此合成**小位移**下以該線彈性定理作篩選，**不是一般非線性定理**。CI 要求額外約束使平均位移下降，兩網格差異低於研究性 15% 門檻、端部新增 RF 訊號與端部／根部 DAT node coverage 均成立，並以完整 deck／DAT／STA／FRD SHA-256 防止混檔。觀測原始 RF **不能**代表經獨立分離荷載後的純扣件力、支承反力矩或完整六分量平衡。
 
 此功能不提供任意支承輸入、不驗證現場加勁肋焊接／機械扣件、局部板肋應力極值、挫屈或 ADM 容量，`EVIDENCE GATED`、`MATERIAL_CAPACITY_NOT_ADMITTED` 與 `GENERAL_GLOBAL_BALANCE_NOT_ADMITTED` 持續成立。以上篩選門檻僅供 synthetic engineering research。
+
+
+### 中心加勁肋端部 Z 向有限剛度彈簧研究（Stage 61）
+
+`tests/fea_benchmark/envelope_panels/check_rib_end_spring.py` 復用 Stage 60 同一模型的無額外支承 8／16 網格、同一面壓、材料和四邊固定板面，額外只對 16 個高於板面的肋端節點加入 `SPRING1` DOF 3（Z 向接地彈簧），每個節點分別採合成常數 1000 或 10000 N/mm。每網格另做兩組真實 CCX，無彈簧比較組從**同一次 CI** Stage 60 的輸入／DAT／STA／FRD 重新核對後取用；材料與折板幾何不變。此處不模擬真實角碼、螺絲、焊接、扣件、節點接觸或轉動勁度，亦不把彈簧剛度反推為廠商性能。
+
+使用 WEB 表面 S8R 形狀函數面積積分之 U3 荷載功共軛平均位移代理，比較同一網格的無彈簧／低剛度／高剛度是否逐步降低；並驗證兩網格相對差不超過受限 15% research screening。**同一死荷載的線彈性正半定彈簧勁度**具有能量單調性，但由於此模型採 NLGEOM follower pressure，僅以小變形近似作定性檢查，**不可宣稱是一般非線性定理**。彈簧總力一律標示為 `k × u` 的衍生數值，並非 CCX 獨立量到的連接力／純支承反力；不進行六分量全域平衡或旋轉反力矩 admission。保持 `EVIDENCE GATED`、`MATERIAL_CAPACITY_NOT_ADMITTED`、`GENERAL_GLOBAL_BALANCE_NOT_ADMITTED`。
