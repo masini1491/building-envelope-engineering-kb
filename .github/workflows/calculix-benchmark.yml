@@ -128,6 +128,16 @@ jobs:
             (cd "u_fold_pressure_${n}" && timeout 90s ccx -i panel)
           done
           python check_u_fold_web_pressure.py .
+          # Stage 59: four-edge clamped synthetic plate; centered continuous rib.
+          python -m unittest -v test_center_rib_plate.py
+          for n in 8 16; do
+            for rib in 0 4 8; do
+              label="center_rib_h${rib}_n${n}"
+              python check_center_rib_plate.py --generate "$label" "$n" "$rib"
+              (cd "$label" && timeout 90s ccx -i panel)
+            done
+          done
+          python check_center_rib_plate.py .
           python -m unittest -v test_follower_pressure.py
           python -m unittest -v test_expanded_face.py
           python -m unittest -v test_expanded_frd.py

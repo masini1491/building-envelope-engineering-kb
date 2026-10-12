@@ -264,3 +264,10 @@ python prepare_aluminum_material_input.py --selection selection.json --output re
 `tests/fea_benchmark/envelope_panels/check_u_fold_web_pressure.py` 僅從 Stage 57 固定 synthetic S8R U 型懸臂殼導出載入方式不同的受限 deck：主面寬 40 mm、長 300 mm、折邊高 20 mm、t=1.5 mm，E=69000 MPa、ν=0.33；主面 WEB element set 接收 `*DLOAD,P,0.0001 N/mm²`，**兩側折邊不直接施加壓力**；根部固定，網格 8／16，材料與節點拓樸不變。獨立 Euler–Bernoulli 理論：中面截面 Iy=5000 mm⁴、名義主面荷載 1.2 N、固定根部彎矩需求 180 N·mm、自由端撓度近似 0.0117391304 mm。這些是小撓度梁近似及初始幾何名義荷載，不是 exact S8R shell 解或任意非線性 follower pressure 合力。
 
 CI 僅採用有可追溯 provenance 的實際 CalculiX 2.21 解，針對 WEB 自由端節點以 Simpson 權重取得 z 向位移，與獨立梁理論交叉比對；要求 16 網格相對差 ≤25%、8→16 變化／理論值 ≤15% 及小撓度範圍成立。使用 `*NODE PRINT ROOT RF` 的原始 RF z 只作有界方向／量級診斷，因 constrained edge 也受到 `*DLOAD`，**不得把原始 RF 升格為獨立純支承力或全域六分量平衡**。本案例只研究合成 U 殼、固定端與均布面壓，不處理四邊支承折板、實際扣件／接觸、折角圓弧與材料成形、局部挫屈、應力場極值或 ADM 構件容量；持續 `EVIDENCE GATED`／`NOT_ADMITTED`。研究篩選門檻不代表工程容許值。
+
+
+### 合成四邊固定鋁板中心連續加勁肋受限研究（Stage 59）
+
+`tests/fea_benchmark/envelope_panels/check_center_rib_plate.py` 只生成固定合成幾何：100×100×2 mm 的等向線彈性 S8R 平板，E=69000 MPa、ν=0.33、面壓 `WEB,P,0.0001 N/mm²`；沿中心線採共用中面殼節點的連續直立薄壁加勁肋（肋高 0／4／8 mm；肋厚與板厚均 2 mm），板面四邊固定、肋件端部不另指定現場扣件約束，板網格 8／16。僅 WEB 面直接受壓，肋不直接受壓；加肋模型的 shared shell nodes 是**理想連續連接**而非實際焊接、螺絲或接觸的認可。
+
+以四邊固定 Kirchhoff 平板單項 Rayleigh–Ritz 近似取得未加肋中心撓度；另外用同一假設位移形狀的「板彎曲能＋中心薄壁梁彎曲能」取得加肋後預期趨勢。後者採中面肋件 `I=T h³/3` 的理想化能量模型，**不含相容性、局部翹曲、板肋耦合的全場精確解**，只能作受限交叉參考及勁度趨勢合理性檢查，不能作真實截面／材料強度設計。真實 CalculiX 2.21 CI 要求六組合成模型完成、deck／DAT／STA／FRD provenance 可核對、各網格中心撓度隨肋高增加而下降、未加肋細網格接近固定平板 Ritz（研究門檻 20%）、各肋高的兩網格撓度差不超過該組細網格結果的 15%。本案例不能確立正式收斂階數、完全六分量平衡、支承反力矩、薄壁局部挫屈、初始缺陷、材料塑性、連接／扣件容量或 ADM 合格與否；維持 `EVIDENCE GATED` 與 `NOT_ADMITTED`。
