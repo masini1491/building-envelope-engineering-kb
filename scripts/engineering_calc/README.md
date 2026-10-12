@@ -195,3 +195,22 @@ Stage 40–44 已另以實際 CalculiX CI 對低荷載合成鋁板完成受限�
 ## 漸進式擴充原則
 
 只有在公式、輸入、輸出、適用條件與失敗語意可明確界定時才新增 helper。下一階段可再依 canonical methodology 與實際計算書需求加入 weld group、transom dead-load / setting-block、biaxial member check、panel/stiffener 與 structural silicone；玻璃與標準高度耦合的計算應在 edition/provenance 與驗證案例足夠後再實作。
+
+
+### 三種中鋁質別的明確輸入前處理（研究專用）
+
+`tests/fea_benchmark/envelope_panels/prepare_aluminum_material_input.py` 可接受 `3003-H14`、`3004-H12`、`3004-O` 的**使用者宣告選擇**，產生與原 `aluminum_research_input.py` 完全相同的十欄 JSON。原求解入口與 `--execute` 門檻不變。輸入仍**必填** `youngs_modulus_mpa`、`poisson_ratio`、尺寸、厚度、面壓、網格與支承，禁止由牌號自動推導任何數值。`manufacturer` 需為 `CS Aluminum`，`property_evidence_status` 需為 `USER_DECLARED_UNVERIFIED`；這只是未驗證來源聲明，不表示產品保證值或材料卡獲認證。工具不讀取客戶版 PDF、不帶入降伏強度、抗拉強度或塑性曲線，也不會執行求解。
+
+範例（全部數值僅是使用者自訂**合成**研究資料，非中鋁產品保證性質）：
+
+```json
+{"alloy_temper":"3004-H12","manufacturer":"CS Aluminum","property_evidence_status":"USER_DECLARED_UNVERIFIED","width_mm":120.0,"height_mm":80.0,"thickness_mm":2.5,"youngs_modulus_mpa":70000.0,"poisson_ratio":0.32,"pressure_n_mm2":0.0002,"mesh":8,"support":"four_edges_clamped","units":"N-mm-MPa"}
+```
+
+從 `tests/fea_benchmark/envelope_panels` 執行：
+
+```bash
+python prepare_aluminum_material_input.py --selection selection.json --output research_input.json
+```
+
+產出的 `research_input.json` 才能依前述受限 opt-in 方式交給 `run_aluminum_research.py`。原始 JSON 的 source label 會明示 `USER_DECLARED_UNVERIFIED`。不要把來源標籤當作已驗證材料性質，或把 `ALUMINUM_PARAMETRIC_RESEARCH_EVIDENCE_PASS` 當成正式工程 strength/capacity PASS。
