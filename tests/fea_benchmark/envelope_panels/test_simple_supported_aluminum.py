@@ -16,15 +16,15 @@ class Tests(unittest.TestCase):
     def test_assess_and_scope(self):
         w=navier_center()
         result=assess({4:.20*w,8:.23*w,16:.25*w},
-                      {4:.84*w,8:.95*w,16:.99*w})
+                      {4:1.04*w,8:1.025*w,16:1.016*w})
         self.assertEqual(result["engineering_acceptance"],"NOT_ADMITTED")
         self.assertEqual(result["attachment_contact"],"NOT_MODELED")
         with self.assertRaisesRegex(ValueError,"NOT_DISTINCT"):
             assess({4:w,8:w,16:w},{4:w,8:w,16:w})
         with self.assertRaisesRegex(ValueError,"NONMONOTONIC"):
-            assess({4:.20*w,8:.23*w,16:.25*w},{4:.95*w,8:.84*w,16:.99*w})
+            assess({4:.20*w,8:.23*w,16:.25*w},{4:1.025*w,8:1.04*w,16:1.016*w})
         with self.assertRaisesRegex(ValueError,"DISAGREEMENT"):
-            assess({4:.20*w,8:.23*w,16:.25*w},{4:.60*w,8:.75*w,16:.80*w})
+            assess({4:.20*w,8:.23*w,16:.25*w},{4:1.45*w,8:1.35*w,16:1.25*w})
         with self.assertRaises(ValueError):
             assess({4:.20*w,8:.23*w,16:.25*w},{4:.84*w,8:.95*w,16:math.nan})
 
