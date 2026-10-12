@@ -228,3 +228,11 @@ python prepare_aluminum_material_input.py --selection selection.json --output re
 ### 三種質別之合成材料標籤隔離回歸（Stage 48）
 
 真實 CalculiX CI 會用 **完全相同且明確輸入的合成 E、ν、板厚、尺寸、面壓**，分別宣告 `3003-H14`、`3004-H12`、`3004-O`，生成三份獨立研究輸入並求解。必須確認原始 deck SHA-256 相同、solver SHA-256 相同、各筆 `material_provenance` 含正確牌號，及研究觀測 payload 完全一致；任何差異都拒絕，且單元測試涵蓋錯誤來源、輸入漂移、結果篡改與材料容量狀態升級。此測試只證明**牌號標籤沒有偷偷改變數值模型**；**不能據此宣稱三種真實鋁板材料等效**。此回歸仍為 linear-elastic research-only，`MATERIAL_PLASTICITY_NOT_ADMITTED`、`MATERIAL_CAPACITY_NOT_ADMITTED` 不變。
+
+### 私人製造商硬化曲線：結構完整性預檢（Stage 52）
+
+`tests/fea_benchmark/envelope_panels/validate_private_hardening.py` 是**只讀的本地 JSON 預檢器**，支援使用者保存在 Repo 外的中鋁 `3003-H14`／`3004-H12`／`3004-O` 材料試驗資料。輸入必須明確包含 `alloy_temper`、無專案身分的 `product_id`、`manufacturer="CS Aluminum"`、`state="AS_SUPPLIED"`、`data_origin="PRIVATE_USER_SUPPLIED_MANUFACTURER_DECLARATION"`、`units="N-mm-MPa"`、`curve_type="TRUE_VON_MISES_STRESS_EQUIVALENT_PLASTIC_STRAIN"`、`elastic_modulus_mpa`、`poisson_ratio`，及至少三個 `points=[[true_stress_mpa, equivalent_plastic_strain], …]`。
+
+預檢器只核對資料形狀、數值有限且正值、首列塑性應變為零、後續塑性應變嚴格遞增、應力非遞減、指定硬上限與 exact keys；**不**以降伏／抗拉／伸長率插值或合成完整應力–應變曲線，**不**驗證製造商文件真偽、拉伸方向／頸縮前有效區間、材料批次或工程設計適用性。接受此 JSON 不表示 CalculiX 材料卡或正式工程 capacity 已 admission，狀態一律 `NOT_ADMITTED`。
+
+執行：`python validate_private_hardening.py /私有路徑/硬化試驗資料.json`。結果只列驗證狀態及點數，不輸出原始資料、產品代號或應力／應變值。不產生任何 `*PLASTIC` deck、無檔案寫入／上傳步驟。**客戶版 PDF、試驗資料 JSON 與實際產品資訊不得提交至公開 Repo**；CI 只執行明確合成且不對應中鋁實際試驗值的 unit fixtures。
