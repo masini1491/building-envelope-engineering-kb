@@ -95,7 +95,7 @@ def parse(frd: Path) -> dict[str, dict[int, tuple[float, ...]]]:
             if ((now == "STRESS" and tuple(labels) != STRESS_LABELS)
                 or (now == "PE" and tuple(labels) != ("PEEQ",))
                 or set(buffer) != NODES):
-                raise ValueError("SYNTHETIC_FRD_LABEL_OR_COVERAGE_MISMATCH")
+                raise ValueError(f"SYNTHETIC_FRD_LABEL_OR_COVERAGE_MISMATCH:field={now}:labels={labels!r}:nodes={sorted(buffer)}")
             records[now].append((stamp, buffer))
             now = None
         elif len(parts) >= 2 and parts[0] == "-5":
