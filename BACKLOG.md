@@ -40,7 +40,15 @@ Cold item **不具 execution authority**。要開始實作前，必須依 curren
 
 ## 候選（CANDIDATE）
 
-### 玻璃／金屬板非線性 FEA execution adapter（KB-CAND-007）
+### 受限非線性 FEA 後續構造能力（KB-CAND-007）
 
-- **Why**：現有 glass／metal-panel FEA governance沒有 validated nonlinear execution route。
-- **Current obligation**：優先 solver adapter／benchmark architecture；不預設自行開發完整 FEA engine。
+- **Current evidence**：現有受限 CalculiX 執行介面已通過合成 S8R 鋁板之位移、外插／平均應力應變及重建平移支承需求等真實 CI 研究檢查；不再沿用「沒有 validated nonlinear execution route」的過時前提。這些研究通過不等於真實帷幕牆鋁板工程 acceptance；current Hot 見 `TASKS.md`。
+- **CANDIDATE／Trigger**：待現有四邊固定平板的可觀測位移／應力基準足以描述限制，並明確取得非合成工況所需的構造、邊界條件、荷載路徑及獨立驗證計畫，再分別考慮折邊／加勁肋、實際支承／扣件、局部挫屈及初始缺陷等模型；每項均須獨立 admission，不因已完成 synthetic NLGEOM 即自動實作。
+- **Boundary**：不自行開發通用 FEA engine；不把平均節點應力、重建平移反力、材料牌號或供應商聲明直接升格為 ADM／其他規範強度及構件容量。
+
+### 鋁板完整塑性本構研究（KB-CAND-007-MATERIAL-PLASTICITY）
+
+- **Status**：`CANDIDATE / EVIDENCE GATED`。Stage 49–50 已有合成 C3D8 塑性／卸載 oracle，Stage 52 已有私人硬化點列結構預檢，**不代表 3003-H14／3004-H12／3004-O 真實塑性材料卡已驗證**。
+- **Why deferred**：一般彈性應力、撓度與受限支承需求研究不必以完整拉伸硬化曲線作為先決條件；優先補足幾何／邊界條件／場值物理基準，而不是反覆增加合成塑性測試。
+- **Trigger**：有實際需要超降伏、塑性重分布、卸載殘餘變形或成形行為的明確工況，並取得對應產品／板厚／temper／加工狀態、方向、批次及使用權利相符的真實應力–應變原始資料及獨立驗證方法。
+- **禁止推論**：不得以降伏強度、抗拉強度與伸長率推造完整硬化曲線；不得在未完成材料、支承、失效準則及正式設計依據 admission 前宣稱工程容量。
