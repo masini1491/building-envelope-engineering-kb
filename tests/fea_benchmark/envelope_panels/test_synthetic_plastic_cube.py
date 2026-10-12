@@ -32,7 +32,7 @@ class SyntheticPlasticTests(unittest.TestCase):
 
     def test_ccx_221_pe_descriptor_is_not_literally_peeq(self):
         # Exact observed CCX 2.21 descriptor: *EL FILE PEEQ -> -4 PE, -5 PE.
-        self.assertIn("*EL FILE\\nS,PEEQ,NOE", deck("plastic"))
+        self.assertIn("*EL FILE\nS,PEEQ,NOE", deck("plastic"))
         import inspect
         import synthetic_plastic_cube
         self.assertIn('tuple(labels) != ("PE",)', inspect.getsource(synthetic_plastic_cube.parse))
