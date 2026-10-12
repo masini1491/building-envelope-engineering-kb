@@ -13,7 +13,7 @@ E = 70000.0  # All numbers deliberately synthetic: NOT AA3003/AA3004 properties.
 NU = 0.30
 SIGMA_Y = 100.0
 H = 1000.0
-CASES = {"elastic": 0.0008, "plastic": 0.004}
+CASES = {"elastic": 0.0008, "plastic": 0.004, "unload": 0.003}
 NODES = set(range(1, 9))
 STRESS_LABELS = ("SXX", "SYY", "SZZ", "SXY", "SYZ", "SZX")
 
@@ -21,7 +21,9 @@ STRESS_LABELS = ("SXX", "SYY", "SZZ", "SXY", "SYZ", "SZX")
 def deck(case: str) -> str:
     if case not in CASES:
         raise ValueError("SYNTHETIC_CASE_INVALID")
-    return "\n".join((
+    # Unload is a second, explicitly recorded step after the known plastic peak.
+    peak_disp = CASES["plastic"] if case == "unload" else CASES[case]
+    lines = [
         "*HEADING", "ONE C3D8 SYNTHETIC BILINEAR; NOT ANY ALUMINUM ALLOY",
         "*NODE", "1,0,0,0", "2,1,0,0", "3,1,1,0", "4,0,1,0",
         "5,0,0,1", "6,1,0,1", "7,1,1,1", "8,0,1,1",
@@ -32,16 +34,29 @@ def deck(case: str) -> str:
         f"{SIGMA_Y+H*0.01},0.01",
         "*SOLID SECTION,ELSET=CUBE,MATERIAL=ARTIFICIAL_BILINEAR",
         "*STEP", "*STATIC", "0.1,1.,0.00001,0.1",
-        "*BOUNDARY", "LEFT,1,1,0.", f"RIGHT,1,1,{CASES[case]:.8f}",
+        "*BOUNDARY", "LEFT,1,1,0.", f"RIGHT,1,1,{peak_disp:.8f}",
         "1,2,3,0.", "4,3,3,0.",
-        "*EL FILE", "S,PEEQ,NOE", "*END STEP", "",
-    ))
+        "*EL FILE", "S,PEEQ,NOE", "*END STEP",
+    ]
+    if case == "unload":
+        lines.extend((
+            "*STEP", "*STATIC", "0.1,1.,0.00001,0.1",
+            "*BOUNDARY", f"RIGHT,1,1,{CASES['unload']:.8f}",
+            "*EL FILE", "S,PEEQ,NOE", "*END STEP",
+        ))
+    return "\n".join((*lines, ""))
 
 
 def analytic(case: str) -> dict:
     if case not in CASES:
         raise ValueError("SYNTHETIC_CASE_INVALID")
     strain = CASES[case]
+    if case == "unload":
+        peak = analytic("plastic")
+        # During partial unloading no reverse yield: elastic recovery only.
+        return {"strain": strain,
+                "stress_mpa": peak["stress_mpa"] - E*(CASES["plastic"]-strain),
+                "peeq": peak["peeq"]}
     trial = E * strain
     plastic_strain = max(0.0, (trial - SIGMA_Y) / (E + H))
     stress = trial if plastic_strain == 0.0 else SIGMA_Y + H * plastic_strain
@@ -61,7 +76,7 @@ def _values(line: str, n: int) -> tuple[int, tuple[float, ...]]:
     return node, items
 
 
-def parse(frd: Path) -> dict[str, dict[int, tuple[float, ...]]]:
+def parse(frd: Path, at_time: float = 1.0) -> dict[str, dict[int, tuple[float, ...]]]:
     if frd.is_symlink() or not frd.is_file() or not 0 < frd.stat().st_size < 8_000_000:
         raise ValueError("SYNTHETIC_FRD_MISSING_OR_UNBOUNDED")
     raw = frd.read_bytes()
@@ -114,7 +129,7 @@ def parse(frd: Path) -> dict[str, dict[int, tuple[float, ...]]]:
         raise ValueError("SYNTHETIC_FRD_TRUNCATED")
     result = {}
     for name, sets in records.items():
-        finals = [data for time, data in sets if abs(time - 1.0) <= 1e-7]
+        finals = [data for time, data in sets if abs(time - at_time) <= 1e-7]
         if len(finals) != 1:
             raise ValueError("SYNTHETIC_FRD_FINAL_FIELD_MISSING_OR_DUPLICATED:" + name)
         result[name] = finals[0]
@@ -130,7 +145,15 @@ def check(case: str, path: Path) -> dict:
     from run_synthetic_panel import _completed_step
     _completed_step(sta)
     ref = analytic(case)
-    parsed = parse(path / "cube.frd")
+    parsed = parse(path / "cube.frd", at_time=2.0 if case == "unload" else 1.0)
+    if case == "unload":
+        peak = parse(path / "cube.frd", at_time=1.0)
+        peak_ref = analytic("plastic")
+        if (max(abs(peak["STRESS"][node][0] - peak_ref["stress_mpa"])
+                for node in NODES) / peak_ref["stress_mpa"] > 0.03
+            or max(abs(peak["PE"][node][0] - peak_ref["peeq"])
+                   for node in NODES) > 0.05*peak_ref["peeq"]):
+            raise ValueError("SYNTHETIC_UNLOAD_STARTING_PLASTIC_STATE_MISMATCH")
     # Node-extrapolated fields from ONE element, not independent Gauss observations.
     stresses = [parsed["STRESS"][n] for n in sorted(NODES)]
     peeqs = [parsed["PE"][n][0] for n in sorted(NODES)]
@@ -142,6 +165,7 @@ def check(case: str, path: Path) -> dict:
     if (any(v < -1e-7 for v in peeqs) or s_error > 0.03 or p_error > p_limit):
         raise ValueError("SYNTHETIC_INDEPENDENT_CONSTITUTIVE_ORACLE_MISMATCH")
     return {"case": case, "model_scope": "SYNTHETIC_ONE_C3D8_UNIAXIAL",
+            "load_path": "PLASTIC_THEN_PARTIAL_ELASTIC_UNLOAD" if case == "unload" else "MONOTONIC",
             "reference": ref, "max_relative_stress_error": s_error,
             "max_absolute_peeq_error": p_error,
             "frd_observation": "EXTRAPOLATED_NODAL_NOT_GAUSS_POINT",
