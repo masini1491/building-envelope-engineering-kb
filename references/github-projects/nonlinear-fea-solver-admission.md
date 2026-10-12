@@ -807,3 +807,13 @@ Stage 43 已通過 PR #68 真實 independent pressure scaling 與 main CI；Stag
 **CI／provenance**：PR exact-head `d8143aa5ff50370c0a6e736199c6cc4b1722cf43` 的 Repository CI `38259477743` 與真實 CalculiX CI `38259477694` 均 SUCCESS，新增測試標記 `END_TRANSFER_KINEMATIC_CONSTRAINT_SCREEN_PASS`。合併後 current main `011099fef194dddb0b252b0abd907ecff7a9c0b0`；merged-main CI 應按獨立 GitHub 結果確認，不能以 PR CI 代替。
 
 **未 admission**：真實肋端轉接角碼、扣件接觸／間隙／滑移／轉動勁度、局部板肋應力極值、有效連接設計、完整六分量平衡／旋轉反力矩、初始缺陷、局部挫屈、任何實際鋁材或 ADM 容量。持續 `EVIDENCE GATED`、`MATERIAL_CAPACITY_NOT_ADMITTED`、`GENERAL_GLOBAL_BALANCE_NOT_ADMITTED`。
+
+## 第六十一階段：加勁肋端部 Z 向有限剛度彈簧（2026-10-12）
+
+**Stage 61／PR #100**（技術 merge SHA `50c83eb5335e2919e9578bd65047e456347ecbde`）延續 Stage 60 已完成的中心連續高 8 mm S8R 肋板，合成四邊固定 100×100×2 mm、E=69000 MPa、ν=0.33、WEB 均布 P=0.0001 N/mm²，保留同一次 real CCX workflow 中 n=8／16 肋端自由模型的 exact deck／DAT／STA／FRD evidence。於同樣 16 個高於板面之肋端節點追加接地 `SPRING1` Z 向自由度 3 的**有限線性彈簧**，每節點 synthetic stiffness `1000`、`10000 N/mm`，另執行四組 CCX；沒有增加六自由度完全固定或任何真實扣件屬性。
+
+**數值觀測與物理界線**：受限 S8R WEB 形狀函數整面 U3 積分之名義載重功共軛平均位移代理，n=8 自由／1000／10000 N/mm 為 `3.8218132e-05／3.8143975542e-05／3.7845806625e-05 mm`；n=16 分別 `4.0286069131e-05／4.0220265749e-05／3.9968016563e-05 mm`。n=16 高剛度比自由柔度代理 `0.99210515`，降幅約 `0.7895%`，不同於 Stage 60 肋端額外六自由度全固定所得 `0.65451717` 比值。16 節點簧力僅可由指定剛度乘求解節點位移 (k u) **衍生估算**，不得稱為獨立 CCX 彈簧元件應力／支承反力量測；線彈性正半定附加勁度的荷載功單調性在此 NLGEOM follower pressure 中僅作小變形研究性篩選，非一般非線性定理。
+
+**驗證來源**：PR exact-head `8aa1fb2425c0363128aa79a654709c2536d97cc4` Repository CI `38262403563` 與真實 CalculiX CI `38262403666` 均 SUCCESS，新增標記 `RIB_END_SPRING_STIFFNESS_TREND_PASS`，兩網格變化研究閾值 15% 受限通過。技術 merged-main SHA 為 `50c83eb5335e2919e9578bd65047e456347ecbde`；合併後 Repository CI 與 canonical read-back 須另行確認，不可把 exact-head PR CI 視同已驗證 main。
+
+**Engineering admission 仍拒絕**：合成剛度並非扣件試驗數據；未建立實際角碼、螺絲、錨定、摩擦／滑移／接觸、彈簧方向耦合、旋轉柔度、全場積分點應力、局部屈曲、初始缺陷、獨立旋轉反力矩、六分量全域平衡、材料塑性或 ADM 設計容量。狀態維持 `EVIDENCE GATED`、`MATERIAL_CAPACITY_NOT_ADMITTED`、`GENERAL_GLOBAL_BALANCE_NOT_ADMITTED`。
