@@ -245,3 +245,8 @@ python prepare_aluminum_material_input.py --selection selection.json --output re
 ### 鋁板中心彎曲應力跨長寬比與網格受限研究（Stage 55）
 
 現有 Stage 40 的兩組 synthetic 四邊固定板（100×100×3 mm 與 120×80×2.5 mm），各有 4／8／16 網格且由真實 CalculiX 2.21 執行。新增 `tests/fea_benchmark/envelope_panels/check_aluminum_ritz_mesh_stress.py` **重用相同六組實際求解產物**，逐組檢查 config、report status、deck／DAT／FRD SHA-256 provenance、expanded C3D20 FRD 節點覆蓋；**只在 16 網格使用 Stage 54 的中心撓度／彎曲 SXX、SYY 近似門檻**，4／8 網格僅擷取實際中心表面應力觀測，不宣稱通過細網格門檻；同時計算每種形狀、每個方向從 4→8→16 的中心彎曲應力變化是否縮小（非精確收斂速率、無解析極限外推）。粗網格及窄板之三項式 Ritz 近似差異可能與 FE 離散誤差重疊；所有門檻僅適用這兩組合成低荷載幾何，不是對真實材料或一般板件的精度保證。輸出持續 `NOT_ADMITTED`，不觀測 Gauss-point 應力峰值、屈曲／缺陷／連接／旋轉反力矩，也不計算 ADM 容量。
+
+
+### 理想簡支與四邊固定鋁板邊界研究（Stage 56）
+
+`tests/fea_benchmark/envelope_panels/check_simple_supported_aluminum.py` 僅從現有 synthetic aluminum low-load S8R deck 產生固定幾何／材料的理想簡支邊界對照（全周限制面外平移，兩個角點最小面內 rigid-body 約束；保留旋轉自由），不新增任意 user-deck／專案支承輸入或 `run_aluminum_research.py` 的支承選項。使用 100×100×2 mm、synthetic E=69000 MPa、ν=0.33、q=0.0001 N/mm²、n=4／8／16。CI 會真實以 CCX 對各 n 的簡支與既有四邊固定算例求解，透過獨立 Kirchhoff–Navier 奇數雙正弦級數（41／61 項截斷互比）取得理想簡支中心撓度參考，要求簡支撓度大於固定、簡支跨網格變化縮小、n=16 相對 Navier 誤差不超過僅供研究篩選的 12%。同時驗證合成模型身分、材料、拓樸、兩組邊界與受限平移平衡，並提供 SHA-256 來源。這種簡支是假設性理想支承，不代表真實帷幕牆的折邊、扣件、框架接觸、實際支承旋轉勁度、離散錨固或局部挫屈，也不提供 ADM 容量與一般六分量全域平衡驗證；結果仍為 `NOT_ADMITTED`。

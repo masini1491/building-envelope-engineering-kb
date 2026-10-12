@@ -105,6 +105,15 @@ jobs:
           python check_reactions.py
           python -m unittest -v test_pressure_equilibrium.py
           python check_pressure_equilibrium.py
+          # Stage 56: independent ideal simply-supported aluminum boundary,
+          # reuse the existing clamped aluminum_small_4/8/16 solver cases.
+          python -m unittest -v test_simple_supported_aluminum.py
+          for n in 4 8 16; do
+            folder="aluminum_simple_small_${n}"
+            python check_simple_supported_aluminum.py --generate "$folder" "$n"
+            (cd "$folder" && timeout 90s ccx -i panel)
+          done
+          python check_simple_supported_aluminum.py .
           python -m unittest -v test_follower_pressure.py
           python -m unittest -v test_expanded_face.py
           python -m unittest -v test_expanded_frd.py
