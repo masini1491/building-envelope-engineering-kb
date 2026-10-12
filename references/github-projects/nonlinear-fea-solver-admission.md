@@ -751,3 +751,11 @@ Stage 43 已通過 PR #68 真實 independent pressure scaling 與 main CI；Stag
 **真實驗證 evidence**：初次 PR head `9854ae348b014d8efe303ab4447dfba076ce6279` 的 Repository CI SUCCESS，但 CCX workflow `38208642361` FAIL，原因是新增單元測試在 membrane 反例中錯誤巢狀使用兩層 `assertRaisesRegex`，內層吞掉預期例外，使外層錯誤判定沒有例外；沒有改動物理模型或容差。修正後 exact PR head `5ada81f7c9e1558ad0c1f5a168a9abfe5a223da4` 的 Repository CI `38208877299` 與真實 CalculiX CI `38208877300` 均 SUCCESS，合併後 main Repository CI `38209073600` SUCCESS；GitHub canonical merged-main source／test／workflow read-back 已確認。
 
 **限制與不可外推**：三項式 Ritz 與 CCX 的 expanded-node stress 均有各自方法誤差；目前篩選門檻撓度 12%、彎曲應力 30%、非彎曲殘量 18% 只是這組 synthetic fixture 的 bounded research thresholds，不是通用精度聲明、精確應力解、法規允許誤差或 ADM 容量值。沒有觀測 Gauss-point 極值、真實折板／加勁肋／支承／扣件／局部挫屈或獨立旋轉反力矩；持續維持 `EVIDENCE GATED`、`MATERIAL_CAPACITY_NOT_ADMITTED`、`GENERAL_GLOBAL_BALANCE_NOT_ADMITTED`。下一步如要提高獨立性，需獨立解析或試驗基準、不同板形與 mesh variation／shell formulation 的適用性評估，不能用本次單組 PASS 宣稱可直接設計鋁板。
+
+## 第五十五階段：兩種板形與三層網格之中心彎曲應力研究（2026-10-12）
+
+**Stage 55／PR #88**（merged-main SHA `2c38211b79062e9407019181327f36ddc404edb4`）沿用 Stage 40 已存在的六組真實 CalculiX 2.21 合成線彈性、四邊固定 S8R NLGEOM P1 算例：100×100×3 mm 與 120×80×2.5 mm，各 4／8／16 網格。 `check_aluminum_ritz_mesh_stress.py` 核對輸入／報告、deck／DAT／FRD SHA-256、expanded C3D20 觀測覆蓋及兩方向中心上下表面應力差，並檢查各板形各方向 4→8 與 8→16 應力變化是否縮小；**只在 n=16 適用 Stage 54 三項式 Kirchhoff–Ritz 中心應力及撓度既有 screening**，粗網格只擷取觀測，不偽稱已達細網格門檻。
+
+初次 PR head `fd7c0e72052140e246c2c7bd31137d6b086c6a73` 的 Repository CI `38211473578` SUCCESS、真實 CCX CI `38211473476` FAIL：直接將 n=16 的 `RITZ_CENTER_DEFLECTION_DISAGREEMENT` 門檻套用到粗網格，屬測試適用性錯誤而非已證實 solver 異常。修正後 PR head `dc42a9999c485b97ef99c37d1f3fd508faaa0a93` 的 Repository CI `38211746401` 與真實 CCX CI `38211746387` 均 SUCCESS；merged-main Repository CI `38211906983` SUCCESS。保留原 Stage 54 n=16 tolerance，不降低驗證門檻。
+
+**限制**：本研究只確認指定合成案例之中心外插／平均應力觀測與網格差異縮小，不建立精確收斂階數或高網格極限，亦非全場／積分點峰值及真實材料、產品構造或 ADM 容量驗證。維持 `EVIDENCE GATED`、`MATERIAL_CAPACITY_NOT_ADMITTED`、`GENERAL_GLOBAL_BALANCE_NOT_ADMITTED`；真實折板、加勁肋、支承／接觸、缺陷與屈曲另需 evidence/admission。
