@@ -151,6 +151,7 @@ jobs:
           python -m unittest -v test_aluminum_material_evidence.py
           python -m unittest -v test_aluminum_grade_replay.py
           python -m unittest -v test_synthetic_plastic_cube.py
+          python -m unittest -v test_validate_private_hardening.py
           # Stage 49: deliberately synthetic one-element material-law oracle
           for case in elastic plastic unload; do
             fixture="$RUNNER_TEMP/synthetic_constitutive_$case"
