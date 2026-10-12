@@ -797,3 +797,13 @@ Stage 43 已通過 PR #68 真實 independent pressure scaling 與 main CI；Stag
 **驗證來源**：PR exact-head `dc1cb0952810be8bc7dcd020fdae3219f80609c0` 之 Repository CI `38252655579` 與真實 CalculiX CI `38252655598` 均 SUCCESS，包含 `CENTER_RIB_LOAD_TRANSFER_SCREEN_PASS`；merge-main 版本為 `caec3e16447cc34f03112b244f8d7890ee077460`。Merged-main workflow 與 canonical remote read-back 應另以完成狀態查核，不以 PR CI 取代。
 
 **Engineering admission 邊界**：板／肋共用中面殼節點是理想剛性連續連接，不代表現場焊接、螺絲、膠或接觸；未 admission 實際折彎／成形材料、初始缺陷、局部挫屈、全場積分點應力極值、獨立旋轉支承反力／反力矩、完整六分量平衡、真實鋁板強度或 ADM 構件容量。狀態持續 `EVIDENCE GATED`、`MATERIAL_CAPACITY_NOT_ADMITTED`、`GENERAL_GLOBAL_BALANCE_NOT_ADMITTED`。
+
+## 第六十階段：中心加勁肋端部理想約束的荷載路徑（2026-10-12）
+
+**Stage 60／PR #98**（merge SHA `011099fef194dddb0b252b0abd907ecff7a9c0b0`）在 Stage 59 的合成 100×100×2 mm、E=69000 MPa、ν=0.33、WEB 壓力 P=0.0001 N/mm²、四邊固定、中心連續高 8 mm S8R 加勁肋上，增加兩端 16 個肋上部節點之**額外全固定**，與肋端不另約束對照（n=8／16，共四個 CalculiX 2.21 synthetic case）。兩案同一幾何、荷載、材料、殼網格；差異限定於 RIB_END 理想額外運動約束。板與肋共節點仍非現場焊接、螺絲、膠或其他實際連接。
+
+**獨立概念與數值**：在同一外力下，線彈性受限位移空間增加同質約束，荷載功共軛柔度不應上升；本研究用整張 WEB 的 S8R 二次形狀函數面積積分（corner -1/12、midside +1/3）獲取 z 向平均位移代理，因 NLGEOM follower pressure 故此定理只作合成**小變形近似篩選**，不是任意非線性證明。8 網格肋端自由／額外固定平均位移 `3.8218132e-05／2.5298594073e-05 mm`；16 網格 `4.0286069131e-05／2.6367923970e-05 mm`，16 網格 fixed/free 比值 `0.65451717`，下降約 `34.55%`。兩支承的兩網格差異分別約 5.13%／4.06%，低於本次 synthetic 的研究性 15% 門檻。肋端固定方案有非零原始 RIB_END RFz 訊號（8 網格 signed -0.17852374 N、sum absolute 0.60848434 N），只證明額外理想約束參與 solver response，**不可升格為實際扣件力或獨立完整反力**。
+
+**CI／provenance**：PR exact-head `d8143aa5ff50370c0a6e736199c6cc4b1722cf43` 的 Repository CI `38259477743` 與真實 CalculiX CI `38259477694` 均 SUCCESS，新增測試標記 `END_TRANSFER_KINEMATIC_CONSTRAINT_SCREEN_PASS`。合併後 current main `011099fef194dddb0b252b0abd907ecff7a9c0b0`；merged-main CI 應按獨立 GitHub 結果確認，不能以 PR CI 代替。
+
+**未 admission**：真實肋端轉接角碼、扣件接觸／間隙／滑移／轉動勁度、局部板肋應力極值、有效連接設計、完整六分量平衡／旋轉反力矩、初始缺陷、局部挫屈、任何實際鋁材或 ADM 容量。持續 `EVIDENCE GATED`、`MATERIAL_CAPACITY_NOT_ADMITTED`、`GENERAL_GLOBAL_BALANCE_NOT_ADMITTED`。
