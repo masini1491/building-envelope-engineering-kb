@@ -13,7 +13,7 @@ import sys
 from pathlib import Path
 
 L, B, FLANGE, T, E, NU, FORCE = 300.0, 40.0, 20.0, 1.5, 69000.0, 0.33, 1.0
-SECTIONS = (4, 8, 4)
+SECTIONS = (4, 16, 4)
 MESHES = (8, 16)
 
 
