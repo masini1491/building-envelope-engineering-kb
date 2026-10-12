@@ -759,3 +759,11 @@ Stage 43 已通過 PR #68 真實 independent pressure scaling 與 main CI；Stag
 初次 PR head `fd7c0e72052140e246c2c7bd31137d6b086c6a73` 的 Repository CI `38211473578` SUCCESS、真實 CCX CI `38211473476` FAIL：直接將 n=16 的 `RITZ_CENTER_DEFLECTION_DISAGREEMENT` 門檻套用到粗網格，屬測試適用性錯誤而非已證實 solver 異常。修正後 PR head `dc42a9999c485b97ef99c37d1f3fd508faaa0a93` 的 Repository CI `38211746401` 與真實 CCX CI `38211746387` 均 SUCCESS；merged-main Repository CI `38211906983` SUCCESS。保留原 Stage 54 n=16 tolerance，不降低驗證門檻。
 
 **限制**：本研究只確認指定合成案例之中心外插／平均應力觀測與網格差異縮小，不建立精確收斂階數或高網格極限，亦非全場／積分點峰值及真實材料、產品構造或 ADM 容量驗證。維持 `EVIDENCE GATED`、`MATERIAL_CAPACITY_NOT_ADMITTED`、`GENERAL_GLOBAL_BALANCE_NOT_ADMITTED`；真實折板、加勁肋、支承／接觸、缺陷與屈曲另需 evidence/admission。
+
+## 第五十六階段：理想簡支鋁板支承對照（2026-10-12）
+
+**Stage 56／PR #90**（merged-main SHA `aaf79bb4323299658f54cb0aaa034dd635b5de92`）建立僅供合成研究用的 100×100×2 mm 等向線彈性鋁板 S8R NLGEOM P1，E=69000 MPa、ν=0.33、p=0.0001 N/mm²，n=4／8／16。理想簡支為全周限制法向平移、兩個角點最小面內 pin／slider 約束，其餘旋轉自由；此處沒有實際扣件、框架接觸或旋轉支承勁度。以獨立 Kirchhoff–Navier 雙奇數正弦級數求中心撓度，61 階參考約 0.00078694836 mm，41／61 截斷差異在本算例低於 1e-6 相對值；同時使用既有同尺寸四邊固定 CCX synthetic case 對照。真實 CCX 簡支中心撓度依序為 n=4：0.0008086117 mm、n=8：0.0008001258 mm、n=16：0.0007999044 mm；四邊固定為 0.0001819677、0.0002296706、0.0002382199 mm。簡支值由上方逐步下降接近解析值，細網格相對差約 1.646%，並觀測相鄰網格差縮小。本研究僅證明指定合成模型的支承差異與撓度趨勢。
+
+**CI provenance**：初版因 fixture 邊界字串的跳脫換行而修正；其後 real CCX 首輪因預設錯誤的網格單調增加假設而拒絕；診斷 run `38213269744` 明確輸出三網格中心撓度後，按真實觀測改為單調下降並維持既有 12% 細網格 Navier 比對門檻。另一次 CI 將兩種不同負向測試提前拒絕的原因分開，未降低門檻。最終 exact-head `060ee7c07067913256ef9757e02677c9318f186f` 的 Repository CI `38213568136`、真實 CalculiX CI `38213568135` 均 SUCCESS，merged-main Repository CI `38213746691` SUCCESS，合併來源 read-back 已成立。
+
+**未 admission**：`MATERIAL_CAPACITY_NOT_ADMITTED`、`GENERAL_GLOBAL_BALANCE_NOT_ADMITTED`，真實鋁板四邊支承的扣件、接觸、折邊、加勁肋、局部挫屈、實際邊界勁度及 ADM 強度設計均未建立。Stage 56 不改動原 `run_aluminum_research.py` 可接受的支承種類，不新增一般 user-deck 執行路徑。所有研究篩選門檻均非設計規範容許誤差。
