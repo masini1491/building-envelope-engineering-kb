@@ -20,18 +20,20 @@ _EVIDENCE = "USER_DECLARED_UNVERIFIED"
 _MANUFACTURER = "CS Aluminum"
 
 
-def prepare(selection: dict) -> dict:
+def prepare(selection: dict, *, evidence_matched: bool = False) -> dict:
     """Validate exact selection; never fill any value from a grade or maker."""
     if not isinstance(selection, dict) or set(selection) != _FIELDS:
         raise ValueError("MATERIAL_SELECTION_SCHEMA_MISMATCH")
     grade = selection["alloy_temper"]
     if (type(grade) is not str or grade not in _ALLOWED_ALLOYS
             or selection["manufacturer"] != _MANUFACTURER
-            or selection["property_evidence_status"] != _EVIDENCE):
+            or selection["property_evidence_status"] not in (_EVIDENCE, "MANUFACTURER_DECLARATION_ACCEPTED_BY_USER")
+            or (selection["property_evidence_status"] != _EVIDENCE and not evidence_matched)):
         raise ValueError("MATERIAL_SELECTION_NOT_ADMITTED")
     core = {k: selection[k] for k in _KEYS if k != "material_provenance"}
+    source_status = selection["property_evidence_status"]
     core["material_provenance"] = (
-        f"USER_DECLARED_UNVERIFIED:{_MANUFACTURER}:{grade}:"
+        f"{source_status}:{_MANUFACTURER}:{grade}:"
         "ELASTIC_RESEARCH_ONLY:NO_AUTO_PROPERTIES"
     )
     return validate(core)
@@ -60,9 +62,8 @@ def read_selection(path: Path, evidence_path: Path | None = None) -> dict:
     if not isinstance(obj, dict) or set(obj) != _FIELDS | {"product_id"}:
         raise ValueError("MATERIAL_SELECTION_PRODUCT_ID_REQUIRED")
     core = {k: v for k, v in obj.items() if k != "product_id"}
-    prepared = prepare(core)
     check(obj, read_metadata(evidence_path))
-    return prepared
+    return prepare(core, evidence_matched=True)
 
 
 def main() -> int:
@@ -76,7 +77,9 @@ def main() -> int:
     with args.output.open("x", encoding="utf-8") as out:
         json.dump(result, out, ensure_ascii=False, sort_keys=True, allow_nan=False)
         out.write("\n")
-    state = "DECLARED_METADATA_CONSISTENCY_ONLY" if args.evidence else "UNVERIFIED"
+    state = ("USER_ACCEPTED_MANUFACTURER_METADATA_CONSISTENCY_ONLY"
+             if args.evidence and result["material_provenance"].startswith("MANUFACTURER_DECLARATION_ACCEPTED_BY_USER:")
+             else "DECLARED_METADATA_CONSISTENCY_ONLY" if args.evidence else "UNVERIFIED")
     print(f"ALUMINUM_EXPLICIT_MATERIAL_SELECTION_PREPARED; {state}; "
           "NO SOLVER EXECUTION OR CAPACITY ADMISSION")
     return 0

@@ -218,3 +218,9 @@ python prepare_aluminum_material_input.py --selection selection.json --output re
 可選用 `--evidence evidence.json` 啟用**使用者宣告 metadata 的一致性檢查**。此時 selection JSON 必須額外包含 `product_id`，evidence JSON 必須精確包含 `manufacturer / alloy_temper / product_id / product_form / material_condition / source_visibility / evidence_claim / thickness_range_mm / elastic_properties`；目前只接受 `product_form="sheet"`、`material_condition="AS_SUPPLIED"`、`evidence_claim="USER_DECLARED_NOT_VERIFIED"`，以及 `source_visibility="PUBLIC"` 或 `"PRIVATE"`。數值 `thickness_range_mm` 的單位是 mm；`elastic_properties` 需提供 `youngs_modulus_mpa` 與 `poisson_ratio`，與 selection 的明確輸入完全相同。省略 `--evidence` 時保留 PR #76 的舊模式；若另有產品識別但未提供 evidence 會拒絕，不會靜默忽略。驗證成功的輸出仍**只有既有十欄 research JSON**，不包含 `product_id`、私人來源內容或廠商強度。
  
 重要：`DECLARED_METADATA_CONSISTENCY_ONLY` **僅證明兩個使用者提供的 JSON 在程式支援的欄位上相符**，不代表官方資料真偽、材料保證值、真實產品合格、允許輸入未核對的應力–應變曲線或 ADM capacity。客戶版及非公開原始證據保留在 Repo 外，禁止上傳；實驗／熱加工後等狀態不在本前處理器的 `AS_SUPPLIED` 支援範圍。
+
+### 製造商聲明的使用者採信（受限研究）
+
+中鋁正式提供的產品技術資料可以作為工程估算與材料參數的**製造商聲明依據**，不必把「未做第三方逐項複驗」視為一律無法引用。不過必須由使用者明確選擇 `property_evidence_status="MANUFACTURER_DECLARATION_ACCEPTED_BY_USER"`，並在獨立的 `--evidence` metadata 內填入同名的 `evidence_claim`，經產品識別、牌號質別、供貨狀態、厚度範圍及 E／ν 一致性檢查，才能取得 `USER_ACCEPTED_MANUFACTURER_METADATA_CONSISTENCY_ONLY`。未明確選擇時維持 `USER_DECLARED_UNVERIFIED`；不同狀態互相衝突時拒絕，不自動升級。
+
+此狀態的語意是**使用者接受製造商文件作為來源、且兩份宣告資料一致**，不是文件真偽的獨立鑑定、批次 MTC 試驗或任何強度／容量保證。材料性能仍須符合特定供貨產品、牌號／temper、厚度、加工與熱處理狀態以及適用設計規範。客戶版 PDF 及其非公開數值不進入公開 Repository。轉出的原始十欄 FEA 研究 input contract 不變、所有 E／ν／幾何及面壓仍須明確提供，`MATERIAL_PLASTICITY_NOT_ADMITTED` 與 `MATERIAL_CAPACITY_NOT_ADMITTED` 不變。

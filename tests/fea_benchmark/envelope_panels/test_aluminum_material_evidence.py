@@ -42,6 +42,36 @@ class EvidenceTests(unittest.TestCase):
                         self.assertNotIn("SYNTHETIC-PRODUCT", json.dumps(out))
                         self.assertEqual(len(out), 10)
 
+    def test_explicit_manufacturer_declaration_trusted_not_independently_certified(self):
+        for grade in ("3003-H14", "3004-H12", "3004-O"):
+            chosen = dict(selection(grade), product_id="SYNTHETIC-PRODUCT",
+                          property_evidence_status="MANUFACTURER_DECLARATION_ACCEPTED_BY_USER")
+            record = dict(declared(grade), evidence_claim="MANUFACTURER_DECLARATION_ACCEPTED_BY_USER")
+            self.assertEqual(check(chosen, record),
+                             "USER_ACCEPTED_MANUFACTURER_METADATA_CONSISTENCY_ONLY")
+            with tempfile.TemporaryDirectory() as d:
+                root = Path(d)
+                (root / "selection.json").write_text(json.dumps(chosen))
+                (root / "evidence.json").write_text(json.dumps(record))
+                actual = read_selection(root / "selection.json", root / "evidence.json")
+                self.assertIn("MANUFACTURER_DECLARATION_ACCEPTED_BY_USER:",
+                              actual["material_provenance"])
+                self.assertEqual(len(actual), 10)
+                self.assertEqual(actual["youngs_modulus_mpa"], 70000.0)
+                self.assertNotIn("SYNTHETIC-PRODUCT", json.dumps(actual))
+                with self.assertRaises(ValueError):
+                    read_selection(root / "selection.json")
+
+    def test_trust_requires_matching_explicit_claim(self):
+        chosen = dict(selection(), product_id="SYNTHETIC-PRODUCT",
+                      property_evidence_status="MANUFACTURER_DECLARATION_ACCEPTED_BY_USER")
+        with self.assertRaisesRegex(ValueError, "STATUS_NOT_ADMITTED"):
+            check(chosen, declared())
+        ordinary = dict(selection(), product_id="SYNTHETIC-PRODUCT")
+        elevated = dict(declared(), evidence_claim="MANUFACTURER_DECLARATION_ACCEPTED_BY_USER")
+        with self.assertRaisesRegex(ValueError, "STATUS_NOT_ADMITTED"):
+            check(ordinary, elevated)
+
     def test_mismatched_identity_process_range_and_properties_reject(self):
         raw = dict(selection(), product_id="SYNTHETIC-PRODUCT")
         edits = [
