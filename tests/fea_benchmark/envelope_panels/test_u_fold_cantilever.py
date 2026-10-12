@@ -24,9 +24,9 @@ class TestUFold(unittest.TestCase):
     def test_exact_mesh_and_load_closure(self):
         for n in (8,16):
             deck,weights,root,tip=build(n)
-            self.assertEqual(len(weights),33)
-            self.assertEqual(len(root),33)
-            self.assertEqual(len(tip),33)
+            self.assertEqual(len(weights),49)
+            self.assertEqual(len(root),49)
+            self.assertEqual(len(tip),49)
             self.assertAlmostEqual(sum(weights.values()),FORCE,places=12)
             self.assertEqual(deck.count("*ELEMENT,TYPE=S8R,ELSET=FOLD"),1)
             self.assertEqual(deck.count("ROOT,1,6,0."),1)
