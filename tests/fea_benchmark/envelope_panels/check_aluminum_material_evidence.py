@@ -16,6 +16,10 @@ _REQUIRED = {
     "thickness_range_mm", "elastic_properties",
 }
 _ALLOWED_VISIBILITY = frozenset(("PUBLIC", "PRIVATE"))
+_EXPECTED_CLAIMS = {
+    "USER_DECLARED_UNVERIFIED": "USER_DECLARED_NOT_VERIFIED",
+    "MANUFACTURER_DECLARATION_ACCEPTED_BY_USER": "MANUFACTURER_DECLARATION_ACCEPTED_BY_USER",
+}
 _ID_RE = re.compile(r"[A-Za-z0-9][A-Za-z0-9._-]{0,63}\Z")
 
 
@@ -66,7 +70,7 @@ def check(selection: dict, evidence: dict) -> str:
         raise ValueError("MATERIAL_EVIDENCE_PRODUCT_STATE_UNSUPPORTED")
     if (type(evidence["source_visibility"]) is not str
             or evidence["source_visibility"] not in _ALLOWED_VISIBILITY
-            or evidence["evidence_claim"] != "USER_DECLARED_NOT_VERIFIED"):
+            or evidence["evidence_claim"] != _EXPECTED_CLAIMS.get(selection.get("property_evidence_status"))):
         raise ValueError("MATERIAL_EVIDENCE_STATUS_NOT_ADMITTED")
     bounds = evidence["thickness_range_mm"]
     if not isinstance(bounds, list) or len(bounds) != 2:
@@ -84,4 +88,6 @@ def check(selection: dict, evidence: dict) -> str:
     for key in ("youngs_modulus_mpa", "poisson_ratio"):
         if _number(selection.get(key)) != _number(elastic[key]):
             raise ValueError("MATERIAL_EVIDENCE_PROPERTY_VALUE_MISMATCH")
+    if selection["property_evidence_status"] == "MANUFACTURER_DECLARATION_ACCEPTED_BY_USER":
+        return "USER_ACCEPTED_MANUFACTURER_METADATA_CONSISTENCY_ONLY"
     return "DECLARED_METADATA_CONSISTENCY_ONLY"
