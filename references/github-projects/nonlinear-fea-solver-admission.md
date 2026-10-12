@@ -725,3 +725,13 @@ Stage 43 已通過 PR #68 真實 independent pressure scaling 與 main CI；Stag
 目前可讀到的 CalculiX 2.18 `*PLASTIC` 文件描述輸入格式，但它**只能作舊版方法路由**；真正針對 CalculiX 2.21 實作必須從已核對版本的 source/manual 與真實 CCX regression 再驗證。不能把任何 peer-reviewed FLC、供應商最小 Rp0.2、單獨材料 E／ν，或跨質別 hardening coefficients，當成可直接產生真實 deck 的材料模型。
 
 **目前結果：** 已找到相關學術材料研究線索，但三種目標 alloy–temper 都維持 `MATERIAL_PLASTICITY_NOT_ADMITTED` 與 `MATERIAL_CAPACITY_NOT_ADMITTED`；已存在的線彈性 S8R synthetic 模型及其 Stage 40–44 數值檢查不受本文件變更影響。整體仍為 `EVIDENCE GATED`、`GENERAL_GLOBAL_BALANCE_NOT_ADMITTED`。
+
+## 第四十九至五十階段：合成塑性本構及部分卸載路徑之真實 CI 驗證（2026-10-12）
+
+**Stage 49（PR #80）**：新增一個明確合成、單元素 C3D8、位移控制單軸的雙線性等向硬化算例，`*ELASTIC`（研究值 E=70000 MPa、ν=0.30）與 `*PLASTIC`（合成初屈服 100 MPa、硬化斜率 H=1000 MPa）由求解器獨立執行低於及高於屈服的兩種位移。檢查獨立單軸 oracle 的 σ 與等效塑性應變、FRD stress/PE 欄位、節點覆蓋及 STA 收斂。官方 CalculiX 2.21 真實輸出中 `*EL FILE PEEQ` 對應 FRD `-4 PE`／`-5 PE` 描述；先前 PR 測試曾因誤期待 PEEQ 欄位名稱或換行 assertion 而失敗，修復後 exact-head CI 與 merged-main Repository CI 成功。完成合併 commit `aa21fd2605e5db689684ba9d4f4e53ae2f4276e8`。
+
+**Stage 50（PR #81）**：以相同合成材料與幾何額外建立兩個連續 CCX `*STEP`，先載入塑性峰值（軸向 ε=0.004），再部分卸載到 ε=0.003；解析 FRD 最終 step time 1 與 2。獨立 oracle 依 `σ_unload=σ_peak−E×(ε_peak−ε_unload)` 與 `PEEQ_unload=PEEQ_peak` 核對實際求解，並檢查載入步末已形成正確塑性起始狀態；本地單元測試 8/8 PASS，PR exact-head Repository CI／real CCX CI 與合併後 main CI 均成功。合併 commit `780c6cf5402393a041daf2ec39dcffdc66337966`。
+
+**研究範圍嚴格限制**：這些 E、ν、σ_y、H、位移與單元素尺寸均是合成測試，不是 3003-H14／3004-H12／3004-O 的製造商資料、合格材料卡、軋延各向異性或真實構件支承；FRD 為節點外插／平均觀測，不是獨立積分點量測。Stage 49–50 僅說明 CCX 本構演算法在選定 *單元素＋指定載入路徑* 下與獨立基準吻合，仍維持 `MATERIAL_PLASTICITY_NOT_ADMITTED`、`MATERIAL_CAPACITY_NOT_ADMITTED`、`GENERAL_GLOBAL_BALANCE_NOT_ADMITTED`。
+
+後續若要提升真實材料與構件 admission，必須有中鋁適用產品、厚度、加工後狀態及合法可使用的完整拉伸本構曲線，並依新支承、幾何、塑性演化及失效模型分別驗證；不能用本次合成雙線性參數替代產品實測資料。
