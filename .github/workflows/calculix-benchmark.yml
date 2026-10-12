@@ -148,6 +148,16 @@ jobs:
             done
           done
           python check_rib_end_transfer.py .
+          # Stage 61: bound finite DOF3 rib-end springs, reuse same-run Stage 60 free cases.
+          python -m unittest -v test_rib_end_spring.py
+          for n in 8 16; do
+            for k in 1000 10000; do
+              folder="rib_spring_k${k}_n${n}"
+              python check_rib_end_spring.py --generate "$folder" "$n" "$k"
+              (cd "$folder" && timeout 90s ccx -i panel)
+            done
+          done
+          python check_rib_end_spring.py .
           python -m unittest -v test_follower_pressure.py
           python -m unittest -v test_expanded_face.py
           python -m unittest -v test_expanded_frd.py
