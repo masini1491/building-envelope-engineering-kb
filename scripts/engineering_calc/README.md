@@ -271,3 +271,12 @@ CI 僅採用有可追溯 provenance 的實際 CalculiX 2.21 解，針對 WEB 自
 `tests/fea_benchmark/envelope_panels/check_center_rib_plate.py` 只生成固定合成幾何：100×100×2 mm 的等向線彈性 S8R 平板，E=69000 MPa、ν=0.33、面壓 `WEB,P,0.0001 N/mm²`；沿中心線採共用中面殼節點的連續直立薄壁加勁肋（肋高 0／4／8 mm；肋厚與板厚均 2 mm），板面四邊固定、肋件端部不另指定現場扣件約束，板網格 8／16。僅 WEB 面直接受壓，肋不直接受壓；加肋模型的 shared shell nodes 是**理想連續連接**而非實際焊接、螺絲或接觸的認可。
 
 以四邊固定 Kirchhoff 平板單項 Rayleigh–Ritz 近似取得未加肋中心撓度；另外用同一假設位移形狀的「板彎曲能＋中心薄壁梁彎曲能」取得加肋後預期趨勢。後者採中面肋件 `I=T h³/3` 的理想化能量模型，**不含相容性、局部翹曲、板肋耦合的全場精確解**，只能作受限交叉參考及勁度趨勢合理性檢查，不能作真實截面／材料強度設計。真實 CalculiX 2.21 CI 要求六組合成模型完成、deck／DAT／STA／FRD provenance 可核對、各網格中心撓度隨肋高增加而下降、未加肋細網格接近固定平板 Ritz（研究門檻 20%）、各肋高的兩網格撓度差不超過該組細網格結果的 15%。本案例不能確立正式收斂階數、完全六分量平衡、支承反力矩、薄壁局部挫屈、初始缺陷、材料塑性、連接／扣件容量或 ADM 合格與否；維持 `EVIDENCE GATED` 與 `NOT_ADMITTED`。
+
+
+### 中心加勁肋端部理想固定的荷載傳遞（Stage 60）
+
+`tests/fea_benchmark/envelope_panels/check_rib_end_transfer.py` 沿用 Stage 59 的固定 100×100×2 mm、E=69000 MPa、ν=0.33、中心高度 8 mm 合成 S8R 板肋共用節點模型。主面 WEB 唯一受 P=0.0001 N/mm²，板面四周固定；僅額外比較「肋端自由」與「肋端上部 16 個節點完全理想固定」這一個位移約束差異，不新增真實扣件、接觸、支承柔度參數或材料容量。本研究在 n=8／16 網格、四組真實 CCX 輸出之間重播。現有 Stage 59 的六組研究仍保留；此模型只是更窄的端部連接剛性邊界比較。
+
+採用板面 WEB 節點的 S8R 平面形狀函數（四角各 -1/12、四邊中點各 +1/3）積分整片原始主面 U3，作為名義固定方向均布荷載的**功共軛平均位移代理（work-conjugate proxy）**；線彈性理論上，同一外力在更受限位移子空間之下的 compliance 不得上升。因本算例用 `NLGEOM` follower pressure，只能在此合成**小位移**下以該線彈性定理作篩選，**不是一般非線性定理**。CI 要求額外約束使平均位移下降，兩網格差異低於研究性 15% 門檻、端部新增 RF 訊號與端部／根部 DAT node coverage 均成立，並以完整 deck／DAT／STA／FRD SHA-256 防止混檔。觀測原始 RF **不能**代表經獨立分離荷載後的純扣件力、支承反力矩或完整六分量平衡。
+
+此功能不提供任意支承輸入、不驗證現場加勁肋焊接／機械扣件、局部板肋應力極值、挫屈或 ADM 容量，`EVIDENCE GATED`、`MATERIAL_CAPACITY_NOT_ADMITTED` 與 `GENERAL_GLOBAL_BALANCE_NOT_ADMITTED` 持續成立。以上篩選門檻僅供 synthetic engineering research。

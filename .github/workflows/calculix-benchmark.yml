@@ -138,6 +138,16 @@ jobs:
             done
           done
           python check_center_rib_plate.py .
+          # Stage 60: extra ideal constraints on synthetic centered-rib ends.
+          python -m unittest -v test_rib_end_transfer.py
+          for n in 8 16; do
+            for support in rib_end_free rib_end_fixed; do
+              folder="rib_end_${support}_n${n}"
+              python check_rib_end_transfer.py --generate "$folder" "$n" "$support"
+              (cd "$folder" && timeout 90s ccx -i panel)
+            done
+          done
+          python check_rib_end_transfer.py .
           python -m unittest -v test_follower_pressure.py
           python -m unittest -v test_expanded_face.py
           python -m unittest -v test_expanded_frd.py
