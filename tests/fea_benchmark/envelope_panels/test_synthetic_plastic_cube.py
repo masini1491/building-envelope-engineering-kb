@@ -30,6 +30,13 @@ class SyntheticPlasticTests(unittest.TestCase):
         for invalid in (row(9,[1.]*6),row(1,[math.nan]*6)," -1 1 2 3"):
             with self.assertRaises(ValueError):_values(invalid,6)
 
+    def test_ccx_221_pe_descriptor_is_not_literally_peeq(self):
+        # Exact observed CCX 2.21 descriptor: *EL FILE PEEQ -> -4 PE, -5 PE.
+        self.assertIn("*EL FILE\\nS,PEEQ,NOE", deck("plastic"))
+        import inspect
+        import synthetic_plastic_cube
+        self.assertIn('tuple(labels) != ("PE",)', inspect.getsource(synthetic_plastic_cube.parse))
+
     def test_missing_and_malformed_frd_rejected(self):
         with tempfile.TemporaryDirectory() as p:
             path=Path(p)/"cube.frd"

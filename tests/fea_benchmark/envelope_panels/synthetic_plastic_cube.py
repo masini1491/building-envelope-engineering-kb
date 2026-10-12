@@ -1,4 +1,7 @@
-"""Isolated one-C3D8 synthetic elastoplastic constitutive smoke (not aluminum)."""
+"""Isolated one-C3D8 synthetic elastoplastic constitutive smoke (not aluminum).
+
+CCX 2.21 *EL FILE PEEQ is exported in FRD as dataset PE with descriptor PE.
+"""
 from __future__ import annotations
 
 import argparse
@@ -93,7 +96,7 @@ def parse(frd: Path) -> dict[str, dict[int, tuple[float, ...]]]:
             continue
         if t == "-3":
             if ((now == "STRESS" and tuple(labels) != STRESS_LABELS)
-                or (now == "PE" and tuple(labels) != ("PEEQ",))
+                or (now == "PE" and tuple(labels) != ("PE",))
                 or set(buffer) != NODES):
                 raise ValueError(f"SYNTHETIC_FRD_LABEL_OR_COVERAGE_MISMATCH:field={now}:labels={labels!r}:nodes={sorted(buffer)}")
             records[now].append((stamp, buffer))
