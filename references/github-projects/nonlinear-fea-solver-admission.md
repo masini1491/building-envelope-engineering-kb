@@ -817,3 +817,13 @@ Stage 43 已通過 PR #68 真實 independent pressure scaling 與 main CI；Stag
 **驗證來源**：PR exact-head `8aa1fb2425c0363128aa79a654709c2536d97cc4` Repository CI `38262403563` 與真實 CalculiX CI `38262403666` 均 SUCCESS，新增標記 `RIB_END_SPRING_STIFFNESS_TREND_PASS`，兩網格變化研究閾值 15% 受限通過。技術 merged-main SHA 為 `50c83eb5335e2919e9578bd65047e456347ecbde`；合併後 Repository CI 與 canonical read-back 須另行確認，不可把 exact-head PR CI 視同已驗證 main。
 
 **Engineering admission 仍拒絕**：合成剛度並非扣件試驗數據；未建立實際角碼、螺絲、錨定、摩擦／滑移／接觸、彈簧方向耦合、旋轉柔度、全場積分點應力、局部屈曲、初始缺陷、獨立旋轉反力矩、六分量全域平衡、材料塑性或 ADM 設計容量。狀態維持 `EVIDENCE GATED`、`MATERIAL_CAPACITY_NOT_ADMITTED`、`GENERAL_GLOBAL_BALANCE_NOT_ADMITTED`。
+
+## 第六十二階段：加勁肋端部平移彈簧方向對照（2026-10-12）
+
+**Stage 62／PR #102**（技術 merge SHA `3cd00fe9b10d2b78fd0a793973dfaa0e65721638`）沿用 Stage 60–61 synthetic 100×100×2 mm、E=69000 MPa、ν=0.33、中心肋高 8 mm、WEB P=0.0001 N/mm² 四邊固定 S8R 板。僅比較 16 個肋端上部節點之 `SPRING1` 全域 X(1)、Y(2)、Z(3) 平移方向，每個節點勁度均 `10,000 N/mm`；新增 X／Y 的 n=8／16 四組真實 CalculiX，Z 與無額外彈簧基準從**同一 CI workflow** 的 Stage 61／60 嚴格輸出回讀。此處沒有任何旋轉 DOF 彈簧或現場扣件資訊。
+
+**實際 CCX 觀測**：以同一 WEB S8R 形狀函數積分 z 向位移作名義固定方向外載功共軛平均位移代理，n=16 無彈簧 `4.028606913125e-05 mm`、X 彈簧 `3.13260750203125e-05 mm`、Y 彈簧 `4.028606913125e-05 mm`、Z 彈簧 `3.99680165625e-05 mm`；X 減少約 `22.24%`，Y 在此對稱合成工況與無額外彈簧相同，Z 減少約 `0.79%`。n=8 也觀察到相同方向趨勢。各方向 8／16 網格相對差均約 4.6–5.3%，符合受限 15% 研究篩選，但沒有完整 mesh convergence order 或獨立殼場精確解。
+
+**證據**：PR exact-head `a3ecc8287c3b33f09650fe852b25faac900b507d` 的 Repository CI `38271242796` 與真實 CalculiX CI `38271243144` 均 SUCCESS，真實執行標記 `RIB_DIRECTION_TRANSLATION_SCREEN_PASS`。合併後的 main CI 應獨立核對。所有 `k u` 彈簧力均為衍生估算而非獨立 CCX 接點反力；NLGEOM follower pressure 下的荷載功減少僅用於此極小位移理想化案例之趨勢 screening，不是一般非線性定理。
+
+**拒絕工程外推**：方向敏感度不等於實際角碼、螺絲、膠、支承連接方向效能；Y 向在本算例結果不變並非一般構造性質。未 admission DOF4–6 轉動勁度、局部翹曲或應力極值、完整六分量平衡、初始缺陷、屈曲、材料塑性及 ADM 容量。狀態保持 `EVIDENCE GATED`、`MATERIAL_CAPACITY_NOT_ADMITTED`、`GENERAL_GLOBAL_BALANCE_NOT_ADMITTED`。
