@@ -24,7 +24,7 @@ class Tests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,"NONMONOTONIC"):
             assess({4:.20*w,8:.23*w,16:.25*w},{4:1.025*w,8:1.04*w,16:1.016*w})
         with self.assertRaisesRegex(ValueError,"DISAGREEMENT"):
-            assess({4:.20*w,8:.23*w,16:.25*w},{4:1.45*w,8:1.35*w,16:1.25*w})
+            assess({4:.20*w,8:.23*w,16:.25*w},{4:1.45*w,8:1.30*w,16:1.25*w})
         with self.assertRaises(ValueError):
             assess({4:.20*w,8:.23*w,16:.25*w},{4:.84*w,8:.95*w,16:math.nan})
 
