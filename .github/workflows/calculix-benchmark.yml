@@ -169,6 +169,16 @@ jobs:
             done
           done
           python check_rib_end_direction.py .
+          # Stage 64 finite-EI B31 beam, synthetic root rotation via rigid lever.
+          python -m unittest -v test_finite_ei_rotation.py
+          for n in 4 8; do
+            for mode in clamped root_spring; do
+              folder="finite_ei_${mode}_n${n}"
+              python check_finite_ei_rotation.py --generate "$folder" "$n" "$mode"
+              (cd "$folder" && timeout 90s ccx -i panel)
+            done
+          done
+          python check_finite_ei_rotation.py .
           python -m unittest -v test_follower_pressure.py
           python -m unittest -v test_expanded_face.py
           python -m unittest -v test_expanded_frd.py
