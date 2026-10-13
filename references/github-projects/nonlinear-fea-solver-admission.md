@@ -827,3 +827,85 @@ Stage 43 已通過 PR #68 真實 independent pressure scaling 與 main CI；Stag
 **證據**：PR exact-head `a3ecc8287c3b33f09650fe852b25faac900b507d` 的 Repository CI `38271242796` 與真實 CalculiX CI `38271243144` 均 SUCCESS，真實執行標記 `RIB_DIRECTION_TRANSLATION_SCREEN_PASS`。合併後的 main CI 應獨立核對。所有 `k u` 彈簧力均為衍生估算而非獨立 CCX 接點反力；NLGEOM follower pressure 下的荷載功減少僅用於此極小位移理想化案例之趨勢 screening，不是一般非線性定理。
 
 **拒絕工程外推**：方向敏感度不等於實際角碼、螺絲、膠、支承連接方向效能；Y 向在本算例結果不變並非一般構造性質。未 admission DOF4–6 轉動勁度、局部翹曲或應力極值、完整六分量平衡、初始缺陷、屈曲、材料塑性及 ADM 容量。狀態保持 `EVIDENCE GATED`、`MATERIAL_CAPACITY_NOT_ADMITTED`、`GENERAL_GLOBAL_BALANCE_NOT_ADMITTED`。
+
+## 第六十三階段：隔離剛性槓桿之平移彈簧轉動柔度（2026-10-13）
+
+**Stage 63／PR #104**：研究範圍是理想剛性槓桿與接地 `SPRING1` 平移 DOF3；利用彈簧配置位置與 `u_z(x)=w+x·s` 的小轉角假設，建立獨立 2×2 幾何剛度矩陣並以真實 CalculiX 2.21 解比對。**沒有使用或驗證 `SPRING2` DOF4–6 的純轉動彈簧**，也未把 Stage 62 X 向彈簧減撓效果直接宣稱為純轉動支承。
+
+- 純力偶合成例：在 `x=±50 mm` 各接 `200 N/mm` DOF3 彈簧，以 `±1 N` 產生 100 N·mm 名義力偶。解析旋轉斜率 `0.0001 rad`，求解端部 U3 為 `−0.005／+0.005 mm`，中心 U3 為零；由 `k×u` **衍生**簧力合計 0 N、加權力矩 100 N·mm，受限解析與求解一致。
+- 偏心荷載分配合成例：三個主要接地平移支承（`x=−50／0／+50 mm`，`k=100／200／300 N/mm`）加兩個 `x=±10 mm`、`k=500 N/mm` 輔助支承，於 `x=+10 mm` 施加 1 N。求解中心 U3 約 `0.0006024096 mm`、位移斜率約 `3.6144578×10⁻⁶ rad`；簧力 `k×u` 合計約 1 N、`x×k×u` 合計約 10 N·mm。額外兩個彈簧**同時增加平移剛度與幾何轉動耦合**，並非獨立純轉動彈簧。
+- 有限 EI Euler–Bernoulli 值在 Stage 63 僅為**獨立理論參考，沒有相對應的真實 CCX 有限剛度梁驗證**；此缺口由下一階段另行處理。
+
+**證據身分**：PR head `a066b5f85edcd7ceb8c82690580db94b96a88693`；[Repository CI `38277415445`](https://github.com/masini1491/building-envelope-engineering-kb/actions/runs/38277415445) 與 [real CCX CI `38277415991`](https://github.com/masini1491/building-envelope-engineering-kb/actions/runs/38277415991) 均 SUCCESS，新增五項 Python 測試通過；[PR #104](https://github.com/masini1491/building-envelope-engineering-kb/pull/104) 合併 SHA `151738eef3bb78136521db031a880ca407b06393`，相同 SHA 的 merged-main [Repository CI `38343837490`](https://github.com/masini1491/building-envelope-engineering-kb/actions/runs/38343837490) SUCCESS。CI 中 `.inp/.dat/.sta/.frd` 與求解檢查器的證據僅屬 isolated synthetic 模型。
+
+**尚未認可**：S8R 真實連接、局部殼旋轉、獨立量得的彈簧反力／反力矩、完整六分量平衡、材料／扣件強度、真正工程設計容量。`EVIDENCE GATED`、`MATERIAL_CAPACITY_NOT_ADMITTED`、`GENERAL_GLOBAL_BALANCE_NOT_ADMITTED`。
+
+## 第六十四階段：有限 EI 梁之彈性根部轉動對照（2026-10-13）
+
+**Stage 64／PR #105**：將 Stage 63 的剛體極限與有限梁彎曲分離。使用完全合成的 `B31` 懸臂梁（`L=100 mm`、`E=69000 MPa`、`ν=0.33`、方形 `10×10 mm`，端部 1 N）對照根部全固定與具有等效轉動柔度的方案；各採 `n=4／8` 網格。Euler–Bernoulli 小撓度解析基準為純梁彎曲 `0.00579710145 mm`、根部彈性轉動額外撓度 `0.010000000 mm`、總撓度 `0.01579710145 mm`，等效轉動剛度 `10⁶ N·mm/rad`。
+
+**失敗與修復必須共同保留**：初版 PR head `19a2c980eef23d34b3d2c1f926c6a59c056cdf0a` 的 real CCX [CI `38326051275`](https://github.com/masini1491/building-envelope-engineering-kb/actions/runs/38326051275) **FAIL**，診斷為所嘗試的 rigid-body coupling 沒有形成主 `B31` 根部轉角到側向平移彈簧的有效傳力鏈，彈性端出現無界量級位移。**不是**放寬容差即可接受的結果。修正版以和主梁共節點的兩根高剛度**但仍有限 EI**之輔助 `B31` 梁將根部轉動傳給接地 DOF3 彈簧，並新增無界位移與彈簧未參與的拒絕條件；此方法不能宣稱為理想 rigid MPC、真實角碼或可用的原生旋轉 DOF 彈簧。
+
+| 梁端向下位移（mm） | Euler–Bernoulli 近似 | CCX n=4 | CCX n=8 |
+| --- | ---: | ---: | ---: |
+| 根部固定 | 0.00579710145 | 0.005729936 | 0.005808374 |
+| 根部彈性轉動總位移 | 0.01579710145 | 0.015576700 | 0.015719570 |
+| 額外根部轉動位移 | 0.01000000000 | 0.009846764 | 0.009911196 |
+
+以細網格為例，固定端撓度相對理論差約 0.19%，轉動增量差約 0.89%；兩側由 `k×u` 衍生的力矩幅值約 100 N·mm。這是合成 B31／輔助梁模型的有限精度對照，**不是**殼加勁肋局部應力或實體連接的轉動剛度驗證。
+
+**證據身分**：修正版獨立候選曾以 head `021d18b9c4e04d0d996383fd7747a6efbd78a219` 經真實 CCX 成功驗證，之後為整合 Stage 63 workflow，PR #105 最終 exact head `f0d55c23ea4be58095adf3a18aee31f574688d3d` 再跑 [Repository CI `38343903329`](https://github.com/masini1491/building-envelope-engineering-kb/actions/runs/38343903329) 與 [real CCX CI `38343903311`](https://github.com/masini1491/building-envelope-engineering-kb/actions/runs/38343903311)，皆 SUCCESS；[PR #105](https://github.com/masini1491/building-envelope-engineering-kb/pull/105) merge SHA `e8052103934cf38f71adde9903d0f35a4eae2195`，merged-main [Repository CI `38344143862`](https://github.com/masini1491/building-envelope-engineering-kb/actions/runs/38344143862) SUCCESS。**未 admission**完整六分量反力矩、真實 S8R 連接、材料容量或 ADM。
+
+## 第六十五階段：合成 S8R 加勁肋端部彈簧高度視窗（2026-10-13）
+
+**Stage 65／PR #106**：沿用 Stage 59–62 的 `100×100×2 mm`、中心連續高 8 mm S8R 加勁肋、E=69000 MPa、ν=0.33、四邊固定及僅 WEB `P=0.0001 N/mm²` 合成模型。與同一次 CI 重新驗證的肋端自由／全高度 X 平移彈簧基準相比，低位 `z=1–4 mm` 與高位 `z=5–8 mm` 各只在兩端共 8 個節點接 `SPRING1` DOF1，`k=10000 N/mm` 每節點，分別在 n=8／16 兩種網格求解。
+
+| WEB 功共軛平均 U3（mm） | n=8 | n=16 |
+| --- | ---: | ---: |
+| 肋端自由 | 3.8218132e-05 | 4.028606913125e-05 |
+| 低位彈簧 | 3.601197786458334e-05 | 3.78892456875e-05 |
+| 高位彈簧 | 3.036418803125e-05 | 3.1839676225520835e-05 |
+| 全高度彈簧 | 2.9887918708333333e-05 | 3.13260750203125e-05 |
+
+在這個特定對稱模型及 16 網格中，低位、高位、全高度相對自由端的位移代理依序降低約 5.95%、20.97%、22.24%。兩種網格各條件的變化約 4.6%–5.1%，只滿足**研究性**雙網格 screen。獨立的**假設剛截面** `u_x(z)=u_0+zθ` 幾何矩陣：兩視窗皆 `K00=80000 N/mm`、凝縮轉動項 `K11−K01²/K00=100000 N·mm/rad`；但低位 `K01=200000 N`、`K11=600000 N·mm`，高位 `K01=520000 N`、`K11=3480000 N·mm`。**凝縮值相同不代表 S8R 局部殼場或轉動剛度相同**；此矩陣也不是獨立的殼場 oracle。
+
+**證據身分**：PR #106 head `62b3685dc078d39d2bb11b8413b9dff492bb3f3c`；[Repository CI `38352604291`](https://github.com/masini1491/building-envelope-engineering-kb/actions/runs/38352604291)、[real CCX CI `38352604287`](https://github.com/masini1491/building-envelope-engineering-kb/actions/runs/38352604287) 均 SUCCESS，Stage 65 四項專項單元測試通過；[merge SHA `a04711c04aff9d9f16f2a43d3d2fa141b0485cee`](https://github.com/masini1491/building-envelope-engineering-kb/pull/106) 與 merged-main [Repository CI `38409511220`](https://github.com/masini1491/building-envelope-engineering-kb/actions/runs/38409511220) 已驗證。全域正負簧力互抵不能判斷每端沒有局部傳力；非真實扣件或純旋轉彈簧容量。
+
+## 第六十六階段：肋端逐高度位移及局部彈簧群衍生內力（2026-10-13）
+
+**Stage 66／PR #107**：重用**同次 CCX 求解** Stage 65 的四組 n=8／16 × 低位／高位數據；不新增 deck。`check_rib_local_groups.py` 逐端讀取全部 16 個肋端節點的 `(U_x,U_y,U_z)`，以選定 8 個有效 DOF1 彈簧的既定 `k` 逐顆形成 `k U_x`、`z k U_x`、`½ k U_x²`，分別彙整左／右端之帶號量與絕對量，核對高度完整性、兩端反對稱與彈簧儲能恆等關係。
+
+| n=16，單端衍生值 | 低位 1–4 mm | 高位 5–8 mm |
+| --- | ---: | ---: |
+| `abs(sum(k U_x))` | 0.15926866 N | 0.24771551 N |
+| `abs(sum(z k U_x))` | 0.49812865 N·mm | 1.6436892 N·mm |
+| 最大單顆 `abs(k U_x)` | 0.07215462 N | 0.07210295 N |
+| 兩端合計 `sum(½ k U_x²)` | 8.3583460e-7 N·mm | 1.55693199e-6 N·mm |
+
+兩端 `sum(k U_x)` 與 `sum(z k U_x)` 帶符號總和在此**對稱載重模型**為零，然而單端絕對量與儲能不為零，**全域帶號相消不可推論局部連接無受力**。上表是求解位移乘**人為指定合成剛度**之衍生診斷；沒有獨立從 CalculiX 取得扣件反力／反力矩，`z k U_x` 亦未取得完整結構力矩驗證。
+
+**證據身分**：PR #107 head `a68978d77d772766bbae137db26a605370754323`；[Repository CI `38423669157`](https://github.com/masini1491/building-envelope-engineering-kb/actions/runs/38423669157) 與 [real CCX CI `38423669241`](https://github.com/masini1491/building-envelope-engineering-kb/actions/runs/38423669241) SUCCESS，新增四項單元測試通過，檢查器輸出 `STAGE66_LOCAL_SPRING_GROUP_POSTPROCESS_PASS; NO_INDEPENDENT_SUPPORT_REACTION`；[PR #107 merge SHA `157674fab45692e7a816f29ca50a82844d83b5fe`](https://github.com/masini1491/building-envelope-engineering-kb/pull/107)，merged-main [Repository CI `38424867812`](https://github.com/masini1491/building-envelope-engineering-kb/actions/runs/38424867812) SUCCESS。
+
+## 第六十七階段：彈簧群衍生力峰值、高度分布及雙網格比較（2026-10-14）
+
+**Stage 67／PR #108**：在同一組 Stage 65／66 real CCX 受限數據上進一步驗證各端最大單顆 `abs(k U_x)`、正規化各高度力幅值比例、`sum(abs(k U_x))`、`sum(z abs(k U_x))` 與力幅值加權高度 `z̄`。在 n=8／16 間比較各分量、各高度量級與最大值所在高度；僅採**兩網格差異 screen**，不建立一般網格收斂階數，不將帶絕對值的高度加權指標寫成真實支承反力矩。
+
+| 單端研究量 | 低位 n=16 | 高位 n=16 |
+| --- | ---: | ---: |
+| 最大單顆 `abs(k U_x)` | 0.07215462 N，z=4 mm | 0.07210295 N，z=8 mm |
+| 四顆力幅值總和 | 0.15926866 N | 0.24771551 N |
+| 力幅值加權高度 `z̄` | 3.12759993 mm | 6.63539074 mm |
+| 最高單顆力占本端總幅值 | 約 45.30% | 約 29.11% |
+| 最大單顆力 n=8／16 相對差 | 約 5.13% | 約 4.27% |
+
+低位四顆按 `z=1／2／3／4 mm` 的力幅值占比約 `7.20／18.15／29.35／45.30%`；高位 `z=5／6／7／8 mm` 約 `20.66／24.25／25.98／29.11%`。**此相同合成模型的高位配置，使每端力幅值總和與力臂指標提高，但最大單顆幅值並未明顯提高**；此敘述不是一般構造安全結論。
+
+**失敗與修復 provenance**：PR 初版 head `dd4726f3cb40076bd7d2b20f8c950f1410dbead2` 的 Repository CI `38425721900` SUCCESS，但 [real CCX CI `38425721923`](https://github.com/masini1491/building-envelope-engineering-kb/actions/runs/38425721923) **FAIL**：新增負面測試原欲驗證重複高度，所造輸入卻先違反既有 `z×k U_x` 算術恆等檢查。只修正測試資料，使其確實測試重複高度拒絕分支；不放寬 solver 或 engineering 容差。修正版 exact head `b2f24e52d34211fc0022a9a33a83af20fe31b33f` 的 [Repository CI `38425933726`](https://github.com/masini1491/building-envelope-engineering-kb/actions/runs/38425933726) 與 [real CCX CI `38425933807`](https://github.com/masini1491/building-envelope-engineering-kb/actions/runs/38425933807) 均 SUCCESS，六項單元測試全過、標記 `STAGE67_LOCAL_FORCE_HEIGHT_MESH_SCREEN_PASS; NO_INDEPENDENT_REACTION_OR_CAPACITY`。 [PR #108](https://github.com/masini1491/building-envelope-engineering-kb/pull/108) merge SHA `5a09072cd2635a2fb88d3651ab6ebe1f33c4ea19`，merged-main [Repository CI `38426821001`](https://github.com/masini1491/building-envelope-engineering-kb/actions/runs/38426821001) SUCCESS。
+
+### Stage 63–67 共通不可外推與下一道研究關卡
+
+上述五階段只證明各指定**合成**模型與指定輸入/輸出 checker 的受限相容。`SPRING1` 只具有指定全域**平移** DOF 的合成線性剛度；力臂所生等效轉動效應、B31 輔助梁傳力、S8R 彈簧高度配置**互相不能當成相同物理連接**。任何 `k×U`、`z×k×U`、正規化力幅值、`Σ|kU|` 或儲能診斷均衍生自相同求解位移，不是額外獨立量測的實體扣件支承反力、反力矩或局部峰值應力。
+
+**後續研究候選（尚未 admission，非自動執行）**：先限定一個具有獨立 oracle 的 solver 反力／element-force 觀測測試：① 從 CalculiX 2.21 官方欄位與實際輸出核對原始 SPRING1 元件力、節點 RF、MPC 消去／約束來源及其符號／座標約定；② 明確區分「由既定 kU 重算」、「由求解器元素輸出」與「經外部解析或試驗獨立驗證」三個證據層級；③ 在隔離小模型及負面檢查先成立後，才判斷 S8R 的局部場值／六分量支承需求是否可 admission。獨立的真正轉動反力矩、整片殼積分點極值、局部支承／扣件非線性與實際規範容量均需另獲可靠模型、來源與獨立驗證，不因追加本段文字即取得工程能力。
+
+所有後續設計相關結論繼續維持 `EVIDENCE GATED`、`MATERIAL_CAPACITY_NOT_ADMITTED`、`GENERAL_GLOBAL_BALANCE_NOT_ADMITTED`；**不能**把本次部件研究數值作為 ASTM／ADM 或實際帷幕牆設計容量。
