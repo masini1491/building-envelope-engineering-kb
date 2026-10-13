@@ -169,6 +169,16 @@ jobs:
             done
           done
           python check_rib_end_direction.py .
+          # Stage 65: paired rib-end X-spring height windows, synthetic only.
+          python -m unittest -v test_rib_spring_height.py
+          for n in 8 16; do
+            for window in low high; do
+              folder="rib_height_${window}_n${n}"
+              python check_rib_spring_height.py --generate "$folder" "$n" "$window"
+              (cd "$folder" && timeout 90s ccx -i panel)
+            done
+          done
+          python check_rib_spring_height.py .
           # Stage 64 finite-EI B31 beam, synthetic root rotation via stiff arms.
           python -m unittest -v test_finite_ei_rotation.py
           for n in 4 8; do
