@@ -1,6 +1,6 @@
 """Stage 64 synthetic B31 / root-lever oracle tests."""
 import unittest
-from check_finite_ei_rotation import analytical,build,assess,CASES,MESHES
+from check_finite_ei_rotation import analytical,build,assess,CASES,MESHES,E_ARM,E
 class Tests(unittest.TestCase):
     def test_theory(self):
         a=analytical()
@@ -12,9 +12,14 @@ class Tests(unittest.TestCase):
         for n in MESHES:
             for case in CASES:
                 s=build(n,case)
-                self.assertEqual(s.count("*ELEMENT,TYPE=B31"),1)
+                self.assertEqual(s.count("*ELEMENT,TYPE=B31"),1+int(case=="root_spring"))
                 self.assertEqual(s.count("*STEP"),1)
-                self.assertEqual(s.count("*RIGID BODY"),int(case=="root_spring"))
+                self.assertNotIn("*RIGID BODY",s)
+                if case=="root_spring":
+                    self.assertIn("1,1,4,0.",s)
+                    self.assertIn("1,6,6,0.",s)
+                    self.assertIn("*BEAM SECTION,ELSET=FINITE_STIFF_LEVERS",s)
+                    self.assertGreater(E_ARM/E,1000)
                 self.assertEqual(s.count("*ELEMENT,TYPE=SPRING1"),int(case=="root_spring"))
                 self.assertNotIn("*PLASTIC",s)
                 self.assertNotIn("S8R",s)

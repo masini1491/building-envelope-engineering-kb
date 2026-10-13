@@ -1,7 +1,8 @@
 """Stage 64 research candidate: finite-EI B31 cantilever with synthetic root lever.
 
-Two bounding cases use identical B31 beams: a fully clamped root, and a
-translation-fixed root with rotation-y resisted by two offset DOF3 SPRING1.
+Two bounding cases use identical finite-EI B31 main beams: a fully clamped
+root, and a translation-fixed root joined to two high-E B31 arm elements and
+DOF3 SPRING1. The arm approximation is elastic and NOT a rigid-body MPC.
 Euler-Bernoulli provides an independent small-deflection reference. CCX B31
 includes formulation effects; this is a tolerance-bounded SCREENING, not an
 exact analytical equivalence or manufactured connection.
@@ -19,9 +20,10 @@ from pathlib import Path
 L, E, NU, SIDE, P = 100.0, 69000.0, .33, 10.0, 1.0
 A = 50.0
 K_PER_LEVER = 200.0
+E_ARM = E*10000.0  # deliberately synthetic finite-stiffness transfer beams
 MESHES = (4, 8)
 CASES = ("clamped", "root_spring")
-REF, ROT, LEFT, RIGHT, DUMMY = 900, 904, 901, 902, 903
+LEFT, RIGHT = 901, 902
 ROOT, TIP = 1, -1
 MAX_RELATIVE_BENDING_ERROR = .12
 MAX_RELATIVE_SPRING_INCREMENT_ERROR = .10
@@ -52,10 +54,7 @@ def build(mesh, case):
     lines += [f"{i+1},{L*i/mesh:.8f},0.,0." for i in range(mesh+1)]
     if case=="root_spring":
         lines += [f"{LEFT},{-A:.8f},0.,0.",
-                  f"{RIGHT},{A:.8f},0.,0.",
-                  f"{DUMMY},0.,1.,0.",
-                  f"{REF},0.,0.,0.",
-                  f"{ROT},0.,0.,0."]
+                  f"{RIGHT},{A:.8f},0.,0."]
     lines += ["*ELEMENT,TYPE=B31,ELSET=FINITE_BEAM"]
     lines += [f"{i},{i},{i+1}" for i in range(1,mesh+1)]
     lines += ["*MATERIAL,NAME=SYNTHETIC_ELASTIC","*ELASTIC",f"{E:.8f},{NU:.8f}",
@@ -66,14 +65,21 @@ def build(mesh, case):
     if case=="clamped":
         lines += ["*BOUNDARY","1,1,6,0."]
     else:
-        lines += ["*NSET,NSET=LEVERS",f"{LEFT},{RIGHT}",
-                  "*NSET,NSET=ROOT_RIGID",f"1,{LEFT},{RIGHT},{DUMMY}",
-                  f"*RIGID BODY,NSET=ROOT_RIGID,REF NODE={REF},ROT NODE={ROT}",
+        # Independent side members physically share node 1 with the main B31.
+        # This establishes a finite-EI moment-transfer route by beam elements,
+        # rather than assuming a rigid-body MPC ties B31 root rotation.
+        lines += ["*ELEMENT,TYPE=B31,ELSET=FINITE_STIFF_LEVERS",
+                  f"{mesh+1},{LEFT},1",f"{mesh+2},1,{RIGHT}",
+                  "*MATERIAL,NAME=SYNTHETIC_LEVER_ELASTIC","*ELASTIC",
+                  f"{E_ARM:.8f},{NU:.8f}",
+                  "*BEAM SECTION,ELSET=FINITE_STIFF_LEVERS,MATERIAL=SYNTHETIC_LEVER_ELASTIC,SECTION=RECT",
+                  f"{SIDE:.8f},{SIDE:.8f}","0.,1.,0.",
+                  "*NSET,NSET=LEVERS",f"{LEFT},{RIGHT}",
                   "*ELEMENT,TYPE=SPRING1,ELSET=LEVER_SPRINGS",
-                  f"{mesh+1},{LEFT}",f"{mesh+2},{RIGHT}",
+                  f"{mesh+3},{LEFT}",f"{mesh+4},{RIGHT}",
                   "*SPRING,ELSET=LEVER_SPRINGS","3",f"{K_PER_LEVER:.8f}",
                   "*BOUNDARY",
-                  f"{REF},1,3,0.",f"{ROT},1,1,0.",f"{ROT},3,3,0."]
+                  "1,1,4,0.","1,6,6,0."]
     lines += ["*STEP","*STATIC","0.05,1.,0.00001,0.1",
               "*CLOAD",f"{tip},3,{-P:.8f}",
               "*NODE FILE,OUTPUT=3D","U,RF",
@@ -133,8 +139,8 @@ def observed(root,mesh,case):
     if set(tip)!={mesh+1} or set(base)!={1}:
         raise ValueError("STAGE64_BEAM_FIELD_COVERAGE")
     d=-tip[mesh+1][2]
-    if not math.isfinite(d) or d<=0:
-        raise ValueError("STAGE64_TIP_RESPONSE_NONPHYSICAL")
+    if not math.isfinite(d) or d<=0 or d>1.0:
+        raise ValueError("STAGE64_TIP_RESPONSE_NONPHYSICAL_OR_UNBOUNDED")
     result={"case":case,"mesh":mesh,"tip_downward_mm":d,
             "beam_root_uz_mm":base[1][2],
             "artifact_sha256":{ext:hashlib.sha256(f.read_bytes()).hexdigest() for ext,f in files.items()},
@@ -142,6 +148,8 @@ def observed(root,mesh,case):
     if case=="root_spring":
         arms=dat_vector(files["dat"],"LEVERS")
         if set(arms)!={LEFT,RIGHT}: raise ValueError("STAGE64_LEVER_FIELD_COVERAGE")
+        if max(abs(arms[LEFT][2]),abs(arms[RIGHT][2]))<1e-9:
+            raise ValueError("STAGE64_LEVER_NOT_PARTICIPATING")
         slope=(arms[RIGHT][2]-arms[LEFT][2])/(2*A)
         total=K_PER_LEVER*(arms[LEFT][2]+arms[RIGHT][2])
         moment=A*K_PER_LEVER*(arms[RIGHT][2]-arms[LEFT][2])
@@ -151,7 +159,8 @@ def observed(root,mesh,case):
             raise ValueError("STAGE64_LEVER_MOMENT_BALANCE")
         if abs(-slope-analytical()["finite_root_rotation_rad"])>1e-5:
             raise ValueError("STAGE64_ROOT_ROTATION_ORACLE_MISMATCH")
-        result.update({"lever_slope_rad":slope,"k_u_total_n":total,
+        result.update({"lever_slope_rad":slope,"lever_to_beam_elastic_modulus_ratio":E_ARM/E,
+                       "k_u_total_n":total,
                        "x_k_u_total_n_mm":moment,
                        "independent_lever_reaction":"NOT_OBSERVED_K_U_DERIVED_ONLY"})
     return result
