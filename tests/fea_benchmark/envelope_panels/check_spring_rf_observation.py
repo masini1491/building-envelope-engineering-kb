@@ -133,8 +133,21 @@ def inspect(folder:Path,case:str)->dict:
     if not _near(fixed_rf,-P):
         raise ValueError("STAGE68_FIXED_NODE_RF_NOT_STABLE")
     data=files["dat"].read_text(encoding="utf-8",errors="replace")
-    native_s_print_observed=bool(re.search(
-        r"(?im)^\s*stresses\b[^\n]*\bfor set LINK\b",data))
+    stress_head=re.search(r"(?im)^\s*stresses\b[^\n]*\bfor set LINK\b[^\n]*$",data)
+    if stress_head is None:
+        raise ValueError("STAGE68_EXPECTED_ELEMENT_STRESS_HEADER_MISSING")
+    # A header is NOT an element row. CCX 2.21 emits this header with ZERO
+    # numerical rows for this SPRING2 S request. Fail if semantics drift.
+    stress_rows=0
+    for line in data[stress_head.end():].splitlines():
+        if not line.strip():
+            continue
+        if re.match(r"^\s*(?:displacements|forces|stresses)\b",line,re.I):
+            break
+        if re.match(r"^\s*\d+\s+",line):
+            stress_rows+=1
+    if stress_rows!=0:
+        raise ValueError("STAGE68_ELEMENT_STRESS_DATA_REQUIRES_REVIEW")
     return {
         "case":case,
         "unit_system":"N_mm",
@@ -151,8 +164,9 @@ def inspect(folder:Path,case:str)->dict:
         "fixed_rf_includes_applied_spc_cload":"NOT_OBSERVED_IN_THIS_CASE",
         "clean_spc_reaction_interpretation":"BOUNDED_NO_DIRECT_LOAD",
         "spring_element_stress_key_observation":{
-            "key":"S","requested":True,"stress_label_present_in_dat":native_s_print_observed,
-            "spring_element_force_validated":"NO"
+            "key":"S","requested":True,"stress_header_present_in_dat":True,
+            "numeric_element_stress_rows":stress_rows,
+            "spring_element_force_validated":"NO_ROWS_NOT_OBSERVED"
         },
         "mpc_transmission":"NOT_MODELED",
         "independent_spring_element_force":"NOT_ADMITTED",
