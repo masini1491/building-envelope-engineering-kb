@@ -902,7 +902,7 @@ Stage 43 已通過 PR #68 真實 independent pressure scaling 與 main CI；Stag
 
 **失敗與修復 provenance**：PR 初版 head `dd4726f3cb40076bd7d2b20f8c950f1410dbead2` 的 Repository CI `38425721900` SUCCESS，但 [real CCX CI `38425721923`](https://github.com/masini1491/building-envelope-engineering-kb/actions/runs/38425721923) **FAIL**：新增負面測試原欲驗證重複高度，所造輸入卻先違反既有 `z×k U_x` 算術恆等檢查。只修正測試資料，使其確實測試重複高度拒絕分支；不放寬 solver 或 engineering 容差。修正版 exact head `b2f24e52d34211fc0022a9a33a83af20fe31b33f` 的 [Repository CI `38425933726`](https://github.com/masini1491/building-envelope-engineering-kb/actions/runs/38425933726) 與 [real CCX CI `38425933807`](https://github.com/masini1491/building-envelope-engineering-kb/actions/runs/38425933807) 均 SUCCESS，六項單元測試全過、標記 `STAGE67_LOCAL_FORCE_HEIGHT_MESH_SCREEN_PASS; NO_INDEPENDENT_REACTION_OR_CAPACITY`。 [PR #108](https://github.com/masini1491/building-envelope-engineering-kb/pull/108) merge SHA `5a09072cd2635a2fb88d3651ab6ebe1f33c4ea19`，merged-main [Repository CI `38426821001`](https://github.com/masini1491/building-envelope-engineering-kb/actions/runs/38426821001) SUCCESS。
 
-### Stage 63–67 共通不可外推與下一道研究關卡
+### 第六十三至六十七階段共通限制與下一道研究關卡
 
 上述五階段只證明各指定**合成**模型與指定輸入/輸出 checker 的受限相容。`SPRING1` 只具有指定全域**平移** DOF 的合成線性剛度；力臂所生等效轉動效應、B31 輔助梁傳力、S8R 彈簧高度配置**互相不能當成相同物理連接**。任何 `k×U`、`z×k×U`、正規化力幅值、`Σ|kU|` 或儲能診斷均衍生自相同求解位移，不是額外獨立量測的實體扣件支承反力、反力矩或局部峰值應力。
 
