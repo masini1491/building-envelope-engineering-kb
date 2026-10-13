@@ -55,6 +55,8 @@ class Stage67Tests(unittest.TestCase):
     def test_reject_duplicate_height_and_missing_node(self):
         bad=synthetic_case(16,"high")
         bad["per_end"]["x0"]["selected_nodes"][0]["z_mm"]=6.
+        first=bad["per_end"]["x0"]["selected_nodes"][0]
+        first["z_times_k_u_n_mm"]=6.*first["k_times_u_x_n"]
         with self.assertRaisesRegex(ValueError,"NONFINITE_OR_DUPLICATED"):
             end_profile(bad,"x0","high")
         bad=synthetic_case(16,"high")
