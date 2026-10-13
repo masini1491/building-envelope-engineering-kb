@@ -169,6 +169,14 @@ jobs:
             done
           done
           python check_rib_end_direction.py .
+          # Stage 63: isolated rigid lever and SPRING1 translation-only benchmark.
+          python -m unittest -v test_rigid_lever_rotation.py
+          for case in rotation distribution; do
+            folder="rigid_lever_${case}"
+            python check_rigid_lever_rotation.py --generate "$folder" "$case"
+            (cd "$folder" && timeout 90s ccx -i panel)
+          done
+          python check_rigid_lever_rotation.py .
           python -m unittest -v test_follower_pressure.py
           python -m unittest -v test_expanded_face.py
           python -m unittest -v test_expanded_frd.py
