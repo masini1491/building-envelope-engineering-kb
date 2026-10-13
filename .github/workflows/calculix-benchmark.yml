@@ -182,6 +182,9 @@ jobs:
           # Stage 66: same-run Stage 65 solver output, per-rib-end derived k*u.
           python -m unittest -v test_rib_local_groups.py
           python check_rib_local_groups.py .
+          # Stage 67: bounded per-height spring force envelope and 8/16 mesh screen.
+          python -m unittest -v test_rib_force_peak_distribution.py
+          python check_rib_force_peak_distribution.py .
           # Stage 64 finite-EI B31 beam, synthetic root rotation via stiff arms.
           python -m unittest -v test_finite_ei_rotation.py
           for n in 4 8; do
