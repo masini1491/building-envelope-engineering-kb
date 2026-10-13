@@ -27,8 +27,8 @@ class SpringRFTests(unittest.TestCase):
         with self.assertRaises(ValueError):field(Path("unused"),"stress","FIXED")
     def test_external_force_decomposition(self):
         a={"observed_fixed_rf3_n":-P,"observed_loaded_rf3_n":P,
-           "observed_uz2_mm":EXPECTED_U2,"inferred_mechanical_fixed_reaction_n":-P}
-        b={**a,"inferred_mechanical_fixed_reaction_n":-P-SUPPORT_LOAD["loaded_spc"]}
+           "observed_uz2_mm":EXPECTED_U2,"fixed_spc_applied_external_load_n":0.}
+        b={**a,"fixed_spc_applied_external_load_n":SUPPORT_LOAD["loaded_spc"]}
         result=crosscheck({"clean_spc":a,"loaded_spc":b})
         self.assertEqual(result["mpc_reaction"],"NOT_ADMITTED_NOT_TESTED")
         with self.assertRaisesRegex(ValueError,"CONTAMINATION"):

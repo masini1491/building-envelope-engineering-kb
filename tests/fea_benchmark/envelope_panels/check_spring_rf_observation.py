@@ -3,9 +3,9 @@
 Only a two-node translational spring, no MPC, S8R shell, real connector,
 rotational DOF spring or engineering capacity. N-mm-N/mm units. The verified
 support is not directly loaded in the clean variant, so CCX RF there has a
-narrow support-reaction interpretation. Loaded-node RF is external resultant,
-NOT a support reaction. In the contaminated variant *CLOAD also acts at the
-fixed node, so fixed-node RF cannot be relabelled as pure reaction.
+narrow support-reaction interpretation. Loaded-node RF is an internal nodal resultant at this unconstrained point,
+NOT a support reaction. The directly loaded fixed-node variant probes whether
+CCX's raw RF responds to that load; it DOES NOT assume a universal rule.
 """
 from __future__ import annotations
 
@@ -127,9 +127,11 @@ def inspect(folder:Path,case:str)->dict:
     # as mechanical support reaction. This is NOT a native spring element force.
     if not _near(fixed_rf,-P) or not _near(loaded_rf,P):
         raise ValueError("STAGE68_OBSERVED_RF_RESULTANT_MISMATCH")
-    inferred_reaction=fixed_rf-SUPPORT_LOAD[case]
-    if not _near(inferred_reaction,-P-SUPPORT_LOAD[case]):
-        raise ValueError("STAGE68_EXTERNAL_LOAD_DECOMPOSITION")
+    # The fixed RF reported by CCX does not change when a CLOAD is added
+    # directly at this SPC in this specific input. Do not infer an unseen
+    # reaction by subtracting that CLOAD: no independent observation supports it.
+    if not _near(fixed_rf,-P):
+        raise ValueError("STAGE68_FIXED_NODE_RF_NOT_STABLE")
     data=files["dat"].read_text(encoding="utf-8",errors="replace")
     native_s_print_observed=bool(re.search(
         r"(?im)^\s*stresses\b[^\n]*\bfor set LINK\b",data))
@@ -143,9 +145,11 @@ def inspect(folder:Path,case:str)->dict:
         "observed_fixed_rf3_n":fixed_rf,
         "observed_loaded_rf3_n":loaded_rf,
         "external_load_at_fixed_node_n":SUPPORT_LOAD[case],
-        "inferred_mechanical_fixed_reaction_n":inferred_reaction,
-        "fixed_rf_is_uncontaminated_reaction":case=="clean_spc",
-        "fixed_rf_is_reaction_plus_external_load":True,
+        "fixed_rf_stable_with_direct_spc_load":True,
+        "fixed_spc_applied_external_load_n":SUPPORT_LOAD[case],
+        "pure_reaction_in_loaded_spc":"NOT_DERIVED_FROM_RF_ALONE",
+        "fixed_rf_includes_applied_spc_cload":"NOT_OBSERVED_IN_THIS_CASE",
+        "clean_spc_reaction_interpretation":"BOUNDED_NO_DIRECT_LOAD",
         "spring_element_stress_key_observation":{
             "key":"S","requested":True,"stress_label_present_in_dat":native_s_print_observed,
             "spring_element_force_validated":"NO"
@@ -164,12 +168,13 @@ def crosscheck(cases:dict)->dict:
     if not (_near(a["observed_fixed_rf3_n"],b["observed_fixed_rf3_n"])
             and _near(a["observed_loaded_rf3_n"],b["observed_loaded_rf3_n"])
             and _near(a["observed_uz2_mm"],b["observed_uz2_mm"])
-            and _near(b["inferred_mechanical_fixed_reaction_n"]-
-                      a["inferred_mechanical_fixed_reaction_n"],
-                      -SUPPORT_LOAD["loaded_spc"])):
+            and _near(b["fixed_spc_applied_external_load_n"]-
+                      a["fixed_spc_applied_external_load_n"],
+                      SUPPORT_LOAD["loaded_spc"])):
         raise ValueError("STAGE68_FIXED_LOAD_CONTAMINATION_IDENTITY_FAILED")
-    return {"cases":cases,"independent_evidence_scope":"CLEAN_FIXED_NODE_RF_VS_EXTERNAL_LOAD_AND_ANALYTIC_FORCE_ONLY",
-            "solver_RF_at_loaded_node":"INCLUDES_CLOAD_NOT_REACTION",
+    return {"cases":cases,"independent_evidence_scope":"NO_DIRECT_CLOAD_CLEAN_SPC_RF_VS_ANALYTIC_FORCE_ONLY",
+            "solver_RF_at_loaded_node":"OBSERVED_INTERNAL_RESULTANT_NOT_SUPPORT_REACTION",
+            "RF_INCLUDES_DIRECT_SPC_CLOAD":"NOT_OBSERVED_IN_THIS_BOUNDED_CASE",
             "spring_element_force":"NOT_ADMITTED_NATIVE_ELEMENT_OUTPUT_UNVERIFIED",
             "mpc_reaction":"NOT_ADMITTED_NOT_TESTED",
             "S8R_shell_application":"NOT_ADMITTED",
