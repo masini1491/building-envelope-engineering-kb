@@ -297,6 +297,11 @@ jobs:
             python run_aluminum_research.py --input "$fixture/input.json" --workspace "$fixture/run" --ccx "$(command -v ccx)" --execute > "$fixture/output.json"
           done
           python check_aluminum_elastic_scaling.py "$RUNNER_TEMP/scaling_baseline" "$RUNNER_TEMP/scaling_doubled"
+          # Engineering-facing research-only brief: unit gate and actual CCX research JSON.
+          python -m unittest -v test_aluminum_engineering_brief.py
+          python aluminum_engineering_brief.py "$RUNNER_TEMP/scaling_baseline/output.json" > "$RUNNER_TEMP/aluminum_engineering_brief.md"
+          grep -q "NOT_ADMITTED" "$RUNNER_TEMP/aluminum_engineering_brief.md"
+          grep -q "不是.*獨立量得" "$RUNNER_TEMP/aluminum_engineering_brief.md"
           python -m unittest -v test_aluminum_normal_hooke.py
           python check_aluminum_normal_hooke.py "$RUNNER_TEMP/scaling_baseline"
           python -m unittest -v test_aluminum_ritz_stress.py
