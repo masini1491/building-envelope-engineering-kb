@@ -4,6 +4,14 @@
 
 ## 目前執行中的工作
 
+## 2026-10-14 工程應用優先序決議（覆寫既有研究 next-step 敘述）
+
+- **使用者已選定調整方向**：KB-CAND-007 自 Stage 69 後暫停追逐一般 MPC／RF／六分量內部重建。下方歷史 Stage 與過去「下一關」敘述保留作研究紀錄，不構成本次優先序。
+- **當前 Hot：工程師可審閱的鋁板研究結果**。優先重用既有 `run_aluminum_research.py` 與 `aluminum_result_summary.py`／`aluminum_tensor_observation.py`，建立對既有受限結果 JSON 的唯讀繁中摘要，明示幾何、材料、面壓、網格、撓度、外插／平均應力、重建支承合力、source provenance，以及不得據以做容量判定的理由。先保留四邊固定矩形／合成 S8R 研究邊界；不擴大任意真實板肋輸入。
+- **其次：有獨立 oracle 才啟動板／肋工程參數化**。先界定實際加勁肋幾何、連接、支承、網格、場值和反力的可驗證缺口；先以已實測合成 Stage 59–67 測例作候選，不得把其固定合成幾何當成可用於任意真實帷幕的驗算模型。
+- **工程 admission 不變**：`EVIDENCE GATED`、`MATERIAL_CAPACITY_NOT_ADMITTED`、`GENERAL_GLOBAL_BALANCE_NOT_ADMITTED`。暫緩不是驗證豁免；應力峰值、扣件反力／反力矩、ADM 容量均尚未認可。
+
+
 ### 非線性 FEA 求解器介面（KB-CAND-007）— EVIDENCE GATED
 
 - **Current admitted capability**：已完成 Stage 1–44（含 Stage 40–44 受限鋁板研究擴充），固定合成算例入口為 `tests/fea_benchmark/envelope_panels/run_synthetic_panel.py`，只允許 Repo 自建 synthetic glass／aluminum、S8R NLGEOM、P1 high-load、網格 4／8／16；必須 opt-in、外部可信 CCX、空白工作目錄、求解完成及內力／外力診斷都成立才輸出 `SYNTHETIC_BENCHMARK_EVIDENCE_PASS`。Stage 33 PR #57 的六組真實 CI、Stage 35 PR #59 的 SHA-256 provenance 以及 Stage 36 PR #60 的跨工作目錄重播與各自 main CI 均成立；**並非任何工程 acceptance**。
