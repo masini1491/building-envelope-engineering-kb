@@ -52,3 +52,11 @@ Cold item **不具 execution authority**。要開始實作前，必須依 curren
 - **Why deferred**：一般彈性應力、撓度與受限支承需求研究不必以完整拉伸硬化曲線作為先決條件；優先補足幾何／邊界條件／場值物理基準，而不是反覆增加合成塑性測試。
 - **Trigger**：有實際需要超降伏、塑性重分布、卸載殘餘變形或成形行為的明確工況，並取得對應產品／板厚／temper／加工狀態、方向、批次及使用權利相符的真實應力–應變原始資料及獨立驗證方法。
 - **禁止推論**：不得以降伏強度、抗拉強度與伸長率推造完整硬化曲線；不得在未完成材料、支承、失效準則及正式設計依據 admission 前宣稱工程容量。
+
+### 深入 MPC／RF 反力與非共線力矩重建（KB-CAND-007-MPC）
+
+- **Status**：`CANDIDATE / DEFERRED`，依 2026-10-14 使用者工程應用優先序，Stage 70 非共線力矩與一般 MPC／rigid-body RF 研究不再是 current Hot。
+- **Evidence**：Stage 68／69 已確認合成 SPRING2 與兩項 `*EQUATION` 的受限單軸位移、固定端 raw RF、外力解析平衡，但原始 slave/master RF 不是已獨立量得的 MPC constraint multiplier；元素力無可採信的原生數值列。技術原始證據在 `references/github-projects/nonlinear-fea-solver-admission.md`。
+- **Trigger**：具體帷幕鋁板／加勁肋／連接研究的工程輸出無法由現有受限模型可靠提供，且能提出真正需 MPC moment／constraint-reaction 的力學問題、獨立解析／試驗 oracle 與可辨識的工程收益。
+- **Boundary**：Cold 不授權自動 Stage 70 執行，不由局部單軸 PASS 推論任意 MPC／六分量平衡或扣件設計力。
+
