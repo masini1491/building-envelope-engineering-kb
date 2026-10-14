@@ -138,6 +138,16 @@ jobs:
             done
           done
           python check_center_rib_plate.py .
+          # Bounded 2/3-mm plate + rib thickness sweep; reuse same-run Stage 59 control.
+          python -m unittest -v test_rib_thickness_sweep.py
+          for n in 8 16; do
+            for rib in 0 4 8; do
+              folder="rib_thickness_3_h${rib}_n${n}"
+              python check_rib_thickness_sweep.py --generate "$folder" "$n" "$rib" 3.0
+              (cd "$folder" && timeout 90s ccx -i panel)
+            done
+          done
+          python check_rib_thickness_sweep.py .
           # Stage 60: extra ideal constraints on synthetic centered-rib ends.
           python -m unittest -v test_rib_end_transfer.py
           for n in 8 16; do
