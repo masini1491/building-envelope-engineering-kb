@@ -909,3 +909,30 @@ Stage 43 已通過 PR #68 真實 independent pressure scaling 與 main CI；Stag
 **後續研究候選（尚未 admission，非自動執行）**：先限定一個具有獨立 oracle 的 solver 反力／element-force 觀測測試：① 從 CalculiX 2.21 官方欄位與實際輸出核對原始 SPRING1 元件力、節點 RF、MPC 消去／約束來源及其符號／座標約定；② 明確區分「由既定 kU 重算」、「由求解器元素輸出」與「經外部解析或試驗獨立驗證」三個證據層級；③ 在隔離小模型及負面檢查先成立後，才判斷 S8R 的局部場值／六分量支承需求是否可 admission。獨立的真正轉動反力矩、整片殼積分點極值、局部支承／扣件非線性與實際規範容量均需另獲可靠模型、來源與獨立驗證，不因追加本段文字即取得工程能力。
 
 所有後續設計相關結論繼續維持 `EVIDENCE GATED`、`MATERIAL_CAPACITY_NOT_ADMITTED`、`GENERAL_GLOBAL_BALANCE_NOT_ADMITTED`；**不能**把本次部件研究數值作為 ASTM／ADM 或實際帷幕牆設計容量。
+
+## 第六十八階段：兩節點平移彈簧 SPC 原始 RF 與節點直接載重（2026-10-14）
+
+**Stage 68／PR #110**：兩節點 SPRING2、全域 DOF3，合成剛度 K=250 N/mm、自由端 CLOAD +1.25 N，解析位移 U=0.005 mm。比較 clean_spc（固定端無直接外力）及 loaded_spc（固定端另加 +0.4 N）。兩案真實 CalculiX 2.21 均觀察到自由端 U3=+0.005 mm、固定端原始 RF3=-1.25 N、自由端原始 RF3=+1.25 N。固定端另加 CLOAD 沒有改變這些原始輸出；禁止因此自行加減 0.4 N 推導另一個已驗證純反力。自由端 RF 不是支承反力。
+
+*EL PRINT S 的原生 SPRING2 輸出只有 stresses 表頭而無元素數值列：numeric_element_stress_rows=0；不能宣稱已驗證 native spring element force。根據既定剛度與位移計算的 kΔu=1.25 N 只能歸類 Level 1 衍生數值。
+
+**Provenance**：PR #110 最終 head 5133fc6d01b4764683c64a20cc4a2c3053ffe9a3；[Repository CI #38431618287](https://github.com/masini1491/building-envelope-engineering-kb/actions/runs/38431618287)、[real CCX CI #38431618133](https://github.com/masini1491/building-envelope-engineering-kb/actions/runs/38431618133) 均 SUCCESS，5 項新增單元測試 PASS。merge 071eb4d0f10efcc5e0cc1de6185577d5f04a7252 的 [Repository CI #38432389143](https://github.com/masini1491/building-envelope-engineering-kb/actions/runs/38432389143) SUCCESS。曾提出的 loaded SPC「RF 減去直接外力即純反力」解讀已撤回，不能復用。
+
+## 第六十九階段：兩項線性 MPC 與獨立單軸平衡基準（2026-10-14）
+
+**Stage 69／PR #111**：合成 SPRING2 無 MPC 控制組與線性 *EQUATION 耦合組，皆為 K=250 N/mm、外力 F=+1.25 N、固定端無直接外力、線彈性小位移。MPC 組以兩項方程「node2 U3 - node3 U3 = 0」將 node2 作 dependent slave、node3 作受力 master；*EQUATION 第一變數消去及 RF 在 MPC 下的限制依 [CalculiX 2.21 User's Manual](https://www.dhondt.de/ccx_2.21.pdf) 第 7.55 節／*NODE PRINT 節。手冊明示 MPC-induced forces 不會由 RF 完整計算，故不能把 slave 或 master 原始 RF 當成完整 MPC 約束反力。
+
+| 真實 CalculiX 2.21 DAT 觀測 | 控制組 | MPC 方程組 |
+| --- | ---: | ---: |
+| 解析及實測 node2 U3（mm） | 0.005 | 0.005 |
+| node3 U3（mm） | 不適用 | 0.005 |
+| 固定 node1 原始 RF3（N） | -1.25 | -1.25 |
+| node2 原始 RF3（N） | +1.25 | +1.25 |
+| node3 原始 RF3（N） | 不適用 | 0.0 |
+| 獨立外力 + 固定端 RF3（N） | 0.0 | 0.0 |
+
+**證據分級**：Level 1 為由 k×位移重算的衍生力；Level 2 是上述求解器 DAT 的原始 RF，master/slave 數值僅作 observation；Level 3 **僅限指定合成模型**的解析 U=F/K、clean SPC 支承 RF=-F 和單軸力平衡獨立對照。此結果不是 MPC multiplier 觀測，也不能升格成非共線力矩、一般三向反力、六分量平衡或實際扣件力分布。
+
+**候選證據**：head bca8ab3aa833ddc71ed3da025c223ac12f3127e2；[Repository CI #38497421252](https://github.com/masini1491/building-envelope-engineering-kb/actions/runs/38497421252) 與 [CalculiX 2.21 CI #38497421248](https://github.com/masini1491/building-envelope-engineering-kb/actions/runs/38497421248) SUCCESS，六項新單元測試及兩個 real solver cases 通過；CI log 標記 STAGE69_MPC_SINGLE_AXIS_SUPPORT_BALANCE_PASS。DAT SHA-256：control d3b307bf11073e304b385edcce0e68f2e0481cf14fe556df2ba390c304486712；equation 6f24b3c881cbddcaebeb6864cf8eca8eac9923caf2ebbe0110f22151d2c4f722。文件增加後的候選 head 須另行執行新 SHA 的 required validation，不得拿此初始 head 的 PASS 代替。
+
+**未 admission 與下一步**：非共線載重與獨立力偶／反力矩 oracle、*RIGID BODY 的 ref／rot node RF 實際語意、MPC constraint multiplier、原生 spring element force、S8R 端部連接局部傳力、完整六分量全域平衡、真實材料與 ASTM／ADM 容量，均保持研究缺口。狀態繼續 EVIDENCE GATED、MATERIAL_CAPACITY_NOT_ADMITTED、GENERAL_GLOBAL_BALANCE_NOT_ADMITTED。
