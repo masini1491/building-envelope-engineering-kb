@@ -193,6 +193,14 @@ jobs:
             (cd "$folder" && timeout 90s ccx -i panel)
           done
           python check_spring_rf_observation.py .
+          # Stage 69: isolated two-term *EQUATION versus clean SPC control.
+          python -m unittest -v test_mpc_reaction.py
+          for mpc_case in control equation; do
+            folder="mpc69_${mpc_case}"
+            python check_mpc_reaction.py --generate "$folder" "$mpc_case"
+            (cd "$folder" && timeout 90s ccx -i panel)
+          done
+          python check_mpc_reaction.py .
           # Stage 64 finite-EI B31 beam, synthetic root rotation via stiff arms.
           python -m unittest -v test_finite_ei_rotation.py
           for n in 4 8; do
