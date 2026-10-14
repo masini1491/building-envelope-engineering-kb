@@ -148,6 +148,11 @@ jobs:
             done
           done
           python check_rib_thickness_sweep.py .
+          # Engineering-facing, research-only comparison using same-run verified 12 cases.
+          python -m unittest -v test_rib_thickness_engineering_report.py
+          python check_rib_thickness_sweep.py . | head -n 1 > "$RUNNER_TEMP/rib_thickness_verified.json"
+          python rib_thickness_engineering_report.py "$RUNNER_TEMP/rib_thickness_verified.json" > "$RUNNER_TEMP/rib_thickness_comparison.md"
+          grep -q "MATERIAL_CAPACITY_NOT_ADMITTED" "$RUNNER_TEMP/rib_thickness_comparison.md"
           # Stage 60: extra ideal constraints on synthetic centered-rib ends.
           python -m unittest -v test_rib_end_transfer.py
           for n in 8 16; do
