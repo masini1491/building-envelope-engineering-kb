@@ -15,7 +15,6 @@ from pathlib import Path
 
 from u_rib_stud_geometry import load
 from check_u_fold_cantilever import _completed, _dat_vectors
-from check_aluminum_ritz import I0, I1, I2, IX
 
 HERE = Path(__file__).parent
 FIXTURE = HERE / 'fixtures' / 'u_rib_stud_50x50_t3_synthetic.json'
@@ -148,11 +147,57 @@ def deck(n:int,case:str)->str:
 
 
 def ritz_point_load_center()->float:
-    # Independent one-term clamped plate Ritz for F at center, NOT exact shell value.
+    """Six-term clamped-plate Rayleigh-Ritz point-load screening.
+
+    Six longitudinal polynomial modes with exact polynomial integrals and
+    a 6x6 Gaussian solve; no solver-output fitting and no design admission.
+    """
+    def shape(k):
+        return {2*k:1,2*k+2:-2,2*k+4:1}
+    def der(p,n=1):
+        for _ in range(n):
+            p={e-1:v*e for e,v in p.items() if e>=1}
+        return p
+    def inte(p,q):
+        return math.fsum(2*v*w/(e+f+1) for e,v in p.items()
+                         for f,w in q.items() if not (e+f)%2)
     a,b=LENGTH,PANEL_WIDTH
-    D=E*3.**3/(12*(1-NU**2)); jac=a*b/4
-    K=jac*(16*I2*I0*(a**-4+b**-4)+32*(NU*IX**2+(1-NU)*I1**2)/(a*a*b*b))
-    return LOAD_N/(D*K)
+    D=E*3**3/(12*(1-NU**2))
+    jac=a*b/4
+    y=shape(0)
+    y00=inte(y,y)
+    y11=inte(der(y),der(y))
+    y22=inte(der(y,2),der(y,2))
+    y20=inte(y,der(y,2))
+    n=6
+    shapes=[shape(k) for k in range(n)]
+    mat=[[0.]*n for _ in range(n)]
+    rhs=[LOAD_N]+[0.]*(n-1)
+    for i,x in enumerate(shapes):
+        for j,z in enumerate(shapes):
+            mat[i][j]=D*jac*(
+                16/a**4*inte(der(x,2),der(z,2))*y00
+                +16/b**4*inte(x,z)*y22
+                +16*NU/(a*a*b*b)*(inte(der(x,2),z)+inte(x,der(z,2)))*y20
+                +32*(1-NU)/(a*a*b*b)*inte(der(x),der(z))*y11)
+    for i in range(n):
+        pivot=max(range(i,n),key=lambda k:abs(mat[k][i]))
+        if abs(mat[pivot][i])<1e-12:
+            raise ValueError('U_SHELL_RITZ_SINGULAR')
+        mat[i],mat[pivot]=mat[pivot],mat[i]
+        rhs[i],rhs[pivot]=rhs[pivot],rhs[i]
+        for j in range(i+1,n):
+            factor=mat[j][i]/mat[i][i]
+            for k in range(i,n):
+                mat[j][k]-=factor*mat[i][k]
+            rhs[j]-=factor*rhs[i]
+    solution=[0.]*n
+    for i in range(n-1,-1,-1):
+        solution[i]=(rhs[i]-math.fsum(mat[i][j]*solution[j]
+                         for j in range(i+1,n)))/mat[i][i]
+    if not 0<solution[0]<.1 or not math.isfinite(solution[0]):
+        raise ValueError('U_SHELL_RITZ_INVALID')
+    return solution[0]
 
 
 def compare(observed: dict[tuple[int,str],float])->dict:
@@ -165,13 +210,13 @@ def compare(observed: dict[tuple[int,str],float])->dict:
         if observed[n,'unlinked']>=.05*3:raise ValueError('U_SHELL_DISPLACEMENT_OUTSIDE_SMALL_LOAD_SCOPE')
     ref=ritz_point_load_center()
     difference=abs(observed[16,'unlinked']-ref)/ref
-    if difference>.7:raise ValueError('U_SHELL_ONE_TERM_PLATE_ORACLE_SCREEN_FAILED')
+    if difference>.25:raise ValueError('U_SHELL_ONE_TERM_PLATE_ORACLE_SCREEN_FAILED')
     meshdiff={}
     for c in CASES:
         d=abs(observed[16,c]-observed[8,c])/observed[16,c]
         if d>.25:raise ValueError('U_SHELL_TWO_MESH_CHANGE_TOO_LARGE')
         meshdiff[c]=d
-    return {'scope':SCOPE,'unlinked_plate_one_term_ritz_mm':ref,
+    return {'scope':SCOPE,'unlinked_plate_six_term_ritz_mm':ref,
             'ritz_screen_relative_difference':difference,
             'center_point_displacement_mm':{str(n):{c:observed[n,c] for c in CASES} for n in MESHES},
             'two_mesh_relative_difference':meshdiff,
