@@ -1,0 +1,12 @@
+{
+  "units": "mm",
+  "panel_thickness_mm": 3.0,
+  "rib_base_width_mm": 50.0,
+  "rib_height_mm": 50.0,
+  "rib_thickness_mm": 3.0,
+  "rib_length_mm": 1200.0,
+  "stud_pitch_mm": 300.0,
+  "first_stud_edge_offset_mm": 150.0,
+  "last_stud_min_edge_offset_mm": 150.0,
+  "stud_layout": "single_center_row"
+}
