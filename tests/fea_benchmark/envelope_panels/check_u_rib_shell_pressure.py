@@ -158,7 +158,9 @@ def observed_case(root: Path, n: int, case: str) -> dict:
     if (set(center) != {topo['center']} or set(p_stud) != set(topo['panel_studs']) or
         set(r_stud) != set(topo['rib_studs'])):
         raise ValueError('U_PRESSURE_INCOMPLETE_OUTPUT_NODES')
-    v = -center[topo['center']][2]
+    # Positive CalculiX P pressure on the PLATE shell produces +U3 here.
+    # Do not import the -U3 sign convention of the prior negative CLOAD.
+    v = center[topo['center']][2]
     if not math.isfinite(v) or not 0 < v < .15:
         raise ValueError('U_PRESSURE_CENTER_DEFLECTION_INVALID')
     x = _configuration()['stud_centers']['positions_along_length_mm']
