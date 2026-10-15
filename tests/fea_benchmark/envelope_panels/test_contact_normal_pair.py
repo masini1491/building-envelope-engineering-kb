@@ -8,8 +8,8 @@ from check_contact_normal_pair import CASES,deck,generate,oracle,field,completed
 def values(case):
     f=1. if case=="compression" else 0.
     g=-.00001 if case=="compression" else .002
-    return ({i:(0.,0.,-f/4) for i in range(1,5)},
-            {i:(0.,0.,f/4) for i in range(13,17)},
+    return ({i:(0.,0.,f/4) for i in range(1,5)},
+            {i:(0.,0.,-f/4) for i in range(13,17)},
             {i:(0.,0.,0.) for i in range(5,9)},
             {i:(0.,0.,g) for i in range(9,13)})
 

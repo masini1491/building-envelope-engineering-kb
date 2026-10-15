@@ -97,7 +97,7 @@ def oracle(case,base,driven,lower,upper):
     gaps=[upper[i+4][2]-lower[i][2] for i in range(5,9)]
     if case=="compression":
         # E*A*delta/(L1+L2) = 1 N; penalty adds only synthetic compliance.
-        if not .8<rt<1.2 or rb>=0 or not all(-.00035<g<.00035 for g in gaps):
+        if not -.0-1.2<rt<-.8 or rb<=0 or not all(-.00035<g<.00035 for g in gaps):
             raise ValueError(f"CONTACT_COMPRESSION_ORACLE_FAIL:driven={rt:.9g}:base={rb:.9g}:gaps={gaps!r}")
     else:
         if abs(rt)>.02 or abs(rb)>.02 or not all(g>.0015 for g in gaps):
