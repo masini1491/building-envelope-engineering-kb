@@ -129,6 +129,9 @@ jobs:
           done
           python check_u_fold_web_pressure.py .
           # Stage 59: four-edge clamped synthetic plate; centered continuous rib.
+          # Parameterized open-U geometry and central-row stud markers, geometry only.
+          python -m unittest -v test_u_rib_geometry.py
+          python u_rib_geometry.py --defaults > "$RUNNER_TEMP/u_rib_nominal_geometry.json"
           python -m unittest -v test_center_rib_plate.py
           for n in 8 16; do
             for rib in 0 4 8; do
