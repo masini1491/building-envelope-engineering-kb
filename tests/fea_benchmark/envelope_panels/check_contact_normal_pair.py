@@ -86,7 +86,7 @@ def field(raw,kind,node_set):
 def oracle(case,base,driven,lower,upper):
     if case not in CASES or any(set(g)!=set(range(lo,hi)) for g,lo,hi in
       ((base,1,5),(driven,13,17),(lower,5,9),(upper,9,13))):
-        raise ValueError("CONTACT_NODE_COVERAGE")
+        raise ValueError(f"CONTACT_NODE_COVERAGE:{case}:base={sorted(base)}:driven={sorted(driven)}:lower={sorted(lower)}:upper={sorted(upper)}")
     if any(len(v)!=3 or any(type(z) not in (float,int) or not math.isfinite(z) for z in v)
            for g in (base,driven,lower,upper) for v in g.values()):
         raise ValueError("CONTACT_BAD_VECTOR")
