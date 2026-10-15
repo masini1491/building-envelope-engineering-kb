@@ -149,6 +149,17 @@ jobs:
           done
           python check_u_rib_shell_links.py . > "$RUNNER_TEMP/u_rib_shell_links.txt"
           grep -q "U_SHELL_DISCRETE_STUD_SYNTHETIC_BENCHMARK_PASS" "$RUNNER_TEMP/u_rib_shell_links.txt"
+          # Synthetic 0.000001 N/mm2 panel-only pressure, independent Ritz screening.
+          python -m unittest -v test_u_rib_shell_pressure.py
+          for n in 8 16; do
+            for scenario in unlinked soft stiff; do
+              folder="u_pressure_n${n}_${scenario}"
+              python check_u_rib_shell_pressure.py --generate "$folder" "$n" "$scenario"
+              (cd "$folder" && timeout 90s ccx -i panel)
+            done
+          done
+          python check_u_rib_shell_pressure.py . > "$RUNNER_TEMP/u_rib_pressure.txt"
+          grep -q "U_PRESSURE_SYNTHETIC_RITZ_AND_MESH_SCREEN_PASS" "$RUNNER_TEMP/u_rib_pressure.txt"
           python -m unittest -v test_center_rib_plate.py
           for n in 8 16; do
             for rib in 0 4 8; do
