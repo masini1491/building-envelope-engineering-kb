@@ -171,6 +171,49 @@ jobs:
           done
           python check_u_rib_support_sensitivity.py . > "$RUNNER_TEMP/u_rib_support.txt"
           grep -q "U_SUPPORT_FOURIER_AND_DISCRETE_LINK_SCREEN_PASS" "$RUNNER_TEMP/u_rib_support.txt"
+          # Retain the actual same-run, CCX-validated 12-case result for review.
+          head -n 1 "$RUNNER_TEMP/u_rib_support.txt" > u_rib_support_result.json
+          python - <<'PY' > u_rib_support_summary.md
+          import json
+          import math
+          from pathlib import Path
+          data = json.loads(Path("u_rib_support_result.json").read_text(encoding="utf-8"))
+          assert data["scope"] == "SYNTHETIC_PLATE_FOUR_EDGE_TRANSVERSE_SIMPLE_SUPPORT_WITH_OPEN_U_RIB_STUD_SPRINGS"
+          assert data["engineering_acceptance"] == "NOT_ADMITTED"
+          assert data["rib_end_condition_in_both"] == "SYNTHETIC_FIXED_RIB_ENDS"
+          cases = data["center_deflection_mm"]
+          assert set(cases) == {"8", "16"}
+          labels = (("unlinked", "無連接"), ("soft", "合成 50 N/mm"), ("stiff", "合成 5000 N/mm"))
+          print("# 鋁板與 U 型加勁肋：支承敏感度合成研究結果")
+          print()
+          print("**EVIDENCE GATED／MATERIAL_CAPACITY_NOT_ADMITTED／GENERAL_GLOBAL_BALANCE_NOT_ADMITTED**")
+          print()
+          print("鋁板 1200 × 300 × 3 mm；U 型肋 50 × 50 × 3 mm；四個名目 @300 mm 植釘站點；肋端理想全固定。")
+          print("僅比較板四邊全固定與 U3 限制之理想簡支近似；連接為 Z 向合成彈簧，非實際植釘剛度。")
+          print("合成均布面壓 0.000001 N/mm²；名目合力 0.36 N（非正式設計風壓）。")
+          print()
+          print("| 連接條件 | 固定 n16 中心 U3 (mm) | 簡支 n16 中心 U3 (mm) | 簡支／固定比 | 簡支 n8／n16 差異 |")
+          print("| :-- | --: | --: | --: | --: |")
+          for key, label in labels:
+              fine, coarse = cases["16"][key], cases["8"][key]
+              fixed, simple = fine["clamped"], fine["simple"]
+              ratio = simple / fixed
+              delta = abs(simple - coarse["simple"]) / simple
+              assert all(math.isfinite(v) and v > 0 for v in (fixed, simple, coarse["simple"], ratio))
+              assert simple > fixed
+              assert math.isclose(ratio, fine["simple_to_clamped_ratio"], rel_tol=1e-8)
+              assert math.isclose(delta, data["two_mesh_simple_relative_change"][key], rel_tol=1e-8, abs_tol=1e-12)
+              print(f"| {label} | {fixed:.8g} | {simple:.8g} | {ratio:.4f} | {delta*100:.2f}% |")
+          assert all(cases["16"][a]["simple"] > cases["16"][b]["simple"] for a,b in (("unlinked","soft"),("soft","stiff")))
+          print()
+          print(f"無連接簡支純板 Navier 參考中心位移：{data['simple_support_center_fourier_reference_mm']:.8g} mm。")
+          print(f"細網格與此解析參考差異：{100*data['unlinked_fine_mesh_fourier_relative_error']:.2f}%。")
+          print("解析參考不驗證 U 肋、離散連接或實際支承。")
+          print("未認可：真實植釘受力／焊接容量、板肋接觸／摩擦／滑移、角碼、風壓組合、材料容量與六分量平衡。")
+          PY
+          test -s u_rib_support_result.json
+          test -s u_rib_support_summary.md
+          grep -q "NOT_ADMITTED" u_rib_support_summary.md
           python -m unittest -v test_center_rib_plate.py
           for n in 8 16; do
             for rib in 0 4 8; do
@@ -424,4 +467,6 @@ jobs:
             tests/fea_benchmark/envelope_panels/*/*.dat
             tests/fea_benchmark/envelope_panels/*/*.frd
             tests/fea_benchmark/envelope_panels/*/*.sta
+            tests/fea_benchmark/envelope_panels/u_rib_support_result.json
+            tests/fea_benchmark/envelope_panels/u_rib_support_summary.md
           if-no-files-found: warn
