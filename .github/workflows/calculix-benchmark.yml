@@ -214,6 +214,15 @@ jobs:
           test -s u_rib_support_result.json
           test -s u_rib_support_summary.md
           grep -q "NOT_ADMITTED" u_rib_support_summary.md
+          # Two-cube unilateral contact oracle; no shell/stud/contact admission.
+          python -m unittest -v test_contact_normal_pair.py
+          for case in compression opening; do
+            folder="normal_contact_${case}"
+            python check_contact_normal_pair.py --generate "$folder" "$case"
+            (cd "$folder" && timeout 90s ccx -i panel)
+          done
+          python check_contact_normal_pair.py . > "$RUNNER_TEMP/normal_contact_result.txt"
+          grep -q "ISOLATED_NORMAL_CONTACT_UNILATERAL_ORACLE_PASS" "$RUNNER_TEMP/normal_contact_result.txt"
           python -m unittest -v test_center_rib_plate.py
           for n in 8 16; do
             for rib in 0 4 8; do
