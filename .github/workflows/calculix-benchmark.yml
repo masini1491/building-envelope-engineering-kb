@@ -129,6 +129,15 @@ jobs:
           done
           python check_u_fold_web_pressure.py .
           # Stage 59: four-edge clamped synthetic plate; centered continuous rib.
+          # Four @300-mm center-row stations; synthetic scalar spring transfer only.
+          python -m unittest -v test_u_rib_stud_link.py
+          for scenario in unlinked soft stiff; do
+            folder="stud_link_${scenario}"
+            python check_u_rib_stud_link.py --generate "$folder" "$scenario"
+            (cd "$folder" && timeout 90s ccx -i panel)
+          done
+          python check_u_rib_stud_link.py . > "$RUNNER_TEMP/stud_link_synthetic_result.txt"
+          grep -q "STUD_ANALOGUE_SPRING_GRAPH_PASS" "$RUNNER_TEMP/stud_link_synthetic_result.txt"
           python -m unittest -v test_center_rib_plate.py
           for n in 8 16; do
             for rib in 0 4 8; do
