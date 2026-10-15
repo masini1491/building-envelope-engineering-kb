@@ -160,6 +160,17 @@ jobs:
           done
           python check_u_rib_shell_pressure.py . > "$RUNNER_TEMP/u_rib_pressure.txt"
           grep -q "U_PRESSURE_SYNTHETIC_RITZ_AND_MESH_SCREEN_PASS" "$RUNNER_TEMP/u_rib_pressure.txt"
+          # Ideal plate U3-only edge restraint vs same-workflow clamped pressure controls.
+          python -m unittest -v test_u_rib_support_sensitivity.py
+          for n in 8 16; do
+            for scenario in unlinked soft stiff; do
+              folder="u_support_simple_n${n}_${scenario}"
+              python check_u_rib_support_sensitivity.py --generate "$folder" "$n" "$scenario"
+              (cd "$folder" && timeout 90s ccx -i panel)
+            done
+          done
+          python check_u_rib_support_sensitivity.py . > "$RUNNER_TEMP/u_rib_support.txt"
+          grep -q "U_SUPPORT_FOURIER_AND_DISCRETE_LINK_SCREEN_PASS" "$RUNNER_TEMP/u_rib_support.txt"
           python -m unittest -v test_center_rib_plate.py
           for n in 8 16; do
             for rib in 0 4 8; do
