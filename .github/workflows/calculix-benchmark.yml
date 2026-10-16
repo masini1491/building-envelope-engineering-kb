@@ -208,6 +208,96 @@ jobs:
           python -m unittest -v test_u_rib_contact_observations.py
           python check_u_rib_contact_observations.py . > u_rib_contact_observations.txt
           head -n 1 u_rib_contact_observations.txt > u_rib_contact_observations.json
+# Diagnostic isolation: declared contact with the independent U-rib
+          # translated +20 mm Z; original physical acceptance gate stays intact.
+          python - <<'PY'
+          from pathlib import Path
+          from check_u_rib_base_contact import deck, selected_faces
+          for n in (8, 16):
+              original = deck(n, "toward")
+              topo, _, _ = selected_faces(n)
+              rib = {node for element in topo["rib"] for node in element}
+              plate = {node for element in topo["plate"] for node in element}
+              assert rib and not (rib & plate)
+              transformed, changed, inside = [], set(), False
+              for line in original.splitlines():
+                  if line == "*NODE":
+                      inside = True
+                  elif line.startswith("*"):
+                      inside = False
+                  if inside and line and not line.startswith("*"):
+                      cells = line.split(",")
+                      assert len(cells) == 4
+                      node = int(cells[0])
+                      if node in rib:
+                          cells[3] = f"{float(cells[3]) + 20.:.8f}"
+                          line = ",".join(cells)
+                          changed.add(node)
+                  transformed.append(line)
+              assert changed == rib
+              candidate = "\n".join(transformed) + "\n"
+              assert candidate.count("*CONTACT PAIR") == 1
+              assert candidate.count("*CONTACT PRINT") == 1
+              assert candidate.count("*ELEMENT,TYPE=S8R") == 2
+              assert "RIB_BASE_UNDERSIDE,PLATE_TOP" in candidate
+              folder = Path(f"u_declared_inactive_n{n}")
+              folder.mkdir(exist_ok=False)
+              (folder / "panel.inp").write_text(candidate, encoding="utf-8")
+          PY
+          for n in 8 16; do
+            (cd "u_declared_inactive_n$n" && timeout 90s ccx -i panel)
+          done
+          # Keep both the matched no-pair control and declared-inactive-pair
+          # observation: this is NOT an independent contact/MPC force oracle.
+          python - <<'PY'
+          import hashlib, json, math
+          from pathlib import Path
+          from check_u_rib_base_contact import selected_faces
+          from check_u_rib_contact_observations import rf, contact_print
+          controls = json.loads(Path("u_rib_contact_observations.json").read_text(encoding="utf-8"))
+          records = {}
+          for n in (8, 16):
+              root = Path(f"u_declared_inactive_n{n}")
+              status = (root / "panel.sta").read_text(encoding="ascii")
+              times = [float(tokens[4]) for line in status.splitlines()
+                       if len(tokens := line.split()) == 7 and tokens[0] == "1"]
+              assert times and math.isfinite(times[-1]) and abs(times[-1]-1.) < 1e-7
+              data = (root / "panel.dat").read_text(encoding="utf-8", errors="replace")
+              topo, _, _ = selected_faces(n)
+              forces = {}
+              for name, nodes in (("PLATE_EDGE_RF", topo["clamped_plate"]),
+                                  ("RIB_END_RF", topo["clamped_rib_end"]),
+                                  ("CENTER_RF", (topo["center"],))):
+                  forces[name] = rf(data, name)
+                  assert forces[name]["count"] == len(nodes)
+              try:
+                  surface = contact_print(data)
+                  surface_status = "PRINTED"
+              except ValueError as exc:
+                  if str(exc) != "U_CONTACT_DIAG_FINAL_SURFACE_MISSING":
+                      raise
+                  surface, surface_status = None, "NOT_AVAILABLE"
+              a = forces["PLATE_EDGE_RF"]["sum_rf3_n"]
+              b = forces["RIB_END_RF"]["sum_rf3_n"]
+              c = forces["CENTER_RF"]["sum_rf3_n"]
+              baseline = controls["cases"][str(n)]["unlinked"]
+              records[str(n)] = {
+                  "plate_edge_rf3_n": a, "rib_end_rf3_n": b, "center_rf3_n": c,
+                  "raw_rf3_sum_n": math.fsum((a,b,c)),
+                  "plate_edge_delta_vs_unlinked_n": a-baseline["PLATE_EDGE_RF"]["sum_rf3_n"],
+                  "center_delta_vs_unlinked_n": c-baseline["CENTER_RF"]["sum_rf3_n"],
+                  "contact_print_status": surface_status, "contact_print": surface,
+                  "inp_sha256": hashlib.sha256((root/"panel.inp").read_bytes()).hexdigest(),
+                  "dat_sha256": hashlib.sha256((root/"panel.dat").read_bytes()).hexdigest()}
+          report = {"scope": "SYNTHETIC_DECLARED_INACTIVE_S8R_CONTACT_CONTROL",
+                    "rib_translation_z_mm": 20., "cases": records,
+                    "contact_balance_oracle": "NOT_ESTABLISHED",
+                    "mpc_reaction_reconstruction": "NOT_ESTABLISHED",
+                    "engineering_acceptance": "NOT_ADMITTED"}
+          Path("u_declared_inactive_observations.json").write_text(
+              json.dumps(report, sort_keys=True, allow_nan=False)+"\n", encoding="utf-8")
+          PY
+
           python check_u_rib_base_contact.py . > "$RUNNER_TEMP/u_base_contact_result.txt"
           grep -q "OPEN_U_BASE_ONLY_UNILATERAL_CONTACT_BOUNDED_SCREEN_PASS_NOT_DESIGN" "$RUNNER_TEMP/u_base_contact_result.txt"
           head -n 1 "$RUNNER_TEMP/u_base_contact_result.txt" > u_base_contact_result.json
@@ -554,5 +644,7 @@ jobs:
             tests/fea_benchmark/envelope_panels/s8r_nonconforming_result.json
             tests/fea_benchmark/envelope_panels/u_base_contact_result.json
             tests/fea_benchmark/envelope_panels/u_rib_contact_observations.json
+            tests/fea_benchmark/envelope_panels/u_declared_inactive_observations.json
+            tests/fea_benchmark/envelope_panels/u_declared_inactive_n*/*.inp
             tests/fea_benchmark/envelope_panels/s8r_normal_summary.md
           if-no-files-found: warn
