@@ -55,6 +55,18 @@ class ObservationsTests(unittest.TestCase):
         value=observe_dat(RF.replace("30.","3.000000+01"),"unlinked")
         self.assertEqual(value["raw_rf3_sum_n"],0.)
         with self.assertRaises(ValueError):observe_dat(RF,"other")
+    def test_swapped_slave_master_output_identity(self):
+        swapped=CONTACT.replace(
+            "slave set RIB_BASE_UNDERSIDE, master set PLATE_TOP",
+            "slave set PLATE_TOP, master set RIB_BASE_UNDERSIDE")
+        with self.assertRaises(ValueError):
+            contact_print(swapped)
+        value=contact_print(swapped,"PLATE_TOP","RIB_BASE_UNDERSIDE")
+        self.assertEqual(value["slave_total_force_n"][2],10.)
+        self.assertEqual(value["contact_area_mm2"],34.)
+        with self.assertRaises(ValueError):
+            contact_print(swapped,"FAKE","RIB_BASE_UNDERSIDE")
+
     def test_true_inactive_contact_print_nan_normal_and_shear(self):
         # Actual CalculiX 2.21 print signature for a pair with zero contact area.
         zero=CONTACT.replace("0. 0. 10. 0. -2000. 0.","0. 0. 0. 0. 0. 0.").replace(

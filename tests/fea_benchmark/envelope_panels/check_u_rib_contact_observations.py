@@ -19,8 +19,13 @@ def numeric_row(chunk,count):
             return [val(x) for x in fields]
     raise ValueError("U_CONTACT_DIAG_MISSING_NUMERIC_ROW")
 
-def contact_print(raw):
-    head=re.compile(r"(?im)^\s*statistics for slave set\s+RIB_BASE_UNDERSIDE,\s*master set\s+PLATE_TOP\s+and time\s+("+NUM+r")\s*$")
+def contact_print(raw,slave="RIB_BASE_UNDERSIDE",master="PLATE_TOP"):
+    if (slave,master) not in (("RIB_BASE_UNDERSIDE","PLATE_TOP"),
+                             ("PLATE_TOP","RIB_BASE_UNDERSIDE")):
+        raise ValueError("U_CONTACT_DIAG_UNKNOWN_SURFACE_PAIR")
+    head=re.compile(r"(?im)^\s*statistics for slave set\s+"+
+                    re.escape(slave)+r",\s*master set\s+"+re.escape(master)+
+                    r"\s+and time\s+("+NUM+r")\s*$")
     hits=list(head.finditer(raw))
     if not hits or abs(val(hits[-1].group(1))-1.)>1e-7:raise ValueError("U_CONTACT_DIAG_FINAL_SURFACE_MISSING")
     block=raw[hits[-1].end():]

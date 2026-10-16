@@ -36,3 +36,7 @@ PR #131 head `ab256396a996b190f9600d4d685cdca34588026e`、CalculiX CI run `38886
 - 此負向控制支持「已知非接觸外力可由本合成 U 肋兩端 RF3 平衡」，但不能推出活動接觸時的偽節點力、MPC 反力或受力等價；原本 `OPEN_U_CONTACT_RF_GLOBAL_Z_IMBALANCE` 仍保持 FAIL。
 
 **下一門**：建立獨立可驗證的 MPC 約束傳力重建／完整反力觀測，或可核對的其他數值 oracle 後，才允許研究 contact／網格收斂及合成植釘共同作用。
+
+## 主從面互換隔離觀測（待 exact-head 求解）
+
+保留本合成板肋 S8R 幾何、接觸參數與 +/−0.02 mm 驅動，僅將接觸配對與 *CONTACT PRINT 的 slave/master 由 U 肋底面／鋁板上表面互換為鋁板上表面／U 肋底面。n=8、16 的 toward／away 共四組，獨立記錄 RF3、接觸合力與面積，並保留原始 input/output SHA-256。僅檢查接觸演算法與配對敏感性，不改接觸平衡 FAIL gate，不代表接觸容量、MPC 反力或正式工程認可。
