@@ -8,10 +8,17 @@ SCOPE="SYNTHETIC_U_RIB_CONTACT_REVERSED_PAIR_OBSERVATION_NOT_ADMITTED"
 def deck(n,case):
     if type(n) is not int or n not in MESHES or case not in CASES:raise ValueError("SWAP_SCOPE")
     original=source_deck(n,case)
-    a="RIB_BASE_UNDERSIDE,PLATE_TOP"
-    b="PLATE_TOP,RIB_BASE_UNDERSIDE"
-    if original.count(a)!=2:raise ValueError("SWAP_ORIGIN")
-    return original.replace(a,b)
+    # CONTACT PAIR and CONTACT PRINT use different complete keyword lines.
+    # Replace only those exact lines; do not alter any geometry or constraints.
+    pair="RIB_BASE_UNDERSIDE,PLATE_TOP"
+    reverse="PLATE_TOP,RIB_BASE_UNDERSIDE"
+    print_old="*CONTACT PRINT,SLAVE=RIB_BASE_UNDERSIDE,MASTER=PLATE_TOP"
+    print_new="*CONTACT PRINT,SLAVE=PLATE_TOP,MASTER=RIB_BASE_UNDERSIDE"
+    lines=original.splitlines()
+    if lines.count(pair)!=1 or lines.count(print_old)!=1:
+        raise ValueError("SWAP_ORIGIN")
+    return original.replace(pair+"\n",reverse+"\n",1).replace(
+        print_old+"\n",print_new+"\n",1)
 def generate(folder,n,case):
     p=Path(folder)
     if p.exists() or p.is_symlink():raise ValueError("SWAP_WORKDIR")
