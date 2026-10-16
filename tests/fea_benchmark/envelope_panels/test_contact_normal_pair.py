@@ -26,7 +26,7 @@ class ContactNormalTests(unittest.TestCase):
             if c=="compression_gap":
                 self.assertIn("9,0,0,1.0005",s)
             else:
-                self.assertIn("9,0,0,1.0",s) if False else None
+                self.assertIn("9,0,0,1",s)
         self.assertNotEqual(deck("compression"),deck("opening"))
     def test_oracle_valid_synthetic_samples(self):
         for c in CASES:
