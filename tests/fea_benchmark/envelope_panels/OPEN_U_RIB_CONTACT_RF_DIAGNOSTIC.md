@@ -37,6 +37,23 @@ PR #131 head `ab256396a996b190f9600d4d685cdca34588026e`、CalculiX CI run `38886
 
 **下一門**：建立獨立可驗證的 MPC 約束傳力重建／完整反力觀測，或可核對的其他數值 oracle 後，才允許研究 contact／網格收斂及合成植釘共同作用。
 
-## 主從面互換隔離觀測（待 exact-head 求解）
+## 主從面互換隔離觀測（已完成 real CalculiX 2.21；負面結果）
 
-保留本合成板肋 S8R 幾何、接觸參數與 +/−0.02 mm 驅動，僅將接觸配對與 *CONTACT PRINT 的 slave/master 由 U 肋底面／鋁板上表面互換為鋁板上表面／U 肋底面。n=8、16 的 toward／away 共四組，獨立記錄 RF3、接觸合力與面積，並保留原始 input/output SHA-256。僅檢查接觸演算法與配對敏感性，不改接觸平衡 FAIL gate，不代表接觸容量、MPC 反力或正式工程認可。
+本次不改合成幾何、網格、材料、理想支承、接觸 penalty 或 ±0.02 mm 人工位移；僅交換接觸 pair 及 CONTACT PRINT 的 slave/master。PR #131 exact head `1c4f881331713e0977d467bba5280f82608a6918`；CalculiX run `38937038025`，artifact `12061078620`（ZIP SHA-256 `20870ab18de84d517b43d24ffbba0c23a4d39161dca44e58ea1aa0b6188e83e6`）。四組 `.inp/.dat/.sta/.frd` 對應 JSON 的 16 組 SHA-256 全部核對一致；原始配對觀測也來自同次 CI。
+
+| 網格／方向 | 原配對 raw RF3 合計 (N) | 反轉配對 raw RF3 合計 (N) | 原配對 slave CFz (N) | 反轉配對 slave CFz (N) | 原配對接觸面積 (mm²) | 反轉配對接觸面積 (mm²) |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| n=8 toward | −44.4374645 | −44.4653812 | +14.40875 | −14.39054 | 34.02925 | 28.48912 |
+| n=16 toward | −17.8664376 | −17.8710571 | +14.10576 | −14.10800 | 59.48620 | 133.62470 |
+| n=8 away | +0.6399254 | +0.1492582 | +0.6890661 | −0.8108804 | 782.45100 | 393.18820 |
+| n=16 away | −0.0192892 | −0.0002979 | +0.03750857 | −0.02053856 | 76.85426 | 1682.72000 |
+
+**範圍限定的結論：**
+
+- 壓合工況原始 RF3 殘差在反轉後仍是 n=8 約 −44.47 N、n=16 約 −17.87 N，沒有形成全域反力平衡 oracle。反轉 slave 側後，CFz 符號改變不能被當成兩側獨立實測平衡證據。
+- 接觸面積及分離時非零接觸力對 slave/master 非常敏感；n=16 away 反轉面積約為原配對的 21.9 倍。這是受限演算法／離散數值敏感度，不能由 `CFN` 與幾何名目重疊面積直接推出真實帷幕接觸容量。
+- n=8／16 的已知 ±1 N 無接觸節點力對照通過，但只限該負向控制；既不能外推至帶 contact springs 的內部節點力，也不能證明缺失的反力全由 MPC 引起。
+- CalculiX 文件將 `RF` 定義為節點外力（含約束反力及 CLOAD/DLOAD），並明示不計算由 MPC 產生的作用力；`CONTACT PRINT` 的 `CF/CFN` 僅代表指定 slave 接觸面力。官方文獻定義見 [*NODE FILE](https://feacluster.com/CalculiX/ccx_2.18/doc/ccx/node305.html)、[*CONTACT PRINT](https://feacluster.com/CalculiX/ccx_2.18/doc/ccx/node237.html)。這是 2.18 公開文件的語意參考，2.21 本算例行為需以實測及 2.21 原始碼核對，不能推定完全相同。
+- [CalculiX upstream issue #97](https://github.com/Dhondtguido/CalculiX/issues/97) 已回報殼與接觸同時存在時外力觀測異常；2026 年 [RR 輸出討論](https://calculix.discourse.group/t/output-reaction-forces-only/3809?page=3) 也指出 expanded shell 的 FRD 力輸出存在未解議題。均只是獨立問題線索，尚未能認定是 PR #131 的同一根因，更不能套用非正式修補作正式反力。
+- **停在證據門**：`CONTACT_NOT_ADMITTED`、`MPC_REACTION_RECONSTRUCTION_NOT_ESTABLISHED`、`ENGINEERING_ACCEPTANCE_NOT_ADMITTED`；原有 `check_u_rib_base_contact.py` RF3 FAIL 不改，PR 不合併。若要突破，優先建立可追溯的接觸力 ownership、獨立切面力或實體單元對照，而非改容差／任意補算 CFN。
+
