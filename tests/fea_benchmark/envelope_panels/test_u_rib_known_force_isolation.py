@@ -5,7 +5,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from check_u_rib_known_force_isolation import CASES, MESHES, deck, generate, load_nodes, observe
+from check_u_rib_known_force_isolation import CASES, MESHES, deck, generate, load_nodes, observe, noncontact_known_force_residual
 
 
 class KnownForceIsolationTests(unittest.TestCase):
@@ -35,6 +35,15 @@ class KnownForceIsolationTests(unittest.TestCase):
                 deck(n, "up")
         with self.assertRaises(ValueError):
             deck(8, "wrong")
+
+    def test_known_force_balance_requires_finite_and_correct_sign(self):
+        self.assertAlmostEqual(noncontact_known_force_residual(-1.0000028, 1.0), -0.0000028)
+        self.assertAlmostEqual(noncontact_known_force_residual(0.9999986, -1.0), -0.0000014)
+        for reaction, load in ((-0.98, 1.0), (1.0, 1.0), (float("nan"), 1.0),
+                               (0.0, float("inf")), (-1.0, 0.5)):
+            with self.subTest(reaction=reaction, load=load):
+                with self.assertRaises(ValueError):
+                    noncontact_known_force_residual(reaction, load)
 
     def test_generation_and_missing_evidence(self):
         with tempfile.TemporaryDirectory() as td:

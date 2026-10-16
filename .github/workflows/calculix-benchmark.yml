@@ -657,6 +657,7 @@ jobs:
             tests/fea_benchmark/envelope_panels/u_rib_contact_observations.json
             tests/fea_benchmark/envelope_panels/u_declared_inactive_observations.json
             tests/fea_benchmark/envelope_panels/u_rib_known_force_observations.json
+            tests/fea_benchmark/envelope_panels/u_rib_known_force_n*/*.inp
             tests/fea_benchmark/envelope_panels/u_declared_inactive_n*/*.inp
             tests/fea_benchmark/envelope_panels/s8r_normal_summary.md
           if-no-files-found: warn

@@ -17,10 +17,24 @@ from check_s8r_normal_contact import rf
 CASES = ("up", "down")
 FORCE_N = 1.0
 SCOPE = "SYNTHETIC_U_RIB_S8R_KNOWN_EXTERNAL_FORCE_NO_CONTACT"
+# Existing synthetic contact check uses a 0.0002 N absolute balance floor.
+# Only this no-contact, known-external-load control is admitted to this test.
+NONCONTACT_RIB_BALANCE_TOL_N = 0.0002
 
 
 def reject(label):
     raise ValueError("U_RIB_KNOWN_FORCE_" + label)
+
+
+def noncontact_known_force_residual(rib_reaction_n, applied_force_n):
+    if not (math.isfinite(rib_reaction_n) and math.isfinite(applied_force_n)):
+        reject("NONFINITE_KNOWN_FORCE")
+    if abs(applied_force_n) != FORCE_N:
+        reject("KNOWN_FORCE_SCOPE")
+    residual = math.fsum((rib_reaction_n, applied_force_n))
+    if abs(residual) > NONCONTACT_RIB_BALANCE_TOL_N:
+        reject("NONCONTACT_RIB_BALANCE")
+    return residual
 
 
 def load_nodes(n):
@@ -96,13 +110,13 @@ def measure(folder, n, case):
         values[name] = math.fsum(row[2] for row in entries.values())
     applied = FORCE_N if case == "up" else -FORCE_N
     rib_sum = values["RIB_END_RF"]
-    if not math.isfinite(rib_sum):
-        reject("RF_NONFINITE")
+    residual = noncontact_known_force_residual(rib_sum, applied)
     return {
         "known_applied_force_n": applied,
         "known_applied_nodes": list(nodes),
         "rib_end_raw_rf3_n": rib_sum,
-        "rib_external_force_balance_residual_n": math.fsum((rib_sum, applied)),
+        "rib_external_force_balance_residual_n": residual,
+        "noncontact_known_force_balance_state": "OBSERVED_WITHIN_NUMERIC_TOLERANCE",
         "plate_edge_raw_rf3_n": values["PLATE_EDGE_RF"],
         "center_raw_rf3_n": values["CENTER_RF"],
         "plate_raw_rf3_sum_n": math.fsum(
@@ -125,6 +139,7 @@ def observe(root):
         "scope": SCOPE,
         "plate_control_displacement_mm": DRIVE_MM,
         "known_external_force_magnitude_n": FORCE_N,
+        "noncontact_known_force_balance_tolerance_n": NONCONTACT_RIB_BALANCE_TOL_N,
         "cases": records,
         "independent_contact_transfer_oracle": "NOT_ESTABLISHED",
         "mpc_reaction_reconstruction": "NOT_ESTABLISHED",
