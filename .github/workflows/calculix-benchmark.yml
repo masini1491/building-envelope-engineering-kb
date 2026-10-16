@@ -221,7 +221,7 @@ jobs:
             python check_contact_normal_pair.py --generate "$folder" "$case"
             (cd "$folder" && timeout 90s ccx -i panel)
           done
-          python check_contact_normal_pair.py . > "$RUNNER_TEMP/normal_contact_result.txt"
+          python check_contact_normal_pair.py . > "$RUNNER_TEMP/normal_contact_result.txt" || { echo "SYNTHETIC_OPENING_DAT_DIAGNOSTIC"; sed -n '1,160p' normal_contact_opening/panel.dat; exit 1; }
           grep -q "ISOLATED_NORMAL_CONTACT_UNILATERAL_ORACLE_PASS" "$RUNNER_TEMP/normal_contact_result.txt"
           python -m unittest -v test_center_rib_plate.py
           for n in 8 16; do
