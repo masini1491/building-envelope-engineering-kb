@@ -78,8 +78,10 @@ def deck(n,case):
                   "*NODE PRINT,NSET=PLATE_EDGE_RF","U,RF",
                   "*NODE PRINT,NSET=RIB_END_RF","U,RF",
                   "*NODE PRINT,NSET=CENTER_RF","U,RF",
-                  "*NODE FILE,OUTPUT=3D","U",
-                  "*CONTACT PRINT","CF,CFN,CNUM","*END STEP",""])
+                  "*NODE FILE,OUTPUT=3D","U"])
+    if case!="unlinked":
+        lines.extend(["*CONTACT PRINT","CF,CFN,CNUM"])
+    lines.extend(["*END STEP",""])
     output="\n".join(lines)
     if (output.count("*ELEMENT,TYPE=S8R")!=2 or
             output.count("*CONTACT PAIR")!=int(case!="unlinked") or
