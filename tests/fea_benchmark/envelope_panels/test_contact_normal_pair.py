@@ -3,15 +3,15 @@ import math
 import tempfile
 import unittest
 from pathlib import Path
-from check_contact_normal_pair import CASES,deck,generate,oracle,field,completed
+from check_contact_normal_pair import CASES,INITIAL_GAP_MM,deck,generate,oracle,field,completed
 
 def values(case):
-    f=1. if case=="compression" else 0.
-    g=-.00001 if case=="compression" else .002
+    f=(1. if case=="compression" else .75 if case=="compression_gap" else 0.)
+    g=-.00001 if case=="compression" else -.0000075 if case=="compression_gap" else .002
     return ({i:(0.,0.,f/4) for i in range(1,5)},
             {i:(0.,0.,-f/4) for i in range(13,17)},
             {i:(0.,0.,0.) for i in range(5,9)},
-            {i:(0.,0.,g) for i in range(9,13)})
+            {i:(0.,0.,g-INITIAL_GAP_MM[case]) for i in range(9,13)})
 
 class ContactNormalTests(unittest.TestCase):
     def test_isolated_two_cube_decks(self):
@@ -23,6 +23,10 @@ class ContactNormalTests(unittest.TestCase):
             self.assertIn("2,S1",s)
             self.assertNotIn("*FRICTION",s)
             self.assertIn(f"DRIVEN,3,3,{CASES[c]:.8f}",s)
+            if c=="compression_gap":
+                self.assertIn("9,0,0,1.0005",s)
+            else:
+                self.assertIn("9,0,0,1",s)
         self.assertNotEqual(deck("compression"),deck("opening"))
     def test_oracle_valid_synthetic_samples(self):
         for c in CASES:
@@ -32,6 +36,11 @@ class ContactNormalTests(unittest.TestCase):
         a[0]={i:(0.,0.,0.) for i in a[0]}
         a[1]={i:(0.,0.,0.) for i in a[1]}
         with self.assertRaises(ValueError): oracle("compression",*a)
+    def test_reject_wrong_initial_gap_force(self):
+        a=list(values("compression_gap"))
+        a[0]={i:(0.,0.,.25) for i in a[0]}
+        a[1]={i:(0.,0.,-.25) for i in a[1]}
+        with self.assertRaises(ValueError): oracle("compression_gap",*a)
     def test_reject_fake_tensile_transfer(self):
         a=list(values("opening"))
         a[0][1]=(0.,0.,-.25)

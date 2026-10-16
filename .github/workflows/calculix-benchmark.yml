@@ -216,7 +216,7 @@ jobs:
           grep -q "NOT_ADMITTED" u_rib_support_summary.md
           # Two-cube unilateral contact oracle; no shell/stud/contact admission.
           python -m unittest -v test_contact_normal_pair.py
-          for case in compression opening; do
+          for case in compression opening compression_gap; do
             folder="normal_contact_${case}"
             python check_contact_normal_pair.py --generate "$folder" "$case"
             (cd "$folder" && timeout 90s ccx -i panel)
