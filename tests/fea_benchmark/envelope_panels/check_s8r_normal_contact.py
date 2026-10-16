@@ -34,7 +34,7 @@ def deck(n,case):
         for e in els:
             lines.append(str(eid)+","+",".join(map(str,e)));surfaces[name].append(eid);eid+=1
         lines.append(f"*NSET,NSET={name}_NODES")
-        lines.append(",".join(map(str,ids)))
+        lines.extend(",".join(map(str,ids[i:i+12])) for i in range(0,len(ids),12))
     lines+=["*MATERIAL,NAME=SYNTHETIC","*ELASTIC","1000.,0.",
             "*SHELL SECTION,ELSET=LOW,MATERIAL=SYNTHETIC","1.",
             "*SHELL SECTION,ELSET=HIGH,MATERIAL=SYNTHETIC","1."]
