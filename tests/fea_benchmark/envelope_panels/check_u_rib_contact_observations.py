@@ -28,11 +28,30 @@ def contact_print(raw):
     a=block.find("area,  normal force (+ = tension)")
     if f<0 or a<f:raise ValueError("U_CONTACT_DIAG_SURFACE_HEADER")
     force=numeric_row(block[f:].split("center of gravity and mean normal")[0],6)
-    area=numeric_row(block[a:],3)
+    try:
+        area=numeric_row(block[a:],3)
+    except ValueError as exc:
+        if str(exc)!="U_CONTACT_DIAG_MISSING_NUMERIC_ROW":
+            raise
+        # Real CCX 2.21 emits zero area/force yet undefined normal and shear
+        # as NaN when no slave node is in contact. Do NOT admit arbitrary NaNs.
+        tail=block[a:].splitlines()
+        rows=[line.split() for line in tail[1:] if line.strip()]
+        fields=rows[0] if rows else []
+        if (len(fields)!=3 or not re.fullmatch(NUM,fields[0]) or
+            val(fields[0])!=0. or
+            [part.lower() for part in fields[1:]]!=["nan","nan"] or
+            any(value!=0. for value in force)):
+            raise ValueError("U_CONTACT_DIAG_INVALID_INACTIVE_SURFACE") from exc
+        return {"slave_total_force_n":force[:3],"slave_total_moment_nmm":force[3:],
+                "contact_area_mm2":0.,"signed_normal_force_n":None,
+                "shear_force_n":None,
+                "contact_statistics_state":"INACTIVE_ZERO_AREA_UNDEFINED_NORMAL_AND_SHEAR"}
     if area[0]<0:raise ValueError("U_CONTACT_DIAG_NEGATIVE_CONTACT_AREA")
     return {"slave_total_force_n":force[:3],"slave_total_moment_nmm":force[3:],
             "contact_area_mm2":area[0],"signed_normal_force_n":area[1],
-            "shear_force_n":area[2]}
+            "shear_force_n":area[2],
+            "contact_statistics_state":"FINITE_SURFACE_STATISTICS"}
 
 def rf(raw,name):
     head=re.compile(r"(?im)^\s*forces\s+\([^\n]*\)\s+for set\s+"+name+r"\s+and time\s+("+NUM+r")\s*$")

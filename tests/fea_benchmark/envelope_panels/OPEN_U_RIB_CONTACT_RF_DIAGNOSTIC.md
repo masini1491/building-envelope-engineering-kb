@@ -12,4 +12,13 @@ CalculiX 的 `RF` 官方輸出契約指出 MPC 相關作用力不被直接計算
 
 `check_u_rib_contact_observations.py` 只取同一次求解的 final-time 節點 RF3 區塊及 `*CONTACT PRINT` slave 表面統計；明確標示 `UNPROVEN`／`NOT_ESTABLISHED`／`NOT_ADMITTED`，不是新的 contact physics PASS，亦不會停止或放寬既有 `check_u_rib_base_contact.py` 的 fail-closed 驗證。
 
+
+## 已宣告但無實際接觸之控制組（2026-10-16）
+
+PR #131 head `ab256396a996b190f9600d4d685cdca34588026e`、CalculiX CI run `38886863783`、artifact `12040810140`：把獨立 U 肋沿 Z 向移動 +20 mm，保留接觸配對，n=8／16 均完成求解。原始 `.dat` 的最終 `*CONTACT PRINT` 六項表面總力皆為 0 N、接觸面積為 0 mm²，但未定義的表面中心／法線、正負號法向力及剪力輸出為 `NaN`；此情況不應與有效有限數值等同，也不應直接視為資料完整損壞。
+
+兩組三個原始 RF3 分區數值均與同次 `unlinked` 對照逐項相同，n=8／16 的原始 RF3 合計分別約 +1.56e-6／−1.118e-6 N。因此本控制組支持「已宣告配對但無接觸」不會自行造成已觀測的巨幅 RF3 殘差，但**未**證明活動接觸工況的 MPC 反力來源或全域平衡。
+
+`check_u_rib_contact_observations.py` 對此 **唯一明確結構**（總力／總力矩皆為有限零、接觸面積為有限零、法向與剪力均為文字 `NaN`）將記錄 `INACTIVE_ZERO_AREA_UNDEFINED_NORMAL_AND_SHEAR`，以 JSON `null` 保存兩個未定義值；任何面積非零、總力非零、錯誤或非有限數值仍 fail-closed。此為輸出格式觀測，不是物理 admission，也不更動原有 RF3 平衡驗收門。
+
 **下一門**：建立獨立可驗證的 MPC 約束傳力重建／完整反力觀測，或可核對的其他數值 oracle 後，才允許研究 contact／網格收斂及合成植釘共同作用。

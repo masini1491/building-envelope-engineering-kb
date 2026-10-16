@@ -55,6 +55,25 @@ class ObservationsTests(unittest.TestCase):
         value=observe_dat(RF.replace("30.","3.000000+01"),"unlinked")
         self.assertEqual(value["raw_rf3_sum_n"],0.)
         with self.assertRaises(ValueError):observe_dat(RF,"other")
+    def test_true_inactive_contact_print_nan_normal_and_shear(self):
+        # Actual CalculiX 2.21 print signature for a pair with zero contact area.
+        zero=CONTACT.replace("0. 0. 10. 0. -2000. 0.","0. 0. 0. 0. 0. 0.").replace(
+            "34. -10. 0.","0.000000E+00 NaN NaN")
+        result=contact_print(zero)
+        self.assertEqual(result["contact_area_mm2"],0.)
+        self.assertEqual(result["slave_total_force_n"],[0.,0.,0.])
+        self.assertIsNone(result["signed_normal_force_n"])
+        self.assertIsNone(result["shear_force_n"])
+        self.assertEqual(result["contact_statistics_state"],
+                         "INACTIVE_ZERO_AREA_UNDEFINED_NORMAL_AND_SHEAR")
+        with self.assertRaises(ValueError):
+            contact_print(zero.replace("0. 0. 0. 0. 0. 0.","0. 0. 1. 0. 0. 0."))
+        with self.assertRaises(ValueError):
+            contact_print(zero.replace("0.000000E+00 NaN NaN","1.000000E+00 NaN NaN"))
+        with self.assertRaises(ValueError):
+            contact_print(zero.replace("0.000000E+00 NaN NaN","0.000000E+00 NaN 0."))
+        with self.assertRaises(ValueError):
+            contact_print(zero.replace("0.000000E+00 NaN NaN","NaN NaN NaN"))
     def test_require_real_artifacts(self):
         with tempfile.TemporaryDirectory() as d:
             with self.assertRaises(ValueError):observe(Path(d))
