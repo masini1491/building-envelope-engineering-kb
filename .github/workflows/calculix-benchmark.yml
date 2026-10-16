@@ -150,6 +150,36 @@ jobs:
           done
           python check_s8r_normal_contact.py . > "$RUNNER_TEMP/s8r_normal_result.txt"
           grep -q "ISOLATED_S8R_UNILATERAL_CONTACT_SCREEN_PASS_NOT_DESIGN" "$RUNNER_TEMP/s8r_normal_result.txt"
+          # Keep exactly the validated same-run six-case RF observations.
+          head -n 1 "$RUNNER_TEMP/s8r_normal_result.txt" > s8r_normal_result.json
+          python - <<'PY' > s8r_normal_summary.md
+          import json,math
+          from pathlib import Path
+          d=json.loads(Path("s8r_normal_result.json").read_text())
+          assert d["scope"]=="ISOLATED_TWO_S8R_UNILATERAL_CONTACT"
+          assert d["engineering_acceptance"]=="NOT_ADMITTED"
+          assert d["absolute_contact_force_oracle"]=="NOT_ESTABLISHED"
+          print("# S8R 雙殼法向接觸｜受限合成求解摘要")
+          print()
+          print("**EVIDENCE GATED／NOT_ADMITTED／不代表實際 U 型肋或植釘容量**")
+          print()
+          print("人工 E=1000 MPa、ν=0、厚度各 1 mm、名目 penalty 100000 MPa/mm。")
+          print("| 網格 | 工況 | 下層 RF3 合力 (N) | 上層 RF3 合力 (N) |")
+          print("| :-- | :-- | --: | --: |")
+          for n in ("1","2"):
+              for case in ("approach","opening","disconnected"):
+                  v=d["cases"][n][case]
+                  a,b=v["lower_rf3_n"],v["upper_rf3_n"]
+                  assert math.isfinite(a) and math.isfinite(b)
+                  assert all(len(h)==64 for h in v["sha256"].values())
+                  print(f"| {n} | {case} | {a:.8g} | {b:.8g} |")
+          print()
+          print(f"接近工況兩網格反力比：{d['two_mesh_force_ratio']:.6g}。")
+          print("沒有獨立絕對接觸力 oracle；僅驗證受限傳力方向、分離及網格趨勢。")
+          PY
+          test -s s8r_normal_result.json
+          test -s s8r_normal_summary.md
+          grep -q 'NOT_ADMITTED' s8r_normal_summary.md
           python -m unittest -v test_u_rib_interface_geometry.py
           python check_u_rib_interface_geometry.py
           python -m unittest -v test_u_rib_shell_links.py
@@ -491,4 +521,6 @@ jobs:
             tests/fea_benchmark/envelope_panels/*/*.sta
             tests/fea_benchmark/envelope_panels/u_rib_support_result.json
             tests/fea_benchmark/envelope_panels/u_rib_support_summary.md
+            tests/fea_benchmark/envelope_panels/s8r_normal_result.json
+            tests/fea_benchmark/envelope_panels/s8r_normal_summary.md
           if-no-files-found: warn
