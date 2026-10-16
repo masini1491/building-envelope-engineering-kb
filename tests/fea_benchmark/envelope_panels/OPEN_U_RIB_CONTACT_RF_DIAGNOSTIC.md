@@ -21,4 +21,9 @@ PR #131 head `ab256396a996b190f9600d4d685cdca34588026e`、CalculiX CI run `38886
 
 `check_u_rib_contact_observations.py` 對此 **唯一明確結構**（總力／總力矩皆為有限零、接觸面積為有限零、法向與剪力均為文字 `NaN`）將記錄 `INACTIVE_ZERO_AREA_UNDEFINED_NORMAL_AND_SHEAR`，以 JSON `null` 保存兩個未定義值；任何面積非零、總力非零、錯誤或非有限數值仍 fail-closed。此為輸出格式觀測，不是物理 admission，也不更動原有 RF3 平衡驗收門。
 
+
+## 已知外力的獨立殼反力診斷（待 exact-head CCX 取得結果）
+
+以未接觸 `unlinked` S8R 板／U 肋為母本，在 U 肋底部中央附近兩個未拘束植釘候選節點各施加 ±0.5 N，形成正、反向 ±1 N **已知外力**；n=8／16 共四組。仍保留鋁板的獨立 +0.02 mm 人工位移控制。比較 `RIB_END_RF` 的原始反力和已知輸入力 `R+F`，同時記錄板邊／中心 RF3、STA 完成時間、原始輸入與輸出 SHA-256。此診斷不含接觸、植釘彈簧或材料容量，不使用推導殼 MPC 力修補輸出，也不改原 PR 的 contact FAIL gate。
+
 **下一門**：建立獨立可驗證的 MPC 約束傳力重建／完整反力觀測，或可核對的其他數值 oracle 後，才允許研究 contact／網格收斂及合成植釘共同作用。

@@ -298,6 +298,17 @@ jobs:
               json.dumps(report, sort_keys=True, allow_nan=False)+"\n", encoding="utf-8")
           PY
 
+          # Independent synthetic U-rib known-force RF probe (no contact, no studs).
+          python -m unittest -v test_u_rib_known_force_isolation.py
+          for n in 8 16; do
+            for case in up down; do
+              folder="u_rib_known_force_n${n}_${case}"
+              python check_u_rib_known_force_isolation.py --generate "$folder" "$n" "$case"
+              (cd "$folder" && timeout 90s ccx -i panel)
+            done
+          done
+          python check_u_rib_known_force_isolation.py . > u_rib_known_force_observations.txt
+          head -n 1 u_rib_known_force_observations.txt > u_rib_known_force_observations.json
           python check_u_rib_base_contact.py . > "$RUNNER_TEMP/u_base_contact_result.txt"
           grep -q "OPEN_U_BASE_ONLY_UNILATERAL_CONTACT_BOUNDED_SCREEN_PASS_NOT_DESIGN" "$RUNNER_TEMP/u_base_contact_result.txt"
           head -n 1 "$RUNNER_TEMP/u_base_contact_result.txt" > u_base_contact_result.json
@@ -645,6 +656,7 @@ jobs:
             tests/fea_benchmark/envelope_panels/u_base_contact_result.json
             tests/fea_benchmark/envelope_panels/u_rib_contact_observations.json
             tests/fea_benchmark/envelope_panels/u_declared_inactive_observations.json
+            tests/fea_benchmark/envelope_panels/u_rib_known_force_observations.json
             tests/fea_benchmark/envelope_panels/u_declared_inactive_n*/*.inp
             tests/fea_benchmark/envelope_panels/s8r_normal_summary.md
           if-no-files-found: warn
