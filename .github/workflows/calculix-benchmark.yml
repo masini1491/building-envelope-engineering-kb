@@ -139,6 +139,17 @@ jobs:
           python check_u_rib_stud_link.py . > "$RUNNER_TEMP/stud_link_synthetic_result.txt"
           grep -q "STUD_ANALOGUE_SPRING_GRAPH_PASS" "$RUNNER_TEMP/stud_link_synthetic_result.txt"
           # Research-only separate S8R plate/open-U shells with 4 synthetic DOF3 stud springs.
+          # Isolated S8R unilateral shell-face contact; research only.
+          python -m unittest -v test_s8r_normal_contact.py
+          for n in 1 2; do
+            for case in approach opening disconnected; do
+              folder="s8r_contact_n${n}_${case}"
+              python check_s8r_normal_contact.py --generate "$folder" "$n" "$case"
+              (cd "$folder" && timeout 90s ccx -i panel)
+            done
+          done
+          python check_s8r_normal_contact.py . > "$RUNNER_TEMP/s8r_normal_result.txt"
+          grep -q "ISOLATED_S8R_UNILATERAL_CONTACT_SCREEN_PASS_NOT_DESIGN" "$RUNNER_TEMP/s8r_normal_result.txt"
           python -m unittest -v test_u_rib_interface_geometry.py
           python check_u_rib_interface_geometry.py
           python -m unittest -v test_u_rib_shell_links.py
