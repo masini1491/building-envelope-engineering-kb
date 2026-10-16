@@ -150,6 +150,19 @@ jobs:
           done
           python check_s8r_normal_contact.py . > "$RUNNER_TEMP/s8r_normal_result.txt"
           grep -q "ISOLATED_S8R_UNILATERAL_CONTACT_SCREEN_PASS_NOT_DESIGN" "$RUNNER_TEMP/s8r_normal_result.txt"
+          # Deliberate nonconforming S8R contacts in two reciprocal mesh arrangements.
+          python -m unittest -v test_s8r_nonconforming_contact.py
+          for pair in 1_2 2_1; do
+            low="${pair%_*}"; high="${pair#*_}"
+            for case in approach opening disconnected; do
+              folder="s8r_nonconform_${low}_${high}_${case}"
+              python check_s8r_nonconforming_contact.py --generate "$folder" "$low" "$high" "$case"
+              (cd "$folder" && timeout 90s ccx -i panel)
+            done
+          done
+          python check_s8r_nonconforming_contact.py . > "$RUNNER_TEMP/s8r_nonconforming_result.txt"
+          grep -q "NONCONFORMING_S8R_BOUNDED_CONTACT_SCREEN_PASS_NOT_DESIGN" "$RUNNER_TEMP/s8r_nonconforming_result.txt"
+          head -n 1 "$RUNNER_TEMP/s8r_nonconforming_result.txt" > s8r_nonconforming_result.json
           # Keep exactly the validated same-run six-case RF observations.
           head -n 1 "$RUNNER_TEMP/s8r_normal_result.txt" > s8r_normal_result.json
           python - <<'PY' > s8r_normal_summary.md
@@ -522,5 +535,6 @@ jobs:
             tests/fea_benchmark/envelope_panels/u_rib_support_result.json
             tests/fea_benchmark/envelope_panels/u_rib_support_summary.md
             tests/fea_benchmark/envelope_panels/s8r_normal_result.json
+            tests/fea_benchmark/envelope_panels/s8r_nonconforming_result.json
             tests/fea_benchmark/envelope_panels/s8r_normal_summary.md
           if-no-files-found: warn
