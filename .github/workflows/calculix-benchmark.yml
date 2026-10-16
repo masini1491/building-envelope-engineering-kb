@@ -139,6 +139,8 @@ jobs:
           python check_u_rib_stud_link.py . > "$RUNNER_TEMP/stud_link_synthetic_result.txt"
           grep -q "STUD_ANALOGUE_SPRING_GRAPH_PASS" "$RUNNER_TEMP/stud_link_synthetic_result.txt"
           # Research-only separate S8R plate/open-U shells with 4 synthetic DOF3 stud springs.
+          python -m unittest -v test_u_rib_interface_geometry.py
+          python check_u_rib_interface_geometry.py
           python -m unittest -v test_u_rib_shell_links.py
           for n in 8 16; do
             for scenario in unlinked soft stiff; do
