@@ -208,7 +208,7 @@ jobs:
           python -m unittest -v test_u_rib_contact_observations.py
           python check_u_rib_contact_observations.py . > u_rib_contact_observations.txt
           head -n 1 u_rib_contact_observations.txt > u_rib_contact_observations.json
-# Diagnostic isolation: declared contact with the independent U-rib
+          # Diagnostic isolation: declared contact with the independent U-rib
           # translated +20 mm Z; original physical acceptance gate stays intact.
           python - <<'PY'
           from pathlib import Path
