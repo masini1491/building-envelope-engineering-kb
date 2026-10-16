@@ -195,6 +195,18 @@ jobs:
           grep -q 'NOT_ADMITTED' s8r_normal_summary.md
           python -m unittest -v test_u_rib_interface_geometry.py
           python check_u_rib_interface_geometry.py
+          # Real-shape synthetic plate/open-U S8R base-only unilateral contact.
+          python -m unittest -v test_u_rib_base_contact.py
+          for n in 8 16; do
+            for case in toward away unlinked; do
+              folder="u_base_contact_n${n}_${case}"
+              python check_u_rib_base_contact.py --generate "$folder" "$n" "$case"
+              (cd "$folder" && timeout 90s ccx -i panel)
+            done
+          done
+          python check_u_rib_base_contact.py . > "$RUNNER_TEMP/u_base_contact_result.txt"
+          grep -q "OPEN_U_BASE_ONLY_UNILATERAL_CONTACT_BOUNDED_SCREEN_PASS_NOT_DESIGN" "$RUNNER_TEMP/u_base_contact_result.txt"
+          head -n 1 "$RUNNER_TEMP/u_base_contact_result.txt" > u_base_contact_result.json
           python -m unittest -v test_u_rib_shell_links.py
           for n in 8 16; do
             for scenario in unlinked soft stiff; do
@@ -536,5 +548,6 @@ jobs:
             tests/fea_benchmark/envelope_panels/u_rib_support_summary.md
             tests/fea_benchmark/envelope_panels/s8r_normal_result.json
             tests/fea_benchmark/envelope_panels/s8r_nonconforming_result.json
+            tests/fea_benchmark/envelope_panels/u_base_contact_result.json
             tests/fea_benchmark/envelope_panels/s8r_normal_summary.md
           if-no-files-found: warn
