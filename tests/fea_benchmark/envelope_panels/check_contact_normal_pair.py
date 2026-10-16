@@ -2,7 +2,8 @@
 import hashlib, json, math, re, sys
 from pathlib import Path
 
-CASES = {"compression": -.002, "opening": .002}
+CASES = {"compression": -.002, "opening": .002, "compression_gap": -.002}
+INITIAL_GAP_MM = {"compression": 0., "opening": 0., "compression_gap": .0005}
 E, NU, K = 1000., 0., 100000.  # entirely synthetic; N-mm-MPa
 SCOPE = "SYNTHETIC_TWO_C3D8_FRICTIONLESS_NORMAL_CONTACT"
 NUMBER = r"[+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:(?:[EeDd][+-]?\d+)|(?:[+-]\d{2,3}))?"
@@ -14,6 +15,7 @@ def deck(case):
               (0,0,1),(1,0,1),(1,1,1),(0,1,1),
               (0,0,1),(1,0,1),(1,1,1),(0,1,1),
               (0,0,2),(1,0,2),(1,1,2),(0,1,2)]
+    coords=coords[:8]+[(x,y,z+INITIAL_GAP_MM[case]) for x,y,z in coords[8:]]
     out = ["*HEADING", "two independent cubes - NOT DESIGN", "*NODE"]
     out += [f"{i},{x},{y},{z}" for i,(x,y,z) in enumerate(coords,1)]
     out += ["*ELEMENT,TYPE=C3D8,ELSET=LOWER","1,1,2,3,4,5,6,7,8",
@@ -94,16 +96,18 @@ def oracle(case,base,driven,lower,upper):
     rt=sum(v[2] for v in driven.values())
     if abs(rb+rt)>max(.002,.015*abs(rt)):
         raise ValueError("CONTACT_FORCE_BALANCE")
-    gaps=[upper[i+4][2]-lower[i][2] for i in range(5,9)]
-    if case=="compression":
-        # E*A*delta/(L1+L2) = 1 N; penalty adds only synthetic compliance.
-        if not -.0-1.2<rt<-.8 or rb<=0 or not all(-.00035<g<.00035 for g in gaps):
+    gaps=[INITIAL_GAP_MM[case]+upper[i+4][2]-lower[i][2] for i in range(5,9)]
+    if case!="opening":
+        # Synthetic 1-D oracle: E*A*(|delta|-initial_gap)/(L1+L2).
+        expected_force=E*(abs(CASES[case])-INITIAL_GAP_MM[case])/2.
+        if not -1.2*expected_force<rt<-.8*expected_force or rb<=0 or not all(-.00035<g<.00035 for g in gaps):
             raise ValueError(f"CONTACT_COMPRESSION_ORACLE_FAIL:driven={rt:.9g}:base={rb:.9g}:gaps={gaps!r}")
     else:
         if abs(rt)>.02 or abs(rb)>.02 or not all(g>.0015 for g in gaps):
             raise ValueError("CONTACT_OPENING_ORACLE_FAIL")
     return {"driven_z_force_n":rt,"base_z_force_n":rb,
-            "interface_gap_mm":gaps,"compression_1d_oracle_n":1.,
+            "interface_gap_mm":gaps,"initial_gap_mm":INITIAL_GAP_MM[case],
+            "compression_1d_oracle_n":E*max(0.,abs(CASES[case])-INITIAL_GAP_MM[case])/2. if case!="opening" else 0.,
             "engineering_acceptance":"NOT_ADMITTED"}
 
 def inspect(root,case):
@@ -123,7 +127,10 @@ def inspect(root,case):
     return result
 
 def assess(root):
-    return {"scope":SCOPE,"cases":{c:inspect(root,c) for c in CASES},
+    measured={c:inspect(root,c) for c in CASES}
+    if not 0 < abs(measured["compression_gap"]["driven_z_force_n"]) < abs(measured["compression"]["driven_z_force_n"]):
+        raise ValueError("CONTACT_GAP_FORCE_ORDER_NOT_OBSERVED")
+    return {"scope":SCOPE,"cases":measured,
             "synthetic_elastic_mpa":E,"synthetic_poisson":NU,"synthetic_penalty_mpa_per_mm":K,
             "real_panel_rib_contact":"NOT_ADMITTED","stud_capacity":"NOT_ADMITTED",
             "material_capacity":"NOT_ADMITTED","engineering_acceptance":"NOT_ADMITTED"}

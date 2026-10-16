@@ -15,3 +15,7 @@
 CalculiX `*CONTACT PAIR`、`*SURFACE BEHAVIOR` 定義參考官方 CalculiX 手冊（2.18 公開參考）：https://www.feacluster.com/CalculiX/ccx_2.18/doc/ccx/node236.html 及 https://www.feacluster.com/CalculiX/ccx_2.18/doc/ccx/node337.html；本 Repo 的 CI 使用其實際安裝套件獨立覆驗，不能直接把舊版文件當成 2.21 PASS。
 
 本階段不含實際板肋面接觸、摩擦滑移、角碼、植釘容量、壓力荷載、接觸點力與力矩全域平衡、材料容量或真實工程 acceptance。所有結果均 `EVIDENCE GATED`／`NOT_ADMITTED`；不得將 1 N 合成結果轉作扣件需求。
+
+## 附加間隙敏感度案例（研究）
+
+`compression_gap` 將上層 C3D8 起始 Z 位置額外抬高 0.0005 mm，在同樣 −0.002 mm 位移下，獨立一維串聯桿參考壓縮力從無間隙的 1 N 降為 `E × A × (0.002 − 0.0005) / 2 = 0.75 N`。面對面懲罰法的有限接觸柔度使真實求解值略低於解析值，並以相同 ±20% 受限研究篩檢。合成 gap、位移和 penalty 都不是實際板肋接觸參數。新增「間隙者應比無間隙者傳力更少」的同次求解比較，並保持非接觸開啟的負向驗證。
