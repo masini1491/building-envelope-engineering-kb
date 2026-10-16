@@ -5,7 +5,7 @@ from pathlib import Path
 CASES = {"compression": -.002, "opening": .002}
 E, NU, K = 1000., 0., 100000.  # entirely synthetic; N-mm-MPa
 SCOPE = "SYNTHETIC_TWO_C3D8_FRICTIONLESS_NORMAL_CONTACT"
-NUMBER = r"[+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[EeDd][+-]?\d+)?"
+NUMBER = r"[+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:(?:[EeDd][+-]?\d+)|(?:[+-]\d{2,3}))?"
 
 def deck(case):
     if case not in CASES:
@@ -76,7 +76,7 @@ def field(raw,kind,node_set):
             if rows: break
             continue
         i=int(m.group(1))
-        val=tuple(float(m.group(j).replace("D","E")) for j in (2,3,4))
+        val=tuple(float(re.sub(r"(?<=\d)([+-]\d{2,3})$",r"E\1",m.group(j).replace("D","E"))) for j in (2,3,4))
         if i in rows or not all(map(math.isfinite,val)):
             raise ValueError("CONTACT_BAD_FIELD")
         rows[i]=val

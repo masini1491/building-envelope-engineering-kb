@@ -54,6 +54,8 @@ class ContactNormalTests(unittest.TestCase):
     def test_parser_and_completion(self):
         s=" displacements (global) for set UPPER_FACE and time 1.0\n\n9 0 0 .002\n"
         self.assertAlmostEqual(field(s,"displacements","UPPER_FACE")[9][2],.002)
+        t=" forces (global) for set BASE and time 1.0\n\n1 -1.908751-162 1.739168-162 -2.336477-163\n"
+        self.assertAlmostEqual(field(t,"forces","BASE")[1][0],-1.908751e-162,delta=1e-165)
         with self.assertRaises(ValueError): field(s+"9 0 0 .002\n","displacements","UPPER_FACE")
         with self.assertRaises(ValueError): field("","forces","BASE")
         with self.assertRaises(ValueError): completed("1 1 1 1 .5 1 1")
