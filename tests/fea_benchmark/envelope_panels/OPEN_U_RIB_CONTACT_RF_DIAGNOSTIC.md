@@ -154,3 +154,14 @@ C3D8 模型的接觸面積、C3D8 實體截面局部剛度與 S8R 殼截面之�
 - 原 S8R 檢查器仍報 `OPEN_U_CONTACT_RF_GLOBAL_Z_IMBALANCE_-44.4374645`，CalculiX CI 因此 FAILURE 且 PR #131 **OPEN／UNMERGED**。`CONTACT_NOT_ADMITTED`、`MPC_REACTION_RECONSTRUCTION_NOT_ESTABLISHED`、`ENGINEERING_ACCEPTANCE_NOT_ADMITTED` 全部維持。
 
 **下一個值得做的最小工作**：使用已版本核對的 CalculiX 2.21 原始碼，以源碼 ownership tracing 界定 `resultsforc`／殼展開／contact spring 在內部節點之作用力保存、分攤與輸出邊界；若需要診斷插樁，僅在隔離研究環境針對相同 2.21 編譯與未修改版本作可重播比較，先形成獨立作用側／平衡 oracle，不能藉修改門檻或推出新的實際設計容量跳過驗證。
+
+## 已驗證的 MPC 權重力分配反例（CalculiX 2.21 原始碼隔離執行）
+
+在未改寫的 CalculiX 2.21 `resultsforc.c` 上，以獨立 C harness 提供人工 `nactdof`、`ipompc`、`nodempc`、`coefmpc` 與 `fn`，實際編譯並執行 `resultsforc()`；本研究不需要也不執行完整的 ccx 求解器。原始 Debian tarball `calculix-ccx_2.21.orig.tar.bz2` 的 SHA-256 為 `51d229aee320cf685216d360f7c04f9a57af0148fbe840483a964c86c315da82`，其中 `resultsforc.c` 與 `CalculiX.h` 也逐檔驗證 SHA-256；僅在執行時使用外部原版原始碼，**不把 GPL 原始碼複製進 KB Repository**。
+
+- 既有四種兩節點情境：MPC 使用／不使用、系統內力向量輸出開關、非零獨立節點力，查驗 `fmpc`、回填的 `fn` 與 reduced active-DOF `f` 不可混淆。
+- 新增三組非單位係數情境：`(1,-2,0)`、`(1,-0.6,-0.4)` 與 `(2,-1,-1)`，驗證 dependent／independent DOF 權重、廣義約束乘數、系統內力與 `fn` 的恢復。
+- 新增兩組**彼此不相交**的 MPC 聯合測試，獨立檢查兩個乘數、兩個 active-DOF 系統內力，並拒絕原始 `fn` 未恢復的狀態；不包含 chained-dependent MPC、`MEANROT`／`RIGID` 等特殊拓撲及實體接觸。
+- **診斷反例**：某個合成線性 MPC 的係數 `(1,-2)` 與原始 `fn=(+10,-20)` N，使原始兩節點 `fn` 直接相加為 −10 N，但該 MPC 消去後的 reduced active-DOF `f=0` N。兩種合計的對象不同；此反例只能說明非平移等效 MPC 下，原始 Z 向力直接相加未必是可直接採用的完整平衡 oracle。**不代表真實模型可以把 −44.4374645／−17.8664376 N 差額判成已平衡**。
+- 本地 exact-source 執行：八組 synthetic harness scenarios **8/8 PASS**；原有五項 archive／失效輸入契約測試 **5/5 PASS**；工具輸出維持 `CCX221_MPC_FORCE_BOOKKEEPING_ISOLATED_PASS_NOT_ENGINEERING_ORACLE`。使用 `python ccx221_resultsforc_mpc_audit.py /path/to/calculix-ccx_2.21.orig.tar.bz2` 重播；結果必須包含 `full_calculix_build=NOT_EXECUTED` 與 `actual_s8r_contact_mpc_balance=NOT_ESTABLISHED`。
+- **下一個缺口**仍然是：從實際 S8R 接觸求解器精確地取得 expanded-node／contact-spring internal forces、MPC 自由度與有效外荷載，建立可獨立重建的作用側和完整平衡。單獨 `resultsforc()` 的人工輸入測試不是 S8R 物理驗收；`OPEN_U_CONTACT_RF_GLOBAL_Z_IMBALANCE` 保持原樣，PR #131 不合併，`ENGINEERING_ACCEPTANCE_NOT_ADMITTED` 不變。
