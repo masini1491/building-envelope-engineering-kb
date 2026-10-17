@@ -37,6 +37,26 @@ class ProjectionTests(unittest.TestCase):
             final_frd_forc(raw.replace(b"1.00000E+00",b"9.00000E-01",1),346)
         with self.assertRaisesRegex(ValueError,"S8R_FRD_FORCE_RECORD_COUNT"):
             final_frd_forc(raw[:-4],346)
+        # Replace the complete 12-character FRD numeric field; preserving
+        # only the non-space substring shifts subsequent fixed-width columns.
+        original_value=f"{1.5:12.5E}".encode("ascii")
+        self.assertEqual(len(original_value),12)
+        for nonfinite in (float("nan"),float("inf"),float("-inf")):
+            malformed=f"{nonfinite:12.5E}".encode("ascii")
+            self.assertEqual(len(malformed),12)
+            with self.subTest(nonfinite=nonfinite):
+                with self.assertRaisesRegex(ValueError,"S8R_FRD_FORCE_NODE_ID_OR_VALUE"):
+                    final_frd_forc(raw.replace(original_value,malformed,1),346)
         with self.assertRaisesRegex(ValueError,"S8R_FRD_FORCE_NODE_ID_OR_VALUE"):
-            final_frd_forc(raw.replace(b"1.50000E+00",b"         NaN",1),346)
+            final_frd_forc(raw.replace(f"{348:10d}".encode("ascii"),
+                                       f"{347:10d}".encode("ascii"),1),346)
+        with self.assertRaisesRegex(ValueError,"S8R_FRD_FORCE_RECORD_COUNT"):
+            final_frd_forc(raw.replace(b"1.00000E+00         2",
+                                       b"1.00000E+00         3",1),346)
+        with self.assertRaisesRegex(ValueError,"S8R_FRD_FORCE_RECORD_INVALID"):
+            # A short terminal F3 slice ("1.5") is parseable without a width guard.
+            final_frd_forc(raw.replace(original_value+b"\n",
+                                       b"        1.5\n",1),346)
+        with self.assertRaisesRegex(ValueError,"S8R_FRD_FORCE_RECORD_MISSING"):
+            final_frd_forc(raw.replace(b" -4  FORC",b" -4  VOID",1),346)
 if __name__=="__main__":unittest.main()

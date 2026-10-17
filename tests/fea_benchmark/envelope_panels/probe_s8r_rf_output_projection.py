@@ -97,7 +97,9 @@ def final_frd_forc(payload: bytes, original_node_upper_bound: int) -> dict:
             break
         if line.startswith(" -5"):
             continue
-        if not line.startswith(" -1"):
+        # Fixed-width FRD node ID (10) + three force components (12 each).
+        # A truncated final component may still parse as a finite float.
+        if not line.startswith(" -1") or len(line) < 3 + 10 + 3 * 12:
             raise ValueError("S8R_FRD_FORCE_RECORD_INVALID")
         try:
             node_id = int(line[3:13])
