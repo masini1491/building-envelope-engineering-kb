@@ -343,6 +343,14 @@ jobs:
           # Independent geometric Z-envelope witness from same-run C3D8 INP/FRD.
           python -m unittest -v test_c3d8_clearance_gap.py
           python check_c3d8_clearance_gap.py . > u_c3d8_clearance_gap_observations.json
+          # Observational only: original S8R nodes do not include expanded MPC nodes.
+          python -m unittest -v test_probe_s8r_all_original_rf.py
+          for n in 8 16; do
+            folder="u_s8r_all_original_rf_n${n}_toward"
+            python probe_s8r_all_original_rf.py --generate "$folder" "$n"
+            (cd "$folder" && timeout 90s ccx -i panel)
+          done
+          python probe_s8r_all_original_rf.py . > u_s8r_all_original_rf_observations.json
           python check_u_rib_base_contact.py . > "$RUNNER_TEMP/u_base_contact_result.txt"
           grep -q "OPEN_U_BASE_ONLY_UNILATERAL_CONTACT_BOUNDED_SCREEN_PASS_NOT_DESIGN" "$RUNNER_TEMP/u_base_contact_result.txt"
           head -n 1 "$RUNNER_TEMP/u_base_contact_result.txt" > u_base_contact_result.json
@@ -697,6 +705,8 @@ jobs:
             tests/fea_benchmark/envelope_panels/u_c3d8_contact_observations.json
             tests/fea_benchmark/envelope_panels/u_c3d8_clearance_observations.json
             tests/fea_benchmark/envelope_panels/u_c3d8_clearance_gap_observations.json
+            tests/fea_benchmark/envelope_panels/u_s8r_all_original_rf_observations.json
+            tests/fea_benchmark/envelope_panels/u_s8r_all_original_rf_n*/*.inp
             tests/fea_benchmark/envelope_panels/u_rib_known_force_n*/*.inp
             tests/fea_benchmark/envelope_panels/u_declared_inactive_n*/*.inp
             tests/fea_benchmark/envelope_panels/s8r_normal_summary.md
