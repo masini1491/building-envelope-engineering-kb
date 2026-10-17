@@ -195,6 +195,173 @@ jobs:
           grep -q 'NOT_ADMITTED' s8r_normal_summary.md
           python -m unittest -v test_u_rib_interface_geometry.py
           python check_u_rib_interface_geometry.py
+          # Real-shape synthetic plate/open-U S8R base-only unilateral contact.
+          python -m unittest -v test_u_rib_base_contact.py
+          for n in 8 16; do
+            for case in toward away unlinked; do
+              folder="u_base_contact_n${n}_${case}"
+              python check_u_rib_base_contact.py --generate "$folder" "$n" "$case"
+              (cd "$folder" && timeout 90s ccx -i panel)
+            done
+          done
+          # Capture diagnostic observations independently of physical acceptance.
+          python -m unittest -v test_u_rib_contact_observations.py
+          python check_u_rib_contact_observations.py . > u_rib_contact_observations.txt
+          head -n 1 u_rib_contact_observations.txt > u_rib_contact_observations.json
+          # Diagnostic isolation: declared contact with the independent U-rib
+          # translated +20 mm Z; original physical acceptance gate stays intact.
+          python - <<'PY'
+          from pathlib import Path
+          from check_u_rib_base_contact import deck, selected_faces
+          for n in (8, 16):
+              original = deck(n, "toward")
+              topo, _, _ = selected_faces(n)
+              rib = {node for element in topo["rib"] for node in element}
+              plate = {node for element in topo["plate"] for node in element}
+              assert rib and not (rib & plate)
+              transformed, changed, inside = [], set(), False
+              for line in original.splitlines():
+                  if line == "*NODE":
+                      inside = True
+                  elif line.startswith("*"):
+                      inside = False
+                  if inside and line and not line.startswith("*"):
+                      cells = line.split(",")
+                      assert len(cells) == 4
+                      node = int(cells[0])
+                      if node in rib:
+                          cells[3] = f"{float(cells[3]) + 20.:.8f}"
+                          line = ",".join(cells)
+                          changed.add(node)
+                  transformed.append(line)
+              assert changed == rib
+              candidate = "\n".join(transformed) + "\n"
+              assert candidate.count("*CONTACT PAIR") == 1
+              assert candidate.count("*CONTACT PRINT") == 1
+              assert candidate.count("*ELEMENT,TYPE=S8R") == 2
+              assert "RIB_BASE_UNDERSIDE,PLATE_TOP" in candidate
+              folder = Path(f"u_declared_inactive_n{n}")
+              folder.mkdir(exist_ok=False)
+              (folder / "panel.inp").write_text(candidate, encoding="utf-8")
+          PY
+          for n in 8 16; do
+            (cd "u_declared_inactive_n$n" && timeout 90s ccx -i panel)
+          done
+          # Keep both the matched no-pair control and declared-inactive-pair
+          # observation: this is NOT an independent contact/MPC force oracle.
+          python - <<'PY'
+          import hashlib, json, math
+          from pathlib import Path
+          from check_u_rib_base_contact import selected_faces
+          from check_u_rib_contact_observations import rf, contact_print
+          controls = json.loads(Path("u_rib_contact_observations.json").read_text(encoding="utf-8"))
+          records = {}
+          for n in (8, 16):
+              root = Path(f"u_declared_inactive_n{n}")
+              status = (root / "panel.sta").read_text(encoding="ascii")
+              times = [float(tokens[4]) for line in status.splitlines()
+                       if len(tokens := line.split()) == 7 and tokens[0] == "1"]
+              assert times and math.isfinite(times[-1]) and abs(times[-1]-1.) < 1e-7
+              data = (root / "panel.dat").read_text(encoding="utf-8", errors="replace")
+              topo, _, _ = selected_faces(n)
+              forces = {}
+              for name, nodes in (("PLATE_EDGE_RF", topo["clamped_plate"]),
+                                  ("RIB_END_RF", topo["clamped_rib_end"]),
+                                  ("CENTER_RF", (topo["center"],))):
+                  forces[name] = rf(data, name)
+                  assert forces[name]["count"] == len(nodes)
+              try:
+                  surface = contact_print(data)
+                  surface_status = "PRINTED"
+              except ValueError as exc:
+                  if str(exc) != "U_CONTACT_DIAG_FINAL_SURFACE_MISSING":
+                      raise
+                  surface, surface_status = None, "NOT_AVAILABLE"
+              a = forces["PLATE_EDGE_RF"]["sum_rf3_n"]
+              b = forces["RIB_END_RF"]["sum_rf3_n"]
+              c = forces["CENTER_RF"]["sum_rf3_n"]
+              baseline = controls["cases"][str(n)]["unlinked"]
+              records[str(n)] = {
+                  "plate_edge_rf3_n": a, "rib_end_rf3_n": b, "center_rf3_n": c,
+                  "raw_rf3_sum_n": math.fsum((a,b,c)),
+                  "plate_edge_delta_vs_unlinked_n": a-baseline["PLATE_EDGE_RF"]["sum_rf3_n"],
+                  "center_delta_vs_unlinked_n": c-baseline["CENTER_RF"]["sum_rf3_n"],
+                  "contact_print_status": surface_status, "contact_print": surface,
+                  "inp_sha256": hashlib.sha256((root/"panel.inp").read_bytes()).hexdigest(),
+                  "dat_sha256": hashlib.sha256((root/"panel.dat").read_bytes()).hexdigest()}
+          report = {"scope": "SYNTHETIC_DECLARED_INACTIVE_S8R_CONTACT_CONTROL",
+                    "rib_translation_z_mm": 20., "cases": records,
+                    "contact_balance_oracle": "NOT_ESTABLISHED",
+                    "mpc_reaction_reconstruction": "NOT_ESTABLISHED",
+                    "engineering_acceptance": "NOT_ADMITTED"}
+          Path("u_declared_inactive_observations.json").write_text(
+              json.dumps(report, sort_keys=True, allow_nan=False)+"\n", encoding="utf-8")
+          PY
+
+          # Independent synthetic U-rib known-force RF probe (no contact, no studs).
+          python -m unittest -v test_u_rib_known_force_isolation.py
+          for n in 8 16; do
+            for case in up down; do
+              folder="u_rib_known_force_n${n}_${case}"
+              python check_u_rib_known_force_isolation.py --generate "$folder" "$n" "$case"
+              (cd "$folder" && timeout 90s ccx -i panel)
+            done
+          done
+          python check_u_rib_known_force_isolation.py . > u_rib_known_force_observations.txt
+          head -n 1 u_rib_known_force_observations.txt > u_rib_known_force_observations.json
+          # Bounded reversed slave/master diagnostic; original gate unchanged.
+          python -m unittest -v test_u_rib_reverse_contact.py
+          for n in 8 16; do
+            for case in toward away; do
+              folder="u_reverse_contact_n${n}_${case}"
+              python check_u_rib_reverse_contact.py --generate "$folder" "$n" "$case"
+              (cd "$folder" && timeout 90s ccx -i panel)
+            done
+          done
+          python check_u_rib_reverse_contact.py . > u_reverse_contact_observations.json
+          # Explicit-solid C3D8 comparator, non-equivalent to original S8R.
+          # Capture raw solver outputs; no physics PASS or RF balancing inference.
+          python -m unittest -v test_probe_c3d8_u_contact.py
+          for n in 8 16; do
+            for case in unlinked toward away; do
+              folder="u_c3d8_control_n${n}_${case}"
+              python probe_c3d8_u_contact.py --generate "$folder" "$n" "$case"
+              (cd "$folder" && timeout 90s ccx -i panel)
+            done
+          done
+          python -m unittest -v test_c3d8_u_contact_observations.py
+          python check_c3d8_u_contact_observations.py . > u_c3d8_contact_observations.json
+          # Zero-active-contact CONTROL: synthetic 0.1 mm initial solid-rib clearance.
+          # This is not an S8R admission; retain the original fail-closed gate below.
+          python -m unittest -v test_c3d8_clearance_control.py
+          for n in 8 16; do
+            folder="u_c3d8_control_n${n}_clearance"
+            python probe_c3d8_u_contact.py --generate "$folder" "$n" clearance
+            (cd "$folder" && timeout 90s ccx -i panel)
+          done
+          python check_c3d8_u_contact_observations.py --clearance . > u_c3d8_clearance_observations.json
+          # Independent geometric Z-envelope witness from same-run C3D8 INP/FRD.
+          python -m unittest -v test_c3d8_clearance_gap.py
+          python check_c3d8_clearance_gap.py . > u_c3d8_clearance_gap_observations.json
+          # Observational only: original S8R nodes do not include expanded MPC nodes.
+          python -m unittest -v test_probe_s8r_all_original_rf.py
+          for n in 8 16; do
+            folder="u_s8r_all_original_rf_n${n}_toward"
+            python probe_s8r_all_original_rf.py --generate "$folder" "$n"
+            (cd "$folder" && timeout 90s ccx -i panel)
+          done
+          python probe_s8r_all_original_rf.py . > u_s8r_all_original_rf_observations.json
+          # Read-only output mapping A/B: same input physics, request RF in NODE FILE.
+          python -m unittest -v test_probe_s8r_rf_output_projection.py
+          for n in 8 16; do
+            folder="u_s8r_rf_projection_n${n}_toward"
+            python probe_s8r_rf_output_projection.py --generate "$folder" "$n"
+            (cd "$folder" && timeout 90s ccx -i panel)
+          done
+          python probe_s8r_rf_output_projection.py . > u_s8r_rf_projection_observations.json
+          python check_u_rib_base_contact.py . > "$RUNNER_TEMP/u_base_contact_result.txt"
+          grep -q "OPEN_U_BASE_ONLY_UNILATERAL_CONTACT_BOUNDED_SCREEN_PASS_NOT_DESIGN" "$RUNNER_TEMP/u_base_contact_result.txt"
+          head -n 1 "$RUNNER_TEMP/u_base_contact_result.txt" > u_base_contact_result.json
           python -m unittest -v test_u_rib_shell_links.py
           for n in 8 16; do
             for scenario in unlinked soft stiff; do
@@ -536,5 +703,21 @@ jobs:
             tests/fea_benchmark/envelope_panels/u_rib_support_summary.md
             tests/fea_benchmark/envelope_panels/s8r_normal_result.json
             tests/fea_benchmark/envelope_panels/s8r_nonconforming_result.json
+            tests/fea_benchmark/envelope_panels/u_base_contact_result.json
+            tests/fea_benchmark/envelope_panels/u_rib_contact_observations.json
+            tests/fea_benchmark/envelope_panels/u_declared_inactive_observations.json
+            tests/fea_benchmark/envelope_panels/u_rib_known_force_observations.json
+            tests/fea_benchmark/envelope_panels/u_reverse_contact_observations.json
+            tests/fea_benchmark/envelope_panels/u_reverse_contact_n*/*.inp
+            tests/fea_benchmark/envelope_panels/u_c3d8_control_n*/*.inp
+            tests/fea_benchmark/envelope_panels/u_c3d8_contact_observations.json
+            tests/fea_benchmark/envelope_panels/u_c3d8_clearance_observations.json
+            tests/fea_benchmark/envelope_panels/u_c3d8_clearance_gap_observations.json
+            tests/fea_benchmark/envelope_panels/u_s8r_all_original_rf_observations.json
+            tests/fea_benchmark/envelope_panels/u_s8r_rf_projection_observations.json
+            tests/fea_benchmark/envelope_panels/u_s8r_rf_projection_n*/*.inp
+            tests/fea_benchmark/envelope_panels/u_s8r_all_original_rf_n*/*.inp
+            tests/fea_benchmark/envelope_panels/u_rib_known_force_n*/*.inp
+            tests/fea_benchmark/envelope_panels/u_declared_inactive_n*/*.inp
             tests/fea_benchmark/envelope_panels/s8r_normal_summary.md
           if-no-files-found: warn
