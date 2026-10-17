@@ -121,3 +121,36 @@ Exact-head `5c4a4ae847719fa49a936ed92b83b31b7f647efd`；CI `39010749089`，artif
 C3D8 模型的接觸面積、C3D8 實體截面局部剛度與 S8R 殼截面之間不具嚴格同一離散等價性，因此只能得到 **solid raw RF3 balance observed / shell raw RF3 unbalanced** 的差異證據，不能排除幾何／網格／接觸離散共同因素，更不能據此確證 MPC 單一根因。
 
 既有 `check_u_rib_base_contact.py` 的 `OPEN_U_CONTACT_RF_GLOBAL_Z_IMBALANCE_-44.4374645` 仍原樣 FAIL，PR 未具合併資格。下一個實質工作是建立受控的殼展開傳力或真正完全張開的獨立幾何控制，再驗證 active-contact 的作用側與支承力學 ownership。仍維持 `CONTACT_NOT_ADMITTED / MPC_REACTION_RECONSTRUCTION_NOT_ESTABLISHED / ENGINEERING_ACCEPTANCE_NOT_ADMITTED`。
+
+## C3D8 完全分離控制與 S8R 全原始節點排查（2026-10-17；受限實測）
+
+### C3D8 明確初始間隙：無作用接觸的兩個觀測通道
+
+在上述 C3D8 板／肋合成模型，將**整組實體 U 肋**上移人工 0.1 mm，仍保持鋁板中心 −0.02 mm 的位移控制與原本的接觸 pair；不添加植釘、摩擦、實際接觸剛度或新的邊界條件。
+
+- 第一個同次求解觀測通道：`CONTACT PRINT` 的接觸面積與 CF 均為零，n=8／16 全域 raw RF3 殘差分別為 +0.0000108／−0.000002148 N。
+- 第二個不使用 `CONTACT PRINT` 計算間隙的通道：依 exact-deck `.inp` 原始座標和 `.frd` 最終位移重建**全板最高 Z 與全肋最低 Z 的嚴格垂直包絡間隙**，n=8 為 0.0999552 mm、n=16 為 0.0999462 mm，皆正值；此控制組兩實體的變形後 Z 包絡完全分離。
+- Exact PR head `c525e5e332d66998f55a52c70f2325cbe7fd11ed`；真實 CalculiX 2.21 CI `39026212648`、artifact `12098472424`，ZIP SHA-256 `ce951d0d6217f1a1d565a38da6d0a4ab721491a9cab44adce61503e8238b9c2a`；檢查器與其 5 項負向測試已於該 run 通過。完整 CI 結果仍因既有 S8R 接觸 RF3 門而 FAILURE。
+- 以上僅支持本控制的 `INACTIVE_CONTACT_OBSERVED_FOR_CLEARANCE_CONTROL`；不能將原始 `away` 視為完全分離，也不能提升 C3D8 到 S8R、植釘、接觸容量或一般工程 admission。
+
+### 全部 S8R 原始殼節點 RF3：失衡無法由漏列自由原始節點解釋
+
+在原 `toward` S8R 工況僅增加 `ALL_ORIGINAL_RF` 的 `*NODE PRINT`，不改接觸幾何、材性、拘束、荷載、網格或原先 fail-closed 驗收。比較全部**原始 `.inp` 節點**與原來 `PLATE_EDGE_RF`、`RIB_END_RF`、`CENTER_RF` 三集合，並檢查節點全集、集合互斥、各集合 RF 值一致及同次求解 provenance。
+
+| 原始 S8R 節點觀測 | n=8 | n=16 |
+| --- | ---: | ---: |
+| 全部原始節點數 | 346 | 666 |
+| 三個已列印節點集合聯集 | 83 | 115 |
+| 其餘原始節點數 | 263 | 551 |
+| 其餘原始節點 RF3 合計 (N) | +2.3712253×10⁻¹⁰ | −5.3182375×10⁻¹¹ |
+| 其餘節點最大單點 `abs(RF3)` (N) | 3.662528×10⁻¹⁰ | 3.024885×10⁻¹⁰ |
+| 三集合 RF3 合計 (N) | −44.43746453 | −17.86643756 |
+| **全部原始節點 RF3 合計 (N)** | **−44.4374645298** | **−17.8664375601** |
+| 同次 slave CFz (N) | +14.40875 | +14.10576 |
+
+- Exact PR head：`ca787748148080cfbf162a7b0fce49e5236e7ada`；CalculiX 2.21 CI run `39027520751`；artifact `12099405754`，ZIP SHA-256 `2491a1dadd84ff2fa7ad1df9b7cf82846e3b520c4b42f170374fcd8d28140aa9`。JSON 指向的 n=8／16 各 `.inp/.dat/.sta/.frd`，共 8 檔 SHA-256 已再次獨立重算比對 **8/8 一致**，節點 partition 與總力複算一致。新三項 deterministic tests 在 real CI 內 PASS，Repository CI `39027520702` SUCCESS。
+- **界限內結論**：原先壓合工況 raw RF3 失衡，並非遺漏加總其他**原始殼節點**的 RF3 所致。印出的自由原始節點 RF3 近零，不能靠將原始節點列印範圍擴大來恢復平衡。
+- **不能推論**：原始節點集合不等於殼厚度展開後的全部內部節點，也不等於整個接觸／MPC system 的完整廣義力。CalculiX 的 `RF` 輸出含其定義內的節點外力，不可視作單獨的支承反力 oracle；不可以將 `CFz` 直接加到 raw RF3 人為補足。本次仍**不能證實**缺口唯一由 MPC、接觸元素或輸出映射造成。
+- 原 S8R 檢查器仍報 `OPEN_U_CONTACT_RF_GLOBAL_Z_IMBALANCE_-44.4374645`，CalculiX CI 因此 FAILURE 且 PR #131 **OPEN／UNMERGED**。`CONTACT_NOT_ADMITTED`、`MPC_REACTION_RECONSTRUCTION_NOT_ESTABLISHED`、`ENGINEERING_ACCEPTANCE_NOT_ADMITTED` 全部維持。
+
+**下一個值得做的最小工作**：使用已版本核對的 CalculiX 2.21 原始碼，以源碼 ownership tracing 界定 `resultsforc`／殼展開／contact spring 在內部節點之作用力保存、分攤與輸出邊界；若需要診斷插樁，僅在隔離研究環境針對相同 2.21 編譯與未修改版本作可重播比較，先形成獨立作用側／平衡 oracle，不能藉修改門檻或推出新的實際設計容量跳過驗證。
