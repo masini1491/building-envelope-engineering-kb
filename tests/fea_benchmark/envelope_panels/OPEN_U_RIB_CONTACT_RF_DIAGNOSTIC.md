@@ -57,3 +57,39 @@ PR #131 head `ab256396a996b190f9600d4d685cdca34588026e`、CalculiX CI run `38886
 - [CalculiX upstream issue #97](https://github.com/Dhondtguido/CalculiX/issues/97) 已回報殼與接觸同時存在時外力觀測異常；2026 年 [RR 輸出討論](https://calculix.discourse.group/t/output-reaction-forces-only/3809?page=3) 也指出 expanded shell 的 FRD 力輸出存在未解議題。均只是獨立問題線索，尚未能認定是 PR #131 的同一根因，更不能套用非正式修補作正式反力。
 - **停在證據門**：`CONTACT_NOT_ADMITTED`、`MPC_REACTION_RECONSTRUCTION_NOT_ESTABLISHED`、`ENGINEERING_ACCEPTANCE_NOT_ADMITTED`；原有 `check_u_rib_base_contact.py` RF3 FAIL 不改，PR 不合併。若要突破，優先建立可追溯的接觸力 ownership、獨立切面力或實體單元對照，而非改容差／任意補算 CFN。
 
+
+## 2.21 原始碼追蹤與端部反力分區（2026-10-17）
+
+### 來源與完整性
+
+本節使用已提供的 Debian `calculix-ccx_2.21.orig.tar.bz2`，依 `calculix-ccx_2.21-1.dsc.txt` 的 SHA-256 核對原始封存檔與 Debian 補丁，不使用不明版本的 GitHub `master` 替代 2.21；未獨立執行 OpenPGP 簽章驗證。
+
+- 原始 tarball SHA-256：`51d229aee320cf685216d360f7c04f9a57af0148fbe840483a964c86c315da82`；Debian 補丁 tarball SHA-256：`6c2a934b66491c9e916cbf6328167d417f7e985b380e200facf92c3e953d255f`。
+- 原始 `ccx_2.21/src/resultsforc.c` SHA-256：`d1de9498ac715a7f08da0b7beba3c92c7c2f1030c85c37122d2708f2f480cad0`；`printoutcontact.f` SHA-256：`2c4d1da25da0ba5f3157a7d591bf262c388fc652dae05b4de0da2c4a36954c01`。
+- `printoutnode.f` SHA-256：`c0bbe37ece5ae10faf2ba93113767361fb3dd4f1225e5c2f082cdfad85889141`；`gen3dforc.f` SHA-256：`513af06251a29e4d64a719d05f7789714bfb5ee95670829ab8ccb7f88ea6fa4d`。
+- 對應本案結果：PR #131 head `e60277e9ed30d097e38303bfb1030952a939a208`、CalculiX run `38982263432`、artifact `12081678042`，ZIP SHA-256：`86b9ae2a790d4b89d2b3f356d979c6dc964e43902d290ab2868df138936b3c4e`。
+
+### 原始碼可直接支持的觀測意義
+
+1. `printoutcontact.f` 第 70–91、175–211 行：以選定 slave 面的接觸元素／積分點累加 `springarea(1,igauss)`，計算接觸應力乘以該面積權重所形成的 `CF` 與力矩。程式輸出的 `area` 是這些接觸權重的總和，**不是獨立幾何接觸面積測量或植釘受力面積**。
+2. `printoutcontact.f` 第 245–280 行：接觸面積為 0 時，平均位置／平均法向仍以 `area` 當除數；這能解釋本算例無作用接觸時的 `NaN` 輸出結構，但不能因此放寬其他非有限結果的拒絕條件。
+3. `resultsforc.c` 第 34–59、75–118 行：為內力／系統向量計算，暫時移除 MPC 對節點內力向量的貢獻，並依係數恢復至 `fn`。這些作業是求解器內部力與 MPC bookkeeping；`printoutnode.f` 第 94–110 行列印 `fn` 的 `RF` 欄位，並不能僅從這些語句推論已取得完整 MPC 約束反力，亦不能當作任意 `fmpc` 補償力獲得物理 admission。
+4. `gen3dforc.f` 第 22–29、715 行起處理殼／梁節點集中載重及 expanded-node 對應，顯示這類單元的輸出 ownership 需分開確認；本次尚未以獨立物理或反力重建 oracle 證實缺口來源。
+
+### 原始 RF3 的 U 肋截面位置分區
+
+使用上述 exact-head artifact 的原配對 `toward` `.dat` 最終時間 `RIB_END_RF`，並使用同一網格互換配對 `.inp` 中**未修改的節點幾何**，按各節點 Z 座標分區。n=8／16 均各包含左右端合計 18 節點；以下單位 N：
+
+| Z 位置 | n=8 | n=16 |
+| --- | ---: | ---: |
+| 底部中面 3.0 mm | −54.2592060 | −26.5812218 |
+| 側壁中面 26.5 mm | +49.6732200 | +25.1760130 |
+| 側壁頂部 50.0 mm | −54.2602300 | −30.5669940 |
+| **直接加總** | **−58.8462160** | **−31.9722028** |
+
+分區加總與同次診斷 JSON 的 `RIB_END_RF.sum_rf3_n` 相同；這是依原始座標與已列印反力進行的重分組，**不是獨立外力平衡或 MPC 重建**。正負交錯及網格差異說明 raw RF3 不能代表單一接觸傳力或中央單排植釘承載需求，也不能把任一區的數值任意抵銷為已驗證反力。
+
+### 工程判斷與後續研究界線
+
+上述原始碼資訊解釋 `CF`／輸出面積的計算路徑，以及零接觸面積的 `NaN`，但仍**不能判定**壓合時 n=8 約 −44.4375 N、n=16 約 −17.8664 N 的 raw 全域反力缺口究竟來自 MPC、接觸元素外力、殼展開後的映射或多項交互因素。下一步需要能明確分辨作用側與傳力的獨立切面力、可信實體單元對照或版本核對的最小診斷；在此以前維持 `CONTACT_NOT_ADMITTED`／`MPC_REACTION_RECONSTRUCTION_NOT_ESTABLISHED`／`ENGINEERING_ACCEPTANCE_NOT_ADMITTED`，不更改現有 `OPEN_U_CONTACT_RF_GLOBAL_Z_IMBALANCE` fail-closed 門，也不合併 PR #131。
+
