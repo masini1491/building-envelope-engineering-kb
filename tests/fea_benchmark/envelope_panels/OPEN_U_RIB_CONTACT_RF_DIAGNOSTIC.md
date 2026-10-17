@@ -94,9 +94,30 @@ PR #131 head `ab256396a996b190f9600d4d685cdca34588026e`、CalculiX CI run `38886
 上述原始碼資訊解釋 `CF`／輸出面積的計算路徑，以及零接觸面積的 `NaN`，但仍**不能判定**壓合時 n=8 約 −44.4375 N、n=16 約 −17.8664 N 的 raw 全域反力缺口究竟來自 MPC、接觸元素外力、殼展開後的映射或多項交互因素。下一步需要能明確分辨作用側與傳力的獨立切面力、可信實體單元對照或版本核對的最小診斷；在此以前維持 `CONTACT_NOT_ADMITTED`／`MPC_REACTION_RECONSTRUCTION_NOT_ESTABLISHED`／`ENGINEERING_ACCEPTANCE_NOT_ADMITTED`，不更改現有 `OPEN_U_CONTACT_RF_GLOBAL_Z_IMBALANCE` fail-closed 門，也不合併 PR #131。
 
 
-## 無殼展開 C3D8 對照（候選，尚未通過實際求解）
+## 無殼展開 C3D8 對照（已取得實際求解，僅反力數值觀測）
 
 為隔離原本開口 U 肋 S8R 殼展開及內部 MPC 的影響，新增獨立節點的 C3D8 實體鋁板與 U 型肋 synthetic 對照（網格 n=8／16、toward／away／unlinked）。板件為 1200×300×3 mm，實體 U 肋截面外寬 50 mm、肋底 3 mm、兩側壁 3 mm、實體高度 50 mm，板上表面與肋底面重合於 Z=1.5 mm；無植釘、無摩擦、人工 E=69000 MPa、ν=0.33、penalty=100000。僅做觀察，不宣稱幾何、網格與 S8R 完全等價。
 
 本地已針對源碼測試元素數、節點不共用、接觸面、實體總體積及六組 deck scope；**2 項 deterministic tests PASS**。本地沒有 ccx 與必備 SPOOLES 環境，因此 **實際求解 NOT_RUN**。Workflow 加入六組隔離執行，原物理驗收 `check_u_rib_base_contact.py` 維持 fail-closed，並將輸入／DAT／STA／FRD 一併保留至 CI artifact。只在 exact-head real CCX 結果出現後，才決定是否需獨立反力解析檢查；若求解失敗不得將「C3D8 也無法平衡」視為已成立。
 
+
+### 真實 C3D8 求解與獨立三集合 RF3 複算（已取得）
+
+Exact-head `5c4a4ae847719fa49a936ed92b83b31b7f647efd`；CI `39010749089`，artifact `12092962247`；下載 ZIP SHA-256 `1d41f9ece682d52cfd9bf3e0b8e5acd78020b70d7526e2293c061b588c811e1c` 與 GitHub artifact digest 一致。六組 `.inp/.dat/.sta/.frd` 已保存；使用最終時間 1.0 的三個節點 RF3 集合，由原始 `.dat` 及實際 `.inp` NSET 分別重算：
+
+| 網格／工況 | PLATE_EDGE_RF (N) | RIB_END_RF (N) | CENTER_RF (N) | 三集合合計 (N) |
+| --- | ---: | ---: | ---: | ---: |
+| n=8 toward | −422.6182400 | −28.8000490 | +451.4181000 | −0.000189000 |
+| n=8 away | +424.0204828 | −0.9179164 | −423.1026000 | −0.000033625 |
+| n=8 unlinked | −423.1023108 | 0 | +423.1023000 | −0.000010800 |
+| n=16 toward | −116.3491909 | −20.1105400 | +136.4597300 | −0.000000932 |
+| n=16 away | +121.2229734 | −4.7051689 | −116.5178100 | −0.000005520 |
+| n=16 unlinked | −116.5104179 | 0 | +116.5104200 | +0.000002148 |
+
+受限觀測結論：六組實體模型的 raw RF3 合計都小於 0.0002 N（該界線只用於表述此合成數值觀測，不是新工程允收門）。原配對 `toward` 的奴面 CFz 為 n=8 +28.79987 N、n=16 +20.11054 N，與各自 U 肋端 RF3 的負號相符到列印精度；**同一求解器兩組輸出的一致性不是獨立物理解析 oracle**。
+
+重要反例：`away` 位移只是中心點向相反方向移動，未證明全部板肋界面皆張開；n=8／16 仍分別有約 +0.9179165／+4.705169 N 的 CFz。這兩組不能被標成 separation PASS，也不能把此數值當實物拉力、摩擦或植釘反力。
+
+C3D8 模型的接觸面積、C3D8 實體截面局部剛度與 S8R 殼截面之間不具嚴格同一離散等價性，因此只能得到 **solid raw RF3 balance observed / shell raw RF3 unbalanced** 的差異證據，不能排除幾何／網格／接觸離散共同因素，更不能據此確證 MPC 單一根因。
+
+既有 `check_u_rib_base_contact.py` 的 `OPEN_U_CONTACT_RF_GLOBAL_Z_IMBALANCE_-44.4374645` 仍原樣 FAIL，PR 未具合併資格。下一個實質工作是建立受控的殼展開傳力或真正完全張開的獨立幾何控制，再驗證 active-contact 的作用側與支承力學 ownership。仍維持 `CONTACT_NOT_ADMITTED / MPC_REACTION_RECONSTRUCTION_NOT_ESTABLISHED / ENGINEERING_ACCEPTANCE_NOT_ADMITTED`。
