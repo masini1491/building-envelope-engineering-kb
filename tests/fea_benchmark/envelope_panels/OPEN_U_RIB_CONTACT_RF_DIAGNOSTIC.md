@@ -122,9 +122,9 @@ C3D8 模型的接觸面積、C3D8 實體截面局部剛度與 S8R 殼截面之�
 
 既有 `check_u_rib_base_contact.py` 的 `OPEN_U_CONTACT_RF_GLOBAL_Z_IMBALANCE_-44.4374645` 仍原樣 FAIL，PR 未具合併資格。下一個實質工作是建立受控的殼展開傳力或真正完全張開的獨立幾何控制，再驗證 active-contact 的作用側與支承力學 ownership。仍維持 `CONTACT_NOT_ADMITTED / MPC_REACTION_RECONSTRUCTION_NOT_ESTABLISHED / ENGINEERING_ACCEPTANCE_NOT_ADMITTED`。
 
-## C3D8 完全分離控制與 S8R 全原始節點排查（2026-10-17；受限實測）
+## 實體 C3D8 完全分離控制與殼體 S8R 全原始節點排查（2026-10-17；受限實測）
 
-### C3D8 明確初始間隙：無作用接觸的兩個觀測通道
+### 實體 C3D8 明確初始間隙：無作用接觸的兩個觀測通道
 
 在上述 C3D8 板／肋合成模型，將**整組實體 U 肋**上移人工 0.1 mm，仍保持鋁板中心 −0.02 mm 的位移控制與原本的接觸 pair；不添加植釘、摩擦、實際接觸剛度或新的邊界條件。
 
