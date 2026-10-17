@@ -93,3 +93,10 @@ PR #131 head `ab256396a996b190f9600d4d685cdca34588026e`、CalculiX CI run `38886
 
 上述原始碼資訊解釋 `CF`／輸出面積的計算路徑，以及零接觸面積的 `NaN`，但仍**不能判定**壓合時 n=8 約 −44.4375 N、n=16 約 −17.8664 N 的 raw 全域反力缺口究竟來自 MPC、接觸元素外力、殼展開後的映射或多項交互因素。下一步需要能明確分辨作用側與傳力的獨立切面力、可信實體單元對照或版本核對的最小診斷；在此以前維持 `CONTACT_NOT_ADMITTED`／`MPC_REACTION_RECONSTRUCTION_NOT_ESTABLISHED`／`ENGINEERING_ACCEPTANCE_NOT_ADMITTED`，不更改現有 `OPEN_U_CONTACT_RF_GLOBAL_Z_IMBALANCE` fail-closed 門，也不合併 PR #131。
 
+
+## 無殼展開 C3D8 對照（候選，尚未通過實際求解）
+
+為隔離原本開口 U 肋 S8R 殼展開及內部 MPC 的影響，新增獨立節點的 C3D8 實體鋁板與 U 型肋 synthetic 對照（網格 n=8／16、toward／away／unlinked）。板件為 1200×300×3 mm，實體 U 肋截面外寬 50 mm、肋底 3 mm、兩側壁 3 mm、實體高度 50 mm，板上表面與肋底面重合於 Z=1.5 mm；無植釘、無摩擦、人工 E=69000 MPa、ν=0.33、penalty=100000。僅做觀察，不宣稱幾何、網格與 S8R 完全等價。
+
+本地已針對源碼測試元素數、節點不共用、接觸面、實體總體積及六組 deck scope；**2 項 deterministic tests PASS**。本地沒有 ccx 與必備 SPOOLES 環境，因此 **實際求解 NOT_RUN**。Workflow 加入六組隔離執行，原物理驗收 `check_u_rib_base_contact.py` 維持 fail-closed，並將輸入／DAT／STA／FRD 一併保留至 CI artifact。只在 exact-head real CCX 結果出現後，才決定是否需獨立反力解析檢查；若求解失敗不得將「C3D8 也無法平衡」視為已成立。
+
