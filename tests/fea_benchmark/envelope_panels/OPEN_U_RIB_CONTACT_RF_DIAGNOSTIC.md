@@ -165,3 +165,21 @@ C3D8 模型的接觸面積、C3D8 實體截面局部剛度與 S8R 殼截面之�
 - **診斷反例**：某個合成線性 MPC 的係數 `(1,-2)` 與原始 `fn=(+10,-20)` N，使原始兩節點 `fn` 直接相加為 −10 N，但該 MPC 消去後的 reduced active-DOF `f=0` N。兩種合計的對象不同；此反例只能說明非平移等效 MPC 下，原始 Z 向力直接相加未必是可直接採用的完整平衡 oracle。**不代表真實模型可以把 −44.4374645／−17.8664376 N 差額判成已平衡**。
 - 本地 exact-source 執行：八組 synthetic harness scenarios **8/8 PASS**；原有五項 archive／失效輸入契約測試 **5/5 PASS**；工具輸出維持 `CCX221_MPC_FORCE_BOOKKEEPING_ISOLATED_PASS_NOT_ENGINEERING_ORACLE`。使用 `python ccx221_resultsforc_mpc_audit.py /path/to/calculix-ccx_2.21.orig.tar.bz2` 重播；結果必須包含 `full_calculix_build=NOT_EXECUTED` 與 `actual_s8r_contact_mpc_balance=NOT_ESTABLISHED`。
 - **下一個缺口**仍然是：從實際 S8R 接觸求解器精確地取得 expanded-node／contact-spring internal forces、MPC 自由度與有效外荷載，建立可獨立重建的作用側和完整平衡。單獨 `resultsforc()` 的人工輸入測試不是 S8R 物理驗收；`OPEN_U_CONTACT_RF_GLOBAL_Z_IMBALANCE` 保持原樣，PR #131 不合併，`ENGINEERING_ACCEPTANCE_NOT_ADMITTED` 不變。
+
+## 殼體反力檔案輸出映射 A/B 實測（2026-10-17；僅輸出差異）
+
+在相同 S8R `toward` 合成模型，A 為只要求 `*NODE FILE U`，B 唯一改動為 `*NODE FILE U,RF`，原來 `*NODE PRINT`、網格、邊界、接觸及位移載重皆不變。Exact PR head `7621993642f836c6509d783495675676633bd290`；CalculiX 2.21 CI `39033608972`，artifact `12101362777`，ZIP SHA-256 `2653c8e8d9eb41cc5a8135dde0f5a92649c4d23fd959f9f1ba729cd55bc104a1`；Repository CI `39033609015` SUCCESS。兩組 `.dat`／`.sta` 各自 A/B **位元組完全相同**，僅 `.frd` 因加入 FORCE 輸出而不同。原 `.dat` 三集合與全部原始節點 RF3 的結果未變。
+
+| 同一時間 1.0 之輸出觀測 | n=8 | n=16 |
+| --- | ---: | ---: |
+| 原始殼節點 raw RF3 合計（A、B 完全相同；N） | −44.4374645298 | −17.8664375601 |
+| B 的最終 `.frd` `FORC` 記錄數 | 904 | 1736 |
+| B 的 `.frd` 記錄節點 ID 最小 | 347 | 667 |
+| B 的最終 `.frd` 記錄 F3 合計（N） | −44.4375782997 | −17.8675579870 |
+| B `.frd` F3 減 B `.dat` raw RF3（N） | 約 −0.00011377 | 約 −0.00112043 |
+
+檢查界線：上表 `.frd` 數值是由 `FORC` 最後一個時間區塊中列印的**節點記錄**求和，並不涵蓋全部展開節點或求解器的獨立 generalized force；不能以「F3 接近 raw RF3」宣稱完整 MPC／接觸反力已平衡。特別是 `.frd` 的 ID 高於原始 `.inp` 節點範圍，該區塊不能與原始節點集合一一對應，兩個總和不能當同一物理量精確相減後解讀。
+
+原始碼 2.21 `printout.f` 的 RF 設定會使用 `map3dto1d2d(...,iforce=1)`；`map3dto1d2d.f` 對力分支採展開節點力加總，而不是對位移的厚度平均。此源碼路徑不足以憑空宣稱 S8R 所有內部節點、MPC 與接觸負載已恢復完整平衡。
+
+**結論**：僅改 RF 檔案輸出不會修復或掩蓋既有的 `OPEN_U_CONTACT_RF_GLOBAL_Z_IMBALANCE`。本受限研究仍為 `MPC_REACTION_RECONSTRUCTION_NOT_ESTABLISHED`／`ENGINEERING_ACCEPTANCE_NOT_ADMITTED`，PR #131 維持 OPEN。下一步應追查原版 2.21 真正的元素內力與約束自由度，而非新增相同的 RF 輸出選項實驗。

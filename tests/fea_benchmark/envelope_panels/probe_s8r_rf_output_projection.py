@@ -72,6 +72,54 @@ def _case_files(root: Path, n: int) -> dict[str, Path]:
     return out
 
 
+
+def final_frd_forc(payload: bytes, original_node_upper_bound: int) -> dict:
+    """Last complete FRD FORC block only; reported-node sum is not a solver force oracle."""
+    lines = payload.decode("ascii").splitlines()
+    headers = [i for i, line in enumerate(lines) if line.startswith(" -4  FORC")]
+    if not headers:
+        raise ValueError("S8R_FRD_FORCE_RECORD_MISSING")
+    i = headers[-1]
+    header = lines[i - 1].split() if i else []
+    if len(header) < 4 or header[0] != "100CL":
+        raise ValueError("S8R_FRD_FORCE_STEP_INVALID")
+    try:
+        t = float(header[2])
+        count = int(header[3])
+    except (ValueError, IndexError) as exc:
+        raise ValueError("S8R_FRD_FORCE_STEP_INVALID") from exc
+    if not math.isfinite(t) or abs(t - 1.0) > 1e-7 or count <= 0:
+        raise ValueError("S8R_FRD_FORCE_STEP_INVALID")
+    observed, terminated = {}, False
+    for line in lines[i + 1:]:
+        if line.startswith(" -3"):
+            terminated = True
+            break
+        if line.startswith(" -5"):
+            continue
+        if not line.startswith(" -1"):
+            raise ValueError("S8R_FRD_FORCE_RECORD_INVALID")
+        try:
+            node_id = int(line[3:13])
+            vals = [float(line[13 + 12 * j:25 + 12 * j]) for j in range(3)]
+        except ValueError as exc:
+            raise ValueError("S8R_FRD_FORCE_RECORD_INVALID") from exc
+        if (node_id in observed or node_id <= original_node_upper_bound or
+                not all(map(math.isfinite, vals))):
+            raise ValueError("S8R_FRD_FORCE_NODE_ID_OR_VALUE")
+        observed[node_id] = vals[2]
+    if not terminated or len(observed) != count:
+        raise ValueError("S8R_FRD_FORCE_RECORD_COUNT")
+    return {
+        "frd_final_force_record_count": count,
+        "frd_final_expanded_node_min_id": min(observed),
+        "frd_final_expanded_node_max_id": max(observed),
+        "frd_final_reported_nodes_rf3_sum_n": math.fsum(observed.values()),
+        "frd_node_id_scope": "ONLY_IDS_GREATER_THAN_INPUT_ORIGINAL_NODES",
+        "frd_is_complete_solver_force_oracle": False,
+    }
+
+
 def observe(root: str | Path) -> dict:
     root = Path(root)
     results = {}
@@ -90,8 +138,17 @@ def observe(root: str | Path) -> dict:
         abs_delta = max(abs(new_nodes[i][2] - old_nodes[i][2]) for i in old_nodes)
         if not all(map(math.isfinite, (delta, abs_delta))):
             raise ValueError("S8R_RF_PROJECTION_NONFINITE")
+        frd_report = final_frd_forc(
+            projection["frd"].read_bytes(),
+            original_report["all_original_node_count"],
+        )
         results[str(n)] = {
             "baseline_all_original_rf3_n": original_report["all_original_nodes_rf3_sum_n"],
+            "frd_reported_node_force_observation": frd_report,
+            "frd_minus_dat_original_rf3_n": (
+                frd_report["frd_final_reported_nodes_rf3_sum_n"] -
+                projection_report["all_original_nodes_rf3_sum_n"]
+            ),
             "rf_output_all_original_rf3_n": projection_report["all_original_nodes_rf3_sum_n"],
             "sum_of_per_node_rf3_changes_n": delta,
             "max_abs_per_node_rf3_change_n": abs_delta,
