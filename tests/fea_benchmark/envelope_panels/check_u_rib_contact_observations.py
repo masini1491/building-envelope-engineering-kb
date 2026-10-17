@@ -58,7 +58,7 @@ def contact_print(raw,slave="RIB_BASE_UNDERSIDE",master="PLATE_TOP"):
             "shear_force_n":area[2],
             "contact_statistics_state":"FINITE_SURFACE_STATISTICS"}
 
-def rf(raw,name):
+def rf(raw,name,expected_nodes=None):
     head=re.compile(r"(?im)^\s*forces\s+\([^\n]*\)\s+for set\s+"+name+r"\s+and time\s+("+NUM+r")\s*$")
     hits=list(head.finditer(raw))
     if not hits or abs(val(hits[-1].group(1))-1.)>1e-7:raise ValueError("U_CONTACT_DIAG_FINAL_RF_MISSING_"+name)
@@ -71,6 +71,8 @@ def rf(raw,name):
             entries[key]=tuple(val(t) for t in fields[1:])
         elif entries:break
     if not entries:raise ValueError("U_CONTACT_DIAG_EMPTY_RF_"+name)
+    if expected_nodes is not None and set(entries)!=set(expected_nodes):
+        raise ValueError("U_CONTACT_DIAG_RF_NODE_IDS_"+name)
     return {"count":len(entries),"sum_rf3_n":math.fsum(v[2] for v in entries.values())}
 
 def observe_dat(raw,case):

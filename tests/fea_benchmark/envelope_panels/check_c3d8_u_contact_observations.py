@@ -28,7 +28,7 @@ def evaluate(root,n,case):
     groups={"PLATE_EDGE_RF":plate,"RIB_END_RF":rib,"CENTER_RF":center}
     raw={}
     for name,nodes in groups.items():
-        value=rf(dat,name)
+        value=rf(dat,name,expected_nodes=nodes)
         if value["count"]!=len(nodes):raise ValueError("C3D8_RF_COVERAGE_"+name)
         raw[name]=value["sum_rf3_n"]
     total=math.fsum(raw.values())
