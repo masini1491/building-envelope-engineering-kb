@@ -331,6 +331,15 @@ jobs:
           done
           python -m unittest -v test_c3d8_u_contact_observations.py
           python check_c3d8_u_contact_observations.py . > u_c3d8_contact_observations.json
+          # Zero-active-contact CONTROL: synthetic 0.1 mm initial solid-rib clearance.
+          # This is not an S8R admission; retain the original fail-closed gate below.
+          python -m unittest -v test_c3d8_clearance_control.py
+          for n in 8 16; do
+            folder="u_c3d8_control_n${n}_clearance"
+            python probe_c3d8_u_contact.py --generate "$folder" "$n" clearance
+            (cd "$folder" && timeout 90s ccx -i panel)
+          done
+          python check_c3d8_u_contact_observations.py --clearance . > u_c3d8_clearance_observations.json
           python check_u_rib_base_contact.py . > "$RUNNER_TEMP/u_base_contact_result.txt"
           grep -q "OPEN_U_BASE_ONLY_UNILATERAL_CONTACT_BOUNDED_SCREEN_PASS_NOT_DESIGN" "$RUNNER_TEMP/u_base_contact_result.txt"
           head -n 1 "$RUNNER_TEMP/u_base_contact_result.txt" > u_base_contact_result.json
@@ -683,6 +692,7 @@ jobs:
             tests/fea_benchmark/envelope_panels/u_reverse_contact_n*/*.inp
             tests/fea_benchmark/envelope_panels/u_c3d8_control_n*/*.inp
             tests/fea_benchmark/envelope_panels/u_c3d8_contact_observations.json
+            tests/fea_benchmark/envelope_panels/u_c3d8_clearance_observations.json
             tests/fea_benchmark/envelope_panels/u_rib_known_force_n*/*.inp
             tests/fea_benchmark/envelope_panels/u_declared_inactive_n*/*.inp
             tests/fea_benchmark/envelope_panels/s8r_normal_summary.md

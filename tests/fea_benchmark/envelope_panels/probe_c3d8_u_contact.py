@@ -5,10 +5,12 @@ from pathlib import Path
 
 MESHES = (8, 16)
 CASES = ("toward", "away", "unlinked")
+CLEARANCE_CASE = "clearance"
+CLEARANCE_MM = 0.1  # synthetic initial geometry offset, NOT a field tolerance
 
 
 def model(n, case):
-    if type(n) is not int or n not in MESHES or case not in CASES:
+    if type(n) is not int or n not in MESHES or case not in CASES+(CLEARANCE_CASE,):
         raise ValueError("U_SOLID_SCOPE")
     nodes, ids, elements, plate, rib_base = {}, {}, {}, [], []
     body_by_node = {}
@@ -47,6 +49,10 @@ def model(n, case):
     center=(ids[("PLATE",600.,0.,-1.5)],ids[("PLATE",600.,0.,1.5)])
     if not ps or not rs or set(ps)&set(rs) or set(center)&set(ps):
         raise ValueError("U_SOLID_SUPPORT")
+    if case==CLEARANCE_CASE:
+        # Lift the ENTIRE independent U-solid; keep connection-free topology and supports.
+        nodes={k:(x,y,z+(CLEARANCE_MM if body_by_node[k]=="RIB" else 0.))
+               for k,(x,y,z) in nodes.items()}
     if len(elements)!=n*n+14*n or len(rib_base)!=6*n:
         raise ValueError("U_SOLID_TOPOLOGY")
     return nodes,elements,tuple(plate),tuple(rib_base),ps,rs,center
@@ -72,7 +78,7 @@ def deck(n,case):
                 "*SURFACE BEHAVIOR,PRESSURE-OVERCLOSURE=LINEAR","100000.,0.001,0.001",
                 "*CONTACT PAIR,INTERACTION=NORMAL,TYPE=SURFACE TO SURFACE",
                 "RIB_BASE_UNDERSIDE,PLATE_TOP"]
-    displ = -0.02 if case=="away" else 0.02
+    displ = -0.02 if case in ("away",CLEARANCE_CASE) else 0.02
     out += ["*BOUNDARY","PLATE_EDGE_RF,1,3,0.","RIB_END_RF,1,3,0.",
             "*STEP,NLGEOM=YES,INC=100","*STATIC","0.1,1.,0.00001,0.1",
             "*BOUNDARY",f"CENTER_RF,3,3,{displ:.8f}"]
