@@ -41,6 +41,8 @@ jobs:
             --name calculix-nlgeom-probe --dir "$RUNNER_TEMP/ccx-ab/ref"
           test -f "$RUNNER_TEMP/ccx-ab/ref/envelope_panels/u_s8r_rf_projection_n8_toward/panel.inp"
           echo 'e0360eed38d6708075200c499a870e38e79f120eaa88ff7427c497e7f0cef2cf  '"$RUNNER_TEMP/ccx-ab/ref/envelope_panels/u_s8r_rf_projection_n8_toward/panel.inp" | sha256sum --check
+          test -f "$RUNNER_TEMP/ccx-ab/ref/envelope_panels/u_s8r_rf_projection_n16_toward/panel.inp"
+          echo '90becf2d6530482a88991f7e038ee63162f52ec41e9943ddfb16be612c7ee6cf  '"$RUNNER_TEMP/ccx-ab/ref/envelope_panels/u_s8r_rf_projection_n16_toward/panel.inp" | sha256sum --check
       - name: 構建未修改的 Debian 2.21-1 求解器
         run: |
           set -euo pipefail
@@ -106,7 +108,35 @@ jobs:
           grep -q '^KB_REDUCED ' "$scratch/instrumented/kb_reduced_ledger.tsv"
           test "$(stat -c %s "$scratch/instrumented/kb_reduced_ledger.tsv")" -lt 20000000
           test "$(stat -c %s "$scratch/instrumented/kb_force_ledger.tsv")" -lt 50000000
-          echo 'KB_AB_OUTPUT_EQUIVALENT_PRISTINE_INSTRUMENTED_AND_TRACE_PRESENT'
+          echo 'KB_N8_AB_OUTPUT_EQUIVALENT_PRISTINE_INSTRUMENTED_AND_TRACE_PRESENT'
+          # Independent mesh-n16 input from the same provenance-pinned artifact.
+          # Not used to change or bypass the existing physical RF3 check.
+          for side in pristine instrumented; do
+            mkdir -p "$scratch/n16/$side"
+            cp "$scratch/ref/envelope_panels/u_s8r_rf_projection_n16_toward/panel.inp" "$scratch/n16/$side/panel.inp"
+            (
+              cd "$scratch/n16/$side"
+              export OMP_NUM_THREADS=1 CCX_NPROC_EQUATION=1 CCX_NPROC_RESULTS=1 CCX_NPROC_STIFFNESS=1
+              if [ "$side" = instrumented ]; then export KB_CCX_LEDGER=1; fi
+              timeout 120s "$scratch/$side-ccx" -i panel > solver.log 2>&1
+            )
+            test -s "$scratch/n16/$side/panel.dat"
+            test -s "$scratch/n16/$side/panel.sta"
+            sha256sum "$scratch/n16/$side/panel.inp" "$scratch/n16/$side/panel.dat" "$scratch/n16/$side/panel.sta"
+          done
+          cmp "$scratch/n16/pristine/panel.inp" "$scratch/n16/instrumented/panel.inp"
+          cmp "$scratch/n16/pristine/panel.dat" "$scratch/n16/instrumented/panel.dat"
+          cmp "$scratch/n16/pristine/panel.sta" "$scratch/n16/instrumented/panel.sta"
+          for ledger in kb_force_ledger.tsv kb_contact_ledger.tsv kb_reduced_ledger.tsv; do
+            test -s "$scratch/n16/instrumented/$ledger"
+            test "$(stat -c %s "$scratch/n16/instrumented/$ledger")" -lt 50000000
+          done
+          grep -q '^KB_REDUCED_EVENT ' "$scratch/n16/instrumented/kb_reduced_ledger.tsv"
+          grep -q '^KB_REDUCED ' "$scratch/n16/instrumented/kb_reduced_ledger.tsv"
+          grep -q 'KB_SPR' "$scratch/n16/instrumented/kb_contact_ledger.tsv"
+          grep -q 'KB_EVENT P' "$scratch/n16/instrumented/kb_force_ledger.tsv"
+          grep -q 'KB_EVENT Q' "$scratch/n16/instrumented/kb_force_ledger.tsv"
+          echo 'KB_N16_AB_OUTPUT_EQUIVALENT_PRISTINE_INSTRUMENTED_AND_TRACE_PRESENT'
       - name: 保留隔離診斷證據
         if: always()
         uses: actions/upload-artifact@v4
@@ -127,3 +157,14 @@ jobs:
             ${{ runner.temp }}/ccx-ab/instrumented/kb_force_ledger.tsv
             ${{ runner.temp }}/ccx-ab/instrumented/kb_contact_ledger.tsv
             ${{ runner.temp }}/ccx-ab/instrumented/kb_reduced_ledger.tsv
+            ${{ runner.temp }}/ccx-ab/n16/pristine/panel.inp
+            ${{ runner.temp }}/ccx-ab/n16/pristine/panel.dat
+            ${{ runner.temp }}/ccx-ab/n16/pristine/panel.sta
+            ${{ runner.temp }}/ccx-ab/n16/pristine/solver.log
+            ${{ runner.temp }}/ccx-ab/n16/instrumented/panel.inp
+            ${{ runner.temp }}/ccx-ab/n16/instrumented/panel.dat
+            ${{ runner.temp }}/ccx-ab/n16/instrumented/panel.sta
+            ${{ runner.temp }}/ccx-ab/n16/instrumented/solver.log
+            ${{ runner.temp }}/ccx-ab/n16/instrumented/kb_force_ledger.tsv
+            ${{ runner.temp }}/ccx-ab/n16/instrumented/kb_contact_ledger.tsv
+            ${{ runner.temp }}/ccx-ab/n16/instrumented/kb_reduced_ledger.tsv
