@@ -232,3 +232,15 @@ PR #131 的 test-only 修正 head `da21e005dde4f9098405c7408019a46b15d8d387`，R
 本次以未安裝 SPOOLES 的本地 GCC／gfortran，分別將插樁後兩檔編譯成物件檔，確認 `-DARCH=Linux -DSPOOLES -DARPACK -DMATRIXSTORAGE` 的 C 與 `-fallow-argument-mismatch` 的 Fortran 來源可編譯；**完整 ccx link 與真實模型求解皆 NOT_RUN**。前述插樁對 `fn`、`f`、`fmpc`、MPC terms及接觸元素 `fnl` 的檔案輸出，是供下一輪研究的 instrumentation candidate；沒有獨立同版原版／插樁版 `.dat/.sta` 檢查前不得進行物理詮釋。輸出會因非預設環境變數 `KB_CCX_LEDGER` 而啟用，接觸 spring 分支與 MPC terms 的覆蓋仍待實際求解證明。
 
 重播前必須於**空白隔離工作目錄**驗證原始碼封存檔 SHA-256、確認診斷 patch 只改上述兩檔，對原版及插樁版使用相同 toolchain／輸入 `.inp`、單 CPU，先要求 `.dat/.sta` 原始資料一致並確認 trace 確有記錄，才分析接觸兩側／有效自由度。不要以 trace 存在、物件檔 PASS 或 raw FRD 的 FORC 合計推導完整 solver 反力平衡；既有 `OPEN_U_CONTACT_RF_GLOBAL_Z_IMBALANCE` 門維持 FAIL，PR #131 不合併。
+
+## 隔離 A/B 求解首次完整通過與 MPC 力回填重播（2026-10-18；不代表工程平衡）
+
+- PR #131 exact head `18b2c4221817243f561829d69774f3b9a24b3920`；隔離 workflow [run 39135858640](https://github.com/masini1491/building-envelope-engineering-kb/actions/runs/39135858640) **SUCCESS**；artifact `12140280193`，ZIP SHA-256 `905b92a2642085e87d3bd685f5b4151d4703585c4d718ac147e423e4a33ce872`，與 GitHub digest 一致。研究版本為同版 CalculiX 2.21-1 原版與只修改隔離 `results.c`／`resultsmech.f` 的插樁版。
+- 真正完成原版及插樁版編譯、n=8 `toward` 求解；原版／插樁版的 `.inp/.dat/.sta` **逐位元組相同**（不是只比較數字）。`.inp` SHA-256 `e0360eed38d6708075200c499a870e38e79f120eaa88ff7427c497e7f0cef2cf`；`.dat` SHA-256 `51355577b2eea72bf19656a00ec73f292008804296b31128c261334ffc5d8043`；`.sta` SHA-256 `4b3c0f468070b0e0ad29d13e2ce30a49dfb72ae73432de88b391db1813cc9a95`。此 A/B 證明插樁未改變上述**輸出 bytes**，不是獨立工程平衡 oracle。
+- `kb_force_ledger.tsv` SHA-256 `2dc6087367abe7f47d1ae62d03c1a212f1325ba2aff0d004e64b95095324b70e`；`kb_contact_ledger.tsv` SHA-256 `4cf6b8a4853e92afec823afb107c6522ebc399106db045bcbc8c3df11ba21b1a`。10 增量、每增量依序 `KB_EVENT P`／`Q`，最終時間 1.0，展開節點數 `1914`、MPC 數 `1238`。
+- 最終增量（#10），接觸 spring 由元素 97、98、99 各輸出 16 筆 `fnl`；各自前 8／後 8 節點的 F3 合計分別為 `(+4.695122924, -4.695122924)`、`(+1.637494896, -1.637494896)`、`(+8.076132190, -8.076132190)` N，三個元素合計 `−1.33×10⁻¹⁵ N`，支持當前 trace 範圍內的雙側接觸作用反作用配對，**不代表接觸力大小已通過獨立絕對 oracle**。
+- 最終 `resultsforc()` 前全部 expanded `fn` 的 F3 合計 `−2.9804104×10⁻¹² N`，後為 `−44.4374737211 N`；舊 `.dat` raw RF3 約 `−44.4374645 N`。這兩種觀測量不同，差值不可擅自用 CF／CFN 補抵，也不能把前者的零合計當成 reduced-system 平衡。
+- 以同次 ledger 中記錄的 MPC `coefmpc`／`fmpc`／`nodempc` 資料、依固定 2.21 `resultsforc.c` 一般線性 MPC 消去與回填順序，在本地唯讀重播 10 個增量：Z 向 `fn` 逐值符合 `Q` trace；最大差異在原 trace 記錄精度下為 `0`。此重播只驗證**已記錄的 MPC 力回填／所有 Z 向節點力一致性**，沒有驗證求解方程的 active-DOF force balance，也不能證明缺口全是輸出映射造成。部分 X/Y MPC 回填具有特殊標記／不在上述有限範圍內，不推廣為三方向完整重建。
+- **尚缺** `KB_ACTIVE` 有效自由度 `f` 的實測紀錄（此次 trace 中 0 筆）及獨立的位移／拘束／外荷載 ledger；也沒有完成 n=16 原版／插樁版求解。因此 `MPC_REACTION_RECONSTRUCTION_NOT_ESTABLISHED` 與原本 `OPEN_U_CONTACT_RF_GLOBAL_Z_IMBALANCE` 的 FAIL-CLOSED 仍不變。
+
+**後續最小步驟**：在隔離 A/B 插樁實際 `calcul_f` 為 1 的運算邊界擷取 reduced active-DOF `f`，並記錄其對應的外力與邊界／MPC ownership；先以 n=8 取得真正 active-DOF residual，再擴張 n=16。不修改物理驗收容差，不將本結果當成實際植釘／帷幕系統的設計認可，PR #131 保持 OPEN／UNMERGED。
