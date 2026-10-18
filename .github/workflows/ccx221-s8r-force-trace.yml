@@ -54,7 +54,7 @@ jobs:
           done < debian/patches/series
           src="$PWD/ccx_2.21/src"
           make -s -j2 -C "$src" \
-            CFLAGS='-O2 -Wall -I/usr/include/spooles -DARCH=\"Linux\" -DSPOOLES -DARPACK -DMATRIXSTORAGE -DUSE_MT=1' \
+            CFLAGS='-O2 -Wall -I/usr/include/spooles -DARCH=Linux -DSPOOLES -DARPACK -DMATRIXSTORAGE -DUSE_MT=1' \
             FFLAGS='-O2 -fallow-argument-mismatch' > "$RUNNER_TEMP/ccx-ab/pristine-build.log" 2>&1 || {
               tail -n 120 "$RUNNER_TEMP/ccx-ab/pristine-build.log"; exit 1;
             }
@@ -72,7 +72,7 @@ jobs:
           diff -q "$scratch/pristine-results.c" "$src/results.c" >/dev/null && { echo 'results.c was not patched'; exit 1; } || true
           diff -q "$scratch/pristine-resultsmech.f" "$src/resultsmech.f" >/dev/null && { echo 'resultsmech.f was not patched'; exit 1; } || true
           make -s -j2 -C "$src" \
-            CFLAGS='-O2 -Wall -I/usr/include/spooles -DARCH=\"Linux\" -DSPOOLES -DARPACK -DMATRIXSTORAGE -DUSE_MT=1' \
+            CFLAGS='-O2 -Wall -I/usr/include/spooles -DARCH=Linux -DSPOOLES -DARPACK -DMATRIXSTORAGE -DUSE_MT=1' \
             FFLAGS='-O2 -fallow-argument-mismatch' > "$scratch/instrumented-build.log" 2>&1 || {
               tail -n 120 "$scratch/instrumented-build.log"; exit 1;
             }
