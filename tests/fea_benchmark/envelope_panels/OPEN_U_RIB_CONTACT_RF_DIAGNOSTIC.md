@@ -184,7 +184,7 @@ C3D8 模型的接觸面積、C3D8 實體截面局部剛度與 S8R 殼截面之�
 
 **結論**：僅改 RF 檔案輸出不會修復或掩蓋既有的 `OPEN_U_CONTACT_RF_GLOBAL_Z_IMBALANCE`。本受限研究仍為 `MPC_REACTION_RECONSTRUCTION_NOT_ESTABLISHED`／`ENGINEERING_ACCEPTANCE_NOT_ADMITTED`，PR #131 維持 OPEN。下一步應追查原版 2.21 真正的元素內力與約束自由度，而非新增相同的 RF 輸出選項實驗。
 
-## FRD 幾何／位移／反力同集合覆核與接觸力歸屬路徑（2026-10-18；仍未通過物理門）
+## 殼體反力檔（FRD）幾何／位移／反力同集合覆核與接觸力歸屬路徑（2026-10-18；仍未通過物理門）
 
 ### 精確提交（Exact-head）CI 與原始證據完整性
 
@@ -224,3 +224,11 @@ PR #131 的 test-only 修正 head `da21e005dde4f9098405c7408019a46b15d8d387`，R
 **下一個可檢驗工作**：如需追究真實 S8R 失衡根因，在隔離、同版本求解環境建立最小 read-only 診斷插樁，分別輸出 `springforc_* ` 的 master／slave 局部 F3 加總、`resultsmech` 聚合後 expanded `fn`、`resultsforc` 處理前後的 `fn/f/fmpc` 與對應 `nactdof/ipompc/nodempc/coefmpc` term identity；使用同版未修改 solver、相同 `.inp`、`.dat`、`.sta` 及 independent external-force ledger 對照。**尚未實際插樁／執行此測試，獨立有效自由度平衡仍未建立**。
 
 狀態維持 `CONTACT_NOT_ADMITTED`／`MPC_REACTION_RECONSTRUCTION_NOT_ESTABLISHED`／`ENGINEERING_ACCEPTANCE_NOT_ADMITTED`；PR #131 保持 OPEN／UNMERGED，不修改物理驗收門檻，不將合成研究外推實際鋁植釘設計容量。
+
+### 隔離診斷插樁重播準備（未進行完整求解）
+
+最小診斷工具：`tests/fea_benchmark/envelope_panels/ccx221_s8r_force_instrument.py`。使用者授權限於隔離研究；工具僅在 Repository **外部**、已驗證 SHA-256 `51d229aee320cf685216d360f7c04f9a57af0148fbe840483a964c86c315da82` 的原始 CalculiX 2.21 解壓目錄修改 `src/results.c` 與 `src/resultsmech.f`。**不得**把修改後 GPL 原始碼提交至公開 KB、不得將此版本視作正式求解器。
+
+本次以未安裝 SPOOLES 的本地 GCC／gfortran，分別將插樁後兩檔編譯成物件檔，確認 `-DARCH=Linux -DSPOOLES -DARPACK -DMATRIXSTORAGE` 的 C 與 `-fallow-argument-mismatch` 的 Fortran 來源可編譯；**完整 ccx link 與真實模型求解皆 NOT_RUN**。前述插樁對 `fn`、`f`、`fmpc`、MPC terms及接觸元素 `fnl` 的檔案輸出，是供下一輪研究的 instrumentation candidate；沒有獨立同版原版／插樁版 `.dat/.sta` 檢查前不得進行物理詮釋。輸出會因非預設環境變數 `KB_CCX_LEDGER` 而啟用，接觸 spring 分支與 MPC terms 的覆蓋仍待實際求解證明。
+
+重播前必須於**空白隔離工作目錄**驗證原始碼封存檔 SHA-256、確認診斷 patch 只改上述兩檔，對原版及插樁版使用相同 toolchain／輸入 `.inp`、單 CPU，先要求 `.dat/.sta` 原始資料一致並確認 trace 確有記錄，才分析接觸兩側／有效自由度。不要以 trace 存在、物件檔 PASS 或 raw FRD 的 FORC 合計推導完整 solver 反力平衡；既有 `OPEN_U_CONTACT_RF_GLOBAL_Z_IMBALANCE` 門維持 FAIL，PR #131 不合併。
