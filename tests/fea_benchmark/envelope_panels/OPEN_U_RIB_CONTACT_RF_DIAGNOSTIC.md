@@ -183,3 +183,44 @@ C3D8 模型的接觸面積、C3D8 實體截面局部剛度與 S8R 殼截面之�
 原始碼 2.21 `printout.f` 的 RF 設定會使用 `map3dto1d2d(...,iforce=1)`；`map3dto1d2d.f` 對力分支採展開節點力加總，而不是對位移的厚度平均。此源碼路徑不足以憑空宣稱 S8R 所有內部節點、MPC 與接觸負載已恢復完整平衡。
 
 **結論**：僅改 RF 檔案輸出不會修復或掩蓋既有的 `OPEN_U_CONTACT_RF_GLOBAL_Z_IMBALANCE`。本受限研究仍為 `MPC_REACTION_RECONSTRUCTION_NOT_ESTABLISHED`／`ENGINEERING_ACCEPTANCE_NOT_ADMITTED`，PR #131 維持 OPEN。下一步應追查原版 2.21 真正的元素內力與約束自由度，而非新增相同的 RF 輸出選項實驗。
+
+## FRD 幾何／位移／反力同集合覆核與接觸力歸屬路徑（2026-10-18；仍未通過物理門）
+
+### Exact-head CI 與原始證據完整性
+
+PR #131 的 test-only 修正 head `da21e005dde4f9098405c7408019a46b15d8d387`，Repository CI `39054940761` SUCCESS；實際 CalculiX 2.21 CI `39054940762` FAILURE。CI 原始 log 中，`test_probe_s8r_rf_output_projection.py` **3/3 PASS**，已排除前一個 head 的固定欄寬 NaN 負向測試失敗；後續真正停止在既有 `check_u_rib_base_contact.py` 的 `OPEN_U_CONTACT_RF_GLOBAL_Z_IMBALANCE_-44.4374645`。不修改、跳過或提高該物理門檻。
+
+同次 CalculiX artifact `12109655758` 的 ZIP SHA-256，經獨立下載、位元組重算，為 `beea8fb590dbf647565517a240f63f3f51d947e2549c6f0458a7a89ce3468fa8`，與 GitHub digest 一致。對 artifact 中 n=8／16 各 A/B 的 `.inp/.dat/.sta/.frd` **16/16 份 SHA-256**，逐一與 `u_s8r_rf_projection_observations.json` 原紀錄比對一致；A/B 各自 `.dat` 與 `.sta` 均位元組相同。A/B `.inp` 比對確認只在 `*NODE FILE,OUTPUT=3D` 增加 `RF`；`.sta` 的最後時間都是 1.0。本獨立重算以 ZIP 原始 bytes 為輸入，不等於第二次獨立求解。
+
+### FRD 輸出幾何節點集合的獨立交叉檢查
+
+對同一 ZIP 的 B 組 `.frd`，不以既有 `probe_s8r_rf_output_projection.py` 的 JSON 宣稱代替實際讀取：分別解析 `2C` 幾何節點記錄、最後時間 1.0 的 `DISP` 與 `FORC` 節點 ID，核對筆數、無重複及**三者 ID 集合逐一相等**。
+
+| 本次實際 FRD（B／toward） | n=8 | n=16 |
+| --- | ---: | ---: |
+| 原始 `.inp` 殼節點數 | 346 | 666 |
+| `2C` 幾何節點數 | 904 | 1736 |
+| 最後 `DISP` 節點數 | 904 | 1736 |
+| 最後 `FORC` 節點數 | 904 | 1736 |
+| 三種 FRD 節點 ID 集合 | 完全相等 | 完全相等 |
+| FRD 節點 ID 範圍 | 347–1758 | 667–3390 |
+| 該範圍內未出現在 FRD 的 ID 數 | 508 | 988 |
+| 最後 `FORC` F3 列印值合計（N） | −44.4375782997 | −17.8675579870 |
+| 原始全部殼節點 `.dat` RF3 合計（N） | −44.4374645298 | −17.8664375601 |
+
+**只可得出的結論**：本次 `FORC` 並未漏列**同一 FRD 已輸出的 `2C` 幾何節點**；原始 `.inp` 殼節點不是同一組觀測 ID。FRD 範圍內的空號不能自行解讀為確實存在、應計反力的內部自由度；`2C` 集合完整也不能證明已列出求解器全部 generated nodes、contact-spring force、MPC generalized forces 或 external load ownership。**此表不是完整求解器平衡 oracle。**
+
+### 版本核對的 CalculiX 2.21 力向量路徑
+
+以 Debian 2.21 原始封存檔 `calculix-ccx_2.21.orig.tar.bz2` 的 SHA-256 `51d229aee320cf685216d360f7c04f9a57af0148fbe840483a964c86c315da82`，在 Repository 外隔離解壓、直接追查：
+
+- `gen3delem.f` 269–281、369–372 行：S8R 的 2D→3D 展開使用 `gen3dfrom2d`，元素改為 `C3D20RL`。展開過程包含 additional MPC，不能視作原始殼節點直接等於有效方程自由度。
+- `resultsmech.f` 389–455 行：接觸 spring 分支經 `springforc_n2f`／`springforc_f2f` 求得元素節點力 `fnl`，隨後逐節點累加進 `fn`。在 `springforc_f2f.f` 424–437 行，可見 master 與 slave 分別以負／正形狀函數權重配置局部接觸力。這是**程式碼路徑**，尚未取得本案真實運算的兩側完整數值和。
+- `results.c` 241–258、401–414 行：先聚合各 thread 的 `fn`，再由 `resultsforc` 依實際 `nactdof`／MPC 拆分 active system force 與回填 `fn`。`resultsforc.c` 34–118 行的 `f`、`fmpc`、`fn` 不應混為單一可直接相加的反力。
+- `printout.f` 84–92 行及 `map3dto1d2d.f` 538–572、650–657 行：RF 輸出經 `iforce=1` 的 expanded→2D force sum 與 node marker 去重。它是映射輸出，不等同 independent active-DOF 平衡驗算。
+
+以上僅能識別潛在的觀測邊界：**局部接觸雙側力 → 全部 expanded-node `fn` → MPC 分離／有效 `f` → RF 映射／列印**。尚未證實本案實際選用的 contact branch、每個接觸積分點正負作用側、各 MPC 條款或有效外荷載的完整數值歸屬；不得把源碼上的正負權重直接宣稱為求解結果已平衡。原版 GPL 原始碼未加入公開 KB。
+
+**下一個可檢驗工作**：如需追究真實 S8R 失衡根因，在隔離、同版本求解環境建立最小 read-only 診斷插樁，分別輸出 `springforc_* ` 的 master／slave 局部 F3 加總、`resultsmech` 聚合後 expanded `fn`、`resultsforc` 處理前後的 `fn/f/fmpc` 與對應 `nactdof/ipompc/nodempc/coefmpc` term identity；使用同版未修改 solver、相同 `.inp`、`.dat`、`.sta` 及 independent external-force ledger 對照。**尚未實際插樁／執行此測試，獨立有效自由度平衡仍未建立**。
+
+狀態維持 `CONTACT_NOT_ADMITTED`／`MPC_REACTION_RECONSTRUCTION_NOT_ESTABLISHED`／`ENGINEERING_ACCEPTANCE_NOT_ADMITTED`；PR #131 保持 OPEN／UNMERGED，不修改物理驗收門檻，不將合成研究外推實際鋁植釘設計容量。
