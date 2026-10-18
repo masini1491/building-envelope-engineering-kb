@@ -244,3 +244,31 @@ PR #131 的 test-only 修正 head `da21e005dde4f9098405c7408019a46b15d8d387`，R
 - **尚缺** `KB_ACTIVE` 有效自由度 `f` 的實測紀錄（此次 trace 中 0 筆）及獨立的位移／拘束／外荷載 ledger；也沒有完成 n=16 原版／插樁版求解。因此 `MPC_REACTION_RECONSTRUCTION_NOT_ESTABLISHED` 與原本 `OPEN_U_CONTACT_RF_GLOBAL_Z_IMBALANCE` 的 FAIL-CLOSED 仍不變。
 
 **後續最小步驟**：在隔離 A/B 插樁實際 `calcul_f` 為 1 的運算邊界擷取 reduced active-DOF `f`，並記錄其對應的外力與邊界／MPC ownership；先以 n=8 取得真正 active-DOF residual，再擴張 n=16。不修改物理驗收容差，不將本結果當成實際植釘／帷幕系統的設計認可，PR #131 保持 OPEN／UNMERGED。
+
+## 雙網格內力與約束方程逐項覆核（2026-10-19）
+
+隔離同版原版／插樁版 A/B：[run 39174714987](https://github.com/masini1491/building-envelope-engineering-kb/actions/runs/39174714987) **SUCCESS**，exact PR head `a5fe08526fd86f19d765b0e93e2a0ae98712d7b6`；artifact `12153418267`、ZIP SHA-256 `ed7584a2a1256b7f59b9f45e302d9927ff6284d41ddf00a9eda9295e2f7e751f`，獨立下載重算與 GitHub digest 一致。此 run 保留 n=8 及 n=16 的 A/B 同版求解，兩網格各自 `.inp/.dat/.sta` **三檔位元組完全一致**，不是跨網格比較，也不是由舊 CI 推估。
+
+| 來自本次 ZIP 的真實求解／trace | n=8 | n=16 |
+| --- | ---: | ---: |
+| `.inp` SHA-256 | `e0360eed38d6708075200c499a870e38e79f120eaa88ff7427c497e7f0cef2cf` | `90becf2d6530482a88991f7e038ee63162f52ec41e9943ddfb16be612c7ee6cf` |
+| `.dat` SHA-256 | `51355577b2eea72bf19656a00ec73f292008804296b31128c261334ffc5d8043` | `0afd51cf40a63be7bd837b684fcd7bbe9c6fc93d530922cd62bc8b67a1efd35d` |
+| `.sta` SHA-256 | `4b3c0f468070b0e0ad29d13e2ce30a49dfb72ae73432de88b391db1813cc9a95` | `3aaf52ec7219ac3effac194b302b835c711c5389f3bb081ee39d52e84fd49f1a` |
+| 展開節點 `nk` | 1914 | 3610 |
+| MPC 條數 | 1238 | 2070 |
+| 最終有效方程數 | 1904 | 3936 |
+| 最終 reduced-system 迭代觀測數 | 6 | 5 |
+| 最終最大絕對 `b`（求解器方程力單位） | 0.000363184958 | 0.00000110015236 |
+| 最終 `fext` 非零有效方程筆數 | 0 | 0 |
+| 第 10 增量、MPC 前 `fn` F3 合計（N） | −2.9804×10⁻¹² | −9.7395×10⁻¹³ |
+| 同一增量、MPC 後 `fn` F3 合計（N） | −44.4374737211 | −17.8664384417 |
+| 最終接觸 spring 元素數 | 3 | 7 |
+| 接觸每元素雙側 X／Y／Z 淨力最大絕對值（N） | 1.78×10⁻¹⁵ | 8.88×10⁻¹⁶ |
+
+雙網格 `*.inp` 皆有一組 `*CONTACT PAIR` 與 displacement boundary，沒有 `*CLOAD` 或 `*DLOAD`。`nonlingeo.c` 的 reduced `fext` 全零與此一致；**但指定非零位移的反力不包含在「自由有效方程外力全零」這個敘述內**，不可據此宣稱全部 support reactions = 0。
+
+獨立 Python 唯讀解析原始 ZIP：檢查 10 個 `P/Q` pair 覆蓋、每組 MPC term 順序與數量、逐項有限性、每元素 16 筆接觸力、每增量 X/Y/Z 兩側合力、每個 reduced 方程 ID 不重複及 `b=fext-f` 一致；對 **n=8／16 各 10 個增量**，以原版 2.21 `resultsforc.c` 的一般 MPC 消去與回填順序重播 Z 向節點力，與實測 `Q` trace 最大絕對差異均為 **0（按原始紀錄雙精度）**。這是 solver trace／MPC 轉換之**同源數據一致性與源碼回放**，**不是額外獨立求解**。本地驗證器及 10 項含 NaN、缺筆、重複方程、修改 digest、接觸節點覆蓋的負向測試已執行 PASS；此輪所述本地檢查不自動代表 CI 已包含該驗證器。
+
+目前可確認：力輸出差異與 MPC 回填的演算法路徑一致；接觸 spring 的雙側對向力互抵；本工況有效方程上的 `fext` 為零且最終 `b` 非零但小。**尚未取得**逐個原始支承／指定位移 DOF 對應的獨立反力帳、全域 MPC constraint dual force 映射，以及未受約束實體力平衡的外部 oracle。因此即使減少錯誤觀測的疑慮，也不可把 `OPEN_U_CONTACT_RF_GLOBAL_Z_IMBALANCE` 門直接改成 PASS；不得藉 `CF/CFN` 補零或宣稱可用於實際植釘容量。
+
+下一步只針對 **SPC／prescribed displacement owner + exact MPC dual vector → 原始及 expanded node 的一致反力映射** 設計新的觀測切面。先核對 `nodeboun/ndirboun/xbounact` 及 mortar branch 對應，建立獨立外部力 ledger，再計算支持／指定位置的反力；所有物理 admission 仍維持 `CONTACT_NOT_ADMITTED`、`MPC_REACTION_RECONSTRUCTION_NOT_ESTABLISHED`、`ENGINEERING_ACCEPTANCE_NOT_ADMITTED`，PR #131 繼續 OPEN／UNMERGED。
