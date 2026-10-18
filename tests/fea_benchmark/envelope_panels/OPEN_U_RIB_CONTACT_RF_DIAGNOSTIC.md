@@ -186,13 +186,13 @@ C3D8 模型的接觸面積、C3D8 實體截面局部剛度與 S8R 殼截面之�
 
 ## FRD 幾何／位移／反力同集合覆核與接觸力歸屬路徑（2026-10-18；仍未通過物理門）
 
-### Exact-head CI 與原始證據完整性
+### 精確提交（Exact-head）CI 與原始證據完整性
 
 PR #131 的 test-only 修正 head `da21e005dde4f9098405c7408019a46b15d8d387`，Repository CI `39054940761` SUCCESS；實際 CalculiX 2.21 CI `39054940762` FAILURE。CI 原始 log 中，`test_probe_s8r_rf_output_projection.py` **3/3 PASS**，已排除前一個 head 的固定欄寬 NaN 負向測試失敗；後續真正停止在既有 `check_u_rib_base_contact.py` 的 `OPEN_U_CONTACT_RF_GLOBAL_Z_IMBALANCE_-44.4374645`。不修改、跳過或提高該物理門檻。
 
 同次 CalculiX artifact `12109655758` 的 ZIP SHA-256，經獨立下載、位元組重算，為 `beea8fb590dbf647565517a240f63f3f51d947e2549c6f0458a7a89ce3468fa8`，與 GitHub digest 一致。對 artifact 中 n=8／16 各 A/B 的 `.inp/.dat/.sta/.frd` **16/16 份 SHA-256**，逐一與 `u_s8r_rf_projection_observations.json` 原紀錄比對一致；A/B 各自 `.dat` 與 `.sta` 均位元組相同。A/B `.inp` 比對確認只在 `*NODE FILE,OUTPUT=3D` 增加 `RF`；`.sta` 的最後時間都是 1.0。本獨立重算以 ZIP 原始 bytes 為輸入，不等於第二次獨立求解。
 
-### FRD 輸出幾何節點集合的獨立交叉檢查
+### 輸出幾何節點集合（FRD）的獨立交叉檢查
 
 對同一 ZIP 的 B 組 `.frd`，不以既有 `probe_s8r_rf_output_projection.py` 的 JSON 宣稱代替實際讀取：分別解析 `2C` 幾何節點記錄、最後時間 1.0 的 `DISP` 與 `FORC` 節點 ID，核對筆數、無重複及**三者 ID 集合逐一相等**。
 
