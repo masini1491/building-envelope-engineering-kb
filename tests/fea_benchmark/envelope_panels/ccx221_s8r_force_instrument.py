@@ -103,6 +103,41 @@ NL_TRACE = '''        /* KB-CAND-007 read-only final-time reduced residual obser
         }
 '''
 
+SPC_HELPER = r'''
+/* KB research-only: SPC owner and nodal force in the expanded topology.
+   No force-vector mutation and no claim of support-reaction admission. */
+static void kb_spc_trace(const char *phase, ITG *nk, ITG mt,
+                         ITG *nboun, ITG *nodeboun, ITG *ndirboun,
+                         double *xboun, double *fn, ITG *nactdof,
+                         ITG *istep, ITG *iinc, double *time){
+  ITG k,node,d,eq;
+  FILE *fp;
+  if(getenv("KB_CCX_LEDGER")==NULL || fabs(*time-1.0)>1e-7) return;
+  fp=fopen("kb_spc_ledger.tsv","a");
+  if(!fp) return;
+  fprintf(fp,"KB_SPC_EVENT %s %d %d %.17g %d %d\n",phase,
+          (int)*istep,(int)*iinc,*time,(int)*nk,(int)*nboun);
+  for(k=0;k<*nboun;k++){
+    node=nodeboun[k]; d=ndirboun[k];
+    if(node<1 || node>*nk || d<1 || d>=mt){
+      fprintf(fp,"KB_SPC_INVALID %s %d %d %d\n",phase,
+              (int)(k+1),(int)node,(int)d);
+      continue;
+    }
+    eq=nactdof[mt*(node-1)+d];
+    fprintf(fp,"KB_SPC %s %d %d %d %d %.17g %.17g\n",phase,
+            (int)(k+1),(int)node,(int)d,(int)eq,
+            xboun[k],fn[mt*(node-1)+d]);
+  }
+  fclose(fp);
+}
+'''
+SPC_PRE = '''  if((*iout>0)&&(calcul_fn==1))
+    kb_spc_trace("P",nk,mt,nboun,nodeboun,ndirboun,xboun,fn,
+                 nactdof,istep,iinc,time);
+'''
+SPC_POST = SPC_PRE.replace('"P",','"Q",')
+
 
 def replace_one(txt: str, anchor: str, new: str) -> str:
     count=txt.count(anchor)
@@ -117,11 +152,11 @@ def patch(root: pathlib.Path) -> None:
     c=cpath.read_text(encoding='latin-1')
     f=fpath.read_text(encoding='latin-1')
     nl=nlpath.read_text(encoding='latin-1')
-    c=replace_one(c,'#include "mortar.h"','#include "mortar.h"\n#include <string.h>\n'+C_HELPER)
+    c=replace_one(c,'#include "mortar.h"','#include "mortar.h"\n#include <string.h>\n'+C_HELPER+SPC_HELPER)
     c=replace_one(c,'  /* calculating the matrix system internal force vector */',
-                  C_PRE+'\n  /* calculating the matrix system internal force vector */')
+                  C_PRE+SPC_PRE+'\n  /* calculating the matrix system internal force vector */')
     c=replace_one(c,'  /* calculating the total energy if',
-                  C_POST+'\n  /* calculating the total energy if')
+                  C_POST+SPC_POST+'\n  /* calculating the total energy if')
     needle=('              do j=1,nope\n'
             '                do k=1,3\n'
             '                  fn(k,konl(j))=fn(k,konl(j))+fnl(k,j)\n'
@@ -132,7 +167,7 @@ def patch(root: pathlib.Path) -> None:
     cpath.write_text(c,encoding='latin-1')
     fpath.write_text(f,encoding='latin-1')
     nlpath.write_text(nl,encoding='latin-1')
-    print('KB_TRACE_PATCHED results.c resultsmech.f nonlingeo.c')
+    print('KB_TRACE_PATCHED results.c resultsmech.f nonlingeo.c SPC')
 
 if __name__=='__main__':
     if len(sys.argv)!=2: raise SystemExit('usage: ccx221_s8r_force_instrument.py CCX_DIR')

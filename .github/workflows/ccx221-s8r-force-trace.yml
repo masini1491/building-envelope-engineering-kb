@@ -98,6 +98,12 @@ jobs:
           cmp "$scratch/pristine/panel.inp" "$scratch/instrumented/panel.inp"
           cmp "$scratch/pristine/panel.dat" "$scratch/instrumented/panel.dat"
           cmp "$scratch/pristine/panel.sta" "$scratch/instrumented/panel.sta"
+          test -s "$scratch/instrumented/kb_spc_ledger.tsv"
+          grep -q '^KB_SPC_EVENT P ' "$scratch/instrumented/kb_spc_ledger.tsv"
+          grep -q '^KB_SPC_EVENT Q ' "$scratch/instrumented/kb_spc_ledger.tsv"
+          grep -q '^KB_SPC P ' "$scratch/instrumented/kb_spc_ledger.tsv"
+          grep -q '^KB_SPC Q ' "$scratch/instrumented/kb_spc_ledger.tsv"
+          test "$(stat -c %s "$scratch/instrumented/kb_spc_ledger.tsv")" -lt 20000000
           test -s "$scratch/instrumented/kb_force_ledger.tsv"
           grep -q 'KB_EVENT P' "$scratch/instrumented/kb_force_ledger.tsv"
           grep -q 'KB_EVENT Q' "$scratch/instrumented/kb_force_ledger.tsv"
@@ -127,10 +133,14 @@ jobs:
           cmp "$scratch/n16/pristine/panel.inp" "$scratch/n16/instrumented/panel.inp"
           cmp "$scratch/n16/pristine/panel.dat" "$scratch/n16/instrumented/panel.dat"
           cmp "$scratch/n16/pristine/panel.sta" "$scratch/n16/instrumented/panel.sta"
-          for ledger in kb_force_ledger.tsv kb_contact_ledger.tsv kb_reduced_ledger.tsv; do
+          for ledger in kb_force_ledger.tsv kb_contact_ledger.tsv kb_reduced_ledger.tsv kb_spc_ledger.tsv; do
             test -s "$scratch/n16/instrumented/$ledger"
             test "$(stat -c %s "$scratch/n16/instrumented/$ledger")" -lt 50000000
           done
+          grep -q '^KB_SPC_EVENT P ' "$scratch/n16/instrumented/kb_spc_ledger.tsv"
+          grep -q '^KB_SPC_EVENT Q ' "$scratch/n16/instrumented/kb_spc_ledger.tsv"
+          grep -q '^KB_SPC P ' "$scratch/n16/instrumented/kb_spc_ledger.tsv"
+          grep -q '^KB_SPC Q ' "$scratch/n16/instrumented/kb_spc_ledger.tsv"
           grep -q '^KB_REDUCED_EVENT ' "$scratch/n16/instrumented/kb_reduced_ledger.tsv"
           grep -q '^KB_REDUCED ' "$scratch/n16/instrumented/kb_reduced_ledger.tsv"
           grep -q 'KB_SPR' "$scratch/n16/instrumented/kb_contact_ledger.tsv"
@@ -157,6 +167,7 @@ jobs:
             ${{ runner.temp }}/ccx-ab/instrumented/kb_force_ledger.tsv
             ${{ runner.temp }}/ccx-ab/instrumented/kb_contact_ledger.tsv
             ${{ runner.temp }}/ccx-ab/instrumented/kb_reduced_ledger.tsv
+            ${{ runner.temp }}/ccx-ab/instrumented/kb_spc_ledger.tsv
             ${{ runner.temp }}/ccx-ab/n16/pristine/panel.inp
             ${{ runner.temp }}/ccx-ab/n16/pristine/panel.dat
             ${{ runner.temp }}/ccx-ab/n16/pristine/panel.sta
@@ -168,3 +179,4 @@ jobs:
             ${{ runner.temp }}/ccx-ab/n16/instrumented/kb_force_ledger.tsv
             ${{ runner.temp }}/ccx-ab/n16/instrumented/kb_contact_ledger.tsv
             ${{ runner.temp }}/ccx-ab/n16/instrumented/kb_reduced_ledger.tsv
+            ${{ runner.temp }}/ccx-ab/n16/instrumented/kb_spc_ledger.tsv
