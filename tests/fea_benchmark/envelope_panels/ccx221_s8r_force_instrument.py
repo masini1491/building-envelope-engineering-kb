@@ -1,7 +1,7 @@
 """Patch verified external CalculiX 2.21 source IN PLACE for bounded diagnostic only.
 
 Never copy upstream GPL sources into the public KB. Explicitly limited to
-results.c and resultsmech.f; the pristine binary must be built first.
+results.c, resultsmech.f and nonlingeo.c; pristine binary must be built first.
 """
 from __future__ import annotations
 import pathlib
@@ -82,6 +82,27 @@ F_BEFORE='''!     KB diagnostic-only contact spring forces before accumulation.
                 close(91)
               endif
 '''
+# Final-time nonlinear iteration; captures same active-equation indices for
+# internal f, external fext, and residual b after calcresidual() (not output RF).
+# No solver vectors are changed. Only records when opt-in KB_CCX_LEDGER is set.
+NL_ANCHOR = '''\t//                for(k=0;k<neq[1];++k){printf("b=%" ITGFORMAT ",%f\\n",k,b[k]);}'''
+NL_TRACE = '''        /* KB-CAND-007 read-only final-time reduced residual observation. */
+        if(getenv("KB_CCX_LEDGER") && time>=0.999999 && neq[0]>0){
+          FILE *kb_fp=fopen("kb_reduced_ledger.tsv","a");
+          if(kb_fp){
+            ITG kb_j;
+            fprintf(kb_fp,"KB_REDUCED_EVENT %d %d %d %.17g %d %d %d\\n",
+                    (int)*istep,(int)iinc,(int)iit,time,
+                    (int)neq[0],(int)neq[1],(int)*mortar);
+            for(kb_j=0;kb_j<neq[0];kb_j++){
+              fprintf(kb_fp,"KB_REDUCED %d %.17g %.17g %.17g\\n",
+                      (int)(kb_j+1),f[kb_j],fext[kb_j],b[kb_j]);
+            }
+            fclose(kb_fp);
+          }
+        }
+'''
+
 
 def replace_one(txt: str, anchor: str, new: str) -> str:
     count=txt.count(anchor)
@@ -92,8 +113,10 @@ def patch(root: pathlib.Path) -> None:
     source=root/'src'
     cpath=source/'results.c'
     fpath=source/'resultsmech.f'
+    nlpath=source/'nonlingeo.c'
     c=cpath.read_text(encoding='latin-1')
     f=fpath.read_text(encoding='latin-1')
+    nl=nlpath.read_text(encoding='latin-1')
     c=replace_one(c,'#include "mortar.h"','#include "mortar.h"\n#include <string.h>\n'+C_HELPER)
     c=replace_one(c,'  /* calculating the matrix system internal force vector */',
                   C_PRE+'\n  /* calculating the matrix system internal force vector */')
@@ -105,9 +128,11 @@ def patch(root: pathlib.Path) -> None:
             '                enddo\n'
             '              enddo')
     f=replace_one(f,needle,F_BEFORE+needle)
+    nl=replace_one(nl,NL_ANCHOR,NL_TRACE+NL_ANCHOR)
     cpath.write_text(c,encoding='latin-1')
     fpath.write_text(f,encoding='latin-1')
-    print('KB_TRACE_PATCHED results.c resultsmech.f')
+    nlpath.write_text(nl,encoding='latin-1')
+    print('KB_TRACE_PATCHED results.c resultsmech.f nonlingeo.c')
 
 if __name__=='__main__':
     if len(sys.argv)!=2: raise SystemExit('usage: ccx221_s8r_force_instrument.py CCX_DIR')

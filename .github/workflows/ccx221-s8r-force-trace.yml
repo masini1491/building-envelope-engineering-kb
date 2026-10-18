@@ -68,9 +68,11 @@ jobs:
           src="$scratch/CalculiX/ccx_2.21/src"
           cp "$src/results.c" "$scratch/pristine-results.c"
           cp "$src/resultsmech.f" "$scratch/pristine-resultsmech.f"
+          cp "$src/nonlingeo.c" "$scratch/pristine-nonlingeo.c"
           python tests/fea_benchmark/envelope_panels/ccx221_s8r_force_instrument.py "$scratch/CalculiX/ccx_2.21"
           diff -q "$scratch/pristine-results.c" "$src/results.c" >/dev/null && { echo 'results.c was not patched'; exit 1; } || true
           diff -q "$scratch/pristine-resultsmech.f" "$src/resultsmech.f" >/dev/null && { echo 'resultsmech.f was not patched'; exit 1; } || true
+          diff -q "$scratch/pristine-nonlingeo.c" "$src/nonlingeo.c" >/dev/null && { echo 'nonlingeo.c was not patched'; exit 1; } || true
           make -s -j2 -C "$src" \
             CFLAGS='-O2 -Wall -I/usr/include/spooles -DARCH=Linux -DSPOOLES -DARPACK -DMATRIXSTORAGE -DUSE_MT=1' \
             FFLAGS='-O2 -fallow-argument-mismatch' > "$scratch/instrumented-build.log" 2>&1 || {
@@ -99,6 +101,10 @@ jobs:
           grep -q 'KB_EVENT Q' "$scratch/instrumented/kb_force_ledger.tsv"
           test -s "$scratch/instrumented/kb_contact_ledger.tsv"
           grep -q 'KB_SPR' "$scratch/instrumented/kb_contact_ledger.tsv"
+          test -s "$scratch/instrumented/kb_reduced_ledger.tsv"
+          grep -q '^KB_REDUCED_EVENT ' "$scratch/instrumented/kb_reduced_ledger.tsv"
+          grep -q '^KB_REDUCED ' "$scratch/instrumented/kb_reduced_ledger.tsv"
+          test "$(stat -c %s "$scratch/instrumented/kb_reduced_ledger.tsv")" -lt 20000000
           test "$(stat -c %s "$scratch/instrumented/kb_force_ledger.tsv")" -lt 50000000
           echo 'KB_AB_OUTPUT_EQUIVALENT_PRISTINE_INSTRUMENTED_AND_TRACE_PRESENT'
       - name: 保留隔離診斷證據
@@ -120,3 +126,4 @@ jobs:
             ${{ runner.temp }}/ccx-ab/instrumented/solver.log
             ${{ runner.temp }}/ccx-ab/instrumented/kb_force_ledger.tsv
             ${{ runner.temp }}/ccx-ab/instrumented/kb_contact_ledger.tsv
+            ${{ runner.temp }}/ccx-ab/instrumented/kb_reduced_ledger.tsv
