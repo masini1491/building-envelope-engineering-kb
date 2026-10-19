@@ -421,7 +421,7 @@ PR #131 的 test-only 修正 head `da21e005dde4f9098405c7408019a46b15d8d387`，R
 
 最新 [PR #131 exact-head `a3b5a855` 的 MPC CI #39246746684](https://github.com/masini1491/building-envelope-engineering-kb/actions/runs/39246746684) 已 SUCCESS，artifact `12183851724`；其 `adjoint-report.json` 六案 `constraint_physical_dual=NOT_ESTABLISHED`，`independent_external_spc_dual=NOT_ESTABLISHED`。原接觸 RF3 失衡及 `CONTACT_NOT_ADMITTED`、`MPC_REACTION_RECONSTRUCTION_NOT_ESTABLISHED`、`ENGINEERING_ACCEPTANCE_NOT_ADMITTED` 不變；PR 保持 OPEN／UNMERGED。
 
-## CalculiX 2.21 原始碼平衡空間界線（2026-10-19／來源核對，非 SPC dual 驗收）
+## 原始碼平衡空間界線：CalculiX 2.21（2026-10-19／來源核對，非 SPC dual 驗收）
 
 本次依使用者提供並通過 SHA-256 固定值驗證的 `calculix-ccx_2.21.orig.tar.bz2`（`51d229aee320cf685216d360f7c04f9a57af0148fbe840483a964c86c315da82`）與 Debian patch archive（`6c2a934b66491c9e916cbf6328167d417f7e985b380e200facf92c3e953d255f`），核對以下原始碼路徑：
 
