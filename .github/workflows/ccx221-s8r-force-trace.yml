@@ -23,7 +23,9 @@ jobs:
           sudo apt-get install -y --no-install-recommends build-essential gfortran libspooles-dev libarpack2-dev liblapack-dev
           gfortran --version | head -n 1
       - name: 先行驗證 SPC ledger parser 負向案例
-        run: python tests/fea_benchmark/envelope_panels/test_check_ccx221_spc_ledger.py
+        run: |
+          python tests/fea_benchmark/envelope_panels/test_check_ccx221_spc_ledger.py
+          python tests/fea_benchmark/envelope_panels/test_check_ccx221_mpc_restore.py
       - name: 取得精確來源與既有同次求解輸入
         env:
           GH_TOKEN: ${{ github.token }}
@@ -150,6 +152,11 @@ jobs:
           grep -q 'KB_EVENT Q' "$scratch/n16/instrumented/kb_force_ledger.tsv"
           python tests/fea_benchmark/envelope_panels/check_ccx221_spc_ledger.py "$scratch/instrumented/kb_spc_ledger.tsv"
           python tests/fea_benchmark/envelope_panels/check_ccx221_spc_ledger.py "$scratch/n16/instrumented/kb_spc_ledger.tsv"
+          # Reconstruct MPC Z-force change from the exact force trace and
+          # independently compare with the corresponding original DAT RF3.
+          # This is algorithmic source/trace agreement, not equilibrium admission.
+          python tests/fea_benchmark/envelope_panels/check_ccx221_mpc_restore.py             "$scratch/instrumented/kb_force_ledger.tsv"             "$scratch/instrumented/panel.dat" > "$scratch/n8_mpc_restore.json"
+          python tests/fea_benchmark/envelope_panels/check_ccx221_mpc_restore.py             "$scratch/n16/instrumented/kb_force_ledger.tsv"             "$scratch/n16/instrumented/panel.dat" > "$scratch/n16_mpc_restore.json"
           echo 'KB_N16_AB_OUTPUT_EQUIVALENT_PRISTINE_INSTRUMENTED_AND_TRACE_PRESENT'
       - name: 保留隔離診斷證據
         if: always()
@@ -160,6 +167,8 @@ jobs:
           if-no-files-found: warn
           path: |
             ${{ runner.temp }}/ccx-ab/*.log
+            ${{ runner.temp }}/ccx-ab/n8_mpc_restore.json
+            ${{ runner.temp }}/ccx-ab/n16_mpc_restore.json
             ${{ runner.temp }}/ccx-ab/pristine/panel.inp
             ${{ runner.temp }}/ccx-ab/pristine/panel.dat
             ${{ runner.temp }}/ccx-ab/pristine/panel.sta

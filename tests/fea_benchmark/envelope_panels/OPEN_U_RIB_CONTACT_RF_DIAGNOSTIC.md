@@ -273,7 +273,7 @@ PR #131 的 test-only 修正 head `da21e005dde4f9098405c7408019a46b15d8d387`，R
 
 下一步只針對 **SPC／prescribed displacement owner + exact MPC dual vector → 原始及 expanded node 的一致反力映射** 設計新的觀測切面。先核對 `nodeboun/ndirboun/xbounact` 及 mortar branch 對應，建立獨立外部力 ledger，再計算支持／指定位置的反力；所有物理 admission 仍維持 `CONTACT_NOT_ADMITTED`、`MPC_REACTION_RECONSTRUCTION_NOT_ESTABLISHED`、`ENGINEERING_ACCEPTANCE_NOT_ADMITTED`，PR #131 繼續 OPEN／UNMERGED。
 
-## MPC 消去／回填依類型歸屬（2026-10-19，研究診斷，非物理平衡 oracle）
+## 約束力歸屬：MPC 消去／回填依類型驗證（2026-10-19，非物理平衡 oracle）
 
 同版 CalculiX 2.21 PR head `a65357fed2af6c3a5d9537033b4494358b63f42e` 的 [Actions #39180408726](https://github.com/masini1491/building-envelope-engineering-kb/actions/runs/39180408726) 為 **SUCCESS**，artifact ID `12155483309`，ZIP SHA-256 `c2a1f10fda57803b7e6241ba842e31ea41bef84b2fe9936c9dfec950be7d5491`。再次驗證 n=8／n=16 原版與插樁版 `.inp/.dat/.sta` 位元組一致，且 SPC 旋轉方向 4～6 已正確歸為 `KB_SPC_ROT_UNMAPPED`（n=8：246 筆；n=16：342 筆），不再作 invalid translational index。
 
