@@ -1,0 +1,133 @@
+name: CalculiX 2.21 接觸能量微擾研究
+
+on:
+  pull_request:
+    paths:
+      - .github/workflows/ccx221-energy-fd.yml
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  pinned_energy_probe:
+    if: github.event.pull_request.number == 131
+    runs-on: ubuntu-24.04
+    timeout-minutes: 32
+    steps:
+      - uses: actions/checkout@v4
+      - name: 安裝固定版本建置相依套件
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends build-essential gfortran libspooles-dev libarpack2-dev liblapack-dev
+          gfortran --version | head -n 1
+      - name: 先行驗證 SPC ledger parser 負向案例
+        run: |
+          python tests/fea_benchmark/envelope_panels/test_check_ccx221_spc_ledger.py
+          python tests/fea_benchmark/envelope_panels/test_check_ccx221_mpc_restore.py
+      - name: 取得精確來源與既有同次求解輸入
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/ccx-ab" "$RUNNER_TEMP/ccx-ab/ref"
+          cd "$RUNNER_TEMP/ccx-ab"
+          curl --fail --location --silent --show-error --retry 2 --max-time 120 \
+            -o calculix-ccx_2.21.orig.tar.bz2 \
+            https://us.archive.ubuntu.com/ubuntu/pool/universe/c/calculix-ccx/calculix-ccx_2.21.orig.tar.bz2
+          echo '51d229aee320cf685216d360f7c04f9a57af0148fbe840483a964c86c315da82  calculix-ccx_2.21.orig.tar.bz2' | sha256sum --check
+          curl --fail --location --silent --show-error --retry 2 --max-time 120 \
+            -o calculix-ccx_2.21-1.debian.tar.xz \
+            https://us.archive.ubuntu.com/ubuntu/pool/universe/c/calculix-ccx/calculix-ccx_2.21-1.debian.tar.xz
+          echo '6c2a934b66491c9e916cbf6328167d417f7e985b380e200facf92c3e953d255f  calculix-ccx_2.21-1.debian.tar.xz' | sha256sum --check
+          gh run download 39054940762 --repo masini1491/building-envelope-engineering-kb \
+            --name calculix-nlgeom-probe --dir "$RUNNER_TEMP/ccx-ab/ref"
+          test -f "$RUNNER_TEMP/ccx-ab/ref/envelope_panels/u_s8r_rf_projection_n8_toward/panel.inp"
+          echo 'e0360eed38d6708075200c499a870e38e79f120eaa88ff7427c497e7f0cef2cf  '"$RUNNER_TEMP/ccx-ab/ref/envelope_panels/u_s8r_rf_projection_n8_toward/panel.inp" | sha256sum --check
+          test -f "$RUNNER_TEMP/ccx-ab/ref/envelope_panels/u_s8r_rf_projection_n16_toward/panel.inp"
+          echo '90becf2d6530482a88991f7e038ee63162f52ec41e9943ddfb16be612c7ee6cf  '"$RUNNER_TEMP/ccx-ab/ref/envelope_panels/u_s8r_rf_projection_n16_toward/panel.inp" | sha256sum --check
+      - name: 構建未修改的 Debian 2.21-1 求解器
+        run: |
+          set -euo pipefail
+          cd "$RUNNER_TEMP/ccx-ab"
+          tar -xjf calculix-ccx_2.21.orig.tar.bz2
+          cd CalculiX
+          tar -xJf ../calculix-ccx_2.21-1.debian.tar.xz
+          while IFS= read -r patchname; do
+            test -z "$patchname" && continue
+            patch --batch --fuzz=0 -p1 < "debian/patches/$patchname" >/dev/null
+          done < debian/patches/series
+          src="$PWD/ccx_2.21/src"
+          make -s -j2 -C "$src" \
+            CFLAGS='-O2 -Wall -I/usr/include/spooles -DARCH=Linux -DSPOOLES -DARPACK -DMATRIXSTORAGE -DUSE_MT=1' \
+            FFLAGS='-O2 -fallow-argument-mismatch' > "$RUNNER_TEMP/ccx-ab/pristine-build.log" 2>&1 || {
+              tail -n 120 "$RUNNER_TEMP/ccx-ab/pristine-build.log"; exit 1;
+            }
+          test -x "$src/ccx_2.21"
+          cp "$src/ccx_2.21" "$RUNNER_TEMP/ccx-ab/pristine-ccx"
+          sha256sum "$RUNNER_TEMP/ccx-ab/pristine-ccx"
+      - name: 建立兩網格五個位移微擾輸入
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import hashlib,json,pathlib,os
+          root=pathlib.Path(os.environ['RUNNER_TEMP'])/'ccx-ab'
+          expected={8:'e0360eed38d6708075200c499a870e38e79f120eaa88ff7427c497e7f0cef2cf',
+                    16:'90becf2d6530482a88991f7e038ee63162f52ec41e9943ddfb16be612c7ee6cf'}
+          samples={'minus2':'0.01980000','minus1':'0.01990000',
+                   'base':'0.02000000','plus1':'0.02010000','plus2':'0.02020000'}
+          energy='*EL PRINT,ELSET=PLATE,TOTALS=ONLY\nELSE\n*EL PRINT,ELSET=RIB,TOTALS=ONLY\nELSE\n'
+          center='CENTER_RF,3,3,0.02000000\n'
+          contact='*CONTACT PRINT,SLAVE=RIB_BASE_UNDERSIDE,MASTER=PLATE_TOP\nCF,CFN,CNUM\n'
+          sha=lambda b:hashlib.sha256(b).hexdigest()
+          meta={}
+          for n in (8,16):
+            src=root/'ref'/'envelope_panels'/f'u_s8r_rf_projection_n{n}_toward'/'panel.inp'
+            raw=src.read_bytes()
+            assert sha(raw)==expected[n], 'PINNED_INPUT_SHA256_MISMATCH'
+            inp=raw.decode('ascii')
+            assert inp.count(center)==inp.count(contact)==inp.count('*END STEP\n')==1
+            assert '*EL PRINT' not in inp and 'CELS' not in inp
+            for name,disp in samples.items():
+              deck=inp.replace(center,'CENTER_RF,3,3,'+disp+'\n',1)
+              deck=deck.replace(contact,'*CONTACT PRINT,SLAVE=RIB_BASE_UNDERSIDE,MASTER=PLATE_TOP,TOTALS=YES\nCF,CFN,CNUM,CELS\n',1)
+              deck=deck.replace('*END STEP\n',energy+'*END STEP\n',1)
+              d=root/'energy'/f'n{n}'/name;d.mkdir(parents=True,exist_ok=False)
+              b=deck.encode('ascii');(d/'panel.inp').write_bytes(b)
+              meta[f'n{n}/{name}']={'z_mm':float(disp),'deck_sha256':sha(b)}
+          (root/'energy'/'manifest.json').write_text(json.dumps(
+              {'status':'DIAGNOSTIC_NOT_ENGINEERING_ADMISSION','trials':meta},sort_keys=True,indent=2)+'\n')
+          print('PINNED_CCX221_ENERGY_INPUTS_READY',len(meta))
+          PY
+      - name: 求解原版 CalculiX 2.21 能量微擾案例
+        run: |
+          set -euo pipefail
+          scratch="$RUNNER_TEMP/ccx-ab"
+          export OMP_NUM_THREADS=1 CCX_NPROC_EQUATION=1 CCX_NPROC_RESULTS=1 CCX_NPROC_STIFFNESS=1
+          for mesh in 8 16; do
+            for trial in minus2 minus1 base plus1 plus2; do
+              (
+                cd "$scratch/energy/n$mesh/$trial"
+                timeout 150s "$scratch/pristine-ccx" -i panel > solver.log 2>&1
+                test -s panel.dat
+                test -s panel.sta
+                grep -qi 'internal energy' panel.dat || { echo "ENERGY_OUTPUT_MISSING n$mesh $trial"; exit 1; }
+                sha256sum panel.inp panel.dat panel.sta
+                echo "PINNED_ENERGY_OUTPUT_OBSERVED n$mesh $trial"
+              )
+            done
+          done
+      - name: 保存能量原始證據
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ccx221-shell-contact-energy-fd-observation
+          retention-days: 14
+          if-no-files-found: warn
+          path: |
+            ${{ runner.temp }}/ccx-ab/energy/manifest.json
+            ${{ runner.temp }}/ccx-ab/energy/**/panel.inp
+            ${{ runner.temp }}/ccx-ab/energy/**/panel.dat
+            ${{ runner.temp }}/ccx-ab/energy/**/panel.sta
+            ${{ runner.temp }}/ccx-ab/energy/**/solver.log
+            ${{ runner.temp }}/ccx-ab/pristine-build.log
