@@ -344,3 +344,9 @@ PR #131 的 test-only 修正 head `da21e005dde4f9098405c7408019a46b15d8d387`，R
 以原版 CalculiX 2.21 [run 39190965338](https://github.com/masini1491/building-envelope-engineering-kb/actions/runs/39190965338) 的 SHA-256 固定 n8/n16 .dat，檢查 M_cg=M_origin−r_cg×F。n8 三向差分 1.44×10⁻⁶／1.71×10⁻⁴／5.12×10⁻¹⁰ N·mm，n16 為 7.74×10⁻⁶／2.12×10⁻³／6.10×10⁻⁹ N·mm，皆在來源輸出捨入誤差上界內；這只是接觸合力矩幾何一致性，不是獨立殼旋轉支承反力。
 
 新增唯讀工具 verify_ccx221_contact_moment.py、test_verify_ccx221_contact_moment.py 與專屬 workflow。原始殼 SPC/MPC 旋轉反力矩、六分量平衡與工程 admission 均仍 NOT_ADMITTED；raw RF3 FAIL-CLOSED；PR #131 OPEN／UNMERGED。
+
+## 原始殼 DOF5 反對稱轉角模態研究（2026-10-19／尚未獨立驗收）
+
+新增 pinned S8R 原始殼節點 DOF5 小角度實驗；在板邊節點施加 θ_i=θ·(x_i−600)/600，θ=0、±1×10⁻⁵、±2×10⁻⁵ rad，接觸與無接觸兩分支、n=8／16 總計 20 案例。保留中心 Z=0.02 mm、原有板邊／肋端支承、材料與模型；只增加指定殼轉角與能量列印，無接觸分支移除 CONTACT PAIR/PRINT。此測試是**反對稱角度模態**，不是剛體轉動；其能量導數只對所定模態功共軛，不能代稱實體肋端反力矩或六分量反力。
+
+生成器 `generate_ccx221_rot5.py`、結果驗證器 `verify_ccx221_rot5.py`、負向測試 `test_ccx221_rot5.py` 及隔離 workflow `ccx221-rot5-probe.yml` 均屬研究觀測。本地原始輸入 SHA、20 組生成與 9 項離線測試 PASS；真實 CalculiX 求解／完整接觸分支及結果尚待 exact-head CI 證據，禁止提前標示 PASS。能量 ELSE+CELS 是否完全涵蓋接觸貢獻，亦尚未 admission。所有原 S8R 物理門 FAIL-CLOSED，PR #131 OPEN／UNMERGED。

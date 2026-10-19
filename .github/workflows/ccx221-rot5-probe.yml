@@ -1,0 +1,115 @@
+name: 殼 DOF5 角度功共軛研究
+on:
+  pull_request:
+    paths:
+      - .github/workflows/ccx221-rot5-probe.yml
+      - tests/fea_benchmark/envelope_panels/generate_ccx221_rot5.py
+      - tests/fea_benchmark/envelope_panels/verify_ccx221_rot5.py
+      - tests/fea_benchmark/envelope_panels/test_ccx221_rot5.py
+permissions:
+  contents: read
+  actions: read
+jobs:
+  original_shell_rotation:
+    if: github.event.pull_request.number == 131
+    runs-on: ubuntu-24.04
+    timeout-minutes: 38
+    steps:
+      - uses: actions/checkout@v4
+      - name: 安裝固定版本建置相依套件
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends build-essential gfortran libspooles-dev libarpack2-dev liblapack-dev
+          gfortran --version | head -n 1
+      - name: 取得精確來源與既有同次求解輸入
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/ccx-ab" "$RUNNER_TEMP/ccx-ab/ref"
+          cd "$RUNNER_TEMP/ccx-ab"
+          curl --fail --location --silent --show-error --retry 2 --max-time 120 \
+            -o calculix-ccx_2.21.orig.tar.bz2 \
+            https://us.archive.ubuntu.com/ubuntu/pool/universe/c/calculix-ccx/calculix-ccx_2.21.orig.tar.bz2
+          echo '51d229aee320cf685216d360f7c04f9a57af0148fbe840483a964c86c315da82  calculix-ccx_2.21.orig.tar.bz2' | sha256sum --check
+          curl --fail --location --silent --show-error --retry 2 --max-time 120 \
+            -o calculix-ccx_2.21-1.debian.tar.xz \
+            https://us.archive.ubuntu.com/ubuntu/pool/universe/c/calculix-ccx/calculix-ccx_2.21-1.debian.tar.xz
+          echo '6c2a934b66491c9e916cbf6328167d417f7e985b380e200facf92c3e953d255f  calculix-ccx_2.21-1.debian.tar.xz' | sha256sum --check
+          gh run download 39054940762 --repo masini1491/building-envelope-engineering-kb \
+            --name calculix-nlgeom-probe --dir "$RUNNER_TEMP/ccx-ab/ref"
+          test -f "$RUNNER_TEMP/ccx-ab/ref/envelope_panels/u_s8r_rf_projection_n8_toward/panel.inp"
+          echo 'e0360eed38d6708075200c499a870e38e79f120eaa88ff7427c497e7f0cef2cf  '"$RUNNER_TEMP/ccx-ab/ref/envelope_panels/u_s8r_rf_projection_n8_toward/panel.inp" | sha256sum --check
+          test -f "$RUNNER_TEMP/ccx-ab/ref/envelope_panels/u_s8r_rf_projection_n16_toward/panel.inp"
+          echo '90becf2d6530482a88991f7e038ee63162f52ec41e9943ddfb16be612c7ee6cf  '"$RUNNER_TEMP/ccx-ab/ref/envelope_panels/u_s8r_rf_projection_n16_toward/panel.inp" | sha256sum --check
+      - name: 構建未修改的 Debian 2.21-1 求解器
+        run: |
+          set -euo pipefail
+          cd "$RUNNER_TEMP/ccx-ab"
+          tar -xjf calculix-ccx_2.21.orig.tar.bz2
+          cd CalculiX
+          tar -xJf ../calculix-ccx_2.21-1.debian.tar.xz
+          while IFS= read -r patchname; do
+            test -z "$patchname" && continue
+            patch --batch --fuzz=0 -p1 < "debian/patches/$patchname" >/dev/null
+          done < debian/patches/series
+          src="$PWD/ccx_2.21/src"
+          make -s -j2 -C "$src" \
+            CFLAGS='-O2 -Wall -I/usr/include/spooles -DARCH=Linux -DSPOOLES -DARPACK -DMATRIXSTORAGE -DUSE_MT=1' \
+            FFLAGS='-O2 -fallow-argument-mismatch' > "$RUNNER_TEMP/ccx-ab/pristine-build.log" 2>&1 || {
+              tail -n 120 "$RUNNER_TEMP/ccx-ab/pristine-build.log"; exit 1;
+            }
+          test -x "$src/ccx_2.21"
+          cp "$src/ccx_2.21" "$RUNNER_TEMP/ccx-ab/pristine-ccx"
+          sha256sum "$RUNNER_TEMP/ccx-ab/pristine-ccx"
+      - name: 先行檢查轉角輸入與負向測試
+        run: |
+          set -euo pipefail
+          python -B tests/fea_benchmark/envelope_panels/test_ccx221_rot5.py
+          python -B tests/fea_benchmark/envelope_panels/generate_ccx221_rot5.py "$RUNNER_TEMP/ccx-ab/ref/envelope_panels" "$RUNNER_TEMP/ccx-ab/rot5"
+      - name: 原版 CCX 2.21 求解原始殼 DOF5 擾動
+        run: |
+          set -euo pipefail
+          root="$RUNNER_TEMP/ccx-ab"
+          export OMP_NUM_THREADS=1 CCX_NPROC_EQUATION=1 CCX_NPROC_RESULTS=1 CCX_NPROC_STIFFNESS=1
+          for mesh in 8 16; do
+            for branch in no_contact contact; do
+              for sample in minus2 minus1 zero plus1 plus2; do
+                (
+                  cd "$root/rot5/n$mesh/$branch/$sample"
+                  timeout 130s "$root/pristine-ccx" -i panel > solver.log 2>&1 || { tail -n 60 solver.log; exit 1; }
+                  test -s panel.dat
+                  test -s panel.sta
+                  grep -qi 'total internal energy for set PLATE' panel.dat
+                  grep -qi 'total internal energy for set RIB' panel.dat
+                  if [ "$branch" = contact ]; then grep -qi 'total contact spring energy' panel.dat; fi
+                )
+                echo "KB_ROT5_RESEARCH_SOLVED n$mesh/$branch/$sample"
+              done
+            done
+          done
+      - name: 檢查輸出完整性與研究分支標記
+        run: |
+          set -euo pipefail
+          python -B tests/fea_benchmark/envelope_panels/verify_ccx221_rot5.py "$RUNNER_TEMP/ccx-ab/rot5" > "$RUNNER_TEMP/ccx-ab/rot5/result.json"
+          python - "$RUNNER_TEMP/ccx-ab/rot5/result.json" <<'PY'
+          import json,sys
+          r=json.load(open(sys.argv[1]))
+          assert r['case_count']==20
+          assert r['engineering_acceptance']=='NOT_ADMITTED'
+          assert r['rotational_mpc_reaction_admission']=='NOT_ESTABLISHED'
+          PY
+      - name: 保存逐案例原始求解
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ccx221-shell-rot5-research-n8n16
+          retention-days: 14
+          if-no-files-found: warn
+          path: |
+            ${{ runner.temp }}/ccx-ab/rot5/manifest.json
+            ${{ runner.temp }}/ccx-ab/rot5/result.json
+            ${{ runner.temp }}/ccx-ab/rot5/**/panel.inp
+            ${{ runner.temp }}/ccx-ab/rot5/**/panel.dat
+            ${{ runner.temp }}/ccx-ab/rot5/**/panel.sta
+            ${{ runner.temp }}/ccx-ab/rot5/**/solver.log
