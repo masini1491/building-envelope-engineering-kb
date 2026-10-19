@@ -432,3 +432,15 @@ PR #131 的 test-only 修正 head `da21e005dde4f9098405c7408019a46b15d8d387`，R
 **最小下一步**：先建立一個明確不改變計算的收斂時點觀測契約，分別保存（1）原始節點 DOF 的 `fn`，（2）active equation DOF 的 `f/fext/b`，（3）完整 SPC/MPC 映射與非齊次約束項；以原始自由度外力是否可獨立重建作為 fail-closed gate。若只能取得 active `fext`，不得以 `fn-fext` 直接推導支承六分量或 DOF5 力矩。既有六組 `*BOUNDARY` 位移激勵沒有顯式 `*CLOAD/*DLOAD`，但不等於外部反力為零。此節為 source-path audit，**沒有**宣稱已完成新插樁、獨立 SPC dual 或力矩驗收。
 
 `CONTACT_NOT_ADMITTED`、`MPC_REACTION_RECONSTRUCTION_NOT_ESTABLISHED`、`ENGINEERING_ACCEPTANCE_NOT_ADMITTED` 不變；PR #131 維持 OPEN／UNMERGED。
+
+## 真實收斂輸出鉤點辨識（2026-10-19／下一個最小插樁候選）
+
+進一步直接檢視已固定的 CalculiX 2.21 `nonlingeo.c`，發現**不可將所有 `results()` 呼叫視為收斂後內力**：
+
+1. 約原始碼第 2101／2136 行的 `results(...,iout=-1,...)` 發生在 `while(icntrl==0)` 迭代主體前，用於增量起始／彈性切線準備；之後立即 `SFREE(fn)`。它不具備最終收斂的時點保證。
+2. 約第 3425 行呼叫 `checkconvergence(...,&icntrl,...)`，迭代迴圈結束後依 `icutb` 決定增量是否成功；失敗時會將 `vold`、`f` 等恢復至前一狀態。因此任何寫在收斂判斷之前的觀測都必須標記 **TRIAL_ONLY**。
+3. 約第 3690 行存在 `if((jout[0]==jprint)&&(icutb==0))` 的收斂輸出分支，其中配置 `fn`、以 `iout=2` 再次呼叫 `results()`。此處是較合理的**既有輸出時點候選**，但仍受 `jout/jprint` 輸出頻率控制，**不是每一個收斂增量都會執行**；而且 `results()` 會重新計算 `f`，不能預設它與前一次迭代的 `fext/b` 是同一時間狀態或相同組裝語意。
+
+下一個插樁的明確契約：僅在隔離版求解器中、以顯式環境旗標啟用，保留原版輸出位元組對照；若以既有 `iout=2` 分支擷取 `fn`，輸出必須包含 `istep/iinc/icutb/jout`、`neq/nk/mt`、`nactdof` 與原始 `fn` 的索引／來源標記，並明示 `fext` 未經同時點獨立證實。不得將此資料冒充完整原始自由度外力或 Lagrange dual。若目標為**每一收斂增量**，需另設不受 `jout/jprint` 限制的獨立診斷呼叫，並先證明不改變 `f`、`fn`、`vold` 與接觸狀態。
+
+本節是根據實際原始碼控制流程的鉤點定位，**不是已完成的動態插樁**；所有工程 admission 保持 fail-closed。
