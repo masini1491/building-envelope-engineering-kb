@@ -8,6 +8,8 @@ on:
       - tests/fea_benchmark/envelope_panels/test_ccx221_rot5_dual.py
       - tests/fea_benchmark/envelope_panels/test_ccx221_rot5_full_work.py
       - tests/fea_benchmark/envelope_panels/verify_ccx221_rot5_full_work.py
+      - tests/fea_benchmark/envelope_panels/verify_ccx221_rot5_kkt_oracle.py
+      - tests/fea_benchmark/envelope_panels/test_ccx221_rot5_kkt_oracle.py
 permissions:
   contents: read
   actions: read
@@ -22,6 +24,7 @@ jobs:
         run: |
           python -B -m unittest discover -s tests/fea_benchmark/envelope_panels -p 'test_ccx221_rot5_dual.py' -v
           python -B -m unittest discover -s tests/fea_benchmark/envelope_panels -p 'test_ccx221_rot5_full_work.py' -v
+          python -B -m unittest discover -s tests/fea_benchmark/envelope_panels -p 'test_ccx221_rot5_kkt_oracle.py' -v
       - name: 準備固定來源及既有六組無接觸案例
         env:
           GH_TOKEN: ${{ github.token }}
