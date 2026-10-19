@@ -4,6 +4,7 @@ on:
   pull_request:
     paths:
       - .github/workflows/ccx221-support-energy-fd.yml
+      - tests/fea_benchmark/envelope_panels/check_ccx221_support_fd.py
 
 permissions:
   contents: read
