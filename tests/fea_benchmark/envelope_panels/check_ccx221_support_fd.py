@@ -91,7 +91,7 @@ def surface_f3(dat: str) -> float:
 
 
 def contact_elements(dat: str) -> set[int]:
-    block = one_block(dat, "contact elements")
+    block = one_block(dat, "contact spring energy (slave element+face,energy) for all contact elements")
     ids = set()
     for row in block.splitlines():
         v = row.split()
