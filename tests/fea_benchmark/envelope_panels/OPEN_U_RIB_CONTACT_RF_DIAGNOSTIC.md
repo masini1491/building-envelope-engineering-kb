@@ -412,3 +412,11 @@ PR #131 的 test-only 修正 head `da21e005dde4f9098405c7408019a46b15d8d387`，R
 使用固定來源 ZIP SHA-256 `d9b36c420feca6a5f8cd50dc8cb07dbba6c2ebbbf0224abb4df57fbfd2291a8b` 與成功的 [DOF5／MEANROTBS CI #39236618417](https://github.com/masini1491/building-envelope-engineering-kb/actions/runs/39236618417) trace artifact `12179018108`（SHA-256 `1ca889801caaab50f92bf4d65e9f5a21ae553b2fdd26badc0ceae18b6005225e`），對六組無接觸 n8／n16、θ=−1e−5／0／+1e−5 rad 進行逆向 MPC 運動學切線重建。此法從指定輔助 SPC 角度模態出發，反向代入完整 MPC 約束係數求虛位移，再與**消去前**原始 `fn` 內積；與正向 MPC 消去後 SPC 加權力帳比較，兩條路徑分開計算。所有六組最大約束切線殘差約 `1.11e−16`；最大虛功差約 `2.27e−13 N·mm`（n8 負角），其餘在 `4.44e−16 N·mm` 內。新增解析、串聯與負向控制本地 9/9 PASS；不使用 `fmpc` 作為逆向內力虛功起點。
 
 這是凍結線性 MPC 係數下的**轉置代數恆等式**，並未量測或獨立求得真正的 SPC dual／外部支承力矩；未指定的獨立平移虛位移設為零，且不包含幾何變動下的係數導數、非線性接觸啟閉或完整外部功。原有 `OPEN_U_CONTACT_RF_GLOBAL_Z_IMBALANCE_-44.4374645` 不得放寬。`CONTACT_NOT_ADMITTED`、`MPC_REACTION_RECONSTRUCTION_NOT_ESTABLISHED`、`ENGINEERING_ACCEPTANCE_NOT_ADMITTED` 均維持，PR #131 保持 OPEN／UNMERGED。
+
+## 固定六組無接觸輸入的外力來源稽核（2026-10-19／外部 SPC dual 仍未建立）
+
+針對固定來源 artifact `12161706369`（ZIP SHA-256 `d9b36c420feca6a5f8cd50dc8cb07dbba6c2ebbbf0224abb4df57fbfd2291a8b`），直接解析 `n8/n16 × no_contact/minus1/zero/plus1` 六個原始 `panel.inp`：每案 `*STEP` 一次、`*BOUNDARY` 兩個區塊，`*CLOAD`、`*DLOAD`、`*DSLOAD`、`*DFLUX`、`*TEMPERATURE` 均為零個區塊。已知激勵為中心 U3=0.02 mm 與指定原始殼 DOF5 角度；其餘支承由 `*BOUNDARY` 指定。這是對**輸入卡片**的範圍限定稽核，不代表已對 CalculiX 所有可能的內生力、殘餘力或外力來源做完動態稽核。
+
+在這六案中，不得虛構非零的顯式節點力或面載重向量，也不得將 `fn` 直接命名為完整 `f_int−f_ext`。先前完整 MPC 消去與逆向運動學虛功兩路徑一致，僅證明**相同內力資料與凍結約束係數**的代數轉置關係；不是外部 SPC reaction 或非線性 KKT residual 的獨立觀測。下階段必須先在求解器收斂後的實際 force-balance assembly 位置辨識內力／外力／約束分量、時間步與 active DOF，再增加最小唯讀插樁；如無法確認來源語意，保持 `INDEPENDENT_EXTERNAL_SPC_DUAL_NOT_ESTABLISHED`，不得以能量中央差分代替。
+
+最新 [PR #131 exact-head `a3b5a855` 的 MPC CI #39246746684](https://github.com/masini1491/building-envelope-engineering-kb/actions/runs/39246746684) 已 SUCCESS，artifact `12183851724`；其 `adjoint-report.json` 六案 `constraint_physical_dual=NOT_ESTABLISHED`，`independent_external_spc_dual=NOT_ESTABLISHED`。原接觸 RF3 失衡及 `CONTACT_NOT_ADMITTED`、`MPC_REACTION_RECONSTRUCTION_NOT_ESTABLISHED`、`ENGINEERING_ACCEPTANCE_NOT_ADMITTED` 不變；PR 保持 OPEN／UNMERGED。
