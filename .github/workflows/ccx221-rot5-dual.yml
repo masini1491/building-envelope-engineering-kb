@@ -14,6 +14,7 @@ on:
       - tests/fea_benchmark/envelope_panels/verify_ccx221_rot5_adjoint.py
       - tests/fea_benchmark/envelope_panels/verify_ccx221_rot5_load_scope.py
       - tests/fea_benchmark/envelope_panels/test_ccx221_rot5_load_scope.py
+      - tests/fea_benchmark/envelope_panels/instrument_ccx221_output_fn.py
 permissions:
   contents: read
   actions: read
@@ -80,6 +81,8 @@ jobs:
           python -B tests/fea_benchmark/envelope_panels/ccx221_rot5_dual_instrument.py "$scratch/CalculiX/ccx_2.21"
           ! cmp -s "$src/gen3dboun.f" "$scratch/gen3dboun-original.f"
           ! cmp -s "$src/results.c" "$scratch/results-original.c"
+          python -B tests/fea_benchmark/envelope_panels/instrument_ccx221_output_fn.py "$scratch/CalculiX/ccx_2.21"
+          grep -q KB_CCX221_OUTPUT_FN "$src/results.c"
           make -s -j2 -C "$src" \
             CFLAGS='-O2 -Wall -I/usr/include/spooles -DARCH=Linux -DSPOOLES -DARPACK -DMATRIXSTORAGE -DUSE_MT=1' \
             FFLAGS='-O2 -fallow-argument-mismatch' > "$scratch/dual-build.log" 2>&1 || {
@@ -90,7 +93,7 @@ jobs:
         run: |
           set -euo pipefail
           scratch="$RUNNER_TEMP/rot5-dual"
-          export OMP_NUM_THREADS=1 CCX_NPROC_EQUATION=1 CCX_NPROC_RESULTS=1 CCX_NPROC_STIFFNESS=1 KB_ROT_DUAL=1 KB_ROT_FULL_WORK=1
+          export OMP_NUM_THREADS=1 CCX_NPROC_EQUATION=1 CCX_NPROC_RESULTS=1 CCX_NPROC_STIFFNESS=1 KB_ROT_DUAL=1 KB_ROT_FULL_WORK=1 KB_CCX221_OUTPUT_FN=1
           for mesh in 8 16; do
             for trial in minus1 zero plus1; do
               key="n$mesh/no_contact/$trial"
@@ -101,6 +104,9 @@ jobs:
               test -s "$dir/kb_rot_dual.tsv"
               test -s "$dir/kb_rot_full_work.tsv"
               test -s "$dir/kb_rot_owner.tsv"
+              test -s "$dir/kb_ccx221_output_fn.tsv"
+              grep -q "^KB_OUTPUT_FN_BEGIN " "$dir/kb_ccx221_output_fn.tsv"
+              grep -q "^KB_OUTPUT_FN_END$" "$dir/kb_ccx221_output_fn.tsv"
               cmp "$dir/panel.dat" "$scratch/ref/$key/panel.dat"
               cmp "$dir/panel.sta" "$scratch/ref/$key/panel.sta"
               echo "CCX221_ROT5_DUAL_AB_IDENTICAL $key"
@@ -140,5 +146,6 @@ jobs:
             ${{ runner.temp }}/rot5-dual/adjoint-report.json
             ${{ runner.temp }}/rot5-dual/load-scope-report.json
             ${{ runner.temp }}/rot5-dual/rot-dual/**/kb_rot_owner.tsv
+            ${{ runner.temp }}/rot5-dual/rot-dual/**/kb_ccx221_output_fn.tsv
             ${{ runner.temp }}/rot5-dual/dual-report.json
             ${{ runner.temp }}/rot5-dual/dual-build.log
