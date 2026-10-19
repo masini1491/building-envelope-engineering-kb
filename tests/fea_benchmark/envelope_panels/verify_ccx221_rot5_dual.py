@@ -87,12 +87,27 @@ def parse_trace(text):
         if spcs['P'][i][:4]!=spcs['Q'][i][:4]:fail('SPC_PRE_POST_OWNER')
     if len({(s[0],s[1]) for s in spcs['Q'].values()})!=len(spcs['Q']):
         fail('SPC_NODE_DIRECTION_DUPLICATE')
+    # usermpc.f may reorder the dependent term and remove zero regular-node
+    # coefficients. 4- and 6-term lists occur for the same one-point shell
+    # mean-rotation MPC; neither term count nor tail position is a dual owner.
+    spc_pairs={(s[0],s[1]) for s in spcs['Q'].values()}
     for v in mpcs.values():
         ts=v['terms']
-        if len(ts)<8 or (len(ts)-2)%3 or ts[-2][1]!=1 or ts[-1][1]!=2 or ts[-1][2]!=1:
+        if len(ts)<4 or len({(node,d) for node,d,c in ts})!=len(ts):
             fail('MEANROT_TOPOLOGY')
-        n=(len(ts)-2)//3
-        if not math.isclose(ts[-2][2],-n,rel_tol=0,abs_tol=1e-10):fail('ANGLE_COEFFICIENT')
+        coeff={(node,d):c for node,d,c in ts}
+        aux=[node for node,d,c in ts
+             if d==1 and (node,1) in spc_pairs and (node,2) in spc_pairs
+             and (node,2) in coeff]
+        if len(aux)!=1:fail('MEANROT_TOPOLOGY')
+        node=aux[0];angle=coeff[(node,1)];inhom=coeff[(node,2)]
+        n=round(-angle)
+        if n<1 or abs(angle+n)>1e-10 or abs(inhom-n/2)>1e-10:
+            fail('ANGLE_COEFFICIENT')
+        v['aux_node']=node
+        v['angle_coef']=angle
+        v['inhom_coef']=inhom
+        v['nodal_cloud_count']=n
     return {'events':events,'spcs':spcs,'mpcs':mpcs}
 
 def deck_mode(deck):
@@ -152,8 +167,9 @@ def reconstruct(owner,trace,angles,weights):
         s=matched[0]
         if abs(s[3]-r['angle'])>1e-13:fail('AUX_SPC_VALUE')
         v=trace['mpcs'].get(r['mpc'])
-        if v is None or v['terms'][-2][:2]!=(r['aux'],1):fail('AUX_MPC_MAPPING')
-        terms.append(-v['fmpc']*v['terms'][-2][2]*weights[r['origin']])
+        if v is None or v['aux_node']!=r['aux']:fail('AUX_MPC_MAPPING')
+        # This is a bookkeeping candidate, not a certified dual-force moment.
+        terms.append(-v['fmpc']*v['angle_coef']*weights[r['origin']])
     return {'node_count':len(rows),'internal_fmpc_weighted_candidate_nmm':math.fsum(terms),
             'angle_coefficient_proven_for_selected_mpcs':True,
             'independent_dual_reaction':'NOT_ESTABLISHED'}

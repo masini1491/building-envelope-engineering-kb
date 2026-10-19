@@ -17,7 +17,7 @@ KB_ROT_TERM 4 4 2 3 0.1
 KB_ROT_TERM 4 5 2 2 0.2
 KB_ROT_TERM 4 6 2 1 0.3
 KB_ROT_TERM 4 7 50 1 -2.0
-KB_ROT_TERM 4 8 51 2 1.0
+KB_ROT_TERM 4 8 50 2 1.0
 '''
 OWNER='KB_ROT_OWNER 64 2 2 7 50 1 0.00002 4\n'
 
@@ -37,6 +37,18 @@ class Tests(unittest.TestCase):
         self.assertEqual(out['independent_dual_reaction'],'NOT_ESTABLISHED')
     def test_invalid_sign_coefficient(self):
         self.assertBad(lambda:parse_trace(EXAMPLE.replace('-2.0','2.0')),'ANGLE_COEFFICIENT')
+    def test_missing_aux_inhomogeneous_pair(self):
+        self.assertBad(lambda:parse_trace(EXAMPLE.replace('KB_ROT_TERM 4 8 50 2 1.0',
+                            'KB_ROT_TERM 4 8 51 2 1.0')),'MEANROT_TOPOLOGY')
+    def test_inhomogeneous_wrong_scale(self):
+        self.assertBad(lambda:parse_trace(EXAMPLE.replace('KB_ROT_TERM 4 8 50 2 1.0',
+                            'KB_ROT_TERM 4 8 50 2 0.5')),'ANGLE_COEFFICIENT')
+    def test_duplicate_mpc_dof(self):
+        self.assertBad(lambda:parse_trace(EXAMPLE.replace('KB_ROT_TERM 4 8 50 2 1.0',
+                            'KB_ROT_TERM 4 8 50 1 1.0')),'MEANROT_TOPOLOGY')
+    def test_truncated_mpc_terms(self):
+        broken=EXAMPLE.split('KB_ROT_TERM 4 4')[0]
+        self.assertBad(lambda:parse_trace(broken),'MEANROT_TOPOLOGY')
     def test_missing_second_phase(self):
         self.assertBad(lambda:parse_trace(EXAMPLE.split('KB_ROT_PHASE Q')[0]),'PHASE_COVERAGE')
     def test_duplicate_mpc(self):
