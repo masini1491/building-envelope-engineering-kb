@@ -1,0 +1,120 @@
+name: 殼 DOF5／MEANROTBS 反力虛功研究
+on:
+  pull_request:
+    paths:
+      - .github/workflows/ccx221-rot5-dual.yml
+      - tests/fea_benchmark/envelope_panels/ccx221_rot5_dual_instrument.py
+      - tests/fea_benchmark/envelope_panels/verify_ccx221_rot5_dual.py
+      - tests/fea_benchmark/envelope_panels/test_ccx221_rot5_dual.py
+permissions:
+  contents: read
+  actions: read
+jobs:
+  rot5_dual:
+    if: github.event.pull_request.number == 131
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - name: 本地可重現的解析基準與負向控制
+        run: python -B -m unittest discover -s tests/fea_benchmark/envelope_panels -p 'test_ccx221_rot5_dual.py' -v
+      - name: 準備固定來源及既有六組無接觸案例
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          scratch="$RUNNER_TEMP/rot5-dual"
+          mkdir -p "$scratch/ref" "$scratch/rot-dual"
+          cd "$scratch"
+          gh api -H 'Accept: application/vnd.github+json' /repos/masini1491/building-envelope-engineering-kb/actions/artifacts/12161706369/zip > source.zip
+          gh api -H 'Accept: application/vnd.github+json' /repos/masini1491/building-envelope-engineering-kb/actions/artifacts/12164552181/zip > owner.zip
+          echo 'd9b36c420feca6a5f8cd50dc8cb07dbba6c2ebbbf0224abb4df57fbfd2291a8b  source.zip' | sha256sum --check
+          echo '01d03784c7fe0521087602262b36446127bad858ad90765170bc40c44c9d0361  owner.zip' | sha256sum --check
+          unzip -q source.zip -d ref
+          curl --fail --location --silent --show-error --retry 2 --max-time 120 \
+            -o calculix-ccx_2.21.orig.tar.bz2 \
+            https://us.archive.ubuntu.com/ubuntu/pool/universe/c/calculix-ccx/calculix-ccx_2.21.orig.tar.bz2
+          curl --fail --location --silent --show-error --retry 2 --max-time 120 \
+            -o calculix-ccx_2.21-1.debian.tar.xz \
+            https://us.archive.ubuntu.com/ubuntu/pool/universe/c/calculix-ccx/calculix-ccx_2.21-1.debian.tar.xz
+          echo '51d229aee320cf685216d360f7c04f9a57af0148fbe840483a964c86c315da82  calculix-ccx_2.21.orig.tar.bz2' | sha256sum --check
+          echo '6c2a934b66491c9e916cbf6328167d417f7e985b380e200facf92c3e953d255f  calculix-ccx_2.21-1.debian.tar.xz' | sha256sum --check
+          tar -xjf calculix-ccx_2.21.orig.tar.bz2
+          cd CalculiX
+          tar -xJf ../calculix-ccx_2.21-1.debian.tar.xz
+          while IFS= read -r patchname; do
+            test -z "$patchname" && continue
+            patch --batch --fuzz=0 -p1 < "debian/patches/$patchname" >/dev/null
+          done < debian/patches/series
+      - name: 建置固定 2.21，僅對隔離來源增加唯讀觀測
+        run: |
+          set -euo pipefail
+          scratch="$RUNNER_TEMP/rot5-dual"
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends build-essential gfortran libspooles-dev libarpack2-dev liblapack-dev
+          src="$scratch/CalculiX/ccx_2.21/src"
+          make -s -j2 -C "$src" \
+            CFLAGS='-O2 -Wall -I/usr/include/spooles -DARCH=Linux -DSPOOLES -DARPACK -DMATRIXSTORAGE -DUSE_MT=1' \
+            FFLAGS='-O2 -fallow-argument-mismatch' > "$scratch/pristine-build.log" 2>&1 || {
+              tail -n 100 "$scratch/pristine-build.log"; exit 1;
+            }
+          test -x "$src/ccx_2.21"
+          cp "$src/ccx_2.21" "$scratch/pristine-ccx"
+          cp "$src/gen3dboun.f" "$scratch/gen3dboun-original.f"
+          cp "$src/results.c" "$scratch/results-original.c"
+          python -B tests/fea_benchmark/envelope_panels/ccx221_rot5_dual_instrument.py "$scratch/CalculiX/ccx_2.21"
+          ! cmp -s "$src/gen3dboun.f" "$scratch/gen3dboun-original.f"
+          ! cmp -s "$src/results.c" "$scratch/results-original.c"
+          make -s -j2 -C "$src" \
+            CFLAGS='-O2 -Wall -I/usr/include/spooles -DARCH=Linux -DSPOOLES -DARPACK -DMATRIXSTORAGE -DUSE_MT=1' \
+            FFLAGS='-O2 -fallow-argument-mismatch' > "$scratch/dual-build.log" 2>&1 || {
+              tail -n 100 "$scratch/dual-build.log"; exit 1;
+            }
+          cp "$src/ccx_2.21" "$scratch/rot5-dual-ccx"
+      - name: 六組 DOF5 無接觸原版／插樁版逐位元組對照
+        run: |
+          set -euo pipefail
+          scratch="$RUNNER_TEMP/rot5-dual"
+          export OMP_NUM_THREADS=1 CCX_NPROC_EQUATION=1 CCX_NPROC_RESULTS=1 CCX_NPROC_STIFFNESS=1 KB_ROT_DUAL=1
+          for mesh in 8 16; do
+            for trial in minus1 zero plus1; do
+              key="n$mesh/no_contact/$trial"
+              dir="$scratch/rot-dual/$key"
+              mkdir -p "$dir"
+              cp "$scratch/ref/$key/panel.inp" "$dir/panel.inp"
+              (cd "$dir"; timeout 100s "$scratch/rot5-dual-ccx" -i panel > solver.log 2>&1)
+              test -s "$dir/kb_rot_dual.tsv"
+              test -s "$dir/kb_rot_owner.tsv"
+              cmp "$dir/panel.dat" "$scratch/ref/$key/panel.dat"
+              cmp "$dir/panel.sta" "$scratch/ref/$key/panel.sta"
+              echo "CCX221_ROT5_DUAL_AB_IDENTICAL $key"
+            done
+          done
+      - name: 虛功係數／SPC／MPC fmpc 獨立解析與證據封存
+        run: |
+          set -euo pipefail
+          scratch="$RUNNER_TEMP/rot5-dual"
+          python - "$scratch" <<'PY'
+          import pathlib,sys,zipfile
+          root=pathlib.Path(sys.argv[1]);dest=root/'dual.zip'
+          with zipfile.ZipFile(dest,'w',compression=zipfile.ZIP_DEFLATED) as z:
+              for p in sorted((root/'rot-dual').rglob('*')):
+                  if p.is_file() and p.name in ('panel.dat','panel.sta','kb_rot_dual.tsv'):
+                      z.write(p,p.relative_to(root).as_posix())
+          PY
+          python -B tests/fea_benchmark/envelope_panels/verify_ccx221_rot5_dual.py \
+            "$scratch/source.zip" "$scratch/owner.zip" "$scratch/dual.zip" > "$scratch/dual-report.json"
+          cat "$scratch/dual-report.json"
+          sha256sum "$scratch/dual.zip" "$scratch/dual-report.json"
+      - name: 保留唯讀反力候選與原版一致性證據
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ccx221-rot5-meanrotbs-dual-candidate-only
+          retention-days: 14
+          if-no-files-found: warn
+          path: |
+            ${{ runner.temp }}/rot5-dual/rot-dual/**/kb_rot_dual.tsv
+            ${{ runner.temp }}/rot5-dual/rot-dual/**/kb_rot_owner.tsv
+            ${{ runner.temp }}/rot5-dual/dual-report.json
+            ${{ runner.temp }}/rot5-dual/dual-build.log
