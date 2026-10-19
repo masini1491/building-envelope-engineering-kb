@@ -43,7 +43,7 @@ jobs:
           gh api -H 'Accept: application/vnd.github+json' /repos/masini1491/building-envelope-engineering-kb/actions/artifacts/12164552181/zip > owner.zip
           echo 'd9b36c420feca6a5f8cd50dc8cb07dbba6c2ebbbf0224abb4df57fbfd2291a8b  source.zip' | sha256sum --check
           echo '01d03784c7fe0521087602262b36446127bad858ad90765170bc40c44c9d0361  owner.zip' | sha256sum --check
-          python -B tests/fea_benchmark/envelope_panels/verify_ccx221_rot5_load_scope.py source.zip > load-scope-report.json
+          python -B "$GITHUB_WORKSPACE/tests/fea_benchmark/envelope_panels/verify_ccx221_rot5_load_scope.py" source.zip > load-scope-report.json
           cat load-scope-report.json
           unzip -q source.zip -d ref
           curl --fail --location --silent --show-error --retry 2 --max-time 120 \
