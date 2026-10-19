@@ -293,3 +293,24 @@ PR #131 的 test-only 修正 head `da21e005dde4f9098405c7408019a46b15d8d387`，R
 新增唯讀重播入口 `tests/fea_benchmark/envelope_panels/check_ccx221_mpc_restore.py` 與合成 cascade／負向測試 `test_check_ccx221_mpc_restore.py`。本地已針對固定 ZIP 雙網格逐增量重播：10/10 各網格最後力結果一致，與原始 `.dat` 比對及合成負向測試 PASS；**只確認診斷一致性**，不更動物理驗收門。需要外部原始殼 SPC 與擴展實體 MPC 的功共軛／力矩對應之**獨立**數值 oracle，不能把同源重播誤寫為 independent support reaction validation。
 
 維持 `OPEN_U_CONTACT_RF_GLOBAL_Z_IMBALANCE` FAIL-CLOSED、`CONTACT_NOT_ADMITTED`／`MPC_REACTION_RECONSTRUCTION_NOT_ESTABLISHED`／`ENGINEERING_ACCEPTANCE_NOT_ADMITTED`，PR #131 繼續 OPEN／UNMERGED。
+
+## 中心指定 Z 位移能量差分觀測（2026-10-19／限定中心反力，不含六分量驗收）
+
+隔離研究 [GitHub Actions #39185949264](https://github.com/masini1491/building-envelope-engineering-kb/actions/runs/39185949264) **SUCCESS**，原版 source-pinned CalculiX 2.21（未插樁）分別對 n=8 與 n=16 的 5 組中心位移 `0.0198/0.0199/0.0200/0.0201/0.0202 mm` 真實求解，保留各 `.inp/.dat/.sta`。Artifact ID `12157943452`，ZIP SHA-256 `65a347dc30237fb9dc732815d70e5ba31b6de071567344581c23af0fde94681e` 已獨立下載校核一致；n=8 原始輸入 `e0360eed38d6708075200c499a870e38e79f120eaa88ff7427c497e7f0cef2cf`；n=16 `90becf2d6530482a88991f7e038ee63162f52ec41e9943ddfb16be612c7ee6cf`。測試只修改 center Z 位移及 `*EL PRINT ELSE`（分別 PLATE、RIB）與 `*CONTACT PRINT CELS` 的診斷輸出；幾何、接觸模型、材料、板邊與肋端固定條件不改。
+
+`ELSE` 輸出之 PLATE＋RIB 內能與 `CELS` 接觸彈簧能量逐案例另列。當前直接採此三個列印合計作**候選觀測能量**，並比較能量中心差分 `[E(0.0200+h)-E(0.0200-h)]/(2h)`；並未宣告三項是普遍適用的無重複計入完整總勢能定義，亦非外部獨立物理求解器。
+
+| 實測量 | n=8 | n=16 |
+| --- | ---: | ---: |
+| `h=0.0001 mm` 候選能量斜率 (N) | 20.5863000 | 19.95807045 |
+| `h=0.0002 mm` 候選能量斜率 (N) | 20.5864250 | 19.95784546 |
+| 基準 `u=0.0200 mm` 的 `.dat CENTER_RF` RF3 (N) | 20.58953 | 19.96088 |
+| h=0.0001 斜率與中心 RF3 絕對差 (N) | 0.00323 | 0.00281 |
+| h=0.0001 相對差 (%) | 0.01569 | 0.01408 |
+| 基準 PLATE `ELSE` (N·mm) | 0.06425522 | 0.06105031 |
+| 基準 RIB `ELSE` (N·mm) | 0.1416027 | 0.1385293 |
+| 基準接觸 `CELS` (N·mm) | 0 | 2.045318×10⁻⁷ |
+
+兩種 h 導出的中心功共軛斜率穩定，與原始 CENTER_RF 的約 20 N 反力相符。**僅此中心 Z 方向的比較得到可重播的交叉證據**，未測支承組逐項變分、力矩或任意 six-component balance。特別注意：n=8 `CELS=0` 但存在非零 contact force；不能因 `CELS=0` 假定 contact work 已全部被正確輸出，也不能直接以此能量差分取代工程接觸驗收。每次擾動是否保持同一接觸分支、接觸負功／雙重計數及完整能量 ownership 尚須獨立確認。
+
+因此原先 `OPEN_U_CONTACT_RF_GLOBAL_Z_IMBALANCE` 仍 **FAIL-CLOSED**；`CONTACT_NOT_ADMITTED`、`MPC_REACTION_RECONSTRUCTION_NOT_ESTABLISHED`、`ENGINEERING_ACCEPTANCE_NOT_ADMITTED` 均不改。下一步應測板邊／肋端群組功共軛擾動與獨立約束力矩／幾何虛功，包含接觸 active-set 變化和負向對照；此 run **不能**宣稱上述後續項目已完成。
