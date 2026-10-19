@@ -1,0 +1,41 @@
+name: 殼 DOF5 壓力間隙固定證據對帳
+on:
+  pull_request:
+    paths:
+      - .github/workflows/ccx221-contact-state-replay.yml
+      - tests/fea_benchmark/envelope_panels/check_ccx221_contact_state.py
+      - tests/fea_benchmark/envelope_panels/test_ccx221_contact_state.py
+permissions:
+  contents: read
+  actions: read
+jobs:
+  verify:
+    if: github.event.pull_request.number == 131
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - name: 取得固定版本兩組 artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/check"
+          gh api -H 'Accept: application/vnd.github+json' /repos/masini1491/building-envelope-engineering-kb/actions/artifacts/12161706369/zip > "$RUNNER_TEMP/check/original.zip"
+          gh api -H 'Accept: application/vnd.github+json' /repos/masini1491/building-envelope-engineering-kb/actions/artifacts/12162044405/zip > "$RUNNER_TEMP/check/pressure.zip"
+      - name: 執行完整來源固定資料與負向測試
+        env:
+          CCX221_ORIGINAL_ZIP: ${{ runner.temp }}/check/original.zip
+          CCX221_PRESSURE_ZIP: ${{ runner.temp }}/check/pressure.zip
+        run: |
+          set -euo pipefail
+          python -B tests/fea_benchmark/envelope_panels/test_ccx221_contact_state.py
+          python -B tests/fea_benchmark/envelope_panels/check_ccx221_contact_state.py "$CCX221_ORIGINAL_ZIP" "$CCX221_PRESSURE_ZIP" > "$RUNNER_TEMP/check/contact-state.json"
+      - name: 保存限定研究結果
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ccx221-rot5-contact-state-audit-only
+          retention-days: 14
+          if-no-files-found: warn
+          path: ${{ runner.temp }}/check/contact-state.json

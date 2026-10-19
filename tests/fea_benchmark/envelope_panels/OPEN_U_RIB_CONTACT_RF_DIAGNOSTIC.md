@@ -360,3 +360,11 @@ PR #131 的 test-only 修正 head `da21e005dde4f9098405c7408019a46b15d8d387`，R
 ## 接觸彈簧清單變化與壓力觀測待辦（2026-10-19，原始殼 DOF5）
 
 已獨立重播原版 CCX 2.21 [run 39194487445](https://github.com/masini1491/building-envelope-engineering-kb/actions/runs/39194487445) 的最後增量 `CNUM`／逐列 `CELS`：n8 依 θ = −2e−5／−1e−5／0／+1e−5／+2e−5 rad 的接觸彈簧列印筆數為 3／3／3／2／3，slave element ID 均屬 79、82；n16 為 7／7／7／19／22，基準的 ID 為 158、159、162、163，正向轉角新增 130、131、190、191。n16 正向角度有新增元素列出能量大於零（130、131）；190、191 為零。列印零能量不等於可證明張開，有非零合力也不等於每筆 spring 均承壓。因此需使用官方支援的 `*CONTACT PRINT CDIS,CSTR` 補充 gap/pressure，先為 n8 3 案與 n16 5 案建立 source-pinned 精確輸入的新研究 workflow；未實際驗證前此輸出保持 NOT_RUN。完整原始殼轉角與 MPC 支承反力矩仍未建立，舊 RF3 門維持 FAIL-CLOSED，PR #131 未合併。
+
+## 接觸壓力與相對間隙實測覆核（2026-10-19，限定求解器列印觀測）
+
+原版 CCX 2.21 [run 39197070630](https://github.com/masini1491/building-envelope-engineering-kb/actions/runs/39197070630) SUCCESS；8 組 `CDIS/CSTR` 輸出 artifact `12162044405`、ZIP SHA-256 `5a025b9f7e87ec3b03078cfaddc4fc11e3bfdcd04c2ce95eec97076d6bc45354`。比較 [20 組原版 run 39194487445](https://github.com/masini1491/building-envelope-engineering-kb/actions/runs/39194487445) 的原始 ZIP SHA-256 `d9b36c420feca6a5f8cd50dc8cb07dbba6c2ebbbf0224abb4df57fbfd2291a8b`，確認新增輸出要求以外的 deck 內容未修改。
+
+於最終時間 1.0：n8 角度 −1e−5／0／+1e−5 有 3／3／2 筆接觸彈簧；n16 角度 −2e−5／−1e−5／0／+1e−5／+2e−5 有 7／7／7／19／22 筆。**每個列印的 spring 均具有負法向相對位移及正壓力**。n16 正向新增 ID 130、131、190、191 均有正壓力；因此求解器層級的受壓接觸分布擴張已確認。注意 n8 3 組及 n16 部分組別 `CELS=0` 仍存在正壓力，故 CELS 單項不可用來判斷接觸是否張開或構成獨立接觸能量 oracle。
+
+對同一案例兩次求解，8 案中 7 案的接觸合力、總列印接觸能與 STA 完全一致；n16 最大正轉角因迭代路徑變更，其接觸 F3 為 31.65338 N，前次為 31.65329 N，差 0.00009 N。此敏感性不得抹除或借此擴大物理容差。新增 `check_ccx221_contact_state.py` 與 `test_ccx221_contact_state.py`，local exact ZIP 八案例重播與 6 項正反向測試 PASS；快速 CI 需另驗 exact artifact ZIP SHA 並維持 NOT_ADMITTED。原始 S8R 殼旋轉支承反力矩與獨立六分量功共軛尚未建立；`OPEN_U_CONTACT_RF_GLOBAL_Z_IMBALANCE` FAIL-CLOSED；PR #131 OPEN／UNMERGED。
