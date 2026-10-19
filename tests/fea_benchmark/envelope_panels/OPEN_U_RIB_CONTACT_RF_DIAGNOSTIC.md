@@ -314,3 +314,25 @@ PR #131 的 test-only 修正 head `da21e005dde4f9098405c7408019a46b15d8d387`，R
 兩種 h 導出的中心功共軛斜率穩定，與原始 CENTER_RF 的約 20 N 反力相符。**僅此中心 Z 方向的比較得到可重播的交叉證據**，未測支承組逐項變分、力矩或任意 six-component balance。特別注意：n=8 `CELS=0` 但存在非零 contact force；不能因 `CELS=0` 假定 contact work 已全部被正確輸出，也不能直接以此能量差分取代工程接觸驗收。每次擾動是否保持同一接觸分支、接觸負功／雙重計數及完整能量 ownership 尚須獨立確認。
 
 因此原先 `OPEN_U_CONTACT_RF_GLOBAL_Z_IMBALANCE` 仍 **FAIL-CLOSED**；`CONTACT_NOT_ADMITTED`、`MPC_REACTION_RECONSTRUCTION_NOT_ESTABLISHED`、`ENGINEERING_ACCEPTANCE_NOT_ADMITTED` 均不改。下一步應測板邊／肋端群組功共軛擾動與獨立約束力矩／幾何虛功，包含接觸 active-set 變化和負向對照；此 run **不能**宣稱上述後續項目已完成。
+
+## 支承群 Z 微擾與接觸分支不對稱（2026-10-19／限研究自由體力帳）
+
+同版原版 CalculiX 2.21、18 個 source-pinned n=8/n=16 求解，[run 39188319636](https://github.com/masini1491/building-envelope-engineering-kb/actions/runs/39188319636) **SUCCESS**；artifact ID `12158619455`、ZIP SHA-256 `b3cddccfda6d05bd472298ff5e8410d2bff3815592edb01c212bad16b6268796`，獨立下載重算一致；manifest SHA-256 `f9d52a1b0f0063527e7596d3766a2a2da08ad2424d63837692dabe8c318a028b`。固定中心 Z=0.0200 mm，板邊、肋端原各固定；分別對板邊或肋端的**整組 Z 方向**添加 ±0.0001／±0.0002 mm 指定位移。各輸入僅更動受控指定位移與 `ELSE/CELS` 觀測，保留 1.0 最終增量與不同模型 SHA。
+
+| 基準最後一步觀測，N | n=8 | n=16 |
+| --- | ---: | ---: |
+| `CENTER_RF` raw F3 | +20.589530 | +19.960880 |
+| `PLATE_EDGE_RF` raw F3 | −6.18077853 | −5.85511476 |
+| `RIB_END_RF` raw F3（**不認可作實體反力**） | −58.8462160 | −31.9722028 |
+| 接觸面列印總 F3（依 U 肋受力約定） | +14.408750 | +14.105760 |
+| 假定 U 肋除端部、接觸外無外加載重的**自由體推得**端部反力 | −14.408750 | −14.105760 |
+| 中心＋板邊－接觸力，自由體殘差 | +0.00000147 | +0.00000524 |
+| 原始 `ALL_ORIGINAL_RF` 總 F3 | −44.43746453 | −17.86643756 |
+
+以上只是模型內**另一輸出通道的自由體力帳**，不是獨立實體反力 oracle。列印 `RIB_END_RF` 與自由體推得值的差異，與先前 MPC 回填 RF3 缺口一致，仍不得自行修補/解除原失衡門。
+
+接觸分支對微擾方向明顯不對稱，例如 n=8 板邊 +0.0001 mm 時接觸面 F3 從 14.40875 跳至 50.75045 N，n=16 同方向跳至 130.9482 N；肋端 −0.0001 mm 時 n=8 約 52.87321 N、n=16 約 130.9584 N。對應反方向僅在 14 N 左右變化。這顯示**微擾跨過接觸組態變化**；不能把跨分支的正負能量中央差分當作光滑一致的支承反力。
+
+固定 artifact 候選總能量（`ELSE(PLATE)+ELSE(RIB)+CELS`，尚未正式證明無雙重計數）在較少改變接觸分支的一側給出初步斜率：n=8 板邊 −向 −6.3798 N、肋端 ＋向 −14.1798 N；n=16 板邊 −向 −5.7660 N、肋端 ＋向 −14.1691 N（h=0.0001 mm）。這些只是**有限步長的單側研究觀測**，而非真正接觸一致切線、非認證支承反力；h=0.0002 mm 的差分仍具步長差異，不得視為收斂證明。
+
+新增 `check_ccx221_support_fd.py` 為只讀 artifact verifier，要求 18 案例、輸入 SHA、最終 STA、原始位移/力節點覆蓋、能量與接觸列印有限性、自由體合計、舊 raw RF3 門 fail-closed，並輸出不同微擾方向的接觸分支不對稱摘要。這個 verifier 不證明接觸法則、完整旋轉功共軛或六分量平衡；獨立物理 admission 仍須額外證據。`CONTACT_NOT_ADMITTED`／`MPC_REACTION_RECONSTRUCTION_NOT_ESTABLISHED`／`ENGINEERING_ACCEPTANCE_NOT_ADMITTED` 維持，PR #131 保持 OPEN／UNMERGED。
