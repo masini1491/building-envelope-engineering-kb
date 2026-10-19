@@ -38,8 +38,10 @@ def finite(s: str) -> float:
 def one_block(dat: str, header: str) -> str:
     # Terminal time == 1; require unambiguous final section; no wandering
     # forward to a later numerical value when the requested block is malformed.
+    # CCX prints element energy "... and time" but CELS "... for time".
+    time_connector = " for time" if header == "total contact spring energy" else " and time"
     matches = list(re.finditer(r"(?m)^\s*" + re.escape(header)
-                               + r" and time\s+(" + NUM + r")\s*$", dat))
+                               + re.escape(time_connector) + r"\s+(" + NUM + r")\s*$", dat))
     if not matches:
         fail("MISSING_BLOCK")
     match = matches[-1]
