@@ -1,0 +1,143 @@
+name: 殼 DOF5 接觸壓力與間隙研究
+
+on:
+  pull_request:
+    paths:
+      - .github/workflows/ccx221-rot5-contact-state.yml
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  contact_pressure_probe:
+    if: github.event.pull_request.number == 131
+    runs-on: ubuntu-24.04
+    timeout-minutes: 22
+    steps:
+      - uses: actions/checkout@v4
+      - name: 安裝固定版本建置相依套件
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends build-essential gfortran libspooles-dev libarpack2-dev liblapack-dev
+          gfortran --version | head -n 1
+      - name: 取得精確來源與既有同次求解輸入
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/ccx-ab" "$RUNNER_TEMP/ccx-ab/ref"
+          cd "$RUNNER_TEMP/ccx-ab"
+          curl --fail --location --silent --show-error --retry 2 --max-time 120 \
+            -o calculix-ccx_2.21.orig.tar.bz2 \
+            https://us.archive.ubuntu.com/ubuntu/pool/universe/c/calculix-ccx/calculix-ccx_2.21.orig.tar.bz2
+          echo '51d229aee320cf685216d360f7c04f9a57af0148fbe840483a964c86c315da82  calculix-ccx_2.21.orig.tar.bz2' | sha256sum --check
+          curl --fail --location --silent --show-error --retry 2 --max-time 120 \
+            -o calculix-ccx_2.21-1.debian.tar.xz \
+            https://us.archive.ubuntu.com/ubuntu/pool/universe/c/calculix-ccx/calculix-ccx_2.21-1.debian.tar.xz
+          echo '6c2a934b66491c9e916cbf6328167d417f7e985b380e200facf92c3e953d255f  calculix-ccx_2.21-1.debian.tar.xz' | sha256sum --check
+          gh run download 39054940762 --repo masini1491/building-envelope-engineering-kb \
+            --name calculix-nlgeom-probe --dir "$RUNNER_TEMP/ccx-ab/ref"
+          test -f "$RUNNER_TEMP/ccx-ab/ref/envelope_panels/u_s8r_rf_projection_n8_toward/panel.inp"
+          echo 'e0360eed38d6708075200c499a870e38e79f120eaa88ff7427c497e7f0cef2cf  '"$RUNNER_TEMP/ccx-ab/ref/envelope_panels/u_s8r_rf_projection_n8_toward/panel.inp" | sha256sum --check
+          test -f "$RUNNER_TEMP/ccx-ab/ref/envelope_panels/u_s8r_rf_projection_n16_toward/panel.inp"
+          echo '90becf2d6530482a88991f7e038ee63162f52ec41e9943ddfb16be612c7ee6cf  '"$RUNNER_TEMP/ccx-ab/ref/envelope_panels/u_s8r_rf_projection_n16_toward/panel.inp" | sha256sum --check
+      - name: 構建未修改的 Debian 2.21-1 求解器
+        run: |
+          set -euo pipefail
+          cd "$RUNNER_TEMP/ccx-ab"
+          tar -xjf calculix-ccx_2.21.orig.tar.bz2
+          cd CalculiX
+          tar -xJf ../calculix-ccx_2.21-1.debian.tar.xz
+          while IFS= read -r patchname; do
+            test -z "$patchname" && continue
+            patch --batch --fuzz=0 -p1 < "debian/patches/$patchname" >/dev/null
+          done < debian/patches/series
+          src="$PWD/ccx_2.21/src"
+          make -s -j2 -C "$src" \
+            CFLAGS='-O2 -Wall -I/usr/include/spooles -DARCH=Linux -DSPOOLES -DARPACK -DMATRIXSTORAGE -DUSE_MT=1' \
+            FFLAGS='-O2 -fallow-argument-mismatch' > "$RUNNER_TEMP/ccx-ab/pristine-build.log" 2>&1 || {
+              tail -n 120 "$RUNNER_TEMP/ccx-ab/pristine-build.log"; exit 1;
+            }
+          test -x "$src/ccx_2.21"
+          cp "$src/ccx_2.21" "$RUNNER_TEMP/ccx-ab/pristine-ccx"
+          sha256sum "$RUNNER_TEMP/ccx-ab/pristine-ccx"
+      - name: 下載原始二十案轉角輸入並加入接觸位移及壓力輸出
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/ccx-ab/rot5-source"
+          gh run download 39194487445 \
+            --repo masini1491/building-envelope-engineering-kb \
+            --name ccx221-shell-rot5-research-n8n16 \
+            --dir "$RUNNER_TEMP/ccx-ab/rot5-source"
+          python - <<'PY'
+          import hashlib,json,os,pathlib
+          root=pathlib.Path(os.environ['RUNNER_TEMP'])/'ccx-ab'
+          source=root/'rot5-source'
+          raw=(source/'manifest.json').read_bytes()
+          assert hashlib.sha256(raw).hexdigest()=='d4af3bb7edbd06b5acba0343f07a8932281cd3221d35036daea31bdf6025fd9b'
+          manifest=json.loads(raw)
+          cases={8:('minus1','zero','plus1'),16:('minus2','minus1','zero','plus1','plus2')}
+          old='CF,CFN,CNUM,CELS\n'
+          new='CF,CFN,CNUM,CELS,CDIS,CSTR\n'
+          results={}
+          for mesh,samples in cases.items():
+            for name in samples:
+              key=f'n{mesh}/contact/{name}'
+              p=source/key/'panel.inp'
+              inp=p.read_bytes()
+              assert hashlib.sha256(inp).hexdigest()==manifest['cases'][key]['input_sha256']
+              t=inp.decode('ascii')
+              assert t.count(old)==1 and t.count('*CONTACT PRINT')==1
+              t=t.replace(old,new,1)
+              dest=root/'rot5-pressure'/key
+              dest.mkdir(parents=True,exist_ok=False)
+              payload=t.encode('ascii')
+              (dest/'panel.inp').write_bytes(payload)
+              results[key]={'source_input_sha256':hashlib.sha256(inp).hexdigest(),
+                            'pressure_input_sha256':hashlib.sha256(payload).hexdigest(),
+                            'scope':'CONTACT_STATE_OBSERVATION_NOT_REACTION_ADMISSION'}
+          (root/'rot5-pressure'/'manifest.json').write_text(json.dumps(
+            {'source_run':39194487445,'source_manifest_sha256':hashlib.sha256(raw).hexdigest(),
+             'cases':results,'engineering_acceptance':'NOT_ADMITTED'},indent=2,sort_keys=True)+'\n')
+          assert len(results)==8
+          print('PINNED_DOF5_CDIS_CSTR_DECKS_PASS',len(results))
+          PY
+      - name: 原版 CalculiX 實際計算接觸位移與接觸應力
+        run: |
+          set -euo pipefail
+          root="$RUNNER_TEMP/ccx-ab"
+          export OMP_NUM_THREADS=1 CCX_NPROC_EQUATION=1 CCX_NPROC_RESULTS=1 CCX_NPROC_STIFFNESS=1
+          for mesh in 8 16; do
+            if [ "$mesh" = 8 ]; then samples="minus1 zero plus1"; else samples="minus2 minus1 zero plus1 plus2"; fi
+            for trial in $samples; do
+              (
+                cd "$root/rot5-pressure/n$mesh/contact/$trial"
+                timeout 120s "$root/pristine-ccx" -i panel > solver.log 2>&1 || {
+                  tail -n 100 solver.log
+                  exit 1
+                }
+                test -s panel.dat
+                test -s panel.sta
+                grep -q 'contact spring energy' panel.dat
+                sha256sum panel.inp panel.dat panel.sta
+              )
+              echo "KB_DOF5_CONTACT_PRESSURE_OBSERVED n$mesh/$trial"
+            done
+          done
+      - name: 保存壓力及相對位移原始輸出
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ccx221-rot5-contact-pressure-research-only
+          retention-days: 14
+          if-no-files-found: warn
+          path: |
+            ${{ runner.temp }}/ccx-ab/rot5-pressure/manifest.json
+            ${{ runner.temp }}/ccx-ab/rot5-pressure/**/panel.inp
+            ${{ runner.temp }}/ccx-ab/rot5-pressure/**/panel.dat
+            ${{ runner.temp }}/ccx-ab/rot5-pressure/**/panel.sta
+            ${{ runner.temp }}/ccx-ab/rot5-pressure/**/solver.log
+            ${{ runner.temp }}/ccx-ab/pristine-build.log
