@@ -368,3 +368,9 @@ PR #131 的 test-only 修正 head `da21e005dde4f9098405c7408019a46b15d8d387`，R
 於最終時間 1.0：n8 角度 −1e−5／0／+1e−5 有 3／3／2 筆接觸彈簧；n16 角度 −2e−5／−1e−5／0／+1e−5／+2e−5 有 7／7／7／19／22 筆。**每個列印的 spring 均具有負法向相對位移及正壓力**。n16 正向新增 ID 130、131、190、191 均有正壓力；因此求解器層級的受壓接觸分布擴張已確認。注意 n8 3 組及 n16 部分組別 `CELS=0` 仍存在正壓力，故 CELS 單項不可用來判斷接觸是否張開或構成獨立接觸能量 oracle。
 
 對同一案例兩次求解，8 案中 7 案的接觸合力、總列印接觸能與 STA 完全一致；n16 最大正轉角因迭代路徑變更，其接觸 F3 為 31.65338 N，前次為 31.65329 N，差 0.00009 N。此敏感性不得抹除或借此擴大物理容差。新增 `check_ccx221_contact_state.py` 與 `test_ccx221_contact_state.py`，local exact ZIP 八案例重播與 6 項正反向測試 PASS；快速 CI 需另驗 exact artifact ZIP SHA 並維持 NOT_ADMITTED。原始 S8R 殼旋轉支承反力矩與獨立六分量功共軛尚未建立；`OPEN_U_CONTACT_RF_GLOBAL_Z_IMBALANCE` FAIL-CLOSED；PR #131 OPEN／UNMERGED。
+
+## 旋轉約束歸屬：原始殼 DOF5 對應擴充輔助 SPC（2026-10-19／僅運動學數值傳遞）
+
+固定 CalculiX 2.21 原始碼 `gen3dboun.f` 顯示：一般靜態 shell 的 DOF4–6 經 tangent-plane projection 與 `MEANROTBS` MPC 轉為輔助節點的第 1 平移方向 SPC；旋轉約束不能以原始殼 `RF` 列印或 expanded-node 任意三維節點力直接當反力矩。研究-only、唯讀插樁 `ccx221_rot5_owner_instrument.py` 只在 `ne2boun(1/2,node)` 建立時列印 owner、原始旋轉軸、輔助 SPC 節點／方向及約束值，未修改 MPC 係數或求解程式的數值向量。
+
+[原版／插樁版 run 39203418753](https://github.com/masini1491/building-envelope-engineering-kb/actions/runs/39203418753) **SUCCESS**，六組 n8／n16 × 無接觸負角／零角／正角的 `.dat/.sta` 對應逐位元組一致。原始輸入角度節點 n8=64（正負角非零各 62），n16=96（正負角非零各 94）；插樁版每案記錄 `KB_ROT_OWNER`：n8=156、n16=220 筆，兩個 auxiliary SPC owner／原始節點（含額外非角度驅動的支承）。就已指定 DOF5 的各原始節點，`axis=2`、第二旋轉約束 owner 的輔助 SPC 值與原始輸入一致；零角全部為 0。專屬 artifact ID `12164552181`、ZIP SHA-256 `01d03784c7fe0521087602262b36446127bad858ad90765170bc40c44c9d0361`。下一階段需對真正 `MEANROTBS` 約束的雙對偶力及 `gen3dboun` 投影係數建立 `Q_theta = sum(force_i * ∂u_i/∂theta)` 的獨立虛功測試；本輪無法取得獨立數值力矩，故 `MPC_REACTION_RECONSTRUCTION_NOT_ESTABLISHED`／`ENGINEERING_ACCEPTANCE_NOT_ADMITTED` 不變。

@@ -1,0 +1,45 @@
+name: 殼 DOF5 原始轉角與輔助 SPC 映射覆核
+on:
+  pull_request:
+    paths:
+      - .github/workflows/ccx221-rot5-owner-replay.yml
+      - tests/fea_benchmark/envelope_panels/verify_ccx221_rot5_owner.py
+permissions:
+  contents: read
+  actions: read
+jobs:
+  owner_replay:
+    if: github.event.pull_request.number == 131
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - name: 下載固定原始求解與約束歸屬兩份原始 ZIP
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/rot5owner"
+          gh api -H 'Accept: application/vnd.github+json' /repos/masini1491/building-envelope-engineering-kb/actions/artifacts/12161706369/zip > "$RUNNER_TEMP/rot5owner/original.zip"
+          gh api -H 'Accept: application/vnd.github+json' /repos/masini1491/building-envelope-engineering-kb/actions/artifacts/12164552181/zip > "$RUNNER_TEMP/rot5owner/owner.zip"
+      - name: 驗證每筆殼 DOF5 角度與輔助 SPC 實際值
+        run: |
+          set -euo pipefail
+          python -B tests/fea_benchmark/envelope_panels/verify_ccx221_rot5_owner.py "$RUNNER_TEMP/rot5owner/original.zip" "$RUNNER_TEMP/rot5owner/owner.zip" > "$RUNNER_TEMP/rot5owner/owner-audit.json"
+          python - "$RUNNER_TEMP/rot5owner/owner-audit.json" <<'PY'
+          import json,sys
+          r=json.load(open(sys.argv[1]))
+          assert r["status"]=="DOF5_VALUE_TO_AUX_SPC_OWNER_MATCH_ONLY"
+          assert len(r["cases"])==6
+          assert all(v["all_angle_values_exact"] for v in r["cases"].values())
+          assert r["mpc_dual_reaction_moment"]=="NOT_ESTABLISHED"
+          assert r["engineering_acceptance"]=="NOT_ADMITTED"
+          PY
+      - name: 留存受限角度歸屬報告
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ccx221-shell-dof5-owner-mapping-only
+          retention-days: 14
+          if-no-files-found: warn
+          path: ${{ runner.temp }}/rot5owner/owner-audit.json
