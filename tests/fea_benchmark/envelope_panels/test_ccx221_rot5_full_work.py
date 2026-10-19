@@ -38,6 +38,15 @@ class Tests(unittest.TestCase):
         txt=CASCADE.replace('1 5 4 2','1 5 7 2').replace('1 1 1 3 1','1 1 1 5 1').replace('1 2 2 3 -1','1 2 2 5 -1')
         f,m=eliminate(parse_work(txt))
         self.assertNotIn(1,m)
+    def test_encoded_dependent_mpc_dof(self):
+        self.assertEqual(parse_work(SAMPLE)['fn'][(1,3)][1],-1)
+    def test_negative_even_spc_dof(self):
+        trace=SAMPLE.replace('KB_WORK_FN 1 3 -1','KB_WORK_FN 1 3 -200')
+        self.assertEqual(parse_work(trace)['fn'][(1,3)][1],-200)
+    def test_out_of_range_dependent_mpc_id(self):
+        trace=SAMPLE.replace('KB_WORK_FN 1 3 -1','KB_WORK_FN 1 3 -3')
+        with self.assertRaisesRegex(ValueError,'CCX221_FULL_WORK_FN_MPC_INDEX'):
+            parse_work(trace)
     def test_duplicate_mpc_term(self):
         self.reject(SAMPLE.replace('1 3 4 2 1','1 3 4 1 1'),'DUPLICATE_TERM')
     def test_invalid_dependent_coefficient(self):

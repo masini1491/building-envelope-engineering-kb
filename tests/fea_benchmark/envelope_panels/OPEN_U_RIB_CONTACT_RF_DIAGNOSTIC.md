@@ -391,3 +391,18 @@ PR #131 的 test-only 修正 head `da21e005dde4f9098405c7408019a46b15d8d387`，R
 上表 `q'=[q(+h)−q(−h)]/(2h)`，`E''=[E(+h)−2E(0)+E(−h)]/h²`；用固定 ZIP 的原始列印值獨立重算。n=8 的 `E''≈184,089,000 N·mm/rad²`、`q'≈92,044,451 N·mm/rad`；n=16 分別 `116,147,600`、`58,073,796`。比例約 0.5 是**同源 solver trace 與捨入能量輸出之觀測關係**，不是已推導的理論因子；`ELSE` 作為完整總勢能的適用性與殼轉動 constraint dual 的物理定義均未被獨立證明。不能乘以 2 強迫通過、不能用中央差分代表跨接觸啟閉分支的唯一導數，也不能拿結果宣稱原始六分量支承平衡。
 
 最小後續研究須先辨識完整 SPC/MPC constraint dual 與原始殼角度的**外部功共軛**（含平移力、旋轉軸投影、MPC 變分與非齊次項），由獨立可解的已知力偶檢驗力矩方向／單位後，才考慮 n=8／16 的真實殼模型。抽象兩彈簧 48 N·mm 解析式通過，只驗符號與算式，**不是**真實 S8R `fmpc` 的獨立 oracle。原始 `OPEN_U_CONTACT_RF_GLOBAL_Z_IMBALANCE_-44.4374645` 不變；PR #131 維持 OPEN／UNMERGED，`CONTACT_NOT_ADMITTED`、`MPC_REACTION_RECONSTRUCTION_NOT_ESTABLISHED`、`ENGINEERING_ACCEPTANCE_NOT_ADMITTED`。
+
+## 原始內力完整 MPC 消去重播與負值自由度歸屬（2026-10-19／僅研究演算法對帳）
+
+固定 [PR #131 run 39228061706](https://github.com/masini1491/building-envelope-engineering-kb/actions/runs/39228061706) 的最終狀態是 **FAILURE**，但失敗階段是新增 `verify_ccx221_rot5_full_work.py` 的 `CCX221_FULL_WORK_FN_OWNER` 資料解析，**不是**真正求解失敗。該次 run 既有解析與負向測試、固定原始碼／artifact 取得、原版與唯讀插樁版 CalculiX 2.21 建置，以及無接觸 n8／n16 × 角度 −1e−5／0／+1e−5 rad 六組 `.dat/.sta` 位元組一致，皆個別 **PASS**。原始 trace 保存 artifact ID `12175920429`，ZIP SHA-256 `bcd509d1e082de9527d3b9da44ea503842d618a4e99ffc8e0407114684619d56`；來源 ZIP 與 owner ZIP 仍使用前述固定 hash。此 artifact 並未保留新求解 `.dat/.sta`，故本地重播使用固定原版 ZIP 的檔案補足驗證器輸入，原版／插樁版一致性只依同次 CI 的 `cmp` 日誌聲明。
+
+實際 trace 的 `nactdof` 包含 `−2475`（n8）與 `−4139`（n16）。CalculiX 2.21 `mastruct.c` 使用負偶數 `−2(i+1)` 表示 SPC，自 `−1` 開始的負奇數 `−2i−1` 表示 dependent MPC；先前驗證器的 `eq < −2` 拒絕條件因而錯誤。更正為保留有效編碼、檢查負奇數所參照 MPC 編號未超出 `nmpc`，另保留節點／方向唯一性與非有限值等拒絕條件。本地負向及解析測試 18/18 PASS，六組固定 artifact 的完整 MPC 消去重播皆成功：每案例 n8 `nmpc=1238`、n16 `nmpc=2070`；各案例內，觀測 `MEANROTBS fmpc` 與重播最大絕對差均為 `0.0 N`（原始 trace 列印精度下）。
+
+以全部 MPC 消去後的原始殼 DOF5 輔助 SPC 權重候選，比對既有 PLATE＋RIB `ELSE` 最終正負角列印能量中央差分：
+
+| 網格 | 完整 MPC 後 `Qθ` 候選（θ=0，N·mm） | `ELSE` 中央斜率（N·mm） | 候選減能量斜率（N·mm） |
+| --- | ---: | ---: | ---: |
+| n8 | +3.8571396467 | +3.8570000000 | +0.0001396467 |
+| n16 | −0.3672852155 | −0.3670000000 | −0.0002852155 |
+
+後者用 `h=1e−5 rad`，且 `ELSE` 只列印有限有效位數；觀測差值與 PLATE 的列印量化尺度相容，**但並非**完整總勢能、真正 Lagrange multiplier、外部 SPC dual 或反力矩功共軛的獨立證明。新結果縮小了先前約 1:2 差額的來源至**未完整計入 MPC 串聯傳力的局部帳值**，而非可任意乘二的校正規則。對接觸分支、六分量自由體、@300 mm 植釘承載與真實工程容量均未建立新驗收。原始 `OPEN_U_CONTACT_RF_GLOBAL_Z_IMBALANCE` 門檻保持 FAIL-CLOSED，PR #131 必須 OPEN／UNMERGED，`CONTACT_NOT_ADMITTED`、`MPC_REACTION_RECONSTRUCTION_NOT_ESTABLISHED`、`ENGINEERING_ACCEPTANCE_NOT_ADMITTED` 不變。

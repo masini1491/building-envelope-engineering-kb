@@ -41,7 +41,12 @@ def parse_work(src):
         elif tag=='KB_WORK_FN':
             if len(p)!=5:reject('FN_FORMAT')
             node,d,eq=map(int,p[1:4]);f=finite(p[4])
-            if not 1<=node<=hdr[3] or not 1<=d<=3 or (node,d) in nodal or eq < -2:
+            if not 1<=node<=hdr[3] or not 1<=d<=3 or (node,d) in nodal:
+            # CalculiX 2.21 mastruct.c encodes MPC-dependent DOFs as
+            # -(2*i+1), i=0..nmpc-1; SPC DOFs use negative even IDs.
+            # Do not misclassify ordinary constraint IDs as invalid forces.
+            if eq < 0 and eq % 2 and eq < -(2*hdr[5]-1):
+                reject('FN_MPC_INDEX')
                 reject('FN_OWNER')
             if f==0:reject('FN_ZERO')
             nodal[(node,d)]=(f,eq)
