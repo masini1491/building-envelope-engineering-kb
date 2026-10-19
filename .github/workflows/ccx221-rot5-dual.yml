@@ -12,6 +12,8 @@ on:
       - tests/fea_benchmark/envelope_panels/test_ccx221_rot5_kkt_oracle.py
       - tests/fea_benchmark/envelope_panels/test_ccx221_rot5_adjoint.py
       - tests/fea_benchmark/envelope_panels/verify_ccx221_rot5_adjoint.py
+      - tests/fea_benchmark/envelope_panels/verify_ccx221_rot5_load_scope.py
+      - tests/fea_benchmark/envelope_panels/test_ccx221_rot5_load_scope.py
 permissions:
   contents: read
   actions: read
@@ -28,6 +30,7 @@ jobs:
           python -B -m unittest discover -s tests/fea_benchmark/envelope_panels -p 'test_ccx221_rot5_full_work.py' -v
           python -B -m unittest discover -s tests/fea_benchmark/envelope_panels -p 'test_ccx221_rot5_kkt_oracle.py' -v
           python -B -m unittest discover -s tests/fea_benchmark/envelope_panels -p 'test_ccx221_rot5_adjoint.py' -v
+          python -B -m unittest discover -s tests/fea_benchmark/envelope_panels -p 'test_ccx221_rot5_load_scope.py' -v
       - name: 準備固定來源及既有六組無接觸案例
         env:
           GH_TOKEN: ${{ github.token }}
@@ -40,6 +43,8 @@ jobs:
           gh api -H 'Accept: application/vnd.github+json' /repos/masini1491/building-envelope-engineering-kb/actions/artifacts/12164552181/zip > owner.zip
           echo 'd9b36c420feca6a5f8cd50dc8cb07dbba6c2ebbbf0224abb4df57fbfd2291a8b  source.zip' | sha256sum --check
           echo '01d03784c7fe0521087602262b36446127bad858ad90765170bc40c44c9d0361  owner.zip' | sha256sum --check
+          python -B tests/fea_benchmark/envelope_panels/verify_ccx221_rot5_load_scope.py source.zip > load-scope-report.json
+          cat load-scope-report.json
           unzip -q source.zip -d ref
           curl --fail --location --silent --show-error --retry 2 --max-time 120 \
             -o calculix-ccx_2.21.orig.tar.bz2 \
@@ -133,6 +138,7 @@ jobs:
             ${{ runner.temp }}/rot5-dual/rot-dual/**/kb_rot_full_work.tsv
             ${{ runner.temp }}/rot5-dual/full-work-report.json
             ${{ runner.temp }}/rot5-dual/adjoint-report.json
+            ${{ runner.temp }}/rot5-dual/load-scope-report.json
             ${{ runner.temp }}/rot5-dual/rot-dual/**/kb_rot_owner.tsv
             ${{ runner.temp }}/rot5-dual/dual-report.json
             ${{ runner.temp }}/rot5-dual/dual-build.log
