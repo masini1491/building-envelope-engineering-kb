@@ -7,8 +7,10 @@ from verify_ccx221_rot5_dual import (analytic_48, parse_trace, reconstruct,
 
 EXAMPLE='''KB_ROT_PHASE P 1 10 1.0 100 12 10
 KB_ROT_SPC P 7 50 1 -10 0.00002 0.0
+KB_ROT_SPC P 8 50 2 -11 0.0 0.0
 KB_ROT_PHASE Q 1 10 1.0 100 12 10
 KB_ROT_SPC Q 7 50 1 -10 0.00002 0.0
+KB_ROT_SPC Q 8 50 2 -11 0.0 0.0
 KB_ROT_MPC 4 1.5
 KB_ROT_TERM 4 1 1 3 0.1
 KB_ROT_TERM 4 2 1 2 0.2
