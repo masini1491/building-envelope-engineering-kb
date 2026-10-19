@@ -1,0 +1,106 @@
+name: 殼 DOF5 輔助約束歸屬對照
+on:
+  pull_request:
+    paths:
+      - .github/workflows/ccx221-rot5-owner.yml
+      - tests/fea_benchmark/envelope_panels/ccx221_rot5_owner_instrument.py
+permissions:
+  contents: read
+  actions: read
+jobs:
+  rot5_owner:
+    if: github.event.pull_request.number == 131
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: 安裝固定版本建置相依套件
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends build-essential gfortran libspooles-dev libarpack2-dev liblapack-dev
+          gfortran --version | head -n 1
+      - name: 取得精確來源與既有同次求解輸入
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/ccx-ab" "$RUNNER_TEMP/ccx-ab/ref"
+          cd "$RUNNER_TEMP/ccx-ab"
+          curl --fail --location --silent --show-error --retry 2 --max-time 120 \
+            -o calculix-ccx_2.21.orig.tar.bz2 \
+            https://us.archive.ubuntu.com/ubuntu/pool/universe/c/calculix-ccx/calculix-ccx_2.21.orig.tar.bz2
+          echo '51d229aee320cf685216d360f7c04f9a57af0148fbe840483a964c86c315da82  calculix-ccx_2.21.orig.tar.bz2' | sha256sum --check
+          curl --fail --location --silent --show-error --retry 2 --max-time 120 \
+            -o calculix-ccx_2.21-1.debian.tar.xz \
+            https://us.archive.ubuntu.com/ubuntu/pool/universe/c/calculix-ccx/calculix-ccx_2.21-1.debian.tar.xz
+          echo '6c2a934b66491c9e916cbf6328167d417f7e985b380e200facf92c3e953d255f  calculix-ccx_2.21-1.debian.tar.xz' | sha256sum --check
+          gh run download 39054940762 --repo masini1491/building-envelope-engineering-kb \
+            --name calculix-nlgeom-probe --dir "$RUNNER_TEMP/ccx-ab/ref"
+          test -f "$RUNNER_TEMP/ccx-ab/ref/envelope_panels/u_s8r_rf_projection_n8_toward/panel.inp"
+          echo 'e0360eed38d6708075200c499a870e38e79f120eaa88ff7427c497e7f0cef2cf  '"$RUNNER_TEMP/ccx-ab/ref/envelope_panels/u_s8r_rf_projection_n8_toward/panel.inp" | sha256sum --check
+          test -f "$RUNNER_TEMP/ccx-ab/ref/envelope_panels/u_s8r_rf_projection_n16_toward/panel.inp"
+          echo '90becf2d6530482a88991f7e038ee63162f52ec41e9943ddfb16be612c7ee6cf  '"$RUNNER_TEMP/ccx-ab/ref/envelope_panels/u_s8r_rf_projection_n16_toward/panel.inp" | sha256sum --check
+      - name: 構建未修改的 Debian 2.21-1 求解器
+        run: |
+          set -euo pipefail
+          cd "$RUNNER_TEMP/ccx-ab"
+          tar -xjf calculix-ccx_2.21.orig.tar.bz2
+          cd CalculiX
+          tar -xJf ../calculix-ccx_2.21-1.debian.tar.xz
+          while IFS= read -r patchname; do
+            test -z "$patchname" && continue
+            patch --batch --fuzz=0 -p1 < "debian/patches/$patchname" >/dev/null
+          done < debian/patches/series
+          src="$PWD/ccx_2.21/src"
+          make -s -j2 -C "$src" \
+            CFLAGS='-O2 -Wall -I/usr/include/spooles -DARCH=Linux -DSPOOLES -DARPACK -DMATRIXSTORAGE -DUSE_MT=1' \
+            FFLAGS='-O2 -fallow-argument-mismatch' > "$RUNNER_TEMP/ccx-ab/pristine-build.log" 2>&1 || {
+              tail -n 120 "$RUNNER_TEMP/ccx-ab/pristine-build.log"; exit 1;
+            }
+          test -x "$src/ccx_2.21"
+          cp "$src/ccx_2.21" "$RUNNER_TEMP/ccx-ab/pristine-ccx"
+          sha256sum "$RUNNER_TEMP/ccx-ab/pristine-ccx"
+      - name: 產生唯讀約束歸屬插樁並編譯
+        run: |
+          set -euo pipefail
+          scratch="$RUNNER_TEMP/ccx-ab"
+          src="$scratch/CalculiX/ccx_2.21/src"
+          cp "$src/gen3dboun.f" "$scratch/gen3dboun-original.f"
+          python -B tests/fea_benchmark/envelope_panels/ccx221_rot5_owner_instrument.py "$scratch/CalculiX/ccx_2.21"
+          ! cmp -s "$src/gen3dboun.f" "$scratch/gen3dboun-original.f"
+          make -s -j2 -C "$src" CFLAGS='-O2 -Wall -I/usr/include/spooles -DARCH=Linux -DSPOOLES -DARPACK -DMATRIXSTORAGE -DUSE_MT=1' FFLAGS='-O2 -fallow-argument-mismatch' > "$scratch/rot-owner-build.log" 2>&1 || { tail -n 80 "$scratch/rot-owner-build.log"; exit 1; }
+          cp "$src/ccx_2.21" "$scratch/rot-owner-ccx"
+      - name: 實測無接觸 DOF5 原始角度至擴充節點的映射
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          scratch="$RUNNER_TEMP/ccx-ab"
+          mkdir -p "$scratch/rot5-existing"
+          gh run download 39194487445 --repo masini1491/building-envelope-engineering-kb --name ccx221-shell-rot5-research-n8n16 --dir "$scratch/rot5-existing"
+          export OMP_NUM_THREADS=1 CCX_NPROC_EQUATION=1 CCX_NPROC_RESULTS=1 CCX_NPROC_STIFFNESS=1
+          for mesh in 8 16; do
+            for angle in minus1 zero plus1; do
+              key="n$mesh/no_contact/$angle"
+              dir="$scratch/rot-owner/$key"
+              mkdir -p "$dir"
+              cp "$scratch/rot5-existing/$key/panel.inp" "$dir/panel.inp"
+              (cd "$dir"; timeout 100s "$scratch/rot-owner-ccx" -i panel > solver.log 2>&1)
+              test -s "$dir/kb_rot_owner.tsv"
+              grep -q 'KB_ROT_OWNER' "$dir/kb_rot_owner.tsv"
+              cmp "$dir/panel.dat" "$scratch/rot5-existing/$key/panel.dat"
+              cmp "$dir/panel.sta" "$scratch/rot5-existing/$key/panel.sta"
+              echo "KB_ROT_OWNER_AB_IDENTICAL $key"
+            done
+          done
+      - name: 保存原始殼與擴充約束映射
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ccx221-rot5-auxiliary-owner-research
+          retention-days: 14
+          if-no-files-found: warn
+          path: |
+            ${{ runner.temp }}/ccx-ab/rot-owner/**/kb_rot_owner.tsv
+            ${{ runner.temp }}/ccx-ab/rot-owner/**/solver.log
+            ${{ runner.temp }}/ccx-ab/rot-owner-build.log
