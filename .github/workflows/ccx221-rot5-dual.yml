@@ -10,6 +10,8 @@ on:
       - tests/fea_benchmark/envelope_panels/verify_ccx221_rot5_full_work.py
       - tests/fea_benchmark/envelope_panels/verify_ccx221_rot5_kkt_oracle.py
       - tests/fea_benchmark/envelope_panels/test_ccx221_rot5_kkt_oracle.py
+      - tests/fea_benchmark/envelope_panels/test_ccx221_rot5_adjoint.py
+      - tests/fea_benchmark/envelope_panels/verify_ccx221_rot5_adjoint.py
 permissions:
   contents: read
   actions: read
@@ -25,6 +27,7 @@ jobs:
           python -B -m unittest discover -s tests/fea_benchmark/envelope_panels -p 'test_ccx221_rot5_dual.py' -v
           python -B -m unittest discover -s tests/fea_benchmark/envelope_panels -p 'test_ccx221_rot5_full_work.py' -v
           python -B -m unittest discover -s tests/fea_benchmark/envelope_panels -p 'test_ccx221_rot5_kkt_oracle.py' -v
+          python -B -m unittest discover -s tests/fea_benchmark/envelope_panels -p 'test_ccx221_rot5_adjoint.py' -v
       - name: 準備固定來源及既有六組無接觸案例
         env:
           GH_TOKEN: ${{ github.token }}
@@ -107,7 +110,7 @@ jobs:
           root=pathlib.Path(sys.argv[1]);dest=root/'dual.zip'
           with zipfile.ZipFile(dest,'w',compression=zipfile.ZIP_DEFLATED) as z:
               for p in sorted((root/'rot-dual').rglob('*')):
-                  if p.is_file() and p.name in ('panel.dat','panel.sta','kb_rot_dual.tsv','kb_rot_full_work.tsv'):
+                  if p.is_file() and p.name in ('panel.dat','panel.sta','kb_rot_dual.tsv','kb_rot_full_work.tsv','kb_rot_owner.tsv'):
                       z.write(p,p.relative_to(root).as_posix())
           PY
           python -B tests/fea_benchmark/envelope_panels/verify_ccx221_rot5_dual.py \
@@ -115,6 +118,8 @@ jobs:
           cat "$scratch/dual-report.json"
           python -B tests/fea_benchmark/envelope_panels/verify_ccx221_rot5_full_work.py "$scratch/source.zip" "$scratch/owner.zip" "$scratch/dual.zip" > "$scratch/full-work-report.json"
           cat "$scratch/full-work-report.json"
+          python -B tests/fea_benchmark/envelope_panels/verify_ccx221_rot5_adjoint.py "$scratch/source.zip" "$scratch/dual.zip" > "$scratch/adjoint-report.json"
+          cat "$scratch/adjoint-report.json"
           sha256sum "$scratch/dual.zip" "$scratch/dual-report.json"
       - name: 保留唯讀反力候選與原版一致性證據
         if: always()
@@ -127,6 +132,7 @@ jobs:
             ${{ runner.temp }}/rot5-dual/rot-dual/**/kb_rot_dual.tsv
             ${{ runner.temp }}/rot5-dual/rot-dual/**/kb_rot_full_work.tsv
             ${{ runner.temp }}/rot5-dual/full-work-report.json
+            ${{ runner.temp }}/rot5-dual/adjoint-report.json
             ${{ runner.temp }}/rot5-dual/rot-dual/**/kb_rot_owner.tsv
             ${{ runner.temp }}/rot5-dual/dual-report.json
             ${{ runner.temp }}/rot5-dual/dual-build.log

@@ -406,3 +406,9 @@ PR #131 的 test-only 修正 head `da21e005dde4f9098405c7408019a46b15d8d387`，R
 | n16 | −0.3672852155 | −0.3670000000 | −0.0002852155 |
 
 後者用 `h=1e−5 rad`，且 `ELSE` 只列印有限有效位數；觀測差值與 PLATE 的列印量化尺度相容，**但並非**完整總勢能、真正 Lagrange multiplier、外部 SPC dual 或反力矩功共軛的獨立證明。新結果縮小了先前約 1:2 差額的來源至**未完整計入 MPC 串聯傳力的局部帳值**，而非可任意乘二的校正規則。對接觸分支、六分量自由體、@300 mm 植釘承載與真實工程容量均未建立新驗收。原始 `OPEN_U_CONTACT_RF_GLOBAL_Z_IMBALANCE` 門檻保持 FAIL-CLOSED，PR #131 必須 OPEN／UNMERGED，`CONTACT_NOT_ADMITTED`、`MPC_REACTION_RECONSTRUCTION_NOT_ESTABLISHED`、`ENGINEERING_ACCEPTANCE_NOT_ADMITTED` 不變。
+
+## 原始內力與 MPC 逆向運動學虛功對帳（2026-10-19／僅代數交叉驗證）
+
+使用固定來源 ZIP SHA-256 `d9b36c420feca6a5f8cd50dc8cb07dbba6c2ebbbf0224abb4df57fbfd2291a8b` 與成功的 [DOF5／MEANROTBS CI #39236618417](https://github.com/masini1491/building-envelope-engineering-kb/actions/runs/39236618417) trace artifact `12179018108`（SHA-256 `1ca889801caaab50f92bf4d65e9f5a21ae553b2fdd26badc0ceae18b6005225e`），對六組無接觸 n8／n16、θ=−1e−5／0／+1e−5 rad 進行逆向 MPC 運動學切線重建。此法從指定輔助 SPC 角度模態出發，反向代入完整 MPC 約束係數求虛位移，再與**消去前**原始 `fn` 內積；與正向 MPC 消去後 SPC 加權力帳比較，兩條路徑分開計算。所有六組最大約束切線殘差約 `1.11e−16`；最大虛功差約 `2.27e−13 N·mm`（n8 負角），其餘在 `4.44e−16 N·mm` 內。新增解析、串聯與負向控制本地 9/9 PASS；不使用 `fmpc` 作為逆向內力虛功起點。
+
+這是凍結線性 MPC 係數下的**轉置代數恆等式**，並未量測或獨立求得真正的 SPC dual／外部支承力矩；未指定的獨立平移虛位移設為零，且不包含幾何變動下的係數導數、非線性接觸啟閉或完整外部功。原有 `OPEN_U_CONTACT_RF_GLOBAL_Z_IMBALANCE_-44.4374645` 不得放寬。`CONTACT_NOT_ADMITTED`、`MPC_REACTION_RECONSTRUCTION_NOT_ESTABLISHED`、`ENGINEERING_ACCEPTANCE_NOT_ADMITTED` 均維持，PR #131 保持 OPEN／UNMERGED。
