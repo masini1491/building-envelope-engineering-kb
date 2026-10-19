@@ -22,6 +22,8 @@ jobs:
           sudo apt-get update -qq
           sudo apt-get install -y --no-install-recommends build-essential gfortran libspooles-dev libarpack2-dev liblapack-dev
           gfortran --version | head -n 1
+      - name: 先行驗證 SPC ledger parser 負向案例
+        run: python tests/fea_benchmark/envelope_panels/test_check_ccx221_spc_ledger.py
       - name: 取得精確來源與既有同次求解輸入
         env:
           GH_TOKEN: ${{ github.token }}
@@ -146,6 +148,8 @@ jobs:
           grep -q 'KB_SPR' "$scratch/n16/instrumented/kb_contact_ledger.tsv"
           grep -q 'KB_EVENT P' "$scratch/n16/instrumented/kb_force_ledger.tsv"
           grep -q 'KB_EVENT Q' "$scratch/n16/instrumented/kb_force_ledger.tsv"
+          python tests/fea_benchmark/envelope_panels/check_ccx221_spc_ledger.py "$scratch/instrumented/kb_spc_ledger.tsv"
+          python tests/fea_benchmark/envelope_panels/check_ccx221_spc_ledger.py "$scratch/n16/instrumented/kb_spc_ledger.tsv"
           echo 'KB_N16_AB_OUTPUT_EQUIVALENT_PRISTINE_INSTRUMENTED_AND_TRACE_PRESENT'
       - name: 保留隔離診斷證據
         if: always()

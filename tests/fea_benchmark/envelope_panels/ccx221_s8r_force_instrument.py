@@ -119,8 +119,14 @@ static void kb_spc_trace(const char *phase, ITG *nk, ITG mt,
           (int)*istep,(int)*iinc,*time,(int)*nk,(int)*nboun);
   for(k=0;k<*nboun;k++){
     node=nodeboun[k]; d=ndirboun[k];
-    if(node<1 || node>*nk || d<1 || d>=mt){
+    if(node<1 || node>*nk || d<1 || d>6){
       fprintf(fp,"KB_SPC_INVALID %s %d %d %d\n",phase,
+              (int)(k+1),(int)node,(int)d);
+      continue;
+    }
+    /* Shell rotation constraints 4..6 have no directly indexable 3D fn. */
+    if(d>3){
+      fprintf(fp,"KB_SPC_ROT_UNMAPPED %s %d %d %d\n",phase,
               (int)(k+1),(int)node,(int)d);
       continue;
     }
