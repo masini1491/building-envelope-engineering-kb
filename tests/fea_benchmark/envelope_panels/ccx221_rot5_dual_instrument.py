@@ -50,6 +50,54 @@ static void kb_rot_dual_trace(const char *phase, ITG *nk, ITG mt,
   fclose(fp);
 }
 '''
+
+# Full pre-elimination ledger, including all MPC categories; original fn is
+# recorded before resultsforc mutates its working buffer. This is NOT a dual.
+RAW_HELPER = r'''
+static void kb_rot_full_trace(ITG *nk, ITG mt, double *fn,
+  ITG *nactdof, ITG *ipompc, ITG *nodempc, double *coefmpc,
+  char *labmpc, ITG *nmpc, ITG *istep, ITG *iinc, double *time){
+  FILE *fp;
+  ITG n,d,m,idx,t;
+  if(getenv("KB_ROT_FULL_WORK")==NULL || fabs(*time-1.)>1.e-7) return;
+  fp=fopen("kb_rot_full_work.tsv","a");
+  if(!fp) return;
+  fprintf(fp,"KB_WORK_EVENT %d %d %.17g %d %d %d\n",
+     (int)*istep,(int)*iinc,*time,(int)*nk,(int)mt,(int)*nmpc);
+  for(n=0;n<*nk;n++) for(d=1;d<=3;d++){
+    if(fn[mt*n+d]!=0.)
+      fprintf(fp,"KB_WORK_FN %d %d %d %.17g\n",
+         (int)(n+1),(int)d,(int)nactdof[mt*n+d],fn[mt*n+d]);
+  }
+  for(m=0;m<*nmpc;m++){
+    idx=ipompc[m]-1;
+    if(idx<0){fprintf(fp,"KB_WORK_INVALID %d\n",(int)(m+1));continue;}
+    fprintf(fp,"KB_WORK_MPC %d %s\n",(int)(m+1),
+       strncmp(&labmpc[20*m],"MEANROT",7)==0?"MEANROT":
+       strncmp(&labmpc[20*m],"FLUID",5)==0?"FLUID":
+       strncmp(&labmpc[20*m],"KNOT",4)==0?"KNOT":"OTHER");
+    for(t=1;idx>=0 && t<=10000;t++){
+      fprintf(fp,"KB_WORK_TERM %d %d %d %d %.17g\n",
+        (int)(m+1),(int)t,(int)nodempc[3*idx],
+        (int)nodempc[3*idx+1],coefmpc[idx]);
+      idx=nodempc[3*idx+2]-1;
+    }
+    if(idx>=0)fprintf(fp,"KB_WORK_TERM_LIMIT %d\n",(int)(m+1));
+  }
+  fprintf(fp,"KB_WORK_END\n");
+  fclose(fp);
+}
+'''
+RAW_PRE = """  if((*iout>0) && (calcul_fn==1))
+    kb_rot_full_trace(nk,mt,fn,nactdof,
+       ((*mortar>1 && *mortartrafoflag==1)?ipompc2:ipompc),
+       ((*mortar>1 && *mortartrafoflag==1)?nodempc2:nodempc),
+       ((*mortar>1 && *mortartrafoflag==1)?coefmpc2:coefmpc),
+       ((*mortar>1 && *mortartrafoflag==1)?labmpc2:labmpc),
+       ((*mortar>1 && *mortartrafoflag==1)?nmpc2:nmpc),
+       istep,iinc,time);
+"""
+
 PRE = '''  if((*iout>0) && (calcul_fn==1))
     kb_rot_dual_trace("P",nk,mt,nboun,nodeboun,ndirboun,xboun,
         fn,nactdof,((*mortar>1 && *mortartrafoflag==1)?ipompc2:ipompc),
@@ -73,8 +121,8 @@ def patch(root: Path) -> None:
     original = c.decode('latin-1')
     if original.count('#include "mortar.h"')!=1 or original.count('  /* calculating the matrix system internal force vector */')!=1 or original.count('  /* calculating the total energy if')!=1:
         raise ValueError('CCX221_DUAL_C_ANCHOR_MISMATCH')
-    c_new = original.replace('#include "mortar.h"','#include "mortar.h"\n#include <string.h>\n'+C_HELPER,1)
-    c_new = c_new.replace('  /* calculating the matrix system internal force vector */',PRE+'  /* calculating the matrix system internal force vector */',1)
+    c_new = original.replace('#include "mortar.h"','#include "mortar.h"\n#include <string.h>\n'+C_HELPER+RAW_HELPER,1)
+    c_new = c_new.replace('  /* calculating the matrix system internal force vector */',RAW_PRE+PRE+'  /* calculating the matrix system internal force vector */',1)
     c_new = c_new.replace('  /* calculating the total energy if',POST+'  /* calculating the total energy if',1)
     gen.write_bytes(g_new.encode('latin-1'))
     cfile.write_bytes(c_new.encode('latin-1'))

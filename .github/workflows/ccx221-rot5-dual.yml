@@ -6,6 +6,8 @@ on:
       - tests/fea_benchmark/envelope_panels/ccx221_rot5_dual_instrument.py
       - tests/fea_benchmark/envelope_panels/verify_ccx221_rot5_dual.py
       - tests/fea_benchmark/envelope_panels/test_ccx221_rot5_dual.py
+      - tests/fea_benchmark/envelope_panels/test_ccx221_rot5_full_work.py
+      - tests/fea_benchmark/envelope_panels/verify_ccx221_rot5_full_work.py
 permissions:
   contents: read
   actions: read
@@ -17,7 +19,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: 本地可重現的解析基準與負向控制
-        run: python -B -m unittest discover -s tests/fea_benchmark/envelope_panels -p 'test_ccx221_rot5_dual.py' -v
+        run: |
+          python -B -m unittest discover -s tests/fea_benchmark/envelope_panels -p 'test_ccx221_rot5_dual.py' -v
+          python -B -m unittest discover -s tests/fea_benchmark/envelope_panels -p 'test_ccx221_rot5_full_work.py' -v
       - name: 準備固定來源及既有六組無接觸案例
         env:
           GH_TOKEN: ${{ github.token }}
@@ -75,7 +79,7 @@ jobs:
         run: |
           set -euo pipefail
           scratch="$RUNNER_TEMP/rot5-dual"
-          export OMP_NUM_THREADS=1 CCX_NPROC_EQUATION=1 CCX_NPROC_RESULTS=1 CCX_NPROC_STIFFNESS=1 KB_ROT_DUAL=1
+          export OMP_NUM_THREADS=1 CCX_NPROC_EQUATION=1 CCX_NPROC_RESULTS=1 CCX_NPROC_STIFFNESS=1 KB_ROT_DUAL=1 KB_ROT_FULL_WORK=1
           for mesh in 8 16; do
             for trial in minus1 zero plus1; do
               key="n$mesh/no_contact/$trial"
@@ -84,6 +88,7 @@ jobs:
               cp "$scratch/ref/$key/panel.inp" "$dir/panel.inp"
               (cd "$dir"; timeout 100s "$scratch/rot5-dual-ccx" -i panel > solver.log 2>&1)
               test -s "$dir/kb_rot_dual.tsv"
+              test -s "$dir/kb_rot_full_work.tsv"
               test -s "$dir/kb_rot_owner.tsv"
               cmp "$dir/panel.dat" "$scratch/ref/$key/panel.dat"
               cmp "$dir/panel.sta" "$scratch/ref/$key/panel.sta"
@@ -99,12 +104,14 @@ jobs:
           root=pathlib.Path(sys.argv[1]);dest=root/'dual.zip'
           with zipfile.ZipFile(dest,'w',compression=zipfile.ZIP_DEFLATED) as z:
               for p in sorted((root/'rot-dual').rglob('*')):
-                  if p.is_file() and p.name in ('panel.dat','panel.sta','kb_rot_dual.tsv'):
+                  if p.is_file() and p.name in ('panel.dat','panel.sta','kb_rot_dual.tsv','kb_rot_full_work.tsv'):
                       z.write(p,p.relative_to(root).as_posix())
           PY
           python -B tests/fea_benchmark/envelope_panels/verify_ccx221_rot5_dual.py \
             "$scratch/source.zip" "$scratch/owner.zip" "$scratch/dual.zip" > "$scratch/dual-report.json"
           cat "$scratch/dual-report.json"
+          python -B tests/fea_benchmark/envelope_panels/verify_ccx221_rot5_full_work.py "$scratch/source.zip" "$scratch/owner.zip" "$scratch/dual.zip" > "$scratch/full-work-report.json"
+          cat "$scratch/full-work-report.json"
           sha256sum "$scratch/dual.zip" "$scratch/dual-report.json"
       - name: 保留唯讀反力候選與原版一致性證據
         if: always()
@@ -115,6 +122,8 @@ jobs:
           if-no-files-found: warn
           path: |
             ${{ runner.temp }}/rot5-dual/rot-dual/**/kb_rot_dual.tsv
+            ${{ runner.temp }}/rot5-dual/rot-dual/**/kb_rot_full_work.tsv
+            ${{ runner.temp }}/rot5-dual/full-work-report.json
             ${{ runner.temp }}/rot5-dual/rot-dual/**/kb_rot_owner.tsv
             ${{ runner.temp }}/rot5-dual/dual-report.json
             ${{ runner.temp }}/rot5-dual/dual-build.log
