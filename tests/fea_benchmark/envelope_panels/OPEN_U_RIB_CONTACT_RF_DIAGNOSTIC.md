@@ -420,3 +420,15 @@ PR #131 的 test-only 修正 head `da21e005dde4f9098405c7408019a46b15d8d387`，R
 在這六案中，不得虛構非零的顯式節點力或面載重向量，也不得將 `fn` 直接命名為完整 `f_int−f_ext`。先前完整 MPC 消去與逆向運動學虛功兩路徑一致，僅證明**相同內力資料與凍結約束係數**的代數轉置關係；不是外部 SPC reaction 或非線性 KKT residual 的獨立觀測。下階段必須先在求解器收斂後的實際 force-balance assembly 位置辨識內力／外力／約束分量、時間步與 active DOF，再增加最小唯讀插樁；如無法確認來源語意，保持 `INDEPENDENT_EXTERNAL_SPC_DUAL_NOT_ESTABLISHED`，不得以能量中央差分代替。
 
 最新 [PR #131 exact-head `a3b5a855` 的 MPC CI #39246746684](https://github.com/masini1491/building-envelope-engineering-kb/actions/runs/39246746684) 已 SUCCESS，artifact `12183851724`；其 `adjoint-report.json` 六案 `constraint_physical_dual=NOT_ESTABLISHED`，`independent_external_spc_dual=NOT_ESTABLISHED`。原接觸 RF3 失衡及 `CONTACT_NOT_ADMITTED`、`MPC_REACTION_RECONSTRUCTION_NOT_ESTABLISHED`、`ENGINEERING_ACCEPTANCE_NOT_ADMITTED` 不變；PR 保持 OPEN／UNMERGED。
+
+## CalculiX 2.21 原始碼平衡空間界線（2026-10-19／來源核對，非 SPC dual 驗收）
+
+本次依使用者提供並通過 SHA-256 固定值驗證的 `calculix-ccx_2.21.orig.tar.bz2`（`51d229aee320cf685216d360f7c04f9a57af0148fbe840483a964c86c315da82`）與 Debian patch archive（`6c2a934b66491c9e916cbf6328167d417f7e985b380e200facf92c3e953d255f`），核對以下原始碼路徑：
+
+- `ccx_2.21/src/results.c`：`resultsforc(...,f,fn,nactdof,...,fmpc,...)` 將原始節點內力 `fn` 投影／消去到 active 方程內力 `f`，並記錄 MPC 力候選 `fmpc`；依 mortar 狀態可使用第二套 `ipompc2/nodempc2`。因此 `f` 與 `fn` 不可直接當成同一個 DOF 空間的向量相減。
+- `ccx_2.21/src/nonlingeo.c`：在機械方程殘差組裝位置有 `for(k=0;k<neq[0];++k){b[k]=fext[k]-f[k];}`，且受 `*mortar!=-1` 分支控制。這是 active equation space 的求解殘差，不是直接可讀的原始殼節點六分量支承反力；該位置也不是已確認的最終收斂後觀測點。
+- `nonlingeo.c` 在初始化路徑呼叫 `results(...,f,fn,nactdof,...,fmpc,...)` 後即釋放 `fn`，故單在上述殘差迴圈插樁不能保證同時取得可核對的原始節點內力 `fn`。需要明確管理資料生命週期、步／增量與收斂狀態，且不可改變原求解結果。
+
+**最小下一步**：先建立一個明確不改變計算的收斂時點觀測契約，分別保存（1）原始節點 DOF 的 `fn`，（2）active equation DOF 的 `f/fext/b`，（3）完整 SPC/MPC 映射與非齊次約束項；以原始自由度外力是否可獨立重建作為 fail-closed gate。若只能取得 active `fext`，不得以 `fn-fext` 直接推導支承六分量或 DOF5 力矩。既有六組 `*BOUNDARY` 位移激勵沒有顯式 `*CLOAD/*DLOAD`，但不等於外部反力為零。此節為 source-path audit，**沒有**宣稱已完成新插樁、獨立 SPC dual 或力矩驗收。
+
+`CONTACT_NOT_ADMITTED`、`MPC_REACTION_RECONSTRUCTION_NOT_ESTABLISHED`、`ENGINEERING_ACCEPTANCE_NOT_ADMITTED` 不變；PR #131 維持 OPEN／UNMERGED。
