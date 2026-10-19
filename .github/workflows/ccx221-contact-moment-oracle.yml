@@ -1,0 +1,48 @@
+name: 殼接觸力矩幾何與解析力偶基準
+on:
+  pull_request:
+    paths:
+      - .github/workflows/ccx221-contact-moment-oracle.yml
+      - tests/fea_benchmark/envelope_panels/verify_ccx221_contact_moment.py
+      - tests/fea_benchmark/envelope_panels/test_verify_ccx221_contact_moment.py
+permissions:
+  contents: read
+  actions: read
+jobs:
+  moment_oracle:
+    if: github.event.pull_request.number == 131
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: 執行解析與負向測試
+        run: python -B tests/fea_benchmark/envelope_panels/test_verify_ccx221_contact_moment.py
+      - name: 取得固定原版求解輸出
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/contact-moment"
+          gh run download 39190965338 --repo masini1491/building-envelope-engineering-kb --name ccx221-n8-n16-support-z-fd-research --dir "$RUNNER_TEMP/contact-moment"
+          test -s "$RUNNER_TEMP/contact-moment/support-energy/n8/base/panel.dat"
+          test -s "$RUNNER_TEMP/contact-moment/support-energy/n16/base/panel.dat"
+      - name: 固定 SHA 與幾何重心力矩驗證
+        run: |
+          set -euo pipefail
+          python -B tests/fea_benchmark/envelope_panels/verify_ccx221_contact_moment.py "$RUNNER_TEMP/contact-moment/support-energy/n8/base/panel.dat" "$RUNNER_TEMP/contact-moment/support-energy/n16/base/panel.dat" > "$RUNNER_TEMP/contact-moment/moment.json"
+          python - "$RUNNER_TEMP/contact-moment/moment.json" <<'PY'
+          import json,sys
+          r=json.load(open(sys.argv[1]))
+          assert r["status"]=="GEOMETRIC_MOMENT_AND_ANALYTIC_COUPLE_PASS_ONLY"
+          assert r["engineering_acceptance"]=="NOT_ADMITTED"
+          assert r["six_component_support_equilibrium"]=="NOT_ADMITTED"
+          assert set(r["observed_ccx_contact"])=={"n8","n16"}
+          PY
+      - name: 保留幾何力矩報告
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ccx221-contact-geometric-moment-only
+          retention-days: 14
+          if-no-files-found: warn
+          path: ${{ runner.temp }}/contact-moment/moment.json

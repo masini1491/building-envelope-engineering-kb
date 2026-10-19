@@ -336,3 +336,11 @@ PR #131 的 test-only 修正 head `da21e005dde4f9098405c7408019a46b15d8d387`，R
 固定 artifact 候選總能量（`ELSE(PLATE)+ELSE(RIB)+CELS`，尚未正式證明無雙重計數）在較少改變接觸分支的一側給出初步斜率：n=8 板邊 −向 −6.3798 N、肋端 ＋向 −14.1798 N；n=16 板邊 −向 −5.7660 N、肋端 ＋向 −14.1691 N（h=0.0001 mm）。這些只是**有限步長的單側研究觀測**，而非真正接觸一致切線、非認證支承反力；h=0.0002 mm 的差分仍具步長差異，不得視為收斂證明。
 
 新增 `check_ccx221_support_fd.py` 為只讀 artifact verifier，要求 18 案例、輸入 SHA、最終 STA、原始位移/力節點覆蓋、能量與接觸列印有限性、自由體合計、舊 raw RF3 門 fail-closed，並輸出不同微擾方向的接觸分支不對稱摘要。這個 verifier 不證明接觸法則、完整旋轉功共軛或六分量平衡；獨立物理 admission 仍須額外證據。`CONTACT_NOT_ADMITTED`／`MPC_REACTION_RECONSTRUCTION_NOT_ESTABLISHED`／`ENGINEERING_ACCEPTANCE_NOT_ADMITTED` 維持，PR #131 保持 OPEN／UNMERGED。
+
+## 力矩解析基準與接觸合力座標驗證（2026-10-19，研究限定）
+
+獨立解析兩對稱彈簧力偶：x=±100 mm，k=120 N/mm，θ=2×10⁻⁵ rad，uz=−xθ。合力 0 N，My=48 N·mm；解析能量導數以兩種步長均驗得 48 N·mm，原點平移後力偶不變。本地 11 項解析／負向測試 PASS。
+
+以原版 CalculiX 2.21 [run 39190965338](https://github.com/masini1491/building-envelope-engineering-kb/actions/runs/39190965338) 的 SHA-256 固定 n8/n16 .dat，檢查 M_cg=M_origin−r_cg×F。n8 三向差分 1.44×10⁻⁶／1.71×10⁻⁴／5.12×10⁻¹⁰ N·mm，n16 為 7.74×10⁻⁶／2.12×10⁻³／6.10×10⁻⁹ N·mm，皆在來源輸出捨入誤差上界內；這只是接觸合力矩幾何一致性，不是獨立殼旋轉支承反力。
+
+新增唯讀工具 verify_ccx221_contact_moment.py、test_verify_ccx221_contact_moment.py 與專屬 workflow。原始殼 SPC/MPC 旋轉反力矩、六分量平衡與工程 admission 均仍 NOT_ADMITTED；raw RF3 FAIL-CLOSED；PR #131 OPEN／UNMERGED。
