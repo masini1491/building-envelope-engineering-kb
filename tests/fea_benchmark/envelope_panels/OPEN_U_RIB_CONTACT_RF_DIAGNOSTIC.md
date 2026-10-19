@@ -374,3 +374,20 @@ PR #131 的 test-only 修正 head `da21e005dde4f9098405c7408019a46b15d8d387`，R
 固定 CalculiX 2.21 原始碼 `gen3dboun.f` 顯示：一般靜態 shell 的 DOF4–6 經 tangent-plane projection 與 `MEANROTBS` MPC 轉為輔助節點的第 1 平移方向 SPC；旋轉約束不能以原始殼 `RF` 列印或 expanded-node 任意三維節點力直接當反力矩。研究-only、唯讀插樁 `ccx221_rot5_owner_instrument.py` 只在 `ne2boun(1/2,node)` 建立時列印 owner、原始旋轉軸、輔助 SPC 節點／方向及約束值，未修改 MPC 係數或求解程式的數值向量。
 
 [原版／插樁版 run 39203418753](https://github.com/masini1491/building-envelope-engineering-kb/actions/runs/39203418753) **SUCCESS**，六組 n8／n16 × 無接觸負角／零角／正角的 `.dat/.sta` 對應逐位元組一致。原始輸入角度節點 n8=64（正負角非零各 62），n16=96（正負角非零各 94）；插樁版每案記錄 `KB_ROT_OWNER`：n8=156、n16=220 筆，兩個 auxiliary SPC owner／原始節點（含額外非角度驅動的支承）。就已指定 DOF5 的各原始節點，`axis=2`、第二旋轉約束 owner 的輔助 SPC 值與原始輸入一致；零角全部為 0。專屬 artifact ID `12164552181`、ZIP SHA-256 `01d03784c7fe0521087602262b36446127bad858ad90765170bc40c44c9d0361`。下一階段需對真正 `MEANROTBS` 約束的雙對偶力及 `gen3dboun` 投影係數建立 `Q_theta = sum(force_i * ∂u_i/∂theta)` 的獨立虛功測試；本輪無法取得獨立數值力矩，故 `MPC_REACTION_RECONSTRUCTION_NOT_ESTABLISHED`／`ENGINEERING_ACCEPTANCE_NOT_ADMITTED` 不變。
+
+## 旋轉虛功候選與能量曲率交叉檢查（2026-10-19／不承認工程反力矩）
+
+原版與唯讀插樁 CalculiX 2.21 在 [PR #131 exact-head e65f0017／run 39213417119](https://github.com/masini1491/building-envelope-engineering-kb/actions/runs/39213417119) 完成無接觸 n=8／16，各 θ=−1e−5／0／+1e−5 rad 共六組真實求解；每組 `.dat/.sta` 與同一 pinned 原版案例**逐位元組一致**。該 workflow 的解析／負向測試、固定來源取得、原版及插樁版建置、六組求解、輔助 SPC／`MEANROTBS` MPC 係數與 `fmpc` trace 重播均 **SUCCESS**；不代表任何物理反力矩已成立。保存 artifact ID `12168916202`、GitHub ZIP SHA-256 `dd4e72c67cf3e05a6a1e54975d564cd123a8034356917aa68c5919100f345a79`、內含 `dual-report.json` SHA-256 `d754ed3c807c658ffea7ab73f4ffeeb05dcf9fdcc43d85a445561b3168a3baf3`。上游 20 組求解 ZIP SHA-256 `d9b36c420feca6a5f8cd50dc8cb07dbba6c2ebbbf0224abb4df57fbfd2291a8b`；owner 映射 ZIP SHA-256 `01d03784c7fe0521087602262b36446127bad858ad90765170bc40c44c9d0361`。
+
+實測 `MEANROTBS` 含 4／6 個非零 MPC 項，不能假設轉角項固定在倒數第二項；已按**輔助節點 ID＋DOF**與固定的角度係數 `−1` 找到所指定原始殼 DOF5 的 owner，並保留 SPC owner 缺漏、係數錯誤、重複與非有限資料的負向拒絕。本輪原版 2.21 `resultsforc.c` 的 `fmpc` 由 dependent 項原始 `fn` 除以其 MPC 係數得到，`MEANROT` 的 `fn` 回填也會排除特定非結構節點；這是**內部 MPC 力帳**，並非經外部虛功證明的支承反力矩。
+
+在同一組 artifact 中，令 `E(θ)` 為無接觸 PLATE＋RIB 列印 `ELSE` 的候選能量，`q(θ)` 為依 `−Σ fmpc·c_angle·(∂θ_i/∂θ)` 得到的候選廣義力，取 `h=1e−5 rad`：
+
+| 網格 | `q(0)`（N·mm） | `[E(+h)−E(−h)]/(2h)`（N·mm） | `q(0)−dE/dθ`（N·mm） | `q'`／`E''`（無因次） |
+| --- | ---: | ---: | ---: | ---: |
+| n=8 | +1.92119125 | +3.85700000 | −1.93580875 | 0.4999997353 |
+| n=16 | −0.15657761 | −0.36700000 | +0.21042239 | 0.4999999690 |
+
+上表 `q'=[q(+h)−q(−h)]/(2h)`，`E''=[E(+h)−2E(0)+E(−h)]/h²`；用固定 ZIP 的原始列印值獨立重算。n=8 的 `E''≈184,089,000 N·mm/rad²`、`q'≈92,044,451 N·mm/rad`；n=16 分別 `116,147,600`、`58,073,796`。比例約 0.5 是**同源 solver trace 與捨入能量輸出之觀測關係**，不是已推導的理論因子；`ELSE` 作為完整總勢能的適用性與殼轉動 constraint dual 的物理定義均未被獨立證明。不能乘以 2 強迫通過、不能用中央差分代表跨接觸啟閉分支的唯一導數，也不能拿結果宣稱原始六分量支承平衡。
+
+最小後續研究須先辨識完整 SPC/MPC constraint dual 與原始殼角度的**外部功共軛**（含平移力、旋轉軸投影、MPC 變分與非齊次項），由獨立可解的已知力偶檢驗力矩方向／單位後，才考慮 n=8／16 的真實殼模型。抽象兩彈簧 48 N·mm 解析式通過，只驗符號與算式，**不是**真實 S8R `fmpc` 的獨立 oracle。原始 `OPEN_U_CONTACT_RF_GLOBAL_Z_IMBALANCE_-44.4374645` 不變；PR #131 維持 OPEN／UNMERGED，`CONTACT_NOT_ADMITTED`、`MPC_REACTION_RECONSTRUCTION_NOT_ESTABLISHED`、`ENGINEERING_ACCEPTANCE_NOT_ADMITTED`。
