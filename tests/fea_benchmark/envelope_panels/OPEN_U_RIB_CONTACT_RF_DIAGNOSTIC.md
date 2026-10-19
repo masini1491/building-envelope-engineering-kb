@@ -350,3 +350,9 @@ PR #131 的 test-only 修正 head `da21e005dde4f9098405c7408019a46b15d8d387`，R
 新增 pinned S8R 原始殼節點 DOF5 小角度實驗；在板邊節點施加 θ_i=θ·(x_i−600)/600，θ=0、±1×10⁻⁵、±2×10⁻⁵ rad，接觸與無接觸兩分支、n=8／16 總計 20 案例。保留中心 Z=0.02 mm、原有板邊／肋端支承、材料與模型；只增加指定殼轉角與能量列印，無接觸分支移除 CONTACT PAIR/PRINT。此測試是**反對稱角度模態**，不是剛體轉動；其能量導數只對所定模態功共軛，不能代稱實體肋端反力矩或六分量反力。
 
 生成器 `generate_ccx221_rot5.py`、結果驗證器 `verify_ccx221_rot5.py`、負向測試 `test_ccx221_rot5.py` 及隔離 workflow `ccx221-rot5-probe.yml` 均屬研究觀測。本地原始輸入 SHA、20 組生成與 9 項離線測試 PASS；真實 CalculiX 求解／完整接觸分支及結果尚待 exact-head CI 證據，禁止提前標示 PASS。能量 ELSE+CELS 是否完全涵蓋接觸貢獻，亦尚未 admission。所有原 S8R 物理門 FAIL-CLOSED，PR #131 OPEN／UNMERGED。
+
+## 轉角模態求解與接觸分支重播（2026-10-19／研究觀測，不升格反力矩）
+
+[原版 CCX 2.21 run 39194487445](https://github.com/masini1491/building-envelope-engineering-kb/actions/runs/39194487445) 20/20 求解及輸出驗證 SUCCESS。Artifact ID `12161706369`，ZIP SHA-256 `d9b36c420feca6a5f8cd50dc8cb07dbba6c2ebbbf0224abb4df57fbfd2291a8b`；manifest SHA-256 `d4af3bb7edbd06b5acba0343f07a8932281cd3221d35036daea31bdf6025fd9b`。n8 無接觸兩種中央候選能量斜率 3.8570／3.8575 N·mm；n16 無接觸 −0.3670／−0.3675 N·mm，網格間差異顯著。n8 接觸 3.6860／3.10851，n16 接觸 7.79852／22.60886 N·mm，後者無步長穩定性。n16 接觸 F3 隨 θ=−2e−5／−1e−5／0／+1e−5／+2e−5 rad，分別 14.10560／14.10568／14.10576／21.93426／31.65329 N。接觸力對轉角正反向不對稱，但尚無獨立 active-set 覆蓋證據，**不得聲稱已證實接觸切換**。
+
+新增 fixed-manifest、兩份最終接觸合力列印相等、20 組精確 deck SHA／solver 完成／分支限定的唯讀重播器 `verify_ccx221_rot5_branch.py` 與 6 項負向測試，以及**僅下載既有 artifact 的快速 workflow** `ccx221-rot5-branch-replay.yml`。本地 6/6 PASS、固定 ZIP 重播 PASS。候選 ELSE+CELS 是否可直接當總勢能仍未證明；原始殼旋轉反力矩、六分量獨立平衡依然 NOT_ADMITTED。保留原 raw RF3 FAIL-CLOSED，PR #131 OPEN／UNMERGED。

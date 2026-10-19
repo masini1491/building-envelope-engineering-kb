@@ -1,0 +1,47 @@
+name: 殼 DOF5 接觸分支固定證據重播
+on:
+  pull_request:
+    paths:
+      - .github/workflows/ccx221-rot5-branch-replay.yml
+      - tests/fea_benchmark/envelope_panels/verify_ccx221_rot5.py
+      - tests/fea_benchmark/envelope_panels/verify_ccx221_rot5_branch.py
+      - tests/fea_benchmark/envelope_panels/test_ccx221_rot5_branch.py
+permissions:
+  contents: read
+  actions: read
+jobs:
+  branch_replay:
+    if: github.event.pull_request.number == 131
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - name: 執行離線負向測試
+        run: python -B tests/fea_benchmark/envelope_panels/test_ccx221_rot5_branch.py
+      - name: 下載固定二十案求解證據
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/rot5"
+          gh run download 39194487445 --repo masini1491/building-envelope-engineering-kb --name ccx221-shell-rot5-research-n8n16 --dir "$RUNNER_TEMP/rot5"
+      - name: 驗證旋轉模態與接觸力分支
+        run: |
+          set -euo pipefail
+          python -B tests/fea_benchmark/envelope_panels/verify_ccx221_rot5_branch.py "$RUNNER_TEMP/rot5" > "$RUNNER_TEMP/rot5/branch-replay.json"
+          python - "$RUNNER_TEMP/rot5/branch-replay.json" <<'PY'
+          import json,sys
+          obj=json.load(open(sys.argv[1]))
+          assert obj["case_count"]==20
+          assert obj["rotational_reaction_admission"]=="NOT_ESTABLISHED"
+          assert obj["engineering_acceptance"]=="NOT_ADMITTED"
+          assert obj["original_rf3_gate"]=="FAIL_CLOSED"
+          PY
+      - name: 保留固定證據重播報告
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ccx221-rot5-branch-replay-only
+          retention-days: 14
+          if-no-files-found: warn
+          path: ${{ runner.temp }}/rot5/branch-replay.json
