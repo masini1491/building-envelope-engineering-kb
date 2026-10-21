@@ -3,6 +3,13 @@ on:
   push:
     branches:
       - research/c3d20r-u-contact-feasibility
+  pull_request:
+    branches:
+      - research/u-rib-base-only-contact
+    paths:
+      - .github/workflows/c3d20r-u-contact-feasibility.yml
+      - tests/fea_benchmark/envelope_panels/quadratic_contact_trial.py
+      - tests/fea_benchmark/envelope_panels/test_quadratic_contact_trial.py
   workflow_dispatch:
 permissions:
   contents: read
@@ -62,6 +69,55 @@ jobs:
           PY
             done
           done
+      - name: Validate raw support force and contact observables (synthetic only)
+        run: |
+          set -euo pipefail
+          python -B - "$RUNNER_TEMP/c3d20r" > "$RUNNER_TEMP/c3d20r/raw-rf3-report.json" <<'PY'
+          import json, math, re, sys
+          from pathlib import Path
+          sys.path.insert(0,'tests/fea_benchmark/envelope_panels')
+          from check_u_rib_contact_observations import rf,contact_print
+          root=Path(sys.argv[1])
+          cases=[]
+          for n in (8,16):
+              for scenario in ('toward','unlinked','clearance'):
+                  p=root/f'n{n}_{scenario}'
+                  inp=(p/'panel.inp').read_text()
+                  dat=(p/'panel.dat').read_text(errors='replace')
+                  groups={};name=None
+                  for line in inp.splitlines():
+                      v=line.strip()
+                      if v.startswith('*'):
+                          m=re.fullmatch(r'\\*NSET,NSET=(PLATE_EDGE_RF|RIB_END_RF|CENTER_RF)',v,re.I)
+                          name=m.group(1).upper() if m else None
+                          if name:groups[name]=[]
+                          continue
+                      if name and v:groups[name].extend(int(z) for z in v.split(',') if z.strip())
+                  assert set(groups)=={'PLATE_EDGE_RF','RIB_END_RF','CENTER_RF'}
+                  assert all(groups.values())
+                  assert len(set(sum(groups.values(),[])))==sum(map(len,groups.values()))
+                  r={key:rf(dat,key,expected_nodes=value)['sum_rf3_n'] for key,value in groups.items()}
+                  residual=math.fsum(r.values())
+                  tol=max(0.002,0.025*math.fsum(abs(v) for v in r.values()))
+                  if abs(residual)>tol:raise ValueError(f'C3D20R_GLOBAL_RF3_IMBALANCE_{n}_{scenario}_{residual:.9g}')
+                  if scenario=='unlinked':
+                      if 'statistics for slave set' in dat:raise ValueError('C3D20R_UNLINKED_FALSE_CONTACT')
+                      cp=None
+                  else:
+                      cp=contact_print(dat)
+                      if scenario=='clearance' and (cp['contact_statistics_state']!='INACTIVE_ZERO_AREA_UNDEFINED_NORMAL_AND_SHEAR' or cp['contact_area_mm2']!=0):
+                          raise ValueError('C3D20R_CLEARANCE_CONTACT_ACTIVE')
+                      if scenario=='toward' and (cp['contact_area_mm2']<=0 or cp['slave_total_force_n'][2]<=0):
+                          raise ValueError('C3D20R_TOWARD_NO_CONTACT')
+                  if scenario in ('unlinked','clearance') and abs(r['RIB_END_RF'])>0.002:
+                      raise ValueError('C3D20R_UNLINKED_RIB_TRANSFER')
+                  cases.append({'mesh':n,'scenario':scenario,'support_rf3_n':r,
+                                'raw_rf3_total_n':residual,'bounded_tolerance_n':tol,
+                                'contact':cp,'engineering_acceptance':'NOT_ADMITTED'})
+          print(json.dumps({'scope':'SYNTHETIC_C3D20R_U_CONTACT_TRIAL_NOT_DESIGN',
+                            'cases':cases,'independent_bending_oracle':'NOT_ESTABLISHED',
+                            'engineering_acceptance':'NOT_ADMITTED'},indent=2,allow_nan=False))
+          PY
       - name: Preserve input/output for independent force reconciliation
         if: always()
         uses: actions/upload-artifact@v4
@@ -76,3 +132,4 @@ jobs:
             ${{ runner.temp }}/c3d20r/n*/panel.frd
             ${{ runner.temp }}/c3d20r/n*/solver.log
             ${{ runner.temp }}/c3d20r/ccx-build.log
+            ${{ runner.temp }}/c3d20r/raw-rf3-report.json
