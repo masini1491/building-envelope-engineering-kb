@@ -3,7 +3,7 @@ from __future__ import annotations
 import sys
 from pathlib import Path
 
-MESHES = (8, 16)
+MESHES = (8, 16, 24)
 CASES = ("toward", "away", "unlinked")
 CLEARANCE_CASE = "clearance"
 CLEARANCE_MM = 0.1  # synthetic initial geometry offset, NOT a field tolerance

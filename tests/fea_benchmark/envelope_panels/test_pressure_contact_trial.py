@@ -7,7 +7,7 @@ from quadratic_contact_trial import deck as base_deck
 class PressureTrial(unittest.TestCase):
     def test_6_decks_and_external_load_contract(self):
         self.assertAlmostEqual(APPLIED_TOTAL_Z_N, 36.0)
-        for n in (8, 16):
+        for n in (8, 16, 24):
             for kind in ('toward', 'unlinked', 'clearance'):
                 with self.subTest(n=n, kind=kind):
                     inp = deck(n, kind)
@@ -21,7 +21,7 @@ class PressureTrial(unittest.TestCase):
                     self.assertEqual(inp.count('*NSET'), source.count('*NSET'))
                     self.assertEqual(inp.count('*STEP'), 1)
     def test_invalid_scope(self):
-        for n,kind in ((24,'toward'),(4,'toward'),(True,'toward'),(8,'away'),(8,'unknown')):
+        for n,kind in ((32,'toward'),(4,'toward'),(True,'toward'),(8,'away'),(8,'unknown')):
             with self.assertRaisesRegex(ValueError,'C3D20R_PRESSURE_SCOPE'):
                 deck(n,kind)
     def test_preserve_boundary_and_material(self):

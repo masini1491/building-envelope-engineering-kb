@@ -16,16 +16,16 @@ def nominal_pressure_equivalents(n):
     +p*A/3 at each midside. Summing over all four fixed perimeter edges
     produces p*A*(2*n+1)/3, while the free center corner is -p*A/3.
     """
-    if type(n) is not int or n not in (8,16):fail('PRESSURE_SCOPE')
+    if type(n) is not int or n not in (8,16,24):fail('PRESSURE_SCOPE')
     cell_force=APPLIED_TOTAL_Z_N/(n*n)
     return {'edge_pressure_n':cell_force*(2*n+1)/3,
             'center_pressure_n':-cell_force/3}
 
 
-def verify(root):
+def verify(root, include_n24=False):
     report=[]
-    for n in (8,16):
-        for case in ('toward','unlinked','clearance'):
+    for n in ((8,16,24) if include_n24 else (8,16)):
+        for case in (('toward','unlinked') if n==24 else ('toward','unlinked','clearance')):
             folder=Path(root)/f'p{n}_{case}'
             paths={e:folder/f'panel.{e}' for e in ('inp','dat','sta','frd')}
             if any(not f.is_file() or f.is_symlink() for f in paths.values()):fail('MISSING_FILE')
@@ -79,5 +79,6 @@ def verify(root):
             'engineering_acceptance':'NOT_ADMITTED'}
 
 if __name__=='__main__':
-    if len(sys.argv)!=2:raise SystemExit('usage: ROOT')
-    print(json.dumps(verify(sys.argv[1]),sort_keys=True,indent=2,allow_nan=False))
+    if len(sys.argv) not in (2,3) or (len(sys.argv)==3 and sys.argv[2]!='--include-n24'):
+        raise SystemExit('usage: ROOT [--include-n24]')
+    print(json.dumps(verify(sys.argv[1],include_n24=len(sys.argv)==3),sort_keys=True,indent=2,allow_nan=False))

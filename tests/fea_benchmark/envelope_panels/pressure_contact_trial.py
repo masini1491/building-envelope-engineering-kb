@@ -9,7 +9,7 @@ APPLIED_TOTAL_Z_N = PRESSURE_N_MM2 * PLATE_AREA_MM2  # P1 bottom face -> inward 
 
 
 def deck(n, case):
-    if type(n) is not int or n not in (8, 16) or case not in ('toward', 'unlinked', 'clearance'):
+    if type(n) is not int or n not in (8, 16, 24) or case not in ('toward', 'unlinked', 'clearance'):
         raise ValueError('C3D20R_PRESSURE_SCOPE')
     original = original_deck(n, case)
     imposed = '-0.02000000' if case == 'clearance' else '0.02000000'

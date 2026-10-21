@@ -1,0 +1,85 @@
+name: C3D20R n24 pressure mesh check (NOT DESIGN)
+on:
+  pull_request:
+    paths:
+      - .github/workflows/c3d20r-pressure-n24.yml
+      - tests/fea_benchmark/envelope_panels/probe_c3d8_u_contact.py
+      - tests/fea_benchmark/envelope_panels/pressure_contact_trial.py
+      - tests/fea_benchmark/envelope_panels/verify_pressure_contact_trial.py
+permissions:
+  contents: read
+  actions: read
+jobs:
+  n24_mesh:
+    if: github.event.pull_request.number == 135
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check n24 input generation
+        run: |
+          python -B -m unittest discover -s tests/fea_benchmark/envelope_panels -p 'test_pressure_contact_trial.py' -v
+          python -B -m unittest discover -s tests/fea_benchmark/envelope_panels -p 'test_quadratic_contact_trial.py' -v
+      - name: Get pinned CCX 2.21 and build
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/c3d20r-n24"
+          cd "$RUNNER_TEMP/c3d20r-n24"
+          curl --fail --location --silent --show-error --retry 2 --max-time 120 -o calculix-ccx_2.21.orig.tar.bz2 https://us.archive.ubuntu.com/ubuntu/pool/universe/c/calculix-ccx/calculix-ccx_2.21.orig.tar.bz2
+          curl --fail --location --silent --show-error --retry 2 --max-time 120 -o calculix-ccx_2.21-1.debian.tar.xz https://us.archive.ubuntu.com/ubuntu/pool/universe/c/calculix-ccx/calculix-ccx_2.21-1.debian.tar.xz
+          echo '51d229aee320cf685216d360f7c04f9a57af0148fbe840483a964c86c315da82  calculix-ccx_2.21.orig.tar.bz2' | sha256sum --check
+          echo '6c2a934b66491c9e916cbf6328167d417f7e985b380e200facf92c3e953d255f  calculix-ccx_2.21-1.debian.tar.xz' | sha256sum --check
+          tar -xjf calculix-ccx_2.21.orig.tar.bz2
+          cd CalculiX
+          tar -xJf ../calculix-ccx_2.21-1.debian.tar.xz
+          while IFS= read -r patchname; do
+            test -z "$patchname" && continue
+            patch --batch --fuzz=0 -p1 < "debian/patches/$patchname" > /dev/null
+          done < debian/patches/series
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends build-essential gfortran libspooles-dev libarpack2-dev liblapack-dev
+          make -s -j2 -C ccx_2.21/src CFLAGS='-O2 -Wall -I/usr/include/spooles -DARCH=Linux -DSPOOLES -DARPACK -DMATRIXSTORAGE -DUSE_MT=1' FFLAGS='-O2 -fallow-argument-mismatch' > "$RUNNER_TEMP/c3d20r-n24/ccx-build.log" 2>&1 || { tail -n 100 "$RUNNER_TEMP/c3d20r-n24/ccx-build.log"; exit 1; }
+          cp ccx_2.21/src/ccx_2.21 "$RUNNER_TEMP/c3d20r-n24/ccx"
+      - name: Solve C3D20R n24 toward and unlinked
+        run: |
+          set -euo pipefail
+          export OMP_NUM_THREADS=1 CCX_NPROC_EQUATION=1 CCX_NPROC_RESULTS=1 CCX_NPROC_STIFFNESS=1
+          root="$RUNNER_TEMP/c3d20r-n24"
+          for scenario in toward unlinked; do
+            name="p24_${scenario}"
+            python -B tests/fea_benchmark/envelope_panels/pressure_contact_trial.py --generate "$root/$name" 24 "$scenario"
+            (cd "$root/$name"; timeout 250s "$root/ccx" -i panel > solver.log 2>&1) || { tail -n 80 "$root/$name/solver.log"; exit 1; }
+            test -s "$root/$name/panel.dat"
+            test -s "$root/$name/panel.sta"
+            test -s "$root/$name/panel.frd"
+            echo "C3D20R_N24_OUTPUT_PRESENT $scenario"
+          done
+      - name: Download verified n8 n16 comparator and combine
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          root="$RUNNER_TEMP/c3d20r-n24"
+          gh api -H 'Accept: application/vnd.github+json' /repos/masini1491/building-envelope-engineering-kb/actions/artifacts/12323121878/zip > "$root/comparator.zip"
+          echo 'b44717b04ad268e2cf49197d8a03444e5cec69897c2d7f6fbed4423e6256ce52  '"$root/comparator.zip" | sha256sum --check
+          unzip -q "$root/comparator.zip" -d "$root"
+      - name: Verify 8/16/24 bounded nominal support force and contact
+        run: |
+          set -euo pipefail
+          root="$RUNNER_TEMP/c3d20r-n24"
+          python -B tests/fea_benchmark/envelope_panels/verify_pressure_contact_trial.py "$root" --include-n24 > "$root/mesh24-report.json"
+          cat "$root/mesh24-report.json"
+      - name: Preserve full n24 results and report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: c3d20r-pressure-n24-synthetic-not-design
+          retention-days: 14
+          if-no-files-found: warn
+          path: |
+            ${{ runner.temp }}/c3d20r-n24/p24_*/panel.inp
+            ${{ runner.temp }}/c3d20r-n24/p24_*/panel.sta
+            ${{ runner.temp }}/c3d20r-n24/p24_*/panel.dat
+            ${{ runner.temp }}/c3d20r-n24/p24_*/panel.frd
+            ${{ runner.temp }}/c3d20r-n24/p24_*/solver.log
+            ${{ runner.temp }}/c3d20r-n24/mesh24-report.json
