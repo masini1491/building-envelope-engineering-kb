@@ -18,7 +18,7 @@ class StudTrial(unittest.TestCase):
     def test_scope(self):
         for n,c in ((4,'soft'),(24,'soft'),(True,'soft'),(8,'real')):
             with self.assertRaisesRegex(ValueError,'STUD_SOLID_SCOPE'):
-                deck(n,c)
+                add_studs(baseline(8,'unlinked'),n,c)
     def test_no_contact(self):
         with self.assertRaisesRegex(ValueError,'BASE_DECK_CONTRACT'):
             add_studs(baseline(8,'toward'),8,'soft')
