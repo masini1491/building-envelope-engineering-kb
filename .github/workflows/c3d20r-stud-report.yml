@@ -1,0 +1,33 @@
+name: C3D20R engineering-facing synthetic comparison (NOT DESIGN)
+on:
+  pull_request:
+    paths:
+      - .github/workflows/c3d20r-stud-report.yml
+      - tests/fea_benchmark/envelope_panels/render_stud_position_report.py
+permissions:
+  contents: read
+  actions: read
+jobs:
+  report:
+    if: github.event.pull_request.number == 135
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download pinned verified JSON report artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          gh api /repos/masini1491/building-envelope-engineering-kb/actions/artifacts/12343751844/zip > "$RUNNER_TEMP/evidence.zip"
+          echo '8207996dc19ab5674c1bc0b218d5048c13fbe4fe8e9f087b1ce06884a38326d1  '"$RUNNER_TEMP/evidence.zip" | sha256sum --check
+          python -c "import sys,zipfile;zipfile.ZipFile(sys.argv[1]).extract('report.json',sys.argv[2])" "$RUNNER_TEMP/evidence.zip" "$RUNNER_TEMP"
+      - name: Render Traditional Chinese report
+        run: |
+          python -B tests/fea_benchmark/envelope_panels/render_stud_position_report.py "$RUNNER_TEMP/report.json" > "$RUNNER_TEMP/comparison-zh-TW.md"
+          test -s "$RUNNER_TEMP/comparison-zh-TW.md"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: c3d20r-synthetic-comparison-zh-TW-not-design
+          retention-days: 14
+          path: ${{ runner.temp }}/comparison-zh-TW.md
