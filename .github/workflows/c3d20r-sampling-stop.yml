@@ -1,0 +1,40 @@
+name: C3D20R CSTR sampling bias STOP replay (NOT DESIGN)
+on:
+  pull_request:
+    paths:
+      - .github/workflows/c3d20r-sampling-stop.yml
+      - tests/fea_benchmark/envelope_panels/contact_ip_sampling_guard.py
+      - tests/fea_benchmark/envelope_panels/test_contact_ip_sampling_guard.py
+permissions:
+  contents: read
+  actions: read
+jobs:
+  audit:
+    if: github.event.pull_request.number == 135
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run sampling counterexample controls
+        run: python -B -m unittest discover -s tests/fea_benchmark/envelope_panels -p test_contact_ip_sampling_guard.py -v
+      - name: Download pinned IP artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/cstr-stop"
+          gh api /repos/masini1491/building-envelope-engineering-kb/actions/artifacts/12332801226/zip > "$RUNNER_TEMP/cstr-stop/ip.zip"
+          echo '4ac6e4f277ad9ccde2ea93f37c465a254400038fad249eef896421fb999669f1  '"$RUNNER_TEMP/cstr-stop/ip.zip" | sha256sum --check
+      - name: Assert biased quadrature proxy stays rejected
+        run: |
+          set -euo pipefail
+          python -B tests/fea_benchmark/envelope_panels/contact_ip_sampling_guard.py "$RUNNER_TEMP/cstr-stop/ip.zip" > "$RUNNER_TEMP/cstr-stop/report.json"
+          cat "$RUNNER_TEMP/cstr-stop/report.json"
+      - name: Save bounded negative evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: c3d20r-cstr-sampling-stop-not-design
+          retention-days: 14
+          if-no-files-found: warn
+          path: ${{ runner.temp }}/cstr-stop/report.json
