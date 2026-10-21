@@ -1,0 +1,40 @@
+name: C3D20R four-station independent rib reaction replay (NOT DESIGN)
+on:
+  pull_request:
+    paths:
+      - .github/workflows/c3d20r-stud-rib-replay.yml
+      - tests/fea_benchmark/envelope_panels/verify_stud_solid_independent_balance.py
+      - tests/fea_benchmark/envelope_panels/test_verify_stud_solid_independent_balance.py
+permissions:
+  contents: read
+  actions: read
+jobs:
+  replay:
+    if: github.event.pull_request.number == 135
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - name: Independent rib balance negative tests
+        run: python -B -m unittest discover -s tests/fea_benchmark/envelope_panels -p test_verify_stud_solid_independent_balance.py -v
+      - name: Download pinned six-case CalculiX artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/stud-rib"
+          gh api /repos/masini1491/building-envelope-engineering-kb/actions/artifacts/12339710329/zip > "$RUNNER_TEMP/stud-rib/actual.zip"
+          echo '03cda477016e945c5f76a5b88a0548a08027c62ec777e4d5e7afec4c6b0e7f7a  '"$RUNNER_TEMP/stud-rib/actual.zip" | sha256sum --check
+      - name: Prove four-spring sum equals opposite clean rib-end RF
+        run: |
+          set -euo pipefail
+          python -B tests/fea_benchmark/envelope_panels/verify_stud_solid_independent_balance.py "$RUNNER_TEMP/stud-rib/actual.zip" > "$RUNNER_TEMP/stud-rib/report.json"
+          cat "$RUNNER_TEMP/stud-rib/report.json"
+      - name: Preserve bounded independent force audit
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: c3d20r-stud-rib-independent-reaction-not-design
+          retention-days: 14
+          if-no-files-found: warn
+          path: ${{ runner.temp }}/stud-rib/report.json
