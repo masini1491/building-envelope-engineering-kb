@@ -1,0 +1,39 @@
+name: U 型肋接觸增量原始輸出對帳
+on:
+  pull_request:
+    paths:
+      - .github/workflows/u-base-contact-increments.yml
+      - tests/fea_benchmark/envelope_panels/verify_u_base_contact_increments.py
+      - tests/fea_benchmark/envelope_panels/test_verify_u_base_contact_increments.py
+permissions:
+  contents: read
+  actions: read
+jobs:
+  audit:
+    if: github.event.pull_request.number == 131
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - name: 固定原始求解輸出並確認 ZIP 完整性
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          gh api -H 'Accept: application/vnd.github+json' /repos/masini1491/building-envelope-engineering-kb/actions/artifacts/12206212695/zip > "$RUNNER_TEMP/u-contact.zip"
+          echo '11804b4f6c419c2fc12134cf952770497ad40fcb701f74ac4ee262d10f433265  '"$RUNNER_TEMP/u-contact.zip" | sha256sum --check
+      - name: 增量對帳與 fail-closed 負向回歸
+        env:
+          CCX221_U_BASE_CONTACT_ZIP: ${{ runner.temp }}/u-contact.zip
+        run: |
+          set -euo pipefail
+          python -B -m unittest discover -s tests/fea_benchmark/envelope_panels -p 'test_verify_u_base_contact_increments.py' -v
+          python -B tests/fea_benchmark/envelope_panels/verify_u_base_contact_increments.py "$CCX221_U_BASE_CONTACT_ZIP" > "$RUNNER_TEMP/u-contact-increment-audit.json"
+      - name: 保存純研究對帳
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: u-base-contact-increment-audit-not-engineering
+          retention-days: 14
+          if-no-files-found: warn
+          path: ${{ runner.temp }}/u-contact-increment-audit.json
