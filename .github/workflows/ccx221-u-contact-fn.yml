@@ -1,0 +1,126 @@
+name: CalculiX 2.21 U 肋接觸原始與展開節點內力診斷
+on:
+  pull_request:
+    paths:
+      - .github/workflows/ccx221-u-contact-fn.yml
+      - tests/fea_benchmark/envelope_panels/verify_ccx221_contact_fn.py
+      - tests/fea_benchmark/envelope_panels/test_verify_ccx221_contact_fn.py
+      - tests/fea_benchmark/envelope_panels/instrument_ccx221_output_fn.py
+permissions:
+  contents: read
+  actions: read
+jobs:
+  output_fn:
+    if: github.event.pull_request.number == 131
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - name: 驗證 fn 唯讀解析器與失敗反例
+        run: python -B -m unittest discover -s tests/fea_benchmark/envelope_panels -p 'test_verify_ccx221_contact_fn.py' -v
+      - name: 取得原始固定 A/B 輸入及 CalculiX 2.21 原始碼
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          scratch="$RUNNER_TEMP/u-contact-fn"
+          mkdir -p "$scratch/ref" "$scratch/baseline" "$scratch/diagnostic"
+          cd "$scratch"
+          gh api -H 'Accept: application/vnd.github+json' /repos/masini1491/building-envelope-engineering-kb/actions/artifacts/12206212695/zip > fixed.zip
+          echo '11804b4f6c419c2fc12134cf952770497ad40fcb701f74ac4ee262d10f433265  fixed.zip' | sha256sum --check
+          unzip -q fixed.zip -d ref
+          for mesh in 8 16; do
+            for kind in toward unlinked; do
+              test -s "ref/envelope_panels/u_base_contact_n${mesh}_${kind}/panel.inp"
+              test -s "ref/envelope_panels/u_base_contact_n${mesh}_${kind}/panel.dat"
+              test -s "ref/envelope_panels/u_base_contact_n${mesh}_${kind}/panel.sta"
+            done
+          done
+          curl --fail --location --silent --show-error --retry 2 --max-time 120 \
+            -o calculix-ccx_2.21.orig.tar.bz2 \
+            https://us.archive.ubuntu.com/ubuntu/pool/universe/c/calculix-ccx/calculix-ccx_2.21.orig.tar.bz2
+          curl --fail --location --silent --show-error --retry 2 --max-time 120 \
+            -o calculix-ccx_2.21-1.debian.tar.xz \
+            https://us.archive.ubuntu.com/ubuntu/pool/universe/c/calculix-ccx/calculix-ccx_2.21-1.debian.tar.xz
+          echo '51d229aee320cf685216d360f7c04f9a57af0148fbe840483a964c86c315da82  calculix-ccx_2.21.orig.tar.bz2' | sha256sum --check
+          echo '6c2a934b66491c9e916cbf6328167d417f7e985b380e200facf92c3e953d255f  calculix-ccx_2.21-1.debian.tar.xz' | sha256sum --check
+          tar -xjf calculix-ccx_2.21.orig.tar.bz2
+          cd CalculiX
+          tar -xJf ../calculix-ccx_2.21-1.debian.tar.xz
+          while IFS= read -r patchname; do
+            test -z "$patchname" && continue
+            patch --batch --fuzz=0 -p1 < "debian/patches/$patchname" > /dev/null
+          done < debian/patches/series
+      - name: 建立未修改與 opt-in 唯讀版
+        run: |
+          set -euo pipefail
+          scratch="$RUNNER_TEMP/u-contact-fn"
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends build-essential gfortran libspooles-dev libarpack2-dev liblapack-dev
+          src="$scratch/CalculiX/ccx_2.21/src"
+          make -s -j2 -C "$src" \
+            CFLAGS='-O2 -Wall -I/usr/include/spooles -DARCH=Linux -DSPOOLES -DARPACK -DMATRIXSTORAGE -DUSE_MT=1' \
+            FFLAGS='-O2 -fallow-argument-mismatch' > "$scratch/pristine-build.log" 2>&1 || {
+              tail -n 100 "$scratch/pristine-build.log"; exit 1;
+            }
+          cp "$src/ccx_2.21" "$scratch/pristine-ccx"
+          cp "$src/results.c" "$scratch/pristine-results.c"
+          python -B tests/fea_benchmark/envelope_panels/instrument_ccx221_output_fn.py "$scratch/CalculiX/ccx_2.21"
+          ! cmp -s "$src/results.c" "$scratch/pristine-results.c"
+          grep -q KB_CCX221_OUTPUT_FN "$src/results.c"
+          make -s -j2 -C "$src" \
+            CFLAGS='-O2 -Wall -I/usr/include/spooles -DARCH=Linux -DSPOOLES -DARPACK -DMATRIXSTORAGE -DUSE_MT=1' \
+            FFLAGS='-O2 -fallow-argument-mismatch' > "$scratch/diagnostic-build.log" 2>&1 || {
+              tail -n 100 "$scratch/diagnostic-build.log"; exit 1;
+            }
+          cp "$src/ccx_2.21" "$scratch/diagnostic-ccx"
+      - name: 四組壓合與無接觸對照 A/B 真實求解
+        run: |
+          set -euo pipefail
+          scratch="$RUNNER_TEMP/u-contact-fn"
+          export OMP_NUM_THREADS=1 CCX_NPROC_EQUATION=1 CCX_NPROC_RESULTS=1 CCX_NPROC_STIFFNESS=1
+          for mesh in 8 16; do
+            for kind in toward unlinked; do
+              key="u_base_contact_n${mesh}_${kind}"
+              for side in baseline diagnostic; do
+                dir="$scratch/$side/$key"
+                mkdir -p "$dir"
+                cp "$scratch/ref/envelope_panels/$key/panel.inp" "$dir/panel.inp"
+                if [ "$side" = diagnostic ]; then
+                  (cd "$dir"; KB_CCX221_OUTPUT_FN=1 timeout 130s "$scratch/diagnostic-ccx" -i panel > solver.log 2>&1)
+                  test -s "$dir/kb_ccx221_output_fn.tsv"
+                else
+                  (cd "$dir"; timeout 130s "$scratch/pristine-ccx" -i panel > solver.log 2>&1)
+                fi
+              done
+              for ext in dat sta; do
+                cmp "$scratch/baseline/$key/panel.$ext" "$scratch/diagnostic/$key/panel.$ext"
+              done
+              echo "CONTACT_FN_AB_IDENTICAL $key"
+            done
+          done
+      - name: 與固定 input 實體核對並分解原始與展開節點內力
+        run: |
+          set -euo pipefail
+          scratch="$RUNNER_TEMP/u-contact-fn"
+          for mesh in 8 16; do
+            for kind in toward unlinked; do
+              key="u_base_contact_n${mesh}_${kind}"
+              cmp "$scratch/ref/envelope_panels/$key/panel.inp" "$scratch/diagnostic/$key/panel.inp"
+            done
+          done
+          python -B tests/fea_benchmark/envelope_panels/verify_ccx221_contact_fn.py \
+            "$scratch/diagnostic" > "$scratch/contact-fn-report.json"
+          cat "$scratch/contact-fn-report.json"
+      - name: 保存隔離版研究輸出（非獨立反力）
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ccx221-u-contact-original-expanded-fn-not-dual
+          retention-days: 14
+          if-no-files-found: warn
+          path: |
+            ${{ runner.temp }}/u-contact-fn/contact-fn-report.json
+            ${{ runner.temp }}/u-contact-fn/diagnostic/**/kb_ccx221_output_fn.tsv
+            ${{ runner.temp }}/u-contact-fn/pristine-build.log
+            ${{ runner.temp }}/u-contact-fn/diagnostic-build.log
