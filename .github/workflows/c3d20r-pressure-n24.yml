@@ -62,7 +62,15 @@ jobs:
           root="$RUNNER_TEMP/c3d20r-n24"
           gh api -H 'Accept: application/vnd.github+json' /repos/masini1491/building-envelope-engineering-kb/actions/artifacts/12323121878/zip > "$root/comparator.zip"
           echo 'b44717b04ad268e2cf49197d8a03444e5cec69897c2d7f6fbed4423e6256ce52  '"$root/comparator.zip" | sha256sum --check
-          unzip -q "$root/comparator.zip" -d "$root"
+          # Select only comparator case directories; never overwrite the n24 CCX build log.
+          unzip -q "$root/comparator.zip" 'p8_*/*' 'p16_*/*' -d "$root"
+          for n in 8 16; do
+            for case in toward unlinked clearance; do
+              test -s "$root/p${n}_${case}/panel.dat"
+              test -s "$root/p${n}_${case}/panel.sta"
+              test -s "$root/p${n}_${case}/panel.frd"
+            done
+          done
       - name: Verify 8/16/24 bounded nominal support force and contact
         run: |
           set -euo pipefail
