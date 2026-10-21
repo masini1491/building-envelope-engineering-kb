@@ -1,0 +1,44 @@
+name: C3D20R CSTR integration point regional artifact replay (NOT DESIGN)
+on:
+  pull_request:
+    paths:
+      - .github/workflows/c3d20r-ip-replay.yml
+      - tests/fea_benchmark/envelope_panels/verify_c3d20r_contact_ip.py
+      - tests/fea_benchmark/envelope_panels/test_verify_c3d20r_contact_ip.py
+permissions:
+  contents: read
+  actions: read
+jobs:
+  ip_replay:
+    if: github.event.pull_request.number == 135
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - name: Region parser positive and negative tests
+        run: python -B -m unittest discover -s tests/fea_benchmark/envelope_panels -p 'test_verify_c3d20r_contact_ip.py' -v
+      - name: Obtain three pinned original solver artifacts
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/ip-replay"
+          gh api /repos/masini1491/building-envelope-engineering-kb/actions/artifacts/12332801226/zip > "$RUNNER_TEMP/ip-replay/ip.zip"
+          gh api /repos/masini1491/building-envelope-engineering-kb/actions/artifacts/12323121878/zip > "$RUNNER_TEMP/ip-replay/n16.zip"
+          gh api /repos/masini1491/building-envelope-engineering-kb/actions/artifacts/12324913185/zip > "$RUNNER_TEMP/ip-replay/n24.zip"
+          echo '4ac6e4f277ad9ccde2ea93f37c465a254400038fad249eef896421fb999669f1  '"$RUNNER_TEMP/ip-replay/ip.zip" | sha256sum --check
+          echo 'b44717b04ad268e2cf49197d8a03444e5cec69897c2d7f6fbed4423e6256ce52  '"$RUNNER_TEMP/ip-replay/n16.zip" | sha256sum --check
+          echo '4fb99ab36edd3fbaba7fb23171eaea04d1ee895d38174f390de874fca723c823  '"$RUNNER_TEMP/ip-replay/n24.zip" | sha256sum --check
+      - name: Run source-qualified end midspan integration point diagnostic
+        run: |
+          set -euo pipefail
+          python -B tests/fea_benchmark/envelope_panels/verify_c3d20r_contact_ip.py "$RUNNER_TEMP/ip-replay/ip.zip" "$RUNNER_TEMP/ip-replay/n16.zip" "$RUNNER_TEMP/ip-replay/n24.zip" > "$RUNNER_TEMP/ip-replay/ip-report.json"
+          cat "$RUNNER_TEMP/ip-replay/ip-report.json"
+      - name: Archive bounded research report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: c3d20r-ip-zones-not-design
+          retention-days: 14
+          if-no-files-found: warn
+          path: ${{ runner.temp }}/ip-replay/ip-report.json
