@@ -1,0 +1,69 @@
+name: C3D20R fixed-count interior position sensitivity (NOT DESIGN)
+on:
+  pull_request:
+    paths:
+      - .github/workflows/c3d20r-stud-position.yml
+      - tests/fea_benchmark/envelope_panels/stud_position_trial.py
+      - tests/fea_benchmark/envelope_panels/test_stud_position_trial.py
+permissions:
+  contents: read
+jobs:
+  position:
+    if: github.event.pull_request.number == 135
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - name: Controlled-position positive and negative tests
+        run: python -B -m unittest discover -s tests/fea_benchmark/envelope_panels -p test_stud_position_trial.py -v
+      - name: Get pinned CCX 2.21 and build
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/c3d20r-position"
+          cd "$RUNNER_TEMP/c3d20r-position"
+          curl --fail --location --silent --show-error --retry 2 --max-time 120 -o calculix-ccx_2.21.orig.tar.bz2 https://us.archive.ubuntu.com/ubuntu/pool/universe/c/calculix-ccx/calculix-ccx_2.21.orig.tar.bz2
+          curl --fail --location --silent --show-error --retry 2 --max-time 120 -o calculix-ccx_2.21-1.debian.tar.xz https://us.archive.ubuntu.com/ubuntu/pool/universe/c/calculix-ccx/calculix-ccx_2.21-1.debian.tar.xz
+          echo '51d229aee320cf685216d360f7c04f9a57af0148fbe840483a964c86c315da82  calculix-ccx_2.21.orig.tar.bz2' | sha256sum --check
+          echo '6c2a934b66491c9e916cbf6328167d417f7e985b380e200facf92c3e953d255f  calculix-ccx_2.21-1.debian.tar.xz' | sha256sum --check
+          tar -xjf calculix-ccx_2.21.orig.tar.bz2
+          cd CalculiX
+          tar -xJf ../calculix-ccx_2.21-1.debian.tar.xz
+          while IFS= read -r patchname; do
+            test -z "$patchname" && continue
+            patch --batch --fuzz=0 -p1 < "debian/patches/$patchname" > /dev/null
+          done < debian/patches/series
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends build-essential gfortran libspooles-dev libarpack2-dev liblapack-dev
+          make -s -j2 -C ccx_2.21/src CFLAGS='-O2 -Wall -I/usr/include/spooles -DARCH=Linux -DSPOOLES -DARPACK -DMATRIXSTORAGE -DUSE_MT=1' FFLAGS='-O2 -fallow-argument-mismatch' > "$RUNNER_TEMP/c3d20r-position/ccx-build.log" 2>&1 || { tail -n 100 "$RUNNER_TEMP/c3d20r-position/ccx-build.log"; exit 1; }
+          cp ccx_2.21/src/ccx_2.21 "$RUNNER_TEMP/c3d20r-position/ccx"
+      - name: Solve n8 n16 at unchanged 4 or 5 station count
+        run: |
+          set -euo pipefail
+          root="$RUNNER_TEMP/c3d20r-position"
+          export OMP_NUM_THREADS=1 CCX_NPROC_EQUATION=1 CCX_NPROC_RESULTS=1 CCX_NPROC_STIFFNESS=1
+          for n in 8 16; do
+            for layout in four_inner_out five_inner_out; do
+              for k in soft stiff; do
+                folder="$root/position_${n}_${layout}_${k}"
+                python -B tests/fea_benchmark/envelope_panels/stud_position_trial.py "$n" "$layout" "$k" "$folder"
+                (cd "$folder"; timeout 220s "$root/ccx" -i panel > solver.log 2>&1) || { tail -n 85 "$folder/solver.log"; exit 1; }
+                test -s "$folder/panel.dat"
+                test -s "$folder/panel.sta"
+                test -s "$folder/panel.frd"
+                echo "STUD_POSITION_SOLVER_OUTPUT n=$n layout=$layout k=$k"
+              done
+            done
+          done
+      - name: Preserve real raw outputs for independent checks
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: c3d20r-fixed-count-position-sensitivity-not-design
+          retention-days: 14
+          if-no-files-found: warn
+          path: |
+            ${{ runner.temp }}/c3d20r-position/position_*/panel.inp
+            ${{ runner.temp }}/c3d20r-position/position_*/panel.dat
+            ${{ runner.temp }}/c3d20r-position/position_*/panel.sta
+            ${{ runner.temp }}/c3d20r-position/position_*/panel.frd
+            ${{ runner.temp }}/c3d20r-position/position_*/solver.log
