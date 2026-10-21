@@ -69,15 +69,39 @@ def parse_trace(lines, n_original):
 
 
 def sta_increments(data):
-    incs=[]
+    """Return completed STEP 1 increments; ATT suffixed U denotes a failed attempt."""
+    incs = []
+    pending_attempt = 0
+    last_time = -math.inf
     for line in data.splitlines():
-        v=line.split()
-        if len(v)==7 and v[0]=='1':
-            try: inc=int(v[1]); time=float(v[4])
-            except ValueError:reject('BAD_STA_ROW')
-            if inc!=len(incs)+1 or not math.isfinite(time):reject('BAD_STA_INCREMENT')
-            incs.append((inc,time))
-    if not incs or abs(incs[-1][1]-1.)>1e-6:reject('INCOMPLETE_STA')
+        v = line.split()
+        if len(v) != 7 or not v[0].isdigit():
+            continue
+        if v[0] != '1':
+            reject('BAD_STA_STEP')
+        att = v[2]
+        unsuccessful = att.endswith('U')
+        attempt_str = att[:-1] if unsuccessful else att
+        if not attempt_str.isdigit():
+            reject('BAD_STA_ROW')
+        try:
+            inc, attempt, iters = int(v[1]), int(attempt_str), int(v[3])
+            total, step_time, delta = map(float, v[4:])
+        except ValueError:
+            reject('BAD_STA_ROW')
+        if (inc != len(incs) + 1 or attempt < 1 or iters < 1
+                or not all(math.isfinite(t) for t in (total, step_time, delta))
+                or delta <= 0 or total < last_time
+                or attempt <= pending_attempt):
+            reject('BAD_STA_INCREMENT')
+        pending_attempt = attempt
+        if unsuccessful:
+            continue
+        incs.append((inc, total))
+        last_time = total
+        pending_attempt = 0
+    if not incs or abs(incs[-1][1] - 1.) > 1e-6:
+        reject('INCOMPLETE_STA')
     return incs
 
 

@@ -48,4 +48,27 @@ class OutputFnTests(unittest.TestCase):
     def test_incomplete_sta_rejected(self):
         with self.assertRaisesRegex(ValueError,'INCOMPLETE_STA'):
             sta_increments('1 1 1 4 0.1 0.1 0.1')
+    def test_real_n16_toward_sta_from_fixed_artifact(self):
+        from pathlib import Path
+        fixture = Path(__file__).parent / 'fixtures' / 'u_contact_n16_toward_panel.sta'
+        rows = sta_increments(fixture.read_text(encoding='ascii'))
+        self.assertEqual([inc for inc, _ in rows], list(range(1, 11)))
+        self.assertAlmostEqual(rows[-1][1], 1.0)
+
+    def test_unsuccessful_attempt_does_not_count_as_convergence(self):
+        with self.assertRaisesRegex(ValueError, 'INCOMPLETE_STA'):
+            sta_increments('1 1 1U 60 0 0 0.1')
+        with self.assertRaisesRegex(ValueError, 'BAD_STA_INCREMENT'):
+            sta_increments('1 1 1U 60 0 0 0.1\n1 2 1 5 1 1 1')
+
+    def test_retry_must_advance_attempt_number(self):
+        with self.assertRaisesRegex(ValueError, 'BAD_STA_INCREMENT'):
+            sta_increments('1 1 1U 60 0 0 0.1\n1 1 1 5 1 1 1')
+
+    def test_sta_invalid_attempt_and_step_rejected(self):
+        with self.assertRaisesRegex(ValueError, 'BAD_STA_ROW'):
+            sta_increments('1 1 1UX 60 0 0 0.1')
+        with self.assertRaisesRegex(ValueError, 'BAD_STA_STEP'):
+            sta_increments('2 1 1 5 1 1 1')
+
 if __name__=='__main__':unittest.main()
