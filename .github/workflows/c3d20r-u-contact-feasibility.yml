@@ -1,0 +1,78 @@
+name: C3D20R isolated U rib contact feasibility (NOT DESIGN)
+on:
+  push:
+    branches:
+      - research/c3d20r-u-contact-feasibility
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  quadratic_contact:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - name: Deterministic deck/negative checks
+        run: python -B -m unittest discover -s tests/fea_benchmark/envelope_panels -p 'test_quadratic_contact_trial.py' -v
+      - name: Get pinned CCX 2.21 and build
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/c3d20r"
+          cd "$RUNNER_TEMP/c3d20r"
+          curl --fail --location --silent --show-error --retry 2 --max-time 120 -o calculix-ccx_2.21.orig.tar.bz2 https://us.archive.ubuntu.com/ubuntu/pool/universe/c/calculix-ccx/calculix-ccx_2.21.orig.tar.bz2
+          curl --fail --location --silent --show-error --retry 2 --max-time 120 -o calculix-ccx_2.21-1.debian.tar.xz https://us.archive.ubuntu.com/ubuntu/pool/universe/c/calculix-ccx/calculix-ccx_2.21-1.debian.tar.xz
+          echo '51d229aee320cf685216d360f7c04f9a57af0148fbe840483a964c86c315da82  calculix-ccx_2.21.orig.tar.bz2' | sha256sum --check
+          echo '6c2a934b66491c9e916cbf6328167d417f7e985b380e200facf92c3e953d255f  calculix-ccx_2.21-1.debian.tar.xz' | sha256sum --check
+          tar -xjf calculix-ccx_2.21.orig.tar.bz2
+          cd CalculiX
+          tar -xJf ../calculix-ccx_2.21-1.debian.tar.xz
+          while IFS= read -r patchname; do
+            test -z "$patchname" && continue
+            patch --batch --fuzz=0 -p1 < "debian/patches/$patchname" > /dev/null
+          done < debian/patches/series
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends build-essential gfortran libspooles-dev libarpack2-dev liblapack-dev
+          make -s -j2 -C ccx_2.21/src CFLAGS='-O2 -Wall -I/usr/include/spooles -DARCH=Linux -DSPOOLES -DARPACK -DMATRIXSTORAGE -DUSE_MT=1' FFLAGS='-O2 -fallow-argument-mismatch' > "$RUNNER_TEMP/c3d20r/ccx-build.log" 2>&1 || { tail -n 100 "$RUNNER_TEMP/c3d20r/ccx-build.log"; exit 1; }
+          cp ccx_2.21/src/ccx_2.21 "$RUNNER_TEMP/c3d20r/ccx"
+      - name: Genuine fixed-model n8/n16 contact and clearance
+        run: |
+          set -euo pipefail
+          export OMP_NUM_THREADS=1 CCX_NPROC_EQUATION=1 CCX_NPROC_RESULTS=1 CCX_NPROC_STIFFNESS=1
+          scratch="$RUNNER_TEMP/c3d20r"
+          for mesh in 8 16; do
+            for scenario in toward unlinked clearance; do
+              label="n${mesh}_${scenario}"
+              python -B tests/fea_benchmark/envelope_panels/quadratic_contact_trial.py --generate "$scratch/$label" "$mesh" "$scenario"
+              (cd "$scratch/$label"; timeout 180s "$scratch/ccx" -i panel > solver.log 2>&1) || { tail -n 100 "$scratch/$label/solver.log"; exit 1; }
+              test -s "$scratch/$label/panel.sta"
+              test -s "$scratch/$label/panel.dat"
+              python -B - "$scratch/$label" "$mesh" "$scenario" <<'PY'
+          import math, sys
+          from pathlib import Path
+          folder=Path(sys.argv[1]);mesh=sys.argv[2];case=sys.argv[3]
+          sta=folder.joinpath('panel.sta').read_text(errors='replace')
+          complete=[]
+          for line in sta.splitlines():
+              a=line.split()
+              if len(a)==7 and a[0]=='1' and a[1].isdigit() and a[2].isdigit():
+                  complete.append((int(a[1]),float(a[4])))
+          if not complete or abs(complete[-1][1]-1.)>1e-7:
+              raise ValueError('C3D20R_STEP_INCOMPLETE')
+          print('C3D20R_SOLVER_FINISHED',mesh,case,'increments',len(complete))
+          PY
+            done
+          done
+      - name: Preserve input/output for independent force reconciliation
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: quadratic-solid-u-contact-feasibility-not-engineering
+          retention-days: 14
+          if-no-files-found: warn
+          path: |
+            ${{ runner.temp }}/c3d20r/n*/panel.inp
+            ${{ runner.temp }}/c3d20r/n*/panel.dat
+            ${{ runner.temp }}/c3d20r/n*/panel.sta
+            ${{ runner.temp }}/c3d20r/n*/panel.frd
+            ${{ runner.temp }}/c3d20r/n*/solver.log
+            ${{ runner.temp }}/c3d20r/ccx-build.log
