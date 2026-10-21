@@ -1,0 +1,46 @@
+name: C3D20R fixed six-case replay (NOT DESIGN)
+on:
+  pull_request:
+    paths:
+      - .github/workflows/c3d20r-u-contact-replay.yml
+      - tests/fea_benchmark/envelope_panels/verify_c3d20r_u_contact.py
+permissions:
+  contents: read
+  actions: read
+jobs:
+  replay:
+    if: github.event.pull_request.number == 135
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - name: Obtain pinned real CCX 2.21 result and check hash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/c3d20r-replay"
+          gh api -H 'Accept: application/vnd.github+json' /repos/masini1491/building-envelope-engineering-kb/actions/artifacts/12317964798/zip > "$RUNNER_TEMP/c3d20r-replay/source.zip"
+          echo '998710e26dd38f9027ef01cba012ba968d56a6786f8c208d53181604bb70b375  '"$RUNNER_TEMP/c3d20r-replay/source.zip" | sha256sum --check
+          unzip -q "$RUNNER_TEMP/c3d20r-replay/source.zip" -d "$RUNNER_TEMP/c3d20r-replay/files"
+          for n in 8 16; do
+            for c in toward unlinked clearance; do
+              test -s "$RUNNER_TEMP/c3d20r-replay/files/n${n}_${c}/panel.inp"
+              test -s "$RUNNER_TEMP/c3d20r-replay/files/n${n}_${c}/panel.sta"
+              test -s "$RUNNER_TEMP/c3d20r-replay/files/n${n}_${c}/panel.dat"
+              test -s "$RUNNER_TEMP/c3d20r-replay/files/n${n}_${c}/panel.frd"
+            done
+          done
+      - name: Reconcile exact inputs, finished steps, RF3, contact, and displacement gap
+        run: |
+          set -euo pipefail
+          python -B tests/fea_benchmark/envelope_panels/verify_c3d20r_u_contact.py "$RUNNER_TEMP/c3d20r-replay/files" > "$RUNNER_TEMP/c3d20r-replay/report.json"
+          cat "$RUNNER_TEMP/c3d20r-replay/report.json"
+      - name: Save replay report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: c3d20r-six-case-evidence-only
+          retention-days: 14
+          if-no-files-found: warn
+          path: ${{ runner.temp }}/c3d20r-replay/report.json
