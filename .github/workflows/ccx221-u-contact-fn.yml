@@ -31,9 +31,11 @@ jobs:
           unzip -q fixed.zip -d ref
           for mesh in 8 16; do
             for kind in toward unlinked; do
-              test -s "ref/envelope_panels/u_base_contact_n${mesh}_${kind}/panel.inp"
-              test -s "ref/envelope_panels/u_base_contact_n${mesh}_${kind}/panel.dat"
-              test -s "ref/envelope_panels/u_base_contact_n${mesh}_${kind}/panel.sta"
+              key="u_base_contact_n${mesh}_${kind}"
+              test -s "ref/envelope_panels/$key/panel.dat"
+              test -s "ref/envelope_panels/$key/panel.sta"
+              python -B "$GITHUB_WORKSPACE/tests/fea_benchmark/envelope_panels/check_u_rib_base_contact.py" --generate "$scratch/generated/$key" "$mesh" "$kind"
+              cp "$scratch/generated/$key/panel.inp" "ref/envelope_panels/$key/panel.inp"
             done
           done
           curl --fail --location --silent --show-error --retry 2 --max-time 120 \
