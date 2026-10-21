@@ -1,0 +1,44 @@
+name: C3D20R contact field fixed artifact replay (NOT DESIGN)
+on:
+  pull_request:
+    paths:
+      - .github/workflows/c3d20r-field-replay.yml
+      - tests/fea_benchmark/envelope_panels/verify_c3d20r_contact_field.py
+      - tests/fea_benchmark/envelope_panels/test_verify_c3d20r_contact_field.py
+permissions:
+  contents: read
+  actions: read
+jobs:
+  replay:
+    if: github.event.pull_request.number == 135
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - name: FRD fixed-format and corruption negative tests
+        run: python -B -m unittest discover -s tests/fea_benchmark/envelope_panels -p 'test_verify_c3d20r_contact_field.py' -v
+      - name: Download pinned solver artifacts
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/field-replay"
+          gh api -H 'Accept: application/vnd.github+json' /repos/masini1491/building-envelope-engineering-kb/actions/artifacts/12325867891/zip > "$RUNNER_TEMP/field-replay/field.zip"
+          gh api -H 'Accept: application/vnd.github+json' /repos/masini1491/building-envelope-engineering-kb/actions/artifacts/12323121878/zip > "$RUNNER_TEMP/field-replay/n16.zip"
+          gh api -H 'Accept: application/vnd.github+json' /repos/masini1491/building-envelope-engineering-kb/actions/artifacts/12324913185/zip > "$RUNNER_TEMP/field-replay/n24.zip"
+          echo '23dd21cb4e43a6a6043a149de4dc5151e28648a315730239f20f542511db10d5  '"$RUNNER_TEMP/field-replay/field.zip" | sha256sum --check
+          echo 'b44717b04ad268e2cf49197d8a03444e5cec69897c2d7f6fbed4423e6256ce52  '"$RUNNER_TEMP/field-replay/n16.zip" | sha256sum --check
+          echo '4fb99ab36edd3fbaba7fb23171eaea04d1ee895d38174f390de874fca723c823  '"$RUNNER_TEMP/field-replay/n24.zip" | sha256sum --check
+      - name: Verify same physical decks, identical DAT STA, and contact field
+        run: |
+          set -euo pipefail
+          python -B tests/fea_benchmark/envelope_panels/verify_c3d20r_contact_field.py "$RUNNER_TEMP/field-replay/field.zip" "$RUNNER_TEMP/field-replay/n16.zip" "$RUNNER_TEMP/field-replay/n24.zip" > "$RUNNER_TEMP/field-replay/report.json"
+          cat "$RUNNER_TEMP/field-replay/report.json"
+      - name: Preserve source-qualified field audit
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: c3d20r-local-pressure-field-replay-not-design
+          retention-days: 14
+          if-no-files-found: warn
+          path: ${{ runner.temp }}/field-replay/report.json
