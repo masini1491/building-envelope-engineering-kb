@@ -1,0 +1,42 @@
+name: C3D20R 3-4-5 synthetic stud pitch evidence replay (NOT DESIGN)
+on:
+  pull_request:
+    paths:
+      - .github/workflows/c3d20r-stud-pitch-replay.yml
+      - tests/fea_benchmark/envelope_panels/verify_stud_pitch_evidence.py
+      - tests/fea_benchmark/envelope_panels/test_verify_stud_pitch_evidence.py
+permissions:
+  contents: read
+  actions: read
+jobs:
+  replay:
+    if: github.event.pull_request.number == 135
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - name: Provenance and coverage negative tests
+        run: python -B -m unittest discover -s tests/fea_benchmark/envelope_panels -p test_verify_stud_pitch_evidence.py -v
+      - name: Retrieve pinned real six and eight case artifacts
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/stud-pitch-evidence"
+          gh api /repos/masini1491/building-envelope-engineering-kb/actions/artifacts/12342130881/zip > "$RUNNER_TEMP/stud-pitch-evidence/pitch.zip"
+          gh api /repos/masini1491/building-envelope-engineering-kb/actions/artifacts/12339710329/zip > "$RUNNER_TEMP/stud-pitch-evidence/four.zip"
+          echo 'c249bb93622b66cd25aab87fa503c3b179ebde1ead2e632c47dd2f1ef0149279  '"$RUNNER_TEMP/stud-pitch-evidence/pitch.zip" | sha256sum --check
+          echo '03cda477016e945c5f76a5b88a0548a08027c62ec777e4d5e7afec4c6b0e7f7a  '"$RUNNER_TEMP/stud-pitch-evidence/four.zip" | sha256sum --check
+      - name: Verify source exactness, reactions, per-link transfer, center response
+        run: |
+          set -euo pipefail
+          python -B tests/fea_benchmark/envelope_panels/verify_stud_pitch_evidence.py "$RUNNER_TEMP/stud-pitch-evidence/pitch.zip" "$RUNNER_TEMP/stud-pitch-evidence/four.zip" > "$RUNNER_TEMP/stud-pitch-evidence/report.json"
+          cat "$RUNNER_TEMP/stud-pitch-evidence/report.json"
+      - name: Publish only research evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: c3d20r-3-4-5-stud-pitch-replay-not-design
+          retention-days: 14
+          if-no-files-found: warn
+          path: ${{ runner.temp }}/stud-pitch-evidence/report.json
