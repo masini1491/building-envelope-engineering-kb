@@ -3,14 +3,7 @@ on:
   pull_request:
     paths:
       - .github/workflows/c3d20r-research-closure.yml
-      - tests/fea_benchmark/envelope_panels/stud_engineering_intake_report.py
-      - tests/fea_benchmark/envelope_panels/stud_hot4_tensile_signed_report.py
-      - tests/fea_benchmark/envelope_panels/stud_tensile_strength_screen.py
-      - tests/fea_benchmark/envelope_panels/stud_connection_evidence_gate.py
-      - tests/fea_benchmark/envelope_panels/test_stud_engineering_intake_report.py
-      - tests/fea_benchmark/envelope_panels/test_stud_hot4_tensile_signed_report.py
-      - tests/fea_benchmark/envelope_panels/test_stud_tensile_strength_screen.py
-      - tests/fea_benchmark/envelope_panels/test_stud_connection_evidence_gate.py
+      - tests/fea_benchmark/envelope_panels/**
 permissions:
   contents: read
   actions: read
@@ -23,14 +16,23 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Synthetic only scope and failure-path tests
+      - name: Synthetic solver model, mesh, intake, strength, and negative-path unit tests
         run: |
           set -euo pipefail
-          python -B -m unittest discover -s tests/fea_benchmark/envelope_panels -p 'test_stud_engineering_intake_report.py' -v
-          python -B -m unittest discover -s tests/fea_benchmark/envelope_panels -p 'test_stud_hot4_tensile_signed_report.py' -v
-          python -B -m unittest discover -s tests/fea_benchmark/envelope_panels -p 'test_stud_tensile_strength_screen.py' -v
-          python -B -m unittest discover -s tests/fea_benchmark/envelope_panels -p 'test_stud_connection_evidence_gate.py' -v
-      - name: Fetch and verify pinned raw synthetic solver artifact (expires 2026-11-05)
+          for name in \
+            test_probe_c3d8_u_contact.py \
+            test_quadratic_contact_trial.py \
+            test_pressure_contact_trial.py \
+            test_stud_solid_trial.py \
+            test_stud_signed_pressure_trial.py \
+            test_stud_mesh_refinement_trial.py \
+            test_stud_engineering_intake_report.py \
+            test_stud_hot4_tensile_signed_report.py \
+            test_stud_tensile_strength_screen.py \
+            test_stud_connection_evidence_gate.py; do
+            python -B -m unittest discover -s tests/fea_benchmark/envelope_panels -p "$name" -v
+          done
+      - name: Obtain and validate immutable raw solver artifact
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -38,35 +40,35 @@ jobs:
           mkdir -p "$RUNNER_TEMP/closure"
           gh api /repos/masini1491/building-envelope-engineering-kb/actions/artifacts/12401885093/zip > "$RUNNER_TEMP/closure/solver.zip"
           echo 'd35d73f6b9f0d5f94f45e53b1c81c607d9839c77c25ea54ba654e033993933a7  '"$RUNNER_TEMP/closure/solver.zip" | sha256sum --check
-      - name: Replay exact synthetic solver evidence; reject engineering admission
+      - name: Independently regenerate 18 exact C3D20R decks and replay raw solver evidence
         run: |
           set -euo pipefail
           python -B - <<'PY'
           import json, os, sys
           from pathlib import Path
-          sys.path.insert(0, 'tests/fea_benchmark/envelope_panels')
+          sys.path.insert(0,'tests/fea_benchmark/envelope_panels')
           from stud_engineering_intake_report import fixture
           from test_stud_hot4_tensile_signed_report import strength
-          p = Path(os.environ['RUNNER_TEMP']) / 'closure'
-          (p / 'request.json').write_text(json.dumps(fixture(mesh=24,case='soft',direction='positive')))
-          (p / 'fictional-strength.json').write_text(json.dumps(strength()))
+          p=Path(os.environ['RUNNER_TEMP'])/'closure'
+          (p/'request.json').write_text(json.dumps(fixture(mesh=24,case='soft',direction='positive')))
+          (p/'fictional-strength.json').write_text(json.dumps(strength()))
           PY
           python -B tests/fea_benchmark/envelope_panels/stud_engineering_intake_report.py "$RUNNER_TEMP/closure/request.json" --pinned-evidence-zip "$RUNNER_TEMP/closure/solver.zip" > "$RUNNER_TEMP/closure/intake.json"
           python -B tests/fea_benchmark/envelope_panels/stud_hot4_tensile_signed_report.py "$RUNNER_TEMP/closure/fictional-strength.json" "$RUNNER_TEMP/closure/request.json" --pinned-evidence-zip "$RUNNER_TEMP/closure/solver.zip" > "$RUNNER_TEMP/closure/hot4.json"
           python -B - <<'PY'
-          import json, os
+          import json,os
           from pathlib import Path
-          p = Path(os.environ['RUNNER_TEMP']) / 'closure'
-          i = json.loads((p / 'intake.json').read_text())
-          h = json.loads((p / 'hot4.json').read_text())
-          assert i['calculation_status'] == 'COMPUTED'
-          assert i['engineering_acceptance'] == 'NOT_ADMITTED'
+          p=Path(os.environ['RUNNER_TEMP'])/'closure'
+          i=json.loads((p/'intake.json').read_text())
+          h=json.loads((p/'hot4.json').read_text())
+          assert i['calculation_status']=='COMPUTED'
           assert i['solver_evidence_replayed'] is True
-          assert h['calculation_status'] == 'COMPUTED_RESEARCH_ONLY'
-          assert h['engineering_acceptance'] == 'NOT_ADMITTED'
-          assert h['ratio_is_design_check'] is False
+          assert i['engineering_acceptance']=='NOT_ADMITTED'
+          assert h['calculation_status']=='COMPUTED_RESEARCH_ONLY'
           assert h['solver_evidence_replayed'] is True
-          assert h['physical_stud_stiffness'] == 'NOT_ESTABLISHED'
-          assert h['real_stud_tension_compression_mapping'] == 'NOT_ESTABLISHED'
-          print('C3D20R_RESEARCH_ONLY_EXACT_EVIDENCE: PASS')
+          assert h['engineering_acceptance']=='NOT_ADMITTED'
+          assert h['ratio_is_design_check'] is False
+          assert h['physical_stud_stiffness']=='NOT_ESTABLISHED'
+          assert h['real_stud_tension_compression_mapping']=='NOT_ESTABLISHED'
+          print('C3D20R_CLEAN_BRANCH_REPLAY_18_CASES_RESEARCH_ONLY: PASS')
           PY
