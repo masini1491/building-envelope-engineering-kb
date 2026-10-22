@@ -7,6 +7,7 @@ on:
       - tests/fea_benchmark/envelope_panels/test_stud_connection_evidence_gate.py
       - tests/fea_benchmark/envelope_panels/stud_connection_applicability.py
       - tests/fea_benchmark/envelope_panels/test_stud_connection_applicability.py
+      - tests/fea_benchmark/envelope_panels/test_stud_connection_applicability_cli.py
 permissions:
   contents: read
 jobs:
@@ -20,6 +21,8 @@ jobs:
         run: python -B -m unittest discover -s tests/fea_benchmark/envelope_panels -p test_stud_connection_evidence_gate.py -v
       - name: Reject unrelated specimen and load-direction metadata
         run: python -B -m unittest discover -s tests/fea_benchmark/envelope_panels -p test_stud_connection_applicability.py -v
+      - name: Real CLI end-to-end and invalid-input tests
+        run: python -B -m unittest discover -s tests/fea_benchmark/envelope_panels -p test_stud_connection_applicability_cli.py -v
       - name: Run incomplete-source smoke without admitting stiffness
         run: |
           set -euo pipefail
