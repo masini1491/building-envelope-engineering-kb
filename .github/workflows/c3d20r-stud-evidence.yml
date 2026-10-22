@@ -1,0 +1,24 @@
+name: C3D20R connection evidence readiness guard (NOT DESIGN)
+on:
+  pull_request:
+    paths:
+      - .github/workflows/c3d20r-stud-evidence.yml
+      - tests/fea_benchmark/envelope_panels/stud_connection_evidence_gate.py
+      - tests/fea_benchmark/envelope_panels/test_stud_connection_evidence_gate.py
+permissions:
+  contents: read
+jobs:
+  evidence:
+    if: github.event.pull_request.number == 135
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run fail-closed material and connection readiness checks
+        run: python -B -m unittest discover -s tests/fea_benchmark/envelope_panels -p test_stud_connection_evidence_gate.py -v
+      - name: Run incomplete-source smoke without admitting stiffness
+        run: |
+          set -euo pipefail
+          python -B -c 'import json; from pathlib import Path; p=Path("/tmp/stud-evidence-synthetic.json"); p.write_text(json.dumps(dict(scope="ALUMINUM_PANEL_TO_U_RIB_STUD_CONNECTION",source_class="NO_EVIDENCE",source_sha256=None,interface=dict(panel_alloy_temper=None,rib_alloy_temper=None,panel_thickness_mm=None,rib_thickness_mm=None,stud_diameter_mm=None,joining_process=None),direction="UNKNOWN",specimen_count=None,force_slip_pairs=[])))'
+          python -B tests/fea_benchmark/envelope_panels/stud_connection_evidence_gate.py /tmp/stud-evidence-synthetic.json > /tmp/stud-evidence-screen.json
+          python -B -c 'import json; x=json.load(open("/tmp/stud-evidence-screen.json")); assert x["engineering_acceptance"]=="NOT_ADMITTED" and x["physical_connection_stiffness_n_per_mm"]=="NOT_ESTABLISHED" and x["readiness"]=="MISSING_INPUT"'
