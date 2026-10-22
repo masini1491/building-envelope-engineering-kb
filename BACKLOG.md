@@ -42,7 +42,7 @@ Cold item **不具 execution authority**。要開始實作前，必須依 curren
 
 ### 受限非線性 FEA 後續構造能力（KB-CAND-007）
 
-- **Current evidence**：現有受限 CalculiX 執行介面已通過合成 S8R 鋁板之位移、外插／平均應力應變及重建平移支承需求等真實 CI 研究檢查；不再沿用「沒有 validated nonlinear execution route」的過時前提。這些研究通過不等於真實帷幕牆鋁板工程 acceptance；current Hot 見 `TASKS.md`。
+- **Current evidence**：現有受限 CalculiX 執行介面已通過合成 S8R 鋁板之位移、外插／平均應力應變及重建平移支承需求等真實 CI 研究檢查；不再沿用「沒有 validated nonlinear execution route」的過時前提。這些研究通過不等於真實帷幕牆鋁板工程 acceptance；本次受限 C3D20R 研究已由 PR #136 整合；目前無 Hot，詳細歷史請見 Git history／PR #131、#135、#136。
 - **CANDIDATE／Trigger**：待現有四邊固定平板的可觀測位移／應力基準足以描述限制，並明確取得非合成工況所需的構造、邊界條件、荷載路徑及獨立驗證計畫，再分別考慮折邊／加勁肋、實際支承／扣件、局部挫屈及初始缺陷等模型；每項均須獨立 admission，不因已完成 synthetic NLGEOM 即自動實作。
 - **Boundary**：不自行開發通用 FEA engine；不把平均節點應力、重建平移反力、材料牌號或供應商聲明直接升格為 ADM／其他規範強度及構件容量。
 
@@ -60,3 +60,10 @@ Cold item **不具 execution authority**。要開始實作前，必須依 curren
 - **Trigger**：具體帷幕鋁板／加勁肋／連接研究的工程輸出無法由現有受限模型可靠提供，且能提出真正需 MPC moment／constraint-reaction 的力學問題、獨立解析／試驗 oracle 與可辨識的工程收益。
 - **Boundary**：Cold 不授權自動 Stage 70 執行，不由局部單軸 PASS 推論任意 MPC／六分量平衡或扣件設計力。
 
+
+### KB-CAND-007｜研究結案後的工程准入與證據保存
+
+- **Status**：`CANDIDATE / EVIDENCE BLOCKED`；非目前 Hot，不授權自動研究或新模擬。合成 C3D20R n8／n16／n24、固定四站 Z-only 雙向 SPRING2、受限輸入、抗拉統計候選與繁中研究摘要，已以 PR #136／main `f808bfaec7c45c86a001ad25732b1eb3939a526b` 交付數值研究工具；`RESEARCH_COMPLETED` 只適用於驗證過的合成研究，不等於真實鋁植釘或工程設計認可。
+- **保留禁止升格狀態**：`ENGINEERING_ACCEPTANCE_NOT_ADMITTED`、`CONTACT_NOT_ADMITTED`、`MPC_REACTION_RECONSTRUCTION_NOT_ESTABLISHED`。原 S8R 不平衡研究及 fail-closed CI 留 PR #131／Issue #134，PR #135 保留原始合成研究脈絡；不合併其失敗依賴。
+- **Trigger**：未來若確實需要實際設計，須取得能對應試體、構造及方向的接頭荷載—位移／滑移（含拉、壓、剪與開離）及獨立驗證、專案風壓／組合、角碼及實際支承、材料與合法適用設計標準；另案定義模型與工程 acceptance。既有破壞荷載統計不能推回彈簧剛度；`(mean−sample SD)/SF` 與合成站點力比值不是設計使用率。
+- **證據保留提醒**：Hot 2 原始求解 Artifact #12401885093，SHA-256 `d35d73f6b9f0d5f94f45e53b1c81c607d9839c77c25ea54ba654e033993933a7`，GitHub 顯示 2026-11-05 到期；PR #136 exact-head research CI #39735595282、Repository CI #39735595238、既有 FEA 探針 #39735595096 均 SUCCESS。Artifact 過期後不能宣稱仍可從原連結重播；若未來需要重驗，須取得並完整驗證具相同輸入契約與求解器來源的可信原始 solver evidence。保存期限提醒不形成自動執行／擴張權限。
