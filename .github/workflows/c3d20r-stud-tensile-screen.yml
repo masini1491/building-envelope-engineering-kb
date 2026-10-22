@@ -1,0 +1,29 @@
+name: C3D20R stud tensile statistical screen (NOT DESIGN)
+on:
+  pull_request:
+    paths:
+      - .github/workflows/c3d20r-stud-tensile-screen.yml
+      - tests/fea_benchmark/envelope_panels/stud_tensile_strength_screen.py
+      - tests/fea_benchmark/envelope_panels/test_stud_tensile_strength_screen.py
+permissions:
+  contents: read
+jobs:
+  tensile:
+    if: github.event.pull_request.number == 135
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - name: Synthetic statistical and CLI regression
+        run: python -B -m unittest discover -s tests/fea_benchmark/envelope_panels -p test_stud_tensile_strength_screen.py -v
+      - name: Ensure no project load records or approvals are embedded
+        run: |
+          python -B - <<'PY'
+          from pathlib import Path
+          p=Path('tests/fea_benchmark/envelope_panels/stud_tensile_strength_screen.py')
+          x=p.read_text()
+          assert 'ENGINEER_SELECTED_MEAN_MINUS_ONE_SAMPLE_SD_OVER_SF' in x
+          assert 'NOT_ADMITTED' in x
+          assert 'NOT_ESTABLISHED' in x
+          assert '268,267,269,268,270,267' not in x
+          PY
