@@ -59,6 +59,22 @@ class Intake(unittest.TestCase):
     def test_unknown_mesh_is_not_coerced(self):
         x=fixture();x["mesh"]=32
         self.assertEqual(inspect(x)["calculation_status"],"UNSUPPORTED_MODEL")
+    def test_unhashable_case_and_direction_are_incomplete(self):
+        bad = fixture()
+        bad["connection"]["case"] = ["soft"]
+        bad["load"]["direction"] = {"unexpected": "positive"}
+        result = inspect(bad)
+        self.assertEqual(result["calculation_status"], "INCOMPLETE_INPUT")
+        self.assertIn("connection.case", result["invalid_fields"])
+        self.assertIn("load.direction", result["invalid_fields"])
+    def test_null_case_and_direction_are_missing(self):
+        bad = fixture()
+        bad["connection"]["case"] = None
+        bad["load"]["direction"] = None
+        result = inspect(bad)
+        self.assertEqual(result["calculation_status"], "INCOMPLETE_INPUT")
+        self.assertIn("connection.case", result["missing_fields"])
+        self.assertIn("load.direction", result["missing_fields"])
     def test_wrong_units_rejected(self):
         x=fixture();x["units"]["pressure"]="kPa"
         self.assertEqual(inspect(x)["calculation_status"],"UNSUPPORTED_MODEL")

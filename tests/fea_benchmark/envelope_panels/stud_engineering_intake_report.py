@@ -98,14 +98,17 @@ def inspect(request):
     raw_mesh = request.get("mesh")
     case = conn.get("case") if isinstance(conn,dict) else None
     direction = loading.get("direction") if isinstance(loading,dict) else None
+    # Invalid JSON field types must not reach mapping membership operations.
+    valid_case = type(case) is str and case in K_CASES
+    valid_direction = type(direction) is str and direction in PRESSURES
     mesh = raw_mesh if type(raw_mesh) is int and raw_mesh in MESHES else 8
-    reference = fixture(mesh,case if case in K_CASES else "soft",
-                        direction if direction in PRESSURES else "positive")
+    reference = fixture(mesh,case if valid_case else "soft",
+                        direction if valid_direction else "positive")
     _compare(request, reference, "", missing, invalid, unsupported)
-    if case is not None and case not in K_CASES:
-        unsupported.append("connection.case")
-    if direction is not None and direction not in PRESSURES:
-        unsupported.append("load.direction")
+    if case is not None and not valid_case:
+        (invalid if type(case) is not str else unsupported).append("connection.case")
+    if direction is not None and not valid_direction:
+        (invalid if type(direction) is not str else unsupported).append("load.direction")
     if type(raw_mesh) is int and raw_mesh not in MESHES:
         unsupported.append("mesh")
     if missing or invalid:
