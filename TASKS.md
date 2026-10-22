@@ -4,17 +4,19 @@
 
 ## 目前執行中的工作
 
-## 帷幕鋁板與 U 型加勁肋工程應用主線（2026-10-16／KB-CAND-007／當前 Hot）
+## 帷幕鋁板與 U 型加勁肋工程應用主線（2026-10-22／KB-CAND-007／當前 Hot）
 
-**目標**：優先將現有受限 FEA 研究逐步轉化為可驗證的帷幕鋁板方案比較能力；不要為 Stage 數量持續追逐一般 MPC／RF 內部研究。下列是同一條具先後依賴的工程工作，不代表各下游階段已具備執行或設計 admission。
+**目標及工作順序**：以現有資料先完成可獨立驗證的 C3D20R 合成板肋數值研究工具，之後才逐項增加可驗證的實務輸入；最終工程設計採用另設證據門。不得以工作階段數、測試數或合成通過率代替工程 admission。以下依序執行，下一階段須以此前階段實際證據與明確限定的能力為前提。
 
-- **目前已取得的基準**：PR #116～#130 的板／U 肋合成幾何、受限均布壓力、理想支承、無接觸與 C3D8 對照皆已完成各自 scope 的研究，勿重建；PR #131 仍 OPEN，最新確認的 head `08bed90df89bbe4da92a6a8d605f0b74028e5b00`，main 在本次 Hot 修訂前為 `7ea597fc94c9123318dde8e2d945df147d3e28d1`。SHA 僅供 continuity，實際執行與合併前必須 fresh-check。
-- **Hot A｜PR #131 板／U 肋實際 S8R 接觸反力（EVIDENCE GATED / CONTACT_NOT_ADMITTED）**：n=8／16 原壓合 S8R 全域 raw RF3 殘差約 −44.4374645／−17.8664376 N，既有 `OPEN_U_CONTACT_RF_GLOBAL_Z_IMBALANCE` 必須保留 fail-closed，不得提高容差或任意添加 CF／CFN 平衡。無接觸及已知 ±1 N 控制組可核對反力；六組 C3D8 實體對照原始 RF3 平衡在 0.002 N 內，但不等價於 S8R；`away` 仍有非零 CF，不能聲稱完全張開。PR head 的 C3D8 節點 ID／provenance 負向測試與真實 CI 已取得，Repository CI SUCCESS、CalculiX CI 依 S8R 物理門 FAILURE。**NEXT**：隔離兩網格 C3D8 明確初始間隙／無接觸控制，觀測接觸面積與 CF 及 RF；隨後針對 S8R expanded-node／MPC internal force ownership 建立獨立切面或版本確認的診斷 oracle，不以此推論單一根因；未取得 oracle 前 PR #131 不合併。
-- **可並行的 Hot P2｜ChatGPT 計算核心整合（研究版、不依賴 A 完成）**：先盤點 `scripts/engineering_calc/review.py` 已有的 AI-facing deterministic adapter 與 `tests/fea_benchmark/envelope_panels/` 研究入口，沿用 `COMPUTED／INCOMPLETE_INPUT／UNSUPPORTED_MODEL` 對 `DESIGN_ACCEPTANCE` 的分離規則。第一個最小交付應是可重播的受限輸入／輸出／繁體中文觀測摘要與來源證據路由；尚未 admission 的 FEA 不得註冊成通用可用 `check_type`，不得建立 Web UI／API／Vercel。若需要新模型輸入或合成結果外推，另行定義 independent oracle。
-- **依賴 A 的 Hot B｜板肋與離散植釘共同作用**：在 A 有可靠數值證據後，才將單向接觸與既有 @300 mm 中央單排「合成 Z 向彈簧」組合，分別比較無連接、柔連接、較硬連接及壓／吸兩向；核對同一荷載與支承條件、位移、接觸開閉、網格影響、力的獨立觀測／平衡與反例。未知實物植釘剛度、剪拉彎／焊接容量、接觸摩擦、折彎半徑、實際支承皆維持 **NOT_ADMITTED**；`k × Δu` 不得稱實際植釘設計需求。
-- **依賴 A/B 的完整工程比較輸出（後續）**：取得板肋接觸／離散連接的獨立傳力證據後，才擴張為任意板長寬／板厚、U 肋幾何、肋數與位置、連接站點、支承與受限面壓之參數化比較；每個新增自由度須有自己獨立幾何、荷載、網格、結果 validation。不可把固定 synthetic 結果轉用到實際案場、不得自動給出 ADM 容量或正式工程合格結論。
-- **工程使用門**：比較工具的合成研究 `NUMERIC_PASS` 與真實專案 `DESIGN_ACCEPTANCE` 分開；真實構造需另取得角碼、折邊、肋端支承、螺柱／焊接測試或合格製造商資料、材料 3003-H14／3004-H12／3004-O 適用證據、實際風壓／組合以及正式容量依據，才可另案 admission。不得用公開 synthetic 範例重建私人案場。
-- **驗證／交付節奏**：每個最小研究問題先定義可重現幾何、獨立 oracle、負向測試與適用邊界；本地 deterministic 能做先做，必要時再以隔離 GitHub candidate 與 exact-head CI 驗證，merge 前 fresh base / changed-file scope / mergeability，merge 後 read-back 與必要 post-merge CI。Current PR 及 run 不能用舊 success 補猜。
+- **已取得的研究基準（REUSE，非重新開工）**：隔離 Draft PR #135 已有 CalculiX 2.21 C3D20R 板／U 肋、無接觸的 @300 mm 合成離散 Z 向連接（50／500 N/mm）、三／四／五站點與內部位置敏感度、獨立肋端 RF3／全域 Z 平衡、n8／n16 研究對帳、繁中報表、試體資料適用性與抗拉破壞荷載統計候選計算，以及研究性力值對照。必須按 actual PR HEAD／CI fresh-read；不得以合成求解宣稱實際植釘需求、材料容量或完整收斂。PR #131 保留原 S8R fail-closed 接觸平衡阻礙，不作 #135 的無限前置等待。
+- **Hot 1｜先完成連接方向及作用反作用基準（READY／NEXT）**：在相同 C3D20R 板肋幾何、彈簧剛度、荷載量級與理想支承下，對正反向受限面外荷載與無連接／有限連接案例建立可重播試算；明確核對每站點 `k × (U_板 − U_肋)` 的符號、肋端獨立 RF3、板邊／全域 Z 平衡、對稱性及反例，分離「模型全域 Z 軸有號力」與「實際植釘拉／壓／剪需求」。無接觸且雙向線性 `SPRING2` 不具單向分離或接頭剪切／彎矩機制；不得以反號或正數絕對值直接稱實物抗拉力。**完成門**：n8／n16 各正反向、原始 solver evidence、符號／力平衡獨立 oracle、負向測試及 exact-head CI 均 PASS，結果仍僅 SYNTHETIC。
+- **Hot 2｜站點力、位移的網格敏感度（依賴 Hot 1）**：固定同一組站點位置、每點合成 K、幾何、合成面壓與支承，重用既有 n8／n16 證據，再選擇可驗證的較細網格／獨立解析控制；檢查各站點有號力、峰值力、肋端／全域平衡與中心撓度，預先設定比較準則並記錄非單調或不收斂。不能以原始 n8／n16 趨勢相同直接推定局部站點力已收斂，亦不可用接觸 CSTR 節點平均建立植釘荷載。**完成門**：固定物理座標、相同力學條件、至少一層新增適用網格或真正獨立 oracle、容差／失敗原因及 exact-head 真實 CCX 證據；不通過則保留研究級限制。
+- **Hot 3｜受限工程輸入與繁中比較輸出（依賴 Hot 1／2 的已驗證邊界，可先開發 schema／防呆）**：優先盤點既有 `scripts/engineering_calc/review.py` 與研究入口，建立明確型別、單位、來源的板長寬／厚、U 肋尺寸／位置、離散站點、合金／質別、受限支承、外加面壓及正／反方向輸入；缺風壓、支承、連接剛度或材料性質時回傳 INCOMPLETE／UNSUPPORTED，不猜測設計值、不接受未驗證的任意 deck。每增加一個幾何／荷載自由度需獨立模型映射、負向案例及網格／反力驗證。輸出現有可支持的撓度／力觀測、來源與適用範圍的唯讀繁中摘要，`NUMERIC_PASS` 與 `DESIGN_ACCEPTANCE` 分開；暫不對外宣稱通用工程 `check_type`、正式計算書或工程合格。
+- **Hot 4｜植釘抗拉強度候選與傳力對照（可與 Hot 3 的資料／報表工作並行；正式比較依賴 Hot 1／2）**：沿用已建立的獨立破壞荷載統計工具，以明示的「樣本平均 − 一個樣本標準差，再除以工程師選定安全係數」重現**候選**容許拉力，記錄破壞位置、試體／接合法、適用條件、來源與公式權威；不得當成已驗證標準特徵值。與合成 `k×ΔU` 只做研究性量級對照，方向、工程荷載、剛度與焊接容量尚未確立時禁止輸出設計使用率／PASS。第三方 SGS 或私人專案來源、逐支實測數值及可識別試體資料不得寫入公開 Repository；公開測試只用合成數據。**完成門**：統計重播、單位／負向測試、資料適用性與方向 gate、來源隔離及 exact-head CI；工程採用仍 NOT_ADMITTED。
+- **設計前置證據門（BLOCKED／不是立即可執行的數值任務）**：需要代表性實際鋁植釘—鋁板／U 肋接頭的荷載—滑移（含拉／壓、剪、夾具柔度與試體構造）與接合破壞證據，才能校準有效剛度及失效模式；還需對應材質／質別與厚度的設計性質、實際折板／焊植釘構造、肋端與角碼支承、專案提供的風壓及組合、合法適用的容量設計依據，才能另案建立工程 capacity admission。現有 SGS 破壞荷載只能支撐指定方法的候選強度計算，**不能推回 Z 向彈簧 K**。取得實物資料前只允許合成 K 的敏感度分析。
+- **S8R／PR #131（隔離研究／有界 STOP，不阻塞 C3D20R Hot 1–4）**：原 `OPEN_U_CONTACT_RF_GLOBAL_Z_IMBALANCE` 及 exact-head 非線性 FEA FAIL 必須保留；若另行執行 S8R 診斷，僅限收斂外部 SPC／MPC 反力的真正獨立 oracle 與受限 A/B，取得證據前停止擴張 DOF5／泛用 MPC 理論、不合併 #131、不降低門檻。#135 為 Draft／研究用途且以 #131 為 base 時，不能由 #135 局部 CI SUCCESS 推論兩者整體可合併。
+
+**驗證及交付**：每階段先定義最小同條件輸入、正反／無連接控制、獨立 oracle、明確容差與負向測試；先執行可行的本機 deterministic checks，再以 pinned 源碼／工件、受限 PR、exact-head 真實 CalculiX 及 GitHub CI read-back 驗收。未通過時保留 FAIL／NOT_RUN 與 blocker。公開 Repo 僅保存泛化研究方法，不收錄私人 PDF／實測來源。完整歷史、數值與 PR／run 證據仍以 canonical dossier、Issues、Git history 與真實 artifacts 為準；`ENGINEERING_ACCEPTANCE_NOT_ADMITTED` 不變。
 
 10/14 舊的泛用 MPC／RF「下一關」及下方歷史 Stage 描述僅保留作歷史 continuity，不構成此 Hot 主線的重複任務；current Hot 以本節為準。
 
