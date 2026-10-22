@@ -1,0 +1,67 @@
+name: C3D20R Hot4 signed tensile research integration (NOT DESIGN)
+on:
+  pull_request:
+    paths:
+      - .github/workflows/c3d20r-stud-hot4.yml
+      - tests/fea_benchmark/envelope_panels/stud_hot4_tensile_signed_report.py
+      - tests/fea_benchmark/envelope_panels/test_stud_hot4_tensile_signed_report.py
+permissions:
+  contents: read
+  actions: read
+jobs:
+  hot4:
+    if: github.event.pull_request.number == 135
+    runs-on: ubuntu-24.04
+    timeout-minutes: 14
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify Hot4 synthetic positive-negative and rejection tests
+        run: python -B -m unittest discover -s tests/fea_benchmark/envelope_panels -p test_stud_hot4_tensile_signed_report.py -v
+      - name: Download pinned Hot2 raw solver evidence
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/hot4"
+          gh api /repos/masini1491/building-envelope-engineering-kb/actions/artifacts/12401885093/zip > "$RUNNER_TEMP/hot4/solver.zip"
+          echo 'd35d73f6b9f0d5f94f45e53b1c81c607d9839c77c25ea54ba654e033993933a7  '"$RUNNER_TEMP/hot4/solver.zip" | sha256sum --check
+      - name: Real CLI signed solver replay with fictional tensile sample
+        run: |
+          set -euo pipefail
+          python -B - <<'PY'
+          import sys, json, os
+          from pathlib import Path
+          sys.path.insert(0,'tests/fea_benchmark/envelope_panels')
+          from test_stud_hot4_tensile_signed_report import strength
+          from stud_engineering_intake_report import fixture
+          p=Path(os.environ['RUNNER_TEMP'])/'hot4'
+          (p/'fictional-strength.json').write_text(json.dumps(strength()))
+          (p/'synthetic-model.json').write_text(json.dumps(fixture(mesh=24,case='soft',direction='positive')))
+          PY
+          python -B tests/fea_benchmark/envelope_panels/stud_hot4_tensile_signed_report.py "$RUNNER_TEMP/hot4/fictional-strength.json" "$RUNNER_TEMP/hot4/synthetic-model.json" --pinned-evidence-zip "$RUNNER_TEMP/hot4/solver.zip" > "$RUNNER_TEMP/hot4/research.json"
+          python -B - <<'PY'
+          import json,os
+          from pathlib import Path
+          p=Path(os.environ['RUNNER_TEMP'])/'hot4'
+          v=json.loads((p/'research.json').read_text())
+          assert v['calculation_status']=='COMPUTED_RESEARCH_ONLY'
+          assert v['solver_evidence_replayed'] is True
+          assert v['ratio_is_design_check'] is False
+          assert v['engineering_acceptance']=='NOT_ADMITTED'
+          assert len(v['directional_research_rows'])==2
+          assert v['real_stud_tension_compression_mapping']=='NOT_ESTABLISHED'
+          assert v['physical_stud_stiffness']=='NOT_ESTABLISHED'
+          assert 'NOT_ADMITTED' in v['report_zh_tw']
+          (p/'research-zh-TW.md').write_text(v['report_zh_tw'],encoding='utf8')
+          print('HOT4_RESEARCH_ONLY: PASS')
+          PY
+      - name: Publish synthetic-only summary
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: c3d20r-hot4-signed-tensile-synthetic-not-design
+          retention-days: 14
+          if-no-files-found: warn
+          path: |
+            ${{ runner.temp }}/hot4/research.json
+            ${{ runner.temp }}/hot4/research-zh-TW.md
