@@ -90,5 +90,44 @@ class TestHot4(unittest.TestCase):
         self.assertEqual(result["engineering_acceptance"],"NOT_ADMITTED")
         self.assertTrue(all(r["arithmetic_magnitude_ratio_NOT_UTILIZATION"]==0 for r in result["directional_research_rows"]))
 
+class TestSourceRelevance(unittest.TestCase):
+    def metadata(self):
+        return dict(
+            scope="ALUMINUM_PANEL_TO_U_RIB_STUD_CONNECTION",
+            source_class="LAB_TEST",source_sha256="a"*64,
+            interface=dict(panel_alloy_temper=None,rib_alloy_temper=None,
+                           panel_thickness_mm=None,rib_thickness_mm=None,
+                           stud_diameter_mm=None,joining_process=None),
+            direction="UNKNOWN",specimen_count=3,force_slip_pairs=[])
+    def test_matching_digest_not_physical_admission(self):
+        result=compare(fixture(),strength(),study(),self.metadata())
+        self.assertEqual(result["specimen_metadata_review"]["status"],"MISSING_INPUT")
+        self.assertEqual(result["specimen_metadata_review"]["source_coherence"],
+                         "SAME_DECLARED_SHA256_NOT_AUTHENTICATED")
+        self.assertEqual(result["specimen_metadata_review"]["interface_relevance"],"NOT_ESTABLISHED")
+        self.assertEqual(result["engineering_acceptance"],"NOT_ADMITTED")
+    def test_different_specimen_digest_rejected(self):
+        metadata=self.metadata()
+        metadata["source_sha256"]="b"*64
+        with self.assertRaisesRegex(ValueError,"SPECIMEN_SOURCE_DIGEST_MISMATCH"):
+            compare(fixture(),strength(),study(),metadata)
+    def test_no_evidence_conflicts_with_claimed_strength(self):
+        metadata=self.metadata()
+        metadata["source_class"]="NO_EVIDENCE"
+        metadata["source_sha256"]=None
+        with self.assertRaisesRegex(ValueError,"STRENGTH_WITH_NO_EVIDENCE"):
+            compare(fixture(),strength(),study(),metadata)
+    def test_private_test_rows_and_digest_not_reported(self):
+        result=compare(fixture(),strength(),study(),self.metadata())
+        self.assertNotIn("a"*64,result["report_zh_tw"])
+        self.assertNotIn("70,80,90",result["report_zh_tw"])
+        self.assertNotIn("source_sha256",result["report_zh_tw"])
+        self.assertFalse(result["ratio_is_design_check"])
+    def test_unlinked_zero_ratio_never_design_pass(self):
+        result=compare(fixture(case="unlinked"),strength(),study())
+        self.assertTrue(all(x["arithmetic_magnitude_ratio_NOT_UTILIZATION"]==0
+                            for x in result["directional_research_rows"]))
+        self.assertEqual(result["engineering_acceptance"],"NOT_ADMITTED")
+
 if __name__=="__main__":
     unittest.main()
