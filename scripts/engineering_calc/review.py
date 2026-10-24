@@ -16,6 +16,7 @@ from .section_required import required_inertia, required_section_modulus, utiliz
 from .connection import demand_capacity, projected_bearing_stress, shear_tension_demand, thread_engagement_ratio
 from .audit import audit_product, audit_force_balance
 from .glazing_condensation import CondensationInputError, screen_center_glass_condensation
+from .member_preliminary_screen import MemberScreenInputError, screen_preliminary_member_options
 from .wind_pressure import (
     WindPressureInputError,
     WindPressureUnsupportedError,
@@ -226,6 +227,77 @@ def _glazing_condensation(p, inp):
     return _final(p, "glazing_condensation", computed, flat)
 
 
+
+# This check_type is strictly unit-locked; ranges must already be converted.
+_MEMBER_UNITS = {
+    "span": "m", "tributary_width": "m", "elastic_modulus": "MPa",
+    "wind_pressure": "kPa", "inertia": "mm^4", "section_modulus": "mm^3",
+}
+_MEMBER_FIELDS = {
+    "member_role", "span_m_range", "span_source",
+    "tributary_width_m_range", "tributary_width_source",
+    "elastic_modulus_mpa_range", "elastic_modulus_source",
+    "wind_cases", "options", "deflection_limit_mm", "deflection_limit_source",
+}
+_MEMBER_WIND_FIELDS = {"name", "direction", "pressure_magnitude_kpa_range", "pressure_source"}
+_MEMBER_OPTION_FIELDS = {
+    "name", "support_model", "support_source", "section_property_source",
+    "inertia_mm4_range", "section_modulus_positive_mm3_range",
+    "section_modulus_negative_mm3_range",
+}
+
+
+def _member_preliminary(p, inp):
+    """Route caller-bounded idealized member demand through the canonical screen.
+
+    The adapter does not derive project loads, material values, code criteria,
+    member capacities or applicability. A computed response is NOT acceptance.
+    """
+    units = _map(p["units"], "units")
+    if set(units) != set(_MEMBER_UNITS):
+        raise IncompleteInputError("member_preliminary_screen requires exactly: " +
+                                   ", ".join(sorted(_MEMBER_UNITS)))
+    for key, expected in _MEMBER_UNITS.items():
+        if units[key] != expected:
+            raise IncompleteInputError(f"units.{key} must be {expected}")
+    unknown = set(inp) - _MEMBER_FIELDS
+    if unknown:
+        raise IncompleteInputError("unsupported member input fields: " + ", ".join(sorted(map(str, unknown))))
+    for name, allowed in (("wind_cases", _MEMBER_WIND_FIELDS),
+                          ("options", _MEMBER_OPTION_FIELDS)):
+        items = inp.get(name)
+        if not isinstance(items, list) or not items:
+            raise IncompleteInputError(f"inputs.{name} must be a nonempty array")
+        for index, raw in enumerate(items):
+            item = _map(raw, f"inputs.{name}[{index}]")
+            excess = set(item) - allowed
+            if excess:
+                raise IncompleteInputError(f"inputs.{name}[{index}] has unsupported fields")
+    if inp.get("member_role") not in ("mullion", "transom"):
+        raise UnsupportedModelError("member_role supports only mullion / transom")
+    for raw in inp["options"]:
+        if raw.get("support_model") not in ("simply_supported", "cantilever"):
+            raise UnsupportedModelError("only ideal simply_supported / cantilever models are admitted")
+    for raw in inp["wind_cases"]:
+        if raw.get("direction") not in ("positive", "negative"):
+            raise IncompleteInputError("wind_cases.direction must be positive or negative")
+    try:
+        result = screen_preliminary_member_options(**inp)
+    except MemberScreenInputError as exc:
+        raise IncompleteInputError(str(exc)) from exc
+    computed = asdict(result)
+    flat = {}
+    for i, option in enumerate(result.options):
+        for j, case in enumerate(option.cases):
+            for attr in ("line_load_n_per_mm", "max_shear_n", "max_moment_n_mm",
+                         "max_deflection_mm", "extreme_fiber_stress_mpa"):
+                bounds = getattr(case, attr)
+                flat[f"options.{i}.cases.{j}.{attr}.minimum"] = bounds.minimum
+                flat[f"options.{i}.cases.{j}.{attr}.maximum"] = bounds.maximum
+    return _final(p, "member_preliminary_screen", computed, flat)
+
+
+
 def _simple(p,inp,check):
     if check=="required_inertia": computed={"required_inertia":required_inertia(_num(inp,"i_trial"),_num(inp,"delta_trial"),_num(inp,"delta_allow"))}
     elif check=="required_section_modulus": computed={"required_section_modulus":required_section_modulus(_num(inp,"moment_max"),_num(inp,"allowable_stress"))}
@@ -253,6 +325,7 @@ def run_review(payload):
         if check=="beam": return _beam(p,inp)
         if check=="wind_pressure": return _wind_pressure(p,inp)
         if check=="glazing_condensation": return _glazing_condensation(p,inp)
+        if check=="member_preliminary_screen": return _member_preliminary(p,inp)
         return _simple(p,inp,check)
     except UnsupportedModelError as e: status="UNSUPPORTED_MODEL"; flag=f"UNSUPPORTED_MODEL:{e}"
     except (IncompleteInputError,TypeError,ValueError) as e: status="INCOMPLETE_INPUT"; flag=f"INCOMPLETE_INPUT:{e}"
