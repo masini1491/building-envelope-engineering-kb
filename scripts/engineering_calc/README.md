@@ -34,7 +34,7 @@ python -m scripts.engineering_calc.review input.json
 
 最外層固定使用 `check_type / units / inputs / reported_results / tolerance`。`units` 必填且不得猜測；`reported_results` 可省略；`tolerance` 只代表 numerical agreement，不是 engineering acceptance criterion。
 
-目前 adapter 支援：`glazing_condensation`、`beam`、`required_inertia`、`required_section_modulus`、`section_property_utilization`、`fastener_group`、`demand_capacity`、`projected_bearing_stress`、`shear_tension_demand`、`thread_engagement`、`audit_product`、`audit_force_balance`、`wind_pressure`、`member_preliminary_screen`。`thermal_bridge_2d.py` 在目前 Stage **尚未接入 `review.py`**；若需要直接使用，屬明確的 lower-level `ADAPTER_FALLBACK`，不得描述成已支援的 AI-facing `check_type`。
+目前 adapter 支援：`glazing_condensation`、`beam`、`required_inertia`、`required_section_modulus`、`section_property_utilization`、`fastener_group`、`demand_capacity`、`projected_bearing_stress`、`shear_tension_demand`、`thread_engagement`、`audit_product`、`audit_force_balance`、`wind_pressure`、`member_preliminary_screen`、`member_multispan_screen`。`thermal_bridge_2d.py` 在目前 Stage **尚未接入 `review.py`**；若需要直接使用，屬明確的 lower-level `ADAPTER_FALLBACK`，不得描述成已支援的 AI-facing `check_type`。
 
 ### 輸出契約
 
@@ -89,6 +89,20 @@ python -m scripts.engineering_calc.review input.json
   }
 }
 ```
+
+### 連續多跨鋁構件初篩（`member_multispan_screen`）
+
+此 adapter check_type 只支援 2–6 跨連續 Euler-Bernoulli 梁、所有支承點垂直位移固定、內部節點彎曲轉角連續的理想化模型。兩種合法 `support_model`：`continuous_pinned_supports`（兩端無轉角約束）、`continuous_fixed_ends`（兩端轉角固定）。不支援接頭轉動釋放、半剛性連接、支承沉陷、側移、扭轉、剪力變形及其他未評估的失效模式；**不能從支承名稱自行推論實際節點連續性**。
+
+`units` 須精確包含 `span=m`、`tributary_width=m`、`elastic_modulus=MPa`、`wind_pressure=kPa`、`inertia=mm^4`、`section_modulus=mm^3`。
+
+`inputs` 包含 `member_role`（`mullion` 或 `transom`）、`span_lengths_m`、`span_source`、`tributary_widths_m`、`tributary_width_source`、`wind_cases`、`options`；可選 `deflection_limit_mm` 與 `deflection_limit_source`。每個 `wind_cases` 都要提供 `name`、`signed_pressure_kpa_by_span`、`pressure_source`；正負風壓採 signed kPa。每個 `options` 要提供 `name`、`support_model`、`support_source`、`continuity_source`、`material_source`、`section_property_source`、`elastic_modulus_mpa`，及逐跨 `inertia_mm4_by_span`、`section_modulus_positive_mm3_by_span`、`section_modulus_negative_mm3_by_span`。
+
+每跨荷載均為該跨常數分佈，且都必須具有相同數量的跨距／截面資料。結果含逐跨 extrema、支承反力與彎矩正負分量；正負截面模數由**局部 signed bending moment**選擇，不是直接以風壓方向挑選。輸入中約定的正負彎矩纖維需與截面資料提供者確認。
+
+`reported_results` 可指定 `options.<i>.cases.<j>.maximum_absolute_moment_n_mm`、`maximum_absolute_shear_n`、`maximum_absolute_deflection_mm`、`maximum_absolute_bending_stress_mpa`、`positive_moment_max_n_mm`、`negative_moment_magnitude_max_n_mm` 或 `reactions_n.<k>`；索引從 0 起，僅比較數學數值。
+
+**此版是離散情境比較**：僅對明確指定的荷載組合與選項求解，不會自動搜尋荷載組合上／下界；`scenario_interpretation=EXPLICIT_DISCRETE_CASES_NOT_UNCERTAINTY_BOUNDS`、`engineering_acceptance=NOT_ADMITTED`，不可解讀為完整統計區間、ADM 容量或技師簽證結論。
 
 ### 風壓（`wind_pressure`）輸入契約
 
