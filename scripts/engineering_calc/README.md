@@ -34,7 +34,7 @@ python -m scripts.engineering_calc.review input.json
 
 最外層固定使用 `check_type / units / inputs / reported_results / tolerance`。`units` 必填且不得猜測；`reported_results` 可省略；`tolerance` 只代表 numerical agreement，不是 engineering acceptance criterion。
 
-目前 adapter 支援：`glazing_condensation`、`beam`、`required_inertia`、`required_section_modulus`、`section_property_utilization`、`fastener_group`、`demand_capacity`、`projected_bearing_stress`、`shear_tension_demand`、`thread_engagement`、`audit_product`、`audit_force_balance`、`wind_pressure`。`thermal_bridge_2d.py` 在目前 Stage **尚未接入 `review.py`**；若需要直接使用，屬明確的 lower-level `ADAPTER_FALLBACK`，不得描述成已支援的 AI-facing `check_type`。
+目前 adapter 支援：`glazing_condensation`、`beam`、`required_inertia`、`required_section_modulus`、`section_property_utilization`、`fastener_group`、`demand_capacity`、`projected_bearing_stress`、`shear_tension_demand`、`thread_engagement`、`audit_product`、`audit_force_balance`、`wind_pressure`、`member_preliminary_screen`。`thermal_bridge_2d.py` 在目前 Stage **尚未接入 `review.py`**；若需要直接使用，屬明確的 lower-level `ADAPTER_FALLBACK`，不得描述成已支援的 AI-facing `check_type`。
 
 ### 輸出契約
 
@@ -44,6 +44,51 @@ python -m scripts.engineering_calc.review input.json
 - `comparison_status`：`MATCH / MISMATCH / NOT_PROVIDED / INCOMPLETE`。
 
 這些 status 只描述**計算執行／數值比對**；不得改寫成整體工程 `PASS`。例如 visible factors 重算得到 `MISMATCH` 時，先記錄為 calculation-chain discrepancy，再查單位、遺漏係數、不同 load source、hidden multiplier 或 transcription error；在 root cause 未確認前，不得僅因 arithmetic mismatch 宣稱整體工程 `FAIL`。
+
+### 鋁直料／橫料初篩（`member_preliminary_screen`）
+
+此入口只做設計階段的**需求與方案比較**，不推導 ADM 容量，也不宣稱結構安全。支援單跨全跨均布橫向荷載，理想簡支（`simply_supported`）與理想懸臂（`cantilever`）；不支援多跨、半剛性、接頭、扭轉、挫屈與組合作用。
+
+`units` 必須**恰好**包含：`span=m`、`tributary_width=m`、`elastic_modulus=MPa`、`wind_pressure=kPa`、`inertia=mm^4`、`section_modulus=mm^3`。輸出使用 `N/mm`、`N`、`N*mm`、`mm`、`MPa`。工具不自動換算不明單位；每個來源與每個區間都須由使用者提供。
+
+`inputs` 必須有 `member_role`（`mullion`／`transom`）、`span_m_range`、`span_source`、`tributary_width_m_range`、`tributary_width_source`、`elastic_modulus_mpa_range`、`elastic_modulus_source`、非空 `wind_cases` 與 `options`。可選 `deflection_limit_mm` 與 `deflection_limit_source`（兩者須同時提供）。
+
+每個 `wind_cases` 需 `name`、`direction`（`positive`／`negative`）、`pressure_magnitude_kpa_range`、`pressure_source`；每個 `options` 需 `name`、`support_model`、`support_source`、`section_property_source`、`inertia_mm4_range`、`section_modulus_positive_mm3_range`、`section_modulus_negative_mm3_range`。範圍一律 `[minimum, maximum]`；壓力使用非負量值，由 `direction` 決定採用哪個截面模數。截面模數正負方向須由使用者確認符合實際截面與彎矩纖維定義。
+
+可選 `reported_results` 以 `options.<i>.cases.<j>.<quantity>.minimum`／`.maximum` 指定比對值；`quantity` 為 `line_load_n_per_mm`、`max_shear_n`、`max_moment_n_mm`、`max_deflection_mm` 或 `extreme_fiber_stress_mpa`。索引依輸入順序由零起算。非數值或不支援的 reported key 不被轉為工程 PASS。
+
+所有區間均為使用者提供上下界的獨立端點包絡，**不是機率信賴區間**。計算結果的 `acceptance_status=NOT_ADMITTED`，且 `unevaluated_modes` 持續標示 ADM 強度、挫屈、連接與其他未評估模式。比較限值只反映輸入數值條件，不能視為正式撓度規範判定。
+
+範例輸入（全部數值僅為合成測試，不代表任何專案或材料核准值）：
+
+```json
+{
+  "check_type": "member_preliminary_screen",
+  "units": {
+    "span": "m", "tributary_width": "m", "elastic_modulus": "MPa",
+    "wind_pressure": "kPa", "inertia": "mm^4", "section_modulus": "mm^3"
+  },
+  "inputs": {
+    "member_role": "mullion",
+    "span_m_range": [2, 2], "span_source": "example",
+    "tributary_width_m_range": [1, 1], "tributary_width_source": "example",
+    "elastic_modulus_mpa_range": [70000, 70000], "elastic_modulus_source": "example",
+    "wind_cases": [
+      {"name": "push", "direction": "positive",
+       "pressure_magnitude_kpa_range": [1, 1], "pressure_source": "example"}
+    ],
+    "options": [
+      {
+        "name": "A", "support_model": "simply_supported",
+        "support_source": "ideal assumption", "section_property_source": "example",
+        "inertia_mm4_range": [1000000, 1000000],
+        "section_modulus_positive_mm3_range": [10000, 10000],
+        "section_modulus_negative_mm3_range": [20000, 20000]
+      }
+    ]
+  }
+}
+```
 
 ### 風壓（`wind_pressure`）輸入契約
 
