@@ -17,6 +17,7 @@ from .connection import demand_capacity, projected_bearing_stress, shear_tension
 from .audit import audit_product, audit_force_balance
 from .glazing_condensation import CondensationInputError, screen_center_glass_condensation
 from .member_preliminary_screen import MemberScreenInputError, screen_preliminary_member_options
+from .member_multispan_screen import MultispanInputError, screen_multispan_options
 from .wind_pressure import (
     WindPressureInputError,
     WindPressureUnsupportedError,
@@ -298,6 +299,48 @@ def _member_preliminary(p, inp):
 
 
 
+
+_MULTISPAN_UNITS = {
+    "span": "m", "tributary_width": "m", "elastic_modulus": "MPa",
+    "wind_pressure": "kPa", "inertia": "mm^4", "section_modulus": "mm^3",
+}
+_MULTISPAN_FIELDS = {
+    "member_role", "span_lengths_m", "span_source", "tributary_widths_m",
+    "tributary_width_source", "wind_cases", "options",
+    "deflection_limit_mm", "deflection_limit_source",
+}
+
+
+def _member_multispan(p, inp):
+    units = _map(p["units"], "units")
+    if units != _MULTISPAN_UNITS:
+        raise IncompleteInputError("member_multispan_screen requires exact units: " + str(_MULTISPAN_UNITS))
+    if set(inp) - _MULTISPAN_FIELDS:
+        raise IncompleteInputError("unsupported member_multispan_screen fields")
+    options = inp.get("options")
+    if not isinstance(options, list) or not options:
+        raise IncompleteInputError("inputs.options must be a nonempty array")
+    for option in options:
+        opt = _map(option, "option")
+        if opt.get("support_model") not in ("continuous_pinned_supports", "continuous_fixed_ends"):
+            raise UnsupportedModelError("unsupported multi-span support model / incomplete support condition")
+    try:
+        result = screen_multispan_options(**inp)
+    except MultispanInputError as exc:
+        raise IncompleteInputError(str(exc)) from exc
+    computed = asdict(result)
+    flat = {}
+    for i, option in enumerate(result.options):
+        for j, case in enumerate(option.cases):
+            for key in ("maximum_absolute_shear_n", "maximum_absolute_moment_n_mm",
+                        "maximum_absolute_deflection_mm", "maximum_absolute_bending_stress_mpa",
+                        "positive_moment_max_n_mm", "negative_moment_magnitude_max_n_mm"):
+                flat[f"options.{i}.cases.{j}.{key}"] = getattr(case, key)
+            for k, reaction in enumerate(case.reactions_n):
+                flat[f"options.{i}.cases.{j}.reactions_n.{k}"] = reaction
+    return _final(p, "member_multispan_screen", computed, flat)
+
+
 def _simple(p,inp,check):
     if check=="required_inertia": computed={"required_inertia":required_inertia(_num(inp,"i_trial"),_num(inp,"delta_trial"),_num(inp,"delta_allow"))}
     elif check=="required_section_modulus": computed={"required_section_modulus":required_section_modulus(_num(inp,"moment_max"),_num(inp,"allowable_stress"))}
@@ -326,6 +369,7 @@ def run_review(payload):
         if check=="wind_pressure": return _wind_pressure(p,inp)
         if check=="glazing_condensation": return _glazing_condensation(p,inp)
         if check=="member_preliminary_screen": return _member_preliminary(p,inp)
+        if check=="member_multispan_screen": return _member_multispan(p,inp)
         return _simple(p,inp,check)
     except UnsupportedModelError as e: status="UNSUPPORTED_MODEL"; flag=f"UNSUPPORTED_MODEL:{e}"
     except (IncompleteInputError,TypeError,ValueError) as e: status="INCOMPLETE_INPUT"; flag=f"INCOMPLETE_INPUT:{e}"
